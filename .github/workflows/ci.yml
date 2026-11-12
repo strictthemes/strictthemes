@@ -1,0 +1,149 @@
+# Builds and tests the monorepo on every pull request and on master, then
+# copies the built site to the server from master.
+#
+# The deploy job needs five secrets in the repository's "production"
+# environment (Settings > Environments). Until all five exist it does nothing:
+#
+#   SSH_PRIVATE_KEY   The private key of the deploy user.
+#   SSH_KNOWN_HOSTS   The server's host keys, as printed by ssh-keyscan.
+#   DEPLOY_HOST       The server's address.
+#   DEPLOY_USER       The user to log in as.
+#   DEPLOY_PATH       The folder to copy into. It must end in /static/.
+#
+# Run by hand (Actions > CI > Run workflow) it lists what a deploy would
+# change and changes nothing, unless "dry run" is switched off.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: List what the deploy would change, and change nothing
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # A newer push to a pull request replaces the run before it. A run on master is never cut short.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm run typecheck
+      # The site's tests build the site again, with the production address.
+      - run: npm test
+      # Strict Check on the site itself, against its own theme: the code, and
+      # five built pages in the runner's Chrome.
+      - name: Strict Check on the site
+        run: npm run strict-check -w apps/site -- --report "$GITHUB_WORKSPACE/strict-check.txt"
+      - name: Show the report on the run's page
+        if: always()
+        run: |
+          test -f strict-check.txt || exit 0
+          {
+            echo '```'
+            cat strict-check.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Stamp the build
+        run: echo "${GITHUB_SHA::8} $GITHUB_REF_NAME $(date -u '+%F %T UTC')" > apps/site/dist/deploy.txt
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: apps/site/dist/
+          # The site has a .htaccess file. Without it the deploy would delete the one on the server.
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: strict-check
+          path: strict-check.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+  deploy:
+    needs: build
+    # From master only: after a push, or when run by hand.
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: production
+      cancel-in-progress: false
+    env:
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+      # A push deploys. A run by hand only lists the changes, unless its switch is off.
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+    steps:
+      - name: See whether the deploy is set up
+        id: setup
+        run: |
+          if [ -n "$SSH_PRIVATE_KEY" ] && [ -n "$SSH_KNOWN_HOSTS" ] && [ -n "$DEPLOY_HOST" ] && [ -n "$DEPLOY_USER" ] && [ -n "$DEPLOY_PATH" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "The deploy is not set up: one or more of the five secrets is missing. Nothing was copied." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/download-artifact@v8
+        if: steps.setup.outputs.ready == 'true'
+        with:
+          name: site
+          path: site
+      - name: Set up SSH
+        if: steps.setup.outputs.ready == 'true'
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          # A key pasted into a form can arrive with Windows line ends and without
+          # a final line end. OpenSSH refuses both, so clean the copy.
+          printf '%s\n' "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+      - name: Copy the site to the server
+        if: steps.setup.outputs.ready == 'true'
+        run: |
+          # --delete removes files on the server that are not in the build, so the
+          # target must be the site's own folder, and the build must be whole.
+          case "$DEPLOY_PATH" in */static/) ;; *) echo "DEPLOY_PATH must end in /static/"; exit 1 ;; esac
+          test -f site/index.html
+          test -f site/.htaccess
+          test -f site/deploy.txt
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run: listing what would change. Nothing is copied or deleted."
+            set -- --dry-run --itemize-changes
+          else
+            set --
+          fi
+          # --checksum compares what is in the files, not their dates, so only
+          # files that really differ are sent, and a dry run lists only those.
+          rsync -rlz --checksum --delete --chmod=D755,F644 \
+            --filter='P .well-known/' \
+            -e "ssh -i $HOME/.ssh/deploy_key -o IdentitiesOnly=yes" \
+            "$@" \
+            site/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run finished: the server was not changed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Deployed $(cat site/deploy.txt)" >> "$GITHUB_STEP_SUMMARY"
+          fi
