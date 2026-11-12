@@ -3,6 +3,9 @@
 // 16px and 32px. The header draws it from here, and scripts/build-brand.ts
 // makes the favicon, the app icons and the share image from the same path.
 
+/** Where the project's code lives. */
+export const REPO_URL = "https://github.com/strictthemes/strictthemes"
+
 /** The two rails, on a 32 by 32 square. */
 export const MARK_PATH = "M8 6h16v4H12v4h3v4H8zM24 26H8v-4h12v-4h-3v-4h7z"
 

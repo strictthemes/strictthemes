@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro"
+import { REPO_URL } from "@/lib/brand"
 import { SITE_URL, themes } from "@/lib/themes"
 
 // A plain-text map of the site for coding agents.
@@ -36,6 +37,10 @@ export const GET: APIRoute = () => {
     "## Docs",
     "",
     `- [The Strict spec format](${SITE_URL}/spec): DESIGN.md plus the \`strict\` block, lint rules and exports.`,
+    "",
+    "## Source",
+    "",
+    `- [strictthemes/strictthemes on GitHub](${REPO_URL}): the spec parser, the themes, Strict Check and this site, under the MIT licence.`,
     "",
   ]
   return new Response(lines.join("\n"), {

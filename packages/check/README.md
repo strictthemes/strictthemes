@@ -253,11 +253,11 @@ jobs:
   (`npm install --save-dev @strictthemes/check`) and call `npx strict-check`,
   and the lock file decides the version.
 - **Time.** On this repo's site the check itself takes about 12 seconds for
-  five pages. Installing Chromium in the GitLab job takes about a minute.
+  five pages. Installing Chromium in a GitLab job takes about a minute.
 
-This repo runs the check on its own site in its GitLab pipeline: see
+This repo runs the check on its own site in GitHub Actions: see
 `strict-check` in `apps/site/package.json` and the `build` job in
-`.gitlab-ci.yml`.
+`.github/workflows/ci.yml`.
 
 ## For coding agents
 
@@ -347,15 +347,20 @@ browser involved.
   dark mode, and the Recital and Avion pages do not pass against their own
   themes: they use those themes' colors and fonts on the site's Strict One
   layout.
-- **In CI (2026-11-12).** The site's check runs in this repo's GitLab
-  pipeline on every merge request and on `master`: the source, without the
-  sixty-five example projects (`--exclude examples`), and the home, themes,
-  spec, Strict One and 404 pages in light mode. It passes at 100% of 15,202
-  measured values, with no errors and no warnings. The same steps were first
-  run by hand in a clean `node:24` container, with Chromium from Debian's
-  packages, and measured the same 15,202 values as Chrome on macOS.
-- The GitHub Actions example has not been run on GitHub yet. Its steps are
-  the GitLab ones, with the runner's own Chrome.
+- **In CI (2026-11-12).** The site's check runs in this repo's GitHub
+  Actions workflow on every pull request and on `master`: the source, without
+  the sixty-five example projects (`--exclude examples`), and the home,
+  themes, spec, Strict One and 404 pages in light mode. It passes at 100% of
+  15,202 measured values, with no errors and no warnings, on an
+  `ubuntu-latest` runner with the runner's own Chrome.
+- Before the repo moved to GitHub the same check ran in a GitLab pipeline, in
+  a `node:24` image with Chromium from Debian's packages, and measured the
+  same 15,202 values, as did Chrome on macOS.
+- The two examples above differ from this repo's own jobs in one thing: they
+  fetch the package with `npx`, and this repo runs its own build of it. The
+  GitLab example was run as written, in a clean `node:24` container, on a
+  failing and on a passing project. The GitHub example has not been run as
+  written.
 - Everything else was run on macOS with Chrome, on Vite + React and Astro
   projects. Other frameworks and Windows are untried.
 - **The skill, by a fresh agent:** one agent followed the skill with the

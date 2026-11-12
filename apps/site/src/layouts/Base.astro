@@ -1,6 +1,7 @@
 ---
 import "@/styles/global.css"
 import Logo from "@/components/Logo.astro"
+import { REPO_URL } from "@/lib/brand"
 import { SITE_URL, themeScopeCss } from "@/lib/themes"
 
 interface Props {
@@ -94,6 +95,7 @@ const current = Astro.url.pathname
           <li><a class="hover:text-foreground" href="/spec">The spec format</a></li>
           <li><a class="hover:text-foreground" href="/r/registry.json">Registry index</a></li>
           <li><a class="hover:text-foreground" href="/llms.txt">llms.txt</a></li>
+          <li><a class="hover:text-foreground" href={REPO_URL}>Source on GitHub</a></li>
         </ul>
       </div>
     </footer>

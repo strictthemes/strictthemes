@@ -21,7 +21,8 @@ coding agent run Strict Check on its own work.
 
 Strict Check also runs as a CI job: the
 [check's README](packages/check/README.md#in-ci) has a GitLab CI and a GitHub
-Actions example, and this repo's own pipeline checks the site with it.
+Actions example, and this repo's own
+[workflow](.github/workflows/ci.yml) checks the site with it.
 
 Planned: the DESIGN.md generator, theme components and skills, and the agent
 UI kit.

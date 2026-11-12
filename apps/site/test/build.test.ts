@@ -184,6 +184,14 @@ test("the home and themes pages show a card for every theme, in its own skin", (
   }
 })
 
+test("every page and llms.txt point to the project's code", () => {
+  const repo = "https://github.com/strictthemes/strictthemes"
+  for (const page of ["index.html", "themes/kiln/index.html", "spec/index.html", "404.html"]) {
+    assert.ok(read(page).includes(`<a class="hover:text-foreground" href="${repo}">Source on GitHub</a>`), page)
+  }
+  assert.ok(read("llms.txt").includes(`(${repo})`))
+})
+
 test("llms.txt lists every theme", () => {
   const text = read("llms.txt")
   for (const theme of THEMES) {

@@ -14,7 +14,7 @@ and [`@strictthemes/spec`](../../packages/spec).
 | `/themes/<slug>/prompts/<page>/build/` | That built page on its own |
 | `/r/<name>.json` | The shadcn registry: theme items, font items and `registry.json` |
 | `/spec` | The spec format, rendered from `packages/spec/SPEC.md` |
-| `/llms.txt` | A plain-text map of the site for coding agents |
+| `/llms.txt` | A plain-text map of the site for coding agents, with a link to this repo |
 | `/sitemap.xml`, `/robots.txt` | The map for search engines, and the file that points them to it |
 
 ## Develop
@@ -129,8 +129,9 @@ npm run strict-check
 Build the repo first (`npm run build` at the root): the script runs the check
 from `packages/check/dist` on the source and on five built pages (home,
 themes, spec, the Strict One page and the 404 page), in light mode, at 1280px
-and 375px. The pipeline runs it on every merge request and on `master`, after
-the tests, and keeps the report as `strict-check.txt`.
+and 375px. The workflow runs it on every pull request and on `master`, after
+the tests, shows the report on the run's page and keeps it as
+`strict-check.txt`.
 
 What is left out, and why:
 
@@ -197,17 +198,25 @@ STRICT_SITE_URL=https://staging.example.com STRICT_NOINDEX=1 npm run build
 
 ## Production deploy
 
-`.gitlab-ci.yml` in the repo root builds and tests the whole monorepo, then
-copies `apps/site/dist/` to the server with rsync over SSH.
+[.github/workflows/ci.yml](../../.github/workflows/ci.yml) builds and tests
+the whole monorepo on GitHub Actions, then copies `apps/site/dist/` to the
+server with rsync over SSH.
 
-- **build** runs on merge requests and on `master`, in `node:24`: `npm ci`,
-  `npm run build`, `npm run typecheck`, `npm test`, then Strict Check on the
-  site. It writes `deploy.txt` (commit, branch, time) into the built site and
-  keeps the site as an artifact.
-- **deploy** runs on `master` only, and only when the variables
-  `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`, `DEPLOY_HOST`, `DEPLOY_USER` and
-  `DEPLOY_PATH` exist in the project's CI/CD settings. It copies the site with
-  `--delete`, and refuses a `DEPLOY_PATH` that does not end in `/static/`.
+- **build** runs on pull requests and on `master`: `npm ci`, `npm run build`,
+  `npm run typecheck`, `npm test`, then Strict Check on the site. It writes
+  `deploy.txt` (commit, branch, time) into the built site and keeps the site
+  as an artifact, hidden files included, because the site has a `.htaccess`.
+- **deploy** runs on `master` only, in the `production` environment, and only
+  when that environment has the secrets `SSH_PRIVATE_KEY`, `SSH_KNOWN_HOSTS`,
+  `DEPLOY_HOST`, `DEPLOY_USER` and `DEPLOY_PATH`. It copies the site with
+  `--delete`, and refuses a `DEPLOY_PATH` that does not end in `/static/` and
+  a build without `index.html`, `.htaccess` or `deploy.txt`. It compares what
+  is in the files (`--checksum`), so only files that differ are sent.
+- Run by hand (Actions > CI > Run workflow) it is a dry run: it lists what a
+  deploy would change and changes nothing, unless the switch is turned off.
+
+A pull request from a fork gets no secrets, and its run never reaches the
+deploy job.
 
 strictthemes.com has served this site since 2026-11-11.
 
@@ -219,6 +228,9 @@ Apache shows its default error page, sends `.md` with no type and `.ts` as
 video.
 
 What was tried: `deploy.txt` on the domain shows the commit of each deploy.
+On 2026-11-12, the day the deploy moved here from a GitLab pipeline, a dry
+run from GitHub listed one file to change, `deploy.txt` itself, and the first
+deploy left every page as it was.
 The `.htaccess` file was tried against the built site in a local `httpd:2.4`
 container, and after its deploy the domain showed the site's own 404 page and
 sent `DESIGN.md` and `app.config.ts` as text.
