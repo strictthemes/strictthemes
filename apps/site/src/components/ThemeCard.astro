@@ -1,0 +1,67 @@
+---
+// strict-ignore-file: a card wears the theme it shows, not the site's own, so
+// its sizes and corners are that theme's.
+import type { ThemeView } from "@/lib/themes"
+
+interface Props {
+  theme: ThemeView
+  /** The heading level of the theme's name, to fit the page's outline. */
+  level?: "h2" | "h3"
+}
+
+const { theme, level: Heading = "h3" } = Astro.props
+const { spec } = theme
+
+const family = (token: string) => String(spec.typography[token]?.fontFamily ?? "")
+const fonts = [...new Set([family("display"), family("body"), family("label")])].filter(Boolean)
+
+const swatches = ["background", "surface", "primary", "secondary", "tertiary", "foreground"]
+  .filter((name) => spec.colors[name])
+  .map((name) => ({ name, value: spec.colors[name] }))
+
+const { fontWeight, letterSpacing, lineHeight } = theme.headingStyle
+const titleStyle = `font-weight:${fontWeight};letter-spacing:${letterSpacing};line-height:${lineHeight}`
+---
+
+{/* A small specimen in the theme's own colors, fonts and corners. The card
+    wears another theme than the site, so Strict Check leaves it out. */}
+<a
+  href={`/themes/${theme.slug}`}
+  data-theme={theme.slug}
+  data-strict-ignore
+  class="group flex h-full flex-col gap-4 rounded-xl border border-border bg-background p-4 font-sans text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring md:p-8"
+>
+  <p class="flex items-baseline justify-between gap-4 font-mono text-xs text-muted-foreground">
+    <span>{theme.number}</span>
+    <span class="text-right">{fonts.join(" · ")}</span>
+  </p>
+  <Heading class="text-4xl wrap-break-word group-hover:underline" style={titleStyle}>
+    {theme.name}
+  </Heading>
+  <p class="text-sm text-muted-foreground">{theme.description}</p>
+  <p class="mt-auto flex flex-wrap items-center gap-2 pt-4 font-mono text-xs">
+    <span class="rounded-lg bg-primary px-4 py-2 text-primary-foreground">Primary</span>
+    <span class="rounded-lg bg-secondary px-4 py-2 text-secondary-foreground">Secondary</span>
+    {
+      spec.colors.tertiary && (
+        <span
+          class="rounded-sm px-2 py-1"
+          style="background:var(--tertiary);color:var(--tertiary-foreground)"
+        >
+          Badge
+        </span>
+      )
+    }
+  </p>
+  <ul class="flex h-8 overflow-hidden rounded-md border border-border" aria-label={`${theme.name} colors`}>
+    {
+      swatches.map((swatch) => (
+        <li class="flex-1" style={`background:${swatch.value}`}>
+          <span class="sr-only">
+            {swatch.name} {swatch.value}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</a>

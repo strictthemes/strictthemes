@@ -1,0 +1,15 @@
+---
+import Layout from "@/layouts/Base.astro"
+---
+
+<Layout title="Page not found | Strict" description="This page does not exist.">
+  <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+    <p class="label text-muted-foreground md:col-span-12">Error 404</p>
+    <h1 class="text-h1 md:col-span-8 md:text-display">This page does not exist.</h1>
+    <p class="md:col-span-6">
+      The address may be mistyped, or the page may have moved.{" "}
+      <a href="/themes" class="text-primary underline underline-offset-4">Browse the themes</a>{" "}
+      or go to the <a href="/" class="text-primary underline underline-offset-4">home page</a>.
+    </p>
+  </div>
+</Layout>

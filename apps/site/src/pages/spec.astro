@@ -1,0 +1,26 @@
+---
+import { marked } from "marked"
+import source from "../../../../packages/spec/SPEC.md?raw"
+
+import Layout from "@/layouts/Base.astro"
+
+// The page is the package's own SPEC.md, so the site never drifts from it.
+const [heading = "", ...rest] = source.split("\n")
+const title = heading.replace(/^#\s*/, "")
+const html = marked.parse(rest.join("\n"), { async: false })
+---
+
+<Layout
+  title={`${title} | Strict`}
+  description="The Strict spec format: a DESIGN.md file plus a strict block of rules, its lint rules, and its exports for shadcn, Tailwind, Nuxt UI and design tokens."
+>
+  <section class="border-b border-border">
+    <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label text-muted-foreground md:col-span-12">Spec</p>
+      <h1 class="text-h1 md:col-span-10 md:text-display">{title}</h1>
+    </div>
+  </section>
+  <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+    <article class="prose min-w-0 md:col-span-8 md:col-start-4" set:html={html} />
+  </div>
+</Layout>

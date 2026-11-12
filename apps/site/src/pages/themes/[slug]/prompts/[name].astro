@@ -1,0 +1,220 @@
+---
+// The preview page of one page prompt: the page an agent built from it, in a
+// frame, with switches for the screen width and the color mode.
+import type { GetStaticPaths } from "astro"
+import type { PagePrompt } from "@strictthemes/themes"
+
+import Layout from "@/layouts/Base.astro"
+import {
+  exampleFor,
+  promptUrls,
+  promptVersion,
+  themes,
+  type PromptExample,
+  type ThemeView,
+} from "@/lib/themes"
+
+export const getStaticPaths: GetStaticPaths = () =>
+  themes.flatMap((theme) =>
+    theme.prompts.flatMap((prompt) => {
+      const example = exampleFor(theme.slug, prompt.slug)
+      return example
+        ? [{ params: { slug: theme.slug, name: prompt.slug }, props: { theme, prompt, example } }]
+        : []
+    })
+  )
+
+const { theme, prompt, example } = Astro.props as {
+  theme: ThemeView
+  prompt: PagePrompt
+  example: PromptExample
+}
+const urls = promptUrls(theme.slug, prompt.slug)
+const description = prompt.description.replace(/^./, (c) => c.toUpperCase())
+const built = new Date(`${example.date}T00:00:00Z`).toLocaleDateString("en-GB", {
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
+})
+const { check } = example
+// The prompt may have been revised since this page was built from it.
+const current = example.prompt === promptVersion(prompt.prompt)
+const count = (n: number, word: string) => `${n === 0 ? "no" : n} ${word}${n === 1 ? "" : "s"}`
+
+const facts = [
+  { name: "Built by", value: `${example.tool}, ${example.model}` },
+  { name: "Built on", value: built },
+  {
+    name: "Built from",
+    value: current ? "The prompt as it is now" : "An earlier version of the prompt, revised since",
+  },
+  { name: "Edited by hand", value: "No" },
+  {
+    name: "Strict Check",
+    value: `${check.score}% of ${check.values.toLocaleString("en-US")} measured values follow the theme: ${count(check.errors, "error")}, ${count(check.warnings, "warning")}`,
+  },
+]
+const widths = [
+  { label: "Desktop", value: "100%" },
+  // The frame's 1px border on each side is added to the screen's width.
+  { label: "Tablet", value: "770px" },
+  { label: "Phone", value: "377px" },
+]
+const others = theme.prompts.filter(
+  (other) => other.slug !== prompt.slug && exampleFor(theme.slug, other.slug)
+)
+const toggle =
+  "label rounded-sm border border-foreground px-4 py-2 hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-ring aria-pressed:bg-foreground aria-pressed:text-background"
+---
+
+<Layout
+  title={`${prompt.title} in ${theme.name}: a page built from one prompt | Strict`}
+  description={`${description} Built by a coding agent from the ${theme.name} page prompt, and shown as it came out.`}
+  theme={theme.slug}
+>
+  <section class="border-b border-border">
+    <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label text-muted-foreground md:col-span-12">
+        <a href="/themes" class="underline underline-offset-4 hover:text-foreground">Themes</a>
+        <span> / </span>
+        <a href={`/themes/${theme.slug}`} class="underline underline-offset-4 hover:text-foreground"
+          >{theme.name}</a
+        >
+        <span> / Page prompt</span>
+      </p>
+      <h1 class="text-h1 md:col-span-12 md:text-display">{prompt.title}</h1>
+      <div class="flex flex-col gap-4 md:col-span-6">
+        <p>{description}</p>
+        <p class="text-muted-foreground">
+          This is the page a coding agent built from {
+            current ? "the prompt" : "an earlier version of the prompt"
+          }, in a new project with the {
+            theme.name
+          } theme installed. Nothing was fixed afterwards. The company and its numbers are made up.
+        </p>
+        <div class="flex flex-wrap items-center gap-4">
+          <button
+            type="button"
+            data-copy-url={urls.prompt}
+            class="label rounded-sm bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/80 focus-visible:outline-2 focus-visible:outline-ring"
+          >
+            Copy prompt
+          </button>
+          <a href={urls.prompt} class="label text-primary underline underline-offset-4">
+            Read the prompt
+          </a>
+          <a href={urls.build} class="label text-primary underline underline-offset-4">
+            Open the page alone
+          </a>
+        </div>
+      </div>
+      <dl class="flex flex-col md:col-span-5 md:col-start-8">
+        {
+          facts.map((fact) => (
+            <div class="grid gap-1 border-t border-border py-2 md:grid-cols-5 md:gap-4">
+              <dt class="label text-muted-foreground md:col-span-2">{fact.name}</dt>
+              <dd class="md:col-span-3">{fact.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="flex flex-col gap-4 px-4 py-8 md:px-8" aria-label="Preview">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div role="group" aria-label="Screen width" class="flex flex-wrap gap-2">
+        {
+          widths.map((width, index) => (
+            <button
+              type="button"
+              class={toggle}
+              data-width={width.value}
+              aria-pressed={index === 0 ? "true" : "false"}
+            >
+              {width.label}
+            </button>
+          ))
+        }
+      </div>
+      <div role="group" aria-label="Color mode" class="flex flex-wrap gap-2">
+        <button type="button" class={toggle} data-mode-choice="light" aria-pressed="true">
+          Light
+        </button>
+        <button type="button" class={toggle} data-mode-choice="dark" aria-pressed="false">
+          Dark
+        </button>
+      </div>
+    </div>
+    <div class="rounded-md border border-border bg-card p-2 md:p-4">
+      <div
+        class="mx-auto max-w-full overflow-hidden rounded-sm border border-border"
+        style="width:100%"
+        data-stage
+        data-strict-ignore
+      >
+        <iframe
+          src={urls.build}
+          title={`${prompt.title} page, built with ${theme.name}`}
+          class="block w-full bg-background"
+          style="height:80svh"></iframe>
+      </div>
+    </div>
+  </section>
+
+  {
+    others.length > 0 && (
+      <section class="mx-auto flex max-w-page flex-col gap-8 px-4 py-16 md:px-8">
+        <h2 class="label border-t border-foreground pt-4 text-muted-foreground">
+          More pages in {theme.name}
+        </h2>
+        <ul class="flex flex-wrap gap-x-8 gap-y-2">
+          {others.map((other) => (
+            <li>
+              <a
+                href={promptUrls(theme.slug, other.slug).preview}
+                class="font-heading text-h2 underline-offset-4 hover:underline"
+              >
+                {other.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Layout>
+
+<script>
+  import { copyPromptButtons } from "@/lib/copy"
+  import { holdMode } from "@/lib/frames"
+
+  copyPromptButtons()
+
+  const stage = document.querySelector<HTMLElement>("[data-stage]")
+  const frame = stage?.querySelector("iframe")
+  let mode: "light" | "dark" = "light"
+  const apply = frame ? holdMode(frame, () => mode) : () => {}
+
+  const press = (chosen: HTMLButtonElement, all: NodeListOf<HTMLButtonElement>) => {
+    for (const button of all) button.setAttribute("aria-pressed", String(button === chosen))
+  }
+
+  const widths = document.querySelectorAll<HTMLButtonElement>("[data-width]")
+  for (const button of widths) {
+    button.addEventListener("click", () => {
+      if (stage) stage.style.width = button.dataset.width ?? "100%"
+      press(button, widths)
+    })
+  }
+
+  const modes = document.querySelectorAll<HTMLButtonElement>("[data-mode-choice]")
+  for (const button of modes) {
+    button.addEventListener("click", () => {
+      mode = button.dataset.modeChoice === "dark" ? "dark" : "light"
+      apply()
+      press(button, modes)
+    })
+  }
+</script>

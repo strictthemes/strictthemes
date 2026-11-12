@@ -1,0 +1,14 @@
+# Netlify settings for the site in apps/site.
+#
+# The build needs two values that depend on where it is deployed, set as
+# environment variables on the Netlify site, not here:
+#   STRICT_SITE_URL   The address the site is served from. The registry's install
+#                     commands are built from it. Default: https://strictthemes.com
+#   STRICT_NOINDEX    Set to 1 on a staging site, so search engines do not index it.
+
+[build]
+  command = "npm run build"
+  publish = "apps/site/dist"
+
+[build.environment]
+  NODE_VERSION = "24"

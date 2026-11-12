@@ -1,0 +1,13 @@
+# Settings for the Apache server behind strictthemes.com. Other hosts, such as
+# the Netlify staging copy, ignore this file.
+
+# Show the site's own "not found" page in place of the server's default one.
+ErrorDocument 404 /404.html
+
+# A theme's exports are opened in a browser as well as fetched by tools.
+# Apache sends .md with no type and .ts as video, so a browser downloads them.
+AddType text/markdown .md
+AddType text/plain .ts
+# The file that tells a phone which icon and name the site has.
+AddType application/manifest+json .webmanifest
+AddCharset utf-8 .html .md .ts .txt .json

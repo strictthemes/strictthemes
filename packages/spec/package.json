@@ -1,0 +1,57 @@
+{
+  "name": "@strictthemes/spec",
+  "version": "0.1.0",
+  "description": "Parse, lint and export Strict design specs (DESIGN.md-compatible).",
+  "keywords": [
+    "design-md",
+    "design-tokens",
+    "design-system",
+    "tailwind",
+    "shadcn",
+    "nuxt-ui",
+    "lint",
+    "ai-agents"
+  ],
+  "license": "MIT",
+  "author": "StrictThemes",
+  "homepage": "https://strictthemes.com/spec",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/strictthemes/strictthemes.git",
+    "directory": "packages/spec"
+  },
+  "bugs": {
+    "url": "https://github.com/strictthemes/strictthemes/issues"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "strict-spec": "dist/cli.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "SPEC.md",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test \"test/*.test.ts\"",
+    "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true })\"",
+    "prepublishOnly": "npm run clean && npm run build"
+  },
+  "dependencies": {
+    "yaml": "^2.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

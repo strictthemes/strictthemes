@@ -1,0 +1,52 @@
+---
+// A small live view of a built example page: the page itself in a frame,
+// scaled down. It is a picture to click on, not a control, so the frame takes
+// no focus and no pointer.
+interface Props {
+  /** Where a click goes: the preview page. */
+  href: string
+  /** The built example. */
+  src: string
+  /** The name of the page, for the link's label. */
+  title: string
+}
+
+const { href, src, title } = Astro.props
+---
+
+<a
+  href={href}
+  aria-label={`Preview the ${title} page`}
+  class="block overflow-hidden rounded-md border border-border bg-card hover:border-foreground focus-visible:outline-2 focus-visible:outline-ring"
+>
+  <span class="relative block overflow-hidden" style="aspect-ratio:16/10" data-thumb data-strict-ignore>
+    <iframe
+      src={src}
+      title={`${title} page`}
+      loading="lazy"
+      tabindex="-1"
+      aria-hidden="true"
+      inert
+      class="pointer-events-none absolute top-0 left-0 origin-top-left"
+      style="width:1280px;height:800px;transform:scale(var(--thumb-scale,0.25))"></iframe>
+  </span>
+</a>
+
+<script>
+  import { holdMode } from "@/lib/frames"
+
+  // The frame is laid out 1280px wide, like a laptop screen, then scaled to fit its box.
+  const fit = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const box = entry.target as HTMLElement
+      box.style.setProperty("--thumb-scale", String(entry.contentRect.width / 1280))
+    }
+  })
+  for (const box of document.querySelectorAll<HTMLElement>("[data-thumb]")) {
+    fit.observe(box)
+    // This site is light only, so the small views are too, whatever the
+    // visitor's system is set to. The preview page has a switch for dark mode.
+    const frame = box.querySelector("iframe")
+    if (frame) holdMode(frame, () => "light")
+  }
+</script>

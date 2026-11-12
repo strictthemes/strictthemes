@@ -1,0 +1,12 @@
+{
+  "tool": "Claude Code",
+  "model": "Claude Opus 5.5",
+  "date": "2026-11-11",
+  "prompt": "6c8d6cab5b257107",
+  "check": {
+    "score": 100,
+    "values": 2915,
+    "errors": 0,
+    "warnings": 0
+  }
+}

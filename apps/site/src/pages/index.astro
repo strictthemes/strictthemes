@@ -1,0 +1,276 @@
+---
+import Command from "@/components/Command.astro"
+import PromptThumb from "@/components/PromptThumb.astro"
+import SectionHeader from "@/components/SectionHeader.astro"
+import ThemeCard from "@/components/ThemeCard.astro"
+import { ThemePreview } from "@/components/ThemePreview"
+import Layout from "@/layouts/Base.astro"
+import { exampleFor, promptUrls, themes } from "@/lib/themes"
+
+const first = themes[0]
+
+// One built page for each theme: the first of its prompts that has an example.
+const pages = themes.flatMap((theme) => {
+  const prompt = theme.prompts.find((p) => exampleFor(theme.slug, p.slug))
+  return prompt
+    ? [{ theme, prompt, urls: promptUrls(theme.slug, prompt.slug), count: theme.prompts.length }]
+    : []
+})
+
+// The start of the site's own theme file, with the colors read from it.
+const own = first?.spec.colors ?? {}
+const excerpt = `---
+name: Strict One
+colors:
+  primary: "${own.primary}"
+  background: "${own.background}"
+  foreground: "${own.foreground}"
+typography:
+  body:
+    fontFamily: IBM Plex Sans
+    fontSize: 16px
+rounded:
+  sm: 2px
+  md: 4px
+strict:
+  contrast: AA
+  colors:
+    allow: tokens
+  tells:
+    purple-gradient: error
+    emoji-icons: error
+---
+
+## Overview
+
+Strict One is an editorial theme built on a
+visible grid. Nothing is decorative.`
+
+const steps = [
+  {
+    title: "One file",
+    body: "A theme is a single DESIGN.md. Tokens sit at the top as YAML, and the reasoning behind them follows in plain prose. An agent reads both before it writes any UI.",
+  },
+  {
+    title: "Any stack",
+    body: "The same file exports to a shadcn registry item, a Tailwind CSS v4 theme, Nuxt UI, and W3C design tokens. Change the file and every export follows.",
+  },
+  {
+    title: "Rules, not requests",
+    body: "The strict block says what is allowed: which colors, which spacing, what contrast. The linter holds the theme to it, and Strict Check holds the pages an agent builds to it.",
+  },
+]
+
+const roadmap = [
+  {
+    name: "Spec format and linter",
+    body: "DESIGN.md plus a strict block, with exports for four targets.",
+    status: "Built",
+  },
+  {
+    name: "Free themes",
+    body: "Thirteen themes with light and dark modes, served as a shadcn registry.",
+    status: "Built",
+  },
+  {
+    name: "Page prompts",
+    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and sixty-one more. Five for each of the thirteen themes, each with a preview of the page an agent built from it.",
+    status: "In testing",
+  },
+  {
+    name: "Generator",
+    body: "Paste a URL, get a DESIGN.md that matches the site.",
+    status: "Planned",
+  },
+  {
+    name: "Strict Check",
+    body: "Checks a project's code and rendered pages against a spec. A first version runs as a command, as an MCP server, as a skill for coding agents and as a job in a CI pipeline.",
+    status: "In testing",
+  },
+  {
+    name: "Agent UI kit",
+    body: "Components for agent interfaces: tool calls, approvals, streaming states.",
+    status: "Planned",
+  },
+]
+---
+
+<Layout
+  title="Strict: themes and guardrails for AI-built UI"
+  description="A Strict theme is one DESIGN.md file your coding agent reads and a linter checks. Thirteen free themes install into shadcn with one command."
+>
+  <section class="relative border-b border-border">
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute inset-0 mx-auto hidden max-w-page grid-cols-12 gap-8 px-8 md:grid"
+    >
+      {Array.from({ length: 12 }).map(() => <div class="bg-card/60" />)}
+    </div>
+    <div class="relative mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label rise text-muted-foreground md:col-span-12">
+        Themes and guardrails for AI-built UI
+      </p>
+      <h1 class="rise text-h1 md:col-span-10 md:text-display" style="--i:1">
+        Give your coding agent a design system it has to follow.
+      </h1>
+      <p class="rise md:col-span-6" style="--i:2">
+        A Strict theme is one DESIGN.md file: tokens an agent can read, rules a
+        linter can check, and exports for shadcn, Tailwind and Nuxt UI. Thirteen
+        themes and sixty-five page prompts, all free.
+      </p>
+      <div class="rise flex flex-wrap items-center gap-4 md:col-span-12" style="--i:3">
+        <a
+          href="/themes"
+          class="label rounded-sm bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/80"
+        >
+          Browse the themes
+        </a>
+        <a href="/spec" class="label text-primary underline underline-offset-4">
+          Read the spec format
+        </a>
+      </div>
+      {
+        first && (
+          <div class="rise min-w-0 md:col-span-8" style="--i:4">
+            <Command command={first.installCommand} label={`Install ${first.name}`} />
+          </div>
+        )
+      }
+    </div>
+  </section>
+
+  <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <SectionHeader number="01" label="Themes" title="Thirteen themes, free to use." />
+    <p class="max-w-measure text-muted-foreground">
+      Each one is a different job and a different look: a shop, a bank, a newspaper, a public
+      service, a launch night. Every card below is drawn in its theme's own colors, fonts and
+      corners.
+    </p>
+    <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      {
+        themes.map((theme) => (
+          <li>
+            <ThemeCard theme={theme} />
+          </li>
+        ))
+      }
+    </ul>
+    {
+      first && (
+        <article class="grid gap-8 md:grid-cols-12">
+          <div class="flex flex-col gap-4 md:col-span-4">
+            <p class="label text-muted-foreground">Stock components, one theme</p>
+            <h3 class="text-h2">{first.name}, on shadcn</h3>
+            <p class="text-muted-foreground">
+              Nothing in this box is styled by hand. Install a theme and the components you
+              already have take its colors, corners and fonts.
+            </p>
+            <a href="/themes" class="label text-primary underline underline-offset-4">
+              See all thirteen this way
+            </a>
+          </div>
+          <div class="md:col-span-8">
+            <ThemePreview
+              client:visible
+              slug={first.slug}
+              name={first.name}
+              headingStyle={first.headingStyle}
+              compact
+            />
+          </div>
+        </article>
+      )
+    }
+  </section>
+
+  {
+    pages.length > 0 && (
+      <section class="mx-auto flex max-w-page flex-col gap-8 px-4 py-16 md:px-8">
+        <SectionHeader
+          number="02"
+          label="Page prompts"
+          title="Paste one prompt. Get a finished page."
+        />
+        <p class="max-w-measure text-muted-foreground">
+          Every theme comes with five page prompts: full briefs for a landing page, an essay,
+          a dashboard, a shop and more. The pages below were each built by a coding agent from
+          one prompt, and are shown as they came out.
+        </p>
+        <ul class="grid gap-8 md:grid-cols-3">
+          {pages.map(({ theme, prompt, urls, count }) => (
+            <li class="flex flex-col gap-4">
+              <PromptThumb href={urls.preview} src={urls.build} title={prompt.title} />
+              <div class="flex flex-col gap-2">
+                <p class="label text-muted-foreground">{theme.name}</p>
+                <h3 class="text-h2">{prompt.title}</h3>
+                <p class="flex flex-wrap gap-x-4 gap-y-2">
+                  <a href={urls.preview} class="label text-primary underline underline-offset-4">
+                    Preview<span class="sr-only"> the {prompt.title} page</span>
+                  </a>
+                  <a
+                    href={`/themes/${theme.slug}`}
+                    class="label text-primary underline underline-offset-4"
+                  >
+                    All {count} {theme.name} prompts
+                  </a>
+                </p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <SectionHeader
+      number={pages.length > 0 ? "03" : "02"}
+      label="How it works"
+      title="A theme your agent reads, and a linter checks."
+    />
+    <div class="grid gap-8 md:grid-cols-12">
+      <ol class="flex flex-col gap-8 md:col-span-5">
+        {
+          steps.map((step, index) => (
+            <li class="flex flex-col gap-2 border-t border-border pt-4">
+              <p class="label text-muted-foreground">Step {index + 1}</p>
+              <h3 class="text-h2">{step.title}</h3>
+              <p class="text-muted-foreground">{step.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="flex min-w-0 flex-col gap-2 md:col-span-6 md:col-start-7">
+        <span class="label text-muted-foreground">DESIGN.md</span>
+        <pre
+          class="overflow-x-auto rounded-md border border-border bg-card p-4 text-body md:p-8"><code>{excerpt}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <SectionHeader
+      number={pages.length > 0 ? "04" : "03"}
+      label="Roadmap"
+      title="What exists, and what is next."
+    />
+    <ul class="flex flex-col">
+      {
+        roadmap.map((item) => (
+          <li class="grid gap-2 border-t border-border py-4 md:grid-cols-12 md:gap-8">
+            <h3 class="font-sans font-semibold md:col-span-3">{item.name}</h3>
+            <p class="text-muted-foreground md:col-span-7">{item.body}</p>
+            <p
+              class:list={[
+                "label md:col-span-2 md:text-right",
+                item.status === "Built" ? "text-foreground" : "text-muted-foreground",
+              ]}
+            >
+              {item.status}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Layout>

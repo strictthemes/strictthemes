@@ -1,0 +1,101 @@
+---
+import "@/styles/global.css"
+import Logo from "@/components/Logo.astro"
+import { SITE_URL, themeScopeCss } from "@/lib/themes"
+
+interface Props {
+  title: string
+  description: string
+  /** Dress the whole page in a theme other than the site's own. */
+  theme?: string
+}
+
+const { title, description, theme } = Astro.props
+const canonical = new URL(Astro.url.pathname, SITE_URL).href
+const shareImage = new URL("/og.png", SITE_URL).href
+const nav = [
+  { href: "/themes", label: "Themes" },
+  { href: "/spec", label: "Spec" },
+]
+const current = Astro.url.pathname
+---
+
+<!doctype html>
+<html lang="en" data-theme={theme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="canonical" href={canonical} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content="Strict" />
+    <meta property="og:image" content={shareImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Strict: themes and guardrails for AI-built UI" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <style is:inline set:html={themeScopeCss()} />
+  </head>
+  <body class="flex min-h-svh flex-col">
+    <a
+      href="#main"
+      class="label sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-primary focus:p-2 focus:text-primary-foreground"
+    >
+      Skip to content
+    </a>
+    <header class="border-b border-border">
+      <div class="mx-auto flex max-w-page items-center justify-between gap-8 px-4 py-4 md:px-8">
+        <a href="/" class="flex items-center gap-2">
+          <Logo class="size-6" />
+          <span class="flex items-baseline gap-2">
+            <span class="font-heading text-h2">Strict</span>
+            <span class="label text-muted-foreground">Themes</span>
+          </span>
+        </a>
+        <nav aria-label="Main" class="flex gap-8">
+          {
+            nav.map((link) => (
+              <a
+                href={link.href}
+                aria-current={current.startsWith(link.href) ? "page" : undefined}
+                class="label text-muted-foreground underline-offset-4 hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:underline"
+              >
+                {link.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-border">
+      <div class="mx-auto grid max-w-page gap-8 px-4 py-8 md:grid-cols-12 md:px-8">
+        <div class="flex flex-col gap-4 md:col-span-6">
+          <Logo class="size-8" />
+          <p class="text-muted-foreground">
+            Strict Themes makes themes and guardrails for AI-built UI. Everything
+            here is free and open source, under the MIT licence.
+          </p>
+        </div>
+        <ul class="label flex flex-col gap-2 text-muted-foreground md:col-span-3 md:col-start-10">
+          <li><a class="hover:text-foreground" href="/themes">Themes</a></li>
+          <li><a class="hover:text-foreground" href="/spec">The spec format</a></li>
+          <li><a class="hover:text-foreground" href="/r/registry.json">Registry index</a></li>
+          <li><a class="hover:text-foreground" href="/llms.txt">llms.txt</a></li>
+        </ul>
+      </div>
+    </footer>
+  </body>
+</html>

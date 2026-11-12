@@ -1,0 +1,344 @@
+---
+import type { GetStaticPaths } from "astro"
+import { marked } from "marked"
+import { tokensForMode } from "@strictthemes/spec"
+
+import Command from "@/components/Command.astro"
+import PromptThumb from "@/components/PromptThumb.astro"
+import SectionHeader from "@/components/SectionHeader.astro"
+import { ThemePreview } from "@/components/ThemePreview"
+import Layout from "@/layouts/Base.astro"
+import { cssFontStack, exampleFor, promptUrls, themes, type ThemeView } from "@/lib/themes"
+
+export const getStaticPaths: GetStaticPaths = () =>
+  themes.map((theme) => ({ params: { slug: theme.slug }, props: { theme } }))
+
+const { theme } = Astro.props as { theme: ThemeView }
+const { spec } = theme
+const darkColors = spec.strict.modes.dark ? tokensForMode(spec, "dark").colors : {}
+
+const colors = Object.entries(spec.colors).map(([name, value]) => ({
+  name,
+  light: value,
+  dark: darkColors[name] ?? value,
+}))
+
+const typography = Object.entries(spec.typography).map(([name, token]) => ({
+  name,
+  summary: [
+    token.fontFamily,
+    token.fontSize,
+    token.fontWeight && `weight ${token.fontWeight}`,
+    token.lineHeight && `line ${token.lineHeight}`,
+  ]
+    .filter(Boolean)
+    .join(" · "),
+  style: [
+    token.fontFamily && `font-family:${cssFontStack(String(token.fontFamily))}`,
+    token.fontSize && `font-size:min(${token.fontSize}, 11vw)`,
+    token.fontWeight && `font-weight:${token.fontWeight}`,
+    token.lineHeight && `line-height:${token.lineHeight}`,
+    token.letterSpacing && `letter-spacing:${token.letterSpacing}`,
+  ]
+    .filter(Boolean)
+    .join(";"),
+}))
+
+const { strict } = spec
+const rules = [
+  { name: "Contrast", value: `WCAG ${strict.contrast}` },
+  {
+    name: "Colors",
+    value:
+      strict.colors.allow === "tokens"
+        ? `Tokens only, within ${strict.colors.tolerance} of a token`
+        : "Any color",
+  },
+  {
+    name: "Spacing",
+    value:
+      strict.spacing.allow === "scale"
+        ? `Scale only, plus ${strict.spacing.extra.join(", ")}`
+        : "Any value",
+  },
+  {
+    name: "Corners",
+    value:
+      strict.rounded.allow === "scale"
+        ? strict.rounded.full
+          ? `Scale only, full rounds up to ${strict.rounded.full}`
+          : "Scale only, no full rounds"
+        : "Any value",
+  },
+  {
+    name: "Type",
+    value: [
+      strict.typography.allow === "scale" ? "Scale only" : "Any size",
+      strict.typography.fonts === "declared" ? "declared fonts only" : "any font",
+    ].join(", "),
+  },
+  ...Object.entries(strict.tells).map(([tell, level]) => ({
+    name: tell.replaceAll("-", " "),
+    value: level === "error" ? "Not allowed" : level === "warn" ? "Flagged" : "Allowed",
+  })),
+]
+
+const sections = spec.sections.map((section) => ({
+  title: section.title,
+  html: marked.parse(section.body, { async: false }),
+}))
+
+const prompts = theme.prompts.map((prompt) => ({
+  slug: prompt.slug,
+  title: prompt.title,
+  description: prompt.description.replace(/^./, (c) => c.toUpperCase()),
+  urls: promptUrls(theme.slug, prompt.slug),
+  example: exampleFor(theme.slug, prompt.slug),
+  length: `${(Math.round(prompt.prompt.length / 100) / 10).toFixed(1)}k characters`,
+  tested:
+    prompt.tested.length > 0
+      ? `Run ${prompt.tested.length === 1 ? "once" : `${prompt.tested.length} times`} in ${[...new Set(prompt.tested.map((test) => test.tool))].join(", ")}`
+      : "Not yet run in a tool",
+}))
+// Sections after the preview are numbered from here, since "Page prompts" is optional.
+const offset = prompts.length > 0 ? 1 : 0
+const num = (n: number) => String(n + offset).padStart(2, "0")
+
+const downloads: Record<string, string> = {
+  "DESIGN.md": "The spec",
+  "tailwind.css": "Tailwind CSS v4",
+  "shadcn.css": "shadcn variables",
+  "nuxt-ui.css": "Nuxt UI",
+  "app.config.ts": "Nuxt UI config",
+  "tokens.json": "W3C design tokens",
+}
+---
+
+<Layout
+  title={`${theme.name} theme | Strict`}
+  description={theme.description}
+  theme={theme.slug}
+>
+  <section class="border-b border-border">
+    <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label rise text-muted-foreground md:col-span-12">
+        <a href="/themes" class="underline underline-offset-4 hover:text-foreground">Themes</a>
+        <span> / {theme.number}</span>
+      </p>
+      <h1 class="rise text-h1 md:col-span-12 md:text-display" style="--i:1">
+        {theme.name}
+      </h1>
+      <p class="rise md:col-span-6" style="--i:2">{theme.description}</p>
+      <div class="rise min-w-0 md:col-span-8" style="--i:3">
+        <Command command={theme.installCommand} label="Install into a shadcn project" />
+      </div>
+      <ul class="rise flex flex-wrap gap-x-8 gap-y-2 md:col-span-12" style="--i:4">
+        {
+          theme.files.map((file) => (
+            <li>
+              <a
+                href={`/themes/${theme.slug}/${file}`}
+                class="label text-primary underline underline-offset-4"
+              >
+                {file}
+              </a>
+              <span class="label text-muted-foreground"> {downloads[file]}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <div class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <section class="flex flex-col gap-8">
+      <SectionHeader number="01" label="Preview" title="Stock shadcn components, this theme." />
+      <ThemePreview
+        client:load
+        slug={theme.slug}
+        name={theme.name}
+        headingStyle={theme.headingStyle}
+      />
+    </section>
+
+    {
+      prompts.length > 0 && (
+        <section class="flex flex-col gap-8">
+          <SectionHeader
+            number="02"
+            label="Page prompts"
+            title="Paste one into your agent. Get that page."
+          />
+          <p class="max-w-measure text-muted-foreground">
+            Each prompt is a full brief for one page in this theme: its sections,
+            layout, behavior, and a checklist the agent goes through before it
+            says it is done. The rules in every prompt are generated from the
+            theme's strict block. Each preview is the page a coding agent built
+            from the prompt, shown as it came out.
+          </p>
+          <ul class="flex flex-col">
+            {prompts.map((prompt) => (
+              <li class="grid gap-4 border-t border-border py-8 md:grid-cols-12 md:gap-8">
+                {prompt.example && (
+                  <div class="md:col-span-4">
+                    <PromptThumb
+                      href={prompt.urls.preview}
+                      src={prompt.urls.build}
+                      title={prompt.title}
+                    />
+                  </div>
+                )}
+                <div
+                  class:list={[
+                    "flex flex-col gap-2",
+                    prompt.example ? "md:col-span-5" : "md:col-span-9",
+                  ]}
+                >
+                  <h3 class="font-heading text-h2">{prompt.title}</h3>
+                  <p>{prompt.description}</p>
+                  <p class="label text-muted-foreground">
+                    {prompt.length} · {prompt.tested}
+                  </p>
+                  {prompt.example && (
+                    <p class="label text-muted-foreground">
+                      Strict Check {prompt.example.check.score}%
+                    </p>
+                  )}
+                </div>
+                <div class="flex flex-wrap items-start gap-4 md:col-span-3 md:flex-col md:items-end">
+                  {prompt.example && (
+                    <a
+                      href={prompt.urls.preview}
+                      class="label rounded-sm bg-primary px-4 py-2 text-primary-foreground hover:bg-primary/80 focus-visible:outline-2 focus-visible:outline-ring"
+                    >
+                      Preview<span class="sr-only"> the {prompt.title} page</span>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    data-copy-url={prompt.urls.prompt}
+                    class="label rounded-sm border border-foreground px-4 py-2 hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-ring"
+                  >
+                    Copy prompt
+                  </button>
+                  <a
+                    href={prompt.urls.prompt}
+                    class="label py-2 text-primary underline underline-offset-4"
+                  >
+                    Read the prompt
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number={num(2)} label="Colors" title="Every color the theme allows." />
+      <ul class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
+        {
+          colors.map((color) => (
+            <li class="flex flex-col gap-2">
+              <div class="flex h-16 overflow-hidden rounded-md border border-border" data-strict-ignore>
+                <div class="flex-1" style={`background:${color.light}`} />
+                <div class="flex-1" style={`background:${color.dark}`} />
+              </div>
+              <p class="label">{color.name}</p>
+              <p class="label text-muted-foreground">
+                {color.light}
+                {color.dark !== color.light && ` / ${color.dark}`}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="label text-muted-foreground">Left: light mode. Right: dark mode.</p>
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number={num(3)} label="Typography" title="Five sizes. Nothing in between." />
+      <ul class="flex flex-col">
+        {
+          typography.map((token) => (
+            <li class="grid gap-2 border-t border-border py-4 md:grid-cols-12 md:gap-8">
+              <div class="flex flex-col gap-1 md:col-span-3">
+                <p class="label">{token.name}</p>
+                <p class="label text-muted-foreground">{token.summary}</p>
+              </div>
+              <p class="overflow-hidden md:col-span-9" style={token.style} data-strict-ignore>
+                The quick brown fox
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number={num(4)} label="Shape and space" title="Corners and spacing." />
+      <div class="grid gap-8 md:grid-cols-12">
+        <ul class="flex flex-wrap gap-4 md:col-span-6">
+          {
+            Object.entries(spec.rounded).map(([name, value]) => (
+              <li class="flex flex-col gap-2">
+                <div
+                  class="size-16 border border-foreground bg-card"
+                  style={`border-radius:${value}`}
+                />
+                <p class="label">{name}</p>
+                <p class="label text-muted-foreground">{value}</p>
+              </li>
+            ))
+          }
+        </ul>
+        <ul class="flex flex-col gap-2 md:col-span-6">
+          {
+            Object.entries(spec.spacing).map(([name, value]) => (
+              <li class="flex items-center gap-4">
+                <p class="label w-16">{name}</p>
+                <div class="h-4 bg-primary" style={`width:${value}`} />
+                <p class="label text-muted-foreground">{value}</p>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number={num(5)} label="Rules" title="What the strict block enforces." />
+      <dl class="flex flex-col">
+        {
+          rules.map((rule) => (
+            <div class="grid gap-2 border-t border-border py-4 md:grid-cols-12 md:gap-8">
+              <dt class="label md:col-span-3">{rule.name}</dt>
+              <dd class="md:col-span-9">{rule.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number={num(6)} label="Guidance" title="What your agent reads." />
+      <div class="flex flex-col">
+        {
+          sections.map((section) => (
+            <div class="grid gap-4 border-t border-border py-8 md:grid-cols-12 md:gap-8">
+              <h3 class="label md:col-span-3">{section.title}</h3>
+              <div class="prose max-w-measure md:col-span-9" set:html={section.html} />
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  import { copyPromptButtons } from "@/lib/copy"
+
+  copyPromptButtons()
+</script>

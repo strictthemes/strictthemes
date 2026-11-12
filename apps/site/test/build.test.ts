@@ -1,0 +1,278 @@
+import assert from "node:assert/strict"
+import { createHash } from "node:crypto"
+import { existsSync, readdirSync, readFileSync } from "node:fs"
+import { join } from "node:path"
+import { test } from "node:test"
+
+// Runs against the built site (`npm test` builds first).
+const dist = join(import.meta.dirname, "..", "dist")
+const read = (path: string) => readFileSync(join(dist, path), "utf8")
+// Every theme, with its name and its five page prompts in reading order.
+const PAGES: [slug: string, name: string, pages: string[]][] = [
+  ["strict-one", "Strict One", ["landing", "pricing", "article", "docs", "dashboard"]],
+  ["recital", "Recital", ["essay", "journal", "chapter", "newsletter", "about"]],
+  ["avion", "Avion", ["dashboard", "status", "list", "detail", "settings"]],
+  ["kiln", "Kiln", ["shop", "collection", "product", "basket", "studio"]],
+  ["ledger", "Ledger", ["overview", "transactions", "invoice", "transfer", "report"]],
+  ["cipher", "Cipher", ["landing", "docs", "changelog", "deploys", "tokens"]],
+  ["sorbet", "Sorbet", ["welcome", "today", "progress", "plans", "profile"]],
+  ["atelier", "Atelier", ["home", "collection", "piece", "house", "appointment"]],
+  ["civic", "Civic", ["start", "question", "review", "confirmation", "guidance"]],
+  ["dispatch", "Dispatch", ["front", "story", "live", "scores", "section"]],
+  ["tisane", "Tisane", ["home", "menu", "booking", "recipe", "visit"]],
+  ["voltage", "Voltage", ["launch", "lineup", "tickets", "artist", "info"]],
+  ["nocturne", "Nocturne", ["programme", "film", "season", "membership", "visit"]],
+]
+const THEMES = PAGES.map(([slug]) => slug)
+
+test("every page is built", () => {
+  for (const page of ["index.html", "themes/index.html", "spec/index.html", "404.html"]) {
+    assert.ok(existsSync(join(dist, page)), page)
+  }
+  for (const theme of THEMES) {
+    assert.ok(existsSync(join(dist, "themes", theme, "index.html")), theme)
+  }
+})
+
+test("the registry is served with production URLs", () => {
+  for (const theme of THEMES) {
+    const item = JSON.parse(read(`r/${theme}.json`)) as {
+      type: string
+      registryDependencies: string[]
+    }
+    assert.equal(item.type, "registry:theme")
+    assert.equal(item.registryDependencies.length, 3)
+    for (const url of item.registryDependencies) {
+      assert.ok(url.startsWith("https://strictthemes.com/r/font-"), url)
+      // Every font a theme depends on is a file the site serves.
+      assert.ok(existsSync(join(dist, "r", url.split("/").at(-1) ?? "")), url)
+    }
+  }
+  const index = JSON.parse(read("r/registry.json")) as { items: unknown[] }
+  // Each theme, and three fonts for each: body, labels and headings.
+  assert.equal(index.items.length, THEMES.length * 4)
+})
+
+test("a normal build does not tell search engines to stay away", () => {
+  // Only a staging build (STRICT_NOINDEX=1) writes the no-index header file.
+  assert.ok(!existsSync(join(dist, "_headers")))
+})
+
+test("the production server gets its settings file", () => {
+  // Apache reads it on strictthemes.com: the 404 page and the types of .md and .ts.
+  const settings = read(".htaccess")
+  assert.ok(settings.includes("ErrorDocument 404 /404.html"))
+  assert.match(settings, /^AddType text\/markdown \.md$/m)
+  assert.match(settings, /^AddType text\/plain \.ts$/m)
+  assert.match(settings, /^AddType application\/manifest\+json \.webmanifest$/m)
+})
+
+test("every page carries the mark, the icons and the share image", () => {
+  const png = (path: string) => {
+    const data = readFileSync(join(dist, path))
+    assert.equal(data.subarray(1, 4).toString("latin1"), "PNG", path)
+    return { width: data.readUInt32BE(16), height: data.readUInt32BE(20) }
+  }
+  assert.deepEqual(png("apple-touch-icon.png"), { width: 180, height: 180 })
+  assert.deepEqual(png("og.png"), { width: 1200, height: 630 })
+  // An .ico file: type 1, and three sizes for a browser to choose from.
+  const ico = readFileSync(join(dist, "favicon.ico"))
+  assert.deepEqual([ico.readUInt16LE(2), ico.readUInt16LE(4)], [1, 3])
+
+  // The manifest names files that exist, at the sizes it says.
+  const manifest = JSON.parse(read("site.webmanifest")) as {
+    icons: { src: string; sizes: string }[]
+  }
+  assert.equal(manifest.icons.length, 3)
+  for (const icon of manifest.icons) {
+    const { width, height } = png(icon.src.slice(1))
+    assert.equal(`${width}x${height}`, icon.sizes, icon.src)
+  }
+
+  // The header and the favicon draw the same path.
+  const mark = /d="(M8 6h16[^"]+)"/
+  const path = mark.exec(read("favicon.svg"))?.[1]
+  assert.ok(path)
+  for (const page of ["index.html", "themes/kiln/index.html", "spec/index.html", "404.html"]) {
+    const html = read(page)
+    assert.equal(mark.exec(html)?.[1], path, page)
+    for (const href of ["/favicon.ico", "/favicon.svg", "/apple-touch-icon.png", "/site.webmanifest"]) {
+      assert.ok(html.includes(`href="${href}"`), `${page} ${href}`)
+    }
+    assert.ok(html.includes('<meta property="og:image" content="https://strictthemes.com/og.png"'), page)
+    assert.ok(html.includes('<meta name="twitter:card" content="summary_large_image"'), page)
+  }
+})
+
+test("the sitemap lists every page a search engine may show, and no other", () => {
+  // Every built page that does not say "noindex", by the canonical address it gives itself.
+  const pages = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? pages(join(dir, entry.name))
+        : entry.name === "index.html"
+          ? [join(dir, entry.name)]
+          : []
+    )
+  const canonical = pages(dist)
+    .map((file) => readFileSync(file, "utf8"))
+    .filter((html) => !html.includes('<meta name="robots" content="noindex">'))
+    .map((html) => /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1] ?? "no canonical")
+    .sort()
+  const listed = [...read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
+  assert.deepEqual([...listed].sort(), canonical)
+  // The home page, the catalog, the spec, and for each theme its page and five previews.
+  assert.equal(listed.length, 3 + THEMES.length * 6)
+  assert.equal(listed[0], "https://strictthemes.com/")
+  assert.ok(!listed.some((url) => url.includes("/404") || url.endsWith("/build/")))
+
+  const robots = read("robots.txt")
+  assert.match(robots, /^User-agent: \*$/m)
+  assert.match(robots, /^Sitemap: https:\/\/strictthemes\.com\/sitemap\.xml$/m)
+  assert.ok(!robots.includes("Disallow"))
+})
+
+test("every theme's exports can be downloaded", () => {
+  for (const theme of THEMES) {
+    for (const file of ["DESIGN.md", "tailwind.css", "shadcn.css", "nuxt-ui.css", "app.config.ts", "tokens.json"]) {
+      assert.ok(existsSync(join(dist, "themes", theme, file)), `${theme}/${file}`)
+    }
+  }
+})
+
+test("theme pages wear their theme and show the install command", () => {
+  for (const theme of THEMES) {
+    const html = read(`themes/${theme}/index.html`)
+    assert.match(html, new RegExp(`<html[^>]*data-theme="${theme}"`))
+    assert.ok(html.includes(`npx shadcn@latest add https://strictthemes.com/r/${theme}.json`))
+  }
+})
+
+test("no page or file points at a local address", () => {
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]
+    )
+  for (const file of walk(dist).filter((f) => /\.(html|json|txt|md)$/.test(f))) {
+    assert.ok(!readFileSync(file, "utf8").includes("localhost"), file)
+  }
+})
+
+test("every theme's page prompts are served and complete", () => {
+  for (const [slug, name, pages] of PAGES) {
+    for (const page of pages) {
+      const prompt = read(`themes/${slug}/prompts/${page}.md`)
+      assert.ok(prompt.startsWith("# Build a"), `${slug}/${page}: title`)
+      assert.ok((prompt.split("\n")[0] ?? "").endsWith(`with the ${name} theme`), `${slug}/${page}: title`)
+      for (const heading of ["## Before you start", "## The page", "## Rules", "## Check before you finish"]) {
+        assert.ok(prompt.includes(heading), `${slug}/${page}: ${heading}`)
+      }
+      assert.ok(prompt.includes(`https://strictthemes.com/r/${slug}.json`), `${slug}/${page}`)
+      // The theme page and the map for agents both link to it.
+      assert.ok(read(`themes/${slug}/index.html`).includes(`/themes/${slug}/prompts/${page}.md`), `${slug}/${page}`)
+      assert.ok(read("llms.txt").includes(`/themes/${slug}/prompts/${page}.md`), `${slug}/${page}`)
+    }
+  }
+})
+
+test("the home and themes pages show a card for every theme, in its own skin", () => {
+  for (const page of ["index.html", "themes/index.html"]) {
+    const html = read(page)
+    for (const theme of THEMES) {
+      assert.match(html, new RegExp(`<a href="/themes/${theme}"[^>]*data-theme="${theme}"`), `${page}: ${theme}`)
+    }
+  }
+})
+
+test("llms.txt lists every theme", () => {
+  const text = read("llms.txt")
+  for (const theme of THEMES) {
+    assert.ok(text.includes(`https://strictthemes.com/r/${theme}.json`), theme)
+  }
+})
+
+// The example pages: what a coding agent built from a page prompt, kept in
+// examples/<theme>/<page>/ and built into the site by scripts/build-examples.ts.
+const examplesDir = join(import.meta.dirname, "..", "examples")
+const examples = readdirSync(examplesDir, { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .flatMap((theme) =>
+    readdirSync(join(examplesDir, theme.name), { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .map((page) => ({ theme: theme.name, page: page.name }))
+  )
+
+test("every page prompt has an example page", () => {
+  const prompts = THEMES.flatMap((theme) =>
+    readdirSync(join(dist, "themes", theme, "prompts"))
+      .filter((file) => file.endsWith(".md"))
+      .map((file) => `${theme}/${file.replace(/\.md$/, "")}`)
+  )
+  assert.equal(prompts.length, PAGES.flatMap(([, , pages]) => pages).length)
+  assert.deepEqual(examples.map(({ theme, page }) => `${theme}/${page}`).sort(), prompts.sort())
+})
+
+test("every example page is built, and kept out of search results", () => {
+  assert.ok(examples.length > 0)
+  for (const { theme, page } of examples) {
+    const html = read(`themes/${theme}/prompts/${page}/build/index.html`)
+    assert.match(html, /<meta name="robots" content="noindex">/, `${theme}/${page}`)
+    // Addresses are relative, so the page works from the folder it is served in.
+    assert.ok(!/(src|href)="\/(assets|src)\//.test(html), `${theme}/${page}`)
+    assert.match(html, /src="\.\/assets\/[^"]+\.js"/, `${theme}/${page}`)
+  }
+})
+
+test("every example has a preview page that says how it was made", () => {
+  for (const { theme, page } of examples) {
+    const facts = JSON.parse(
+      readFileSync(join(examplesDir, theme, page, "example.json"), "utf8")
+    ) as {
+      tool: string
+      model: string
+      date: string
+      prompt: string
+      check: { score: number; errors: number }
+    }
+    assert.match(facts.date, /^\d{4}-\d{2}-\d{2}$/, `${theme}/${page}`)
+    // It names the text of the prompt it was built from, and the page says
+    // whether that is still the prompt as served.
+    assert.match(facts.prompt, /^[0-9a-f]{16}$/, `${theme}/${page}`)
+    const served = createHash("sha256")
+      .update(read(`themes/${theme}/prompts/${page}.md`))
+      .digest("hex")
+      .slice(0, 16)
+    const preview = read(`themes/${theme}/prompts/${page}/index.html`)
+    assert.ok(
+      preview.includes(
+        facts.prompt === served ? "The prompt as it is now" : "An earlier version of the prompt"
+      ),
+      `${theme}/${page}: which prompt it was built from`
+    )
+    // An example with errors in Strict Check is not one to show.
+    assert.equal(facts.check.errors, 0, `${theme}/${page}`)
+
+    const html = read(`themes/${theme}/prompts/${page}/index.html`)
+    assert.ok(html.includes(`src="/themes/${theme}/prompts/${page}/build/"`), `${theme}/${page}: frame`)
+    assert.ok(html.includes(`data-copy-url="/themes/${theme}/prompts/${page}.md"`), `${theme}/${page}: copy`)
+    assert.ok(html.includes(`${facts.tool}, ${facts.model}`), `${theme}/${page}: who built it`)
+    assert.ok(html.includes(`${facts.check.score}% of`), `${theme}/${page}: score`)
+    // The theme page shows it next to its prompt.
+    const themePage = read(`themes/${theme}/index.html`)
+    assert.ok(themePage.includes(`href="/themes/${theme}/prompts/${page}/"`), `${theme}/${page}: link`)
+    assert.ok(themePage.includes(`src="/themes/${theme}/prompts/${page}/build/"`), `${theme}/${page}: small view`)
+  }
+})
+
+test("the home page shows a built page for each theme that has one", () => {
+  const html = read("index.html")
+  for (const theme of new Set(examples.map((example) => example.theme))) {
+    assert.match(html, new RegExp(`src="/themes/${theme}/prompts/[a-z-]+/build/"`), theme)
+  }
+})
+
+test("the site says nothing about the shop it used to be", () => {
+  for (const page of ["index.html", "themes/index.html", "spec/index.html", "404.html", "llms.txt"]) {
+    assert.doesNotMatch(read(page), /wordpress/i, page)
+  }
+})

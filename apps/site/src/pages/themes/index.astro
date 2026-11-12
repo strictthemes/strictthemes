@@ -1,0 +1,91 @@
+---
+import Command from "@/components/Command.astro"
+import ThemeCard from "@/components/ThemeCard.astro"
+import { ThemePreview } from "@/components/ThemePreview"
+import Layout from "@/layouts/Base.astro"
+import { exampleFor, promptUrls, themes } from "@/lib/themes"
+
+/** A theme's page prompts that have a built example to look at. */
+const previews = (slug: string) =>
+  (themes.find((theme) => theme.slug === slug)?.prompts ?? [])
+    .filter((prompt) => exampleFor(slug, prompt.slug))
+    .map((prompt) => ({ title: prompt.title, href: promptUrls(slug, prompt.slug).preview }))
+---
+
+<Layout
+  title="Themes | Strict"
+  description="Thirteen free themes for AI-built UI. Each is one DESIGN.md file with light and dark modes, and installs into shadcn with one command."
+>
+  <section class="border-b border-border">
+    <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label text-muted-foreground md:col-span-12">Themes</p>
+      <h1 class="text-h1 md:col-span-8 md:text-display">
+        Pick a theme. Hand it to your agent.
+      </h1>
+      <p class="md:col-span-6">
+        Each theme is one DESIGN.md file with a light and a dark mode. Install
+        it into a shadcn project with one command, or download the Tailwind,
+        Nuxt UI or design-token export.
+      </p>
+    </div>
+  </section>
+
+  <div class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <section class="flex flex-col gap-8" aria-labelledby="all-themes">
+      <h2 id="all-themes" class="label text-muted-foreground">All thirteen, each in its own skin</h2>
+      <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {
+          themes.map((theme) => (
+            <li>
+              <ThemeCard theme={theme} level="h3" />
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    {
+      themes.map((theme) => (
+        <article class="flex flex-col gap-8 border-t border-foreground pt-4">
+          <div class="grid gap-4 md:grid-cols-12 md:gap-8">
+            <p class="label text-muted-foreground md:col-span-3">
+              <span class="text-foreground">{theme.number}</span> / Theme
+            </p>
+            <div class="flex min-w-0 flex-col gap-4 md:col-span-9">
+              <h2 class="text-h1">
+                <a href={`/themes/${theme.slug}`} class="hover:text-primary">
+                  {theme.name}
+                </a>
+              </h2>
+              <p class="max-w-measure text-muted-foreground">{theme.description}</p>
+              <div class="max-w-measure">
+                <Command command={theme.installCommand} />
+              </div>
+              <a
+                href={`/themes/${theme.slug}`}
+                class="label text-primary underline underline-offset-4"
+              >
+                Tokens, rules and downloads
+              </a>
+              {previews(theme.slug).length > 0 && (
+                <p class="flex flex-wrap items-baseline gap-x-4 gap-y-2">
+                  <span class="label text-muted-foreground">Pages built from its prompts</span>
+                  {previews(theme.slug).map((preview) => (
+                    <a href={preview.href} class="label text-primary underline underline-offset-4">
+                      {preview.title}
+                    </a>
+                  ))}
+                </p>
+              )}
+            </div>
+          </div>
+          <ThemePreview
+            client:visible
+            slug={theme.slug}
+            name={theme.name}
+            headingStyle={theme.headingStyle}
+          />
+        </article>
+      ))
+    }
+  </div>
+</Layout>

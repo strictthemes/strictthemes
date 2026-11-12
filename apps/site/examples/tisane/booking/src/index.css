@@ -1,0 +1,169 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/albert-sans";
+@import "@fontsource-variable/reddit-mono";
+@import "@fontsource/young-serif";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Young Serif', serif;
+    --font-sans: 'Albert Sans Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: var(--radius);
+    --radius-xl: 20px;
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --text-display: 56px;
+    --text-display--line-height: 1.05;
+    --text-display--font-weight: 400;
+    --text-display--letter-spacing: -0.01em;
+    --text-h1: 38px;
+    --text-h1--line-height: 1.15;
+    --text-h1--font-weight: 400;
+    --text-h2: 26px;
+    --text-h2--line-height: 1.25;
+    --text-h2--font-weight: 400;
+    --text-body: 17px;
+    --text-body--line-height: 1.65;
+    --text-body--font-weight: 400;
+    --text-label: 12px;
+    --text-label--line-height: 1.35;
+    --text-label--font-weight: 500;
+    --text-label--letter-spacing: 0.04em;
+    --color-tertiary: var(--tertiary);
+    --color-tertiary-foreground: var(--tertiary-foreground);
+    --font-mono: 'Reddit Mono Variable', monospace;
+}
+
+:root {
+    --background: #F5F1E8;
+    --foreground: #26281C;
+    --card: #FCFAF4;
+    --card-foreground: #26281C;
+    --popover: #FCFAF4;
+    --popover-foreground: #26281C;
+    --primary: #4C5B1A;
+    --primary-foreground: #FFFFFF;
+    --secondary: #26281C;
+    --secondary-foreground: #FCFAF4;
+    --muted: #ebe7de;
+    --muted-foreground: #626451;
+    --accent: #ebe9e3;
+    --accent-foreground: #26281C;
+    --destructive: #A8321F;
+    --border: #DAD5C3;
+    --input: #DAD5C3;
+    --ring: #4C5B1A;
+    --chart-1: #bdcc9a;
+    --chart-2: #9cae6e;
+    --chart-3: #80924c;
+    --chart-4: #667731;
+    --chart-5: #4c5b1a;
+    --radius: 12px;
+    --sidebar: #FCFAF4;
+    --sidebar-foreground: #26281C;
+    --sidebar-primary: #4C5B1A;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #ebe9e3;
+    --sidebar-accent-foreground: #26281C;
+    --sidebar-border: #DAD5C3;
+    --sidebar-ring: #4C5B1A;
+    --tertiary: #F0B59A;
+    --tertiary-foreground: #26281C;
+}
+
+.dark {
+    --background: #171810;
+    --foreground: #EDEBDD;
+    --card: #20221A;
+    --card-foreground: #EDEBDD;
+    --popover: #20221A;
+    --popover-foreground: #EDEBDD;
+    --primary: #B9CC72;
+    --primary-foreground: #1B2206;
+    --secondary: #EDEBDD;
+    --secondary-foreground: #26281C;
+    --muted: #22231a;
+    --muted-foreground: #A9AB95;
+    --accent: #30322a;
+    --accent-foreground: #EDEBDD;
+    --destructive: #FF917E;
+    --border: #36382B;
+    --input: #36382B;
+    --ring: #B9CC72;
+    --chart-1: #b9cc72;
+    --chart-2: #9bb131;
+    --chart-3: #809500;
+    --chart-4: #677800;
+    --chart-5: #526000;
+    --sidebar: #20221A;
+    --sidebar-foreground: #EDEBDD;
+    --sidebar-primary: #B9CC72;
+    --sidebar-primary-foreground: #1B2206;
+    --sidebar-accent: #30322a;
+    --sidebar-accent-foreground: #EDEBDD;
+    --sidebar-border: #36382B;
+    --sidebar-ring: #B9CC72;
+    --tertiary: #F0B59A;
+    --tertiary-foreground: #26281C;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  code, kbd, pre, samp {
+    @apply font-mono;
+    }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    }
+}
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}

@@ -1,0 +1,35 @@
+---
+interface Props {
+  command: string
+  label?: string
+}
+
+const { command, label = "Install" } = Astro.props
+---
+
+<div class="flex flex-col gap-2">
+  <span class="label text-muted-foreground">{label}</span>
+  <div class="flex items-stretch rounded-md border border-border bg-card">
+    <pre
+      class="min-w-0 flex-1 overflow-x-auto p-4 text-body"><code data-command>{command}</code></pre>
+    <button
+      type="button"
+      data-copy
+      class="label border-l border-border px-4 text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+    >
+      Copy
+    </button>
+  </div>
+</div>
+
+<script>
+  import { copyText, flash } from "@/lib/copy"
+
+  for (const button of document.querySelectorAll<HTMLButtonElement>("[data-copy]")) {
+    button.addEventListener("click", async () => {
+      const code = button.parentElement?.querySelector("[data-command]")
+      if (!code?.textContent) return
+      flash(button, (await copyText(code.textContent)) ? "Copied" : "Could not copy")
+    })
+  }
+</script>
