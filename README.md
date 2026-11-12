@@ -135,23 +135,24 @@ hosted at `https://mcp.strictthemes.com/mcp`:
 
 Or give it the [skill](skills/strict-check/SKILL.md), which says when to run
 the check, how to read the report and how to fix each rule. The
-[guide](packages/check#readme) has every option, the rules, and a GitLab CI
-and a GitHub Actions example.
+[guide](packages/check#readme) has every option, the rules, the GitHub Action
+and a GitLab CI example.
 
 ## What is in this repo
 
 | Package | What it does | Status |
 |---|---|---|
 | [`@strictthemes/spec`](packages/spec) | Parses, lints and exports Strict design specs (`DESIGN.md` + a `strict` rules block). Everything else builds on it. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/spec) |
-| [`@strictthemes/themes`](packages/themes) | The twenty-three themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
+| [`@strictthemes/themes`](packages/themes) | The twenty-three themes, five page prompts for each, and the build that turns them into a shadcn registry: the themes, their fonts, every example page as a block, and the agent kit for each theme. | First version, served from strictthemes.com/r |
+| [`packages/kit`](packages/kit) | The agent kit: four React blocks for agent interfaces (tool call, approval, stream, citations), written once and served for each theme in its own spacing and type. | First version, shown at strictthemes.com/kit |
 | [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. The MCP server also serves the themes and page prompts. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
 | [`@strictthemes/site`](apps/site) | strictthemes.com, built with Astro: theme pages with live previews, a built example page for every page prompt, the registry and the spec docs. | Live |
 | [`@strictthemes/mcp`](apps/mcp) | The themes and page prompts as a hosted MCP server, a Cloudflare Worker. | Live at mcp.strictthemes.com |
 | [`skills/strict-check`](skills/strict-check/SKILL.md) | The skill that has a coding agent run Strict Check on its own work. | First version |
+| [`skills/strict-theme-*`](skills) | One skill for each theme: how to build any page in it. Generated from the theme; add one with `npx skills add strictthemes/strictthemes --skill strict-theme-kiln`. | First version |
+| [`action.yml`](action.yml) | Strict Check as a GitHub Action: `uses: strictthemes/strictthemes@v1`. | First version |
 
-Planned: a generator that writes a `DESIGN.md` from a site's address, theme
-components, and a kit of components for agent interfaces. The roadmap is on
-[strictthemes.com](https://strictthemes.com).
+Planned: a generator that writes a `DESIGN.md` from a site's address.
 
 ## Develop
 

@@ -215,7 +215,7 @@
   .prose pre { background: var(--card); border: 1px solid var(--border); padding: 16px; overflow-x: auto; border-radius: var(--radius); font-size: var(--text-body); line-height: var(--text-body--line-height); }
   .prose pre code { background: none; border: 0; padding: 0; font-size: inherit; }
   .prose table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
-  .prose th { text-align: left; font-family: var(--theme-font-mono); font-size: var(--text-label); letter-spacing: var(--text-label--letter-spacing); text-transform: uppercase; font-weight: 500; color: var(--muted-foreground); }
+  .prose th { text-align: left; font-family: var(--theme-font-mono); font-size: var(--text-label); line-height: var(--text-label--line-height); letter-spacing: var(--text-label--letter-spacing); text-transform: uppercase; font-weight: 500; color: var(--muted-foreground); }
   .prose th, .prose td { border-bottom: 1px solid var(--border); padding: 8px 16px 8px 0; vertical-align: top; }
 }
 

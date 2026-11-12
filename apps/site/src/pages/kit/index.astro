@@ -1,0 +1,95 @@
+---
+// The agent kit: what its four blocks are, and the kit in every theme.
+import Layout from "@/layouts/Base.astro"
+import SectionHeader from "@/components/SectionHeader.astro"
+import { REPO_URL } from "@/lib/brand"
+import { kitBlocks, kitUrls, SITE_THEME, themes } from "@/lib/themes"
+
+const first = themes.find((theme) => theme.slug === SITE_THEME) ?? themes[0]
+const words = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"]
+const count = words[kitBlocks.length] ?? String(kitBlocks.length)
+---
+
+<Layout
+  title="Agent kit: blocks for agent interfaces | Strict"
+  description="Free React blocks for an agent's side of a conversation: a tool call, an approval, a streaming answer and its sources. Written out for each Strict theme, and checked against it."
+>
+  <section class="border-b border-border">
+    <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
+      <p class="label text-muted-foreground md:col-span-12">Agent kit</p>
+      <h1 class="text-h1 md:col-span-9 md:text-display">Blocks for the agent's side of the conversation.</h1>
+      <p class="md:col-span-6">
+        {count} React blocks for an interface where an agent works: what it called, what it
+        asks leave for, what it is writing, and what it read. Each is one file you own, built
+        on Base UI and Tailwind, and written out for the theme you pick, in that theme's
+        spacing, type and colors.
+      </p>
+    </div>
+  </section>
+
+  <div class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <section class="flex flex-col gap-8">
+      <SectionHeader number="01" label="The blocks" title="One file each. No library to install." id="blocks" />
+      <ul class="grid gap-8 md:grid-cols-2">
+        {
+          kitBlocks.map((block) => (
+            <li class="flex flex-col gap-2 border-t border-border pt-4">
+              <h3 class="font-heading text-h2">{block.title}</h3>
+              <p class="text-muted-foreground">{block.description}</p>
+              <p class="label text-muted-foreground">components/agent/{block.file}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="max-w-measure text-muted-foreground">
+        They hold no state of their own beyond open and closed: your code says whether a
+        call is running, whether a request was allowed, and what the answer is so far. The
+        source is in{" "}
+        <a href={`${REPO_URL}/tree/master/packages/kit`} class="text-link underline underline-offset-4"
+          >packages/kit</a
+        >.
+      </p>
+    </section>
+
+    {
+      first && (
+        <section class="flex flex-col gap-8">
+          <SectionHeader number="02" label="Look" title={`The kit in ${first.name}.`} id="look" />
+          <div class="rounded-md border border-border bg-card p-2 md:p-4">
+            <div class="overflow-hidden rounded-sm border border-border" data-strict-ignore>
+              <iframe
+                src={kitUrls(first.slug).build}
+                title={`The agent kit, built with ${first.name}`}
+                class="block w-full bg-background"
+                style="height:80svh"></iframe>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader number="03" label="Themes" title="Pick the theme. The kit follows it." id="themes" />
+      <p class="max-w-measure text-muted-foreground">
+        A block does not carry sizes of its own. For each theme it is written out again:
+        a gap is that theme's spacing step, a label is that theme's label size in its label
+        font. Every one of them is run through Strict Check in light and dark mode, at two
+        widths, with hover and focus.
+      </p>
+      <ul class="grid gap-x-8 md:grid-cols-2 lg:grid-cols-3">
+        {
+          themes.map((theme) => (
+            <li class="border-t border-border py-4">
+              <a
+                href={kitUrls(theme.slug).page}
+                class="font-heading text-h2 underline-offset-4 hover:underline"
+              >
+                {theme.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+</Layout>

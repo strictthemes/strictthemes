@@ -58,9 +58,44 @@ test("the registry is served with production URLs", () => {
       assert.ok(existsSync(join(dist, "r", url.split("/").at(-1) ?? "")), url)
     }
   }
-  const index = JSON.parse(read("r/registry.json")) as { items: unknown[] }
-  // Each theme, and three fonts for each: body, labels and headings.
-  assert.equal(index.items.length, THEMES.length * 4)
+  const index = JSON.parse(read("r/registry.json")) as { items: { name: string; type: string }[] }
+  // Each theme, three fonts for each (body, labels and headings), a block for each of its
+  // five example pages, and the agent kit: four blocks and one item that holds them all.
+  assert.equal(index.items.length, THEMES.length * (4 + 5 + 5))
+  assert.equal(new Set(index.items.map((item) => item.name)).size, index.items.length)
+})
+
+test("every example page is a block, and every theme has the agent kit", () => {
+  for (const [theme, , pages] of PAGES) {
+    for (const page of pages) {
+      const block = JSON.parse(read(`r/${theme}-${page}.json`)) as {
+        type: string
+        docs: string
+        files: { target: string; content: string }[]
+      }
+      assert.equal(block.type, "registry:block")
+      assert.equal(block.files[0]?.target, `components/${theme}-${page}/page.tsx`)
+      // The page's own source, as the example holds it.
+      assert.ok((block.files[0]?.content.length ?? 0) > 500, `${theme}-${page}`)
+      const command = `npx shadcn@latest add https://strictthemes.com/r/${theme}.json https://strictthemes.com/r/${theme}-${page}.json`
+      assert.ok(block.docs.includes(command), `${theme}-${page}`)
+      // The preview page offers the same command.
+      assert.ok(read(`themes/${theme}/prompts/${page}/index.html`).includes(command), `${theme}/${page}`)
+    }
+    const kit = JSON.parse(read(`r/${theme}-agent-kit.json`)) as { files: { target: string }[] }
+    assert.deepEqual(
+      kit.files.map((file) => file.target),
+      ["tool-call", "approval", "stream", "citations"].map((name) => `components/agent/${name}.tsx`)
+    )
+    // The kit's page for the theme, and the demo it shows, built from those files.
+    assert.ok(read(`kit/${theme}/index.html`).includes(`https://strictthemes.com/r/${theme}-agent-kit.json`), theme)
+    assert.ok(existsSync(join(dist, "kit", theme, "build", "index.html")), theme)
+    // The theme's skill, as a file and by its install command.
+    const skill = read(`themes/${theme}/SKILL.md`)
+    assert.match(skill, new RegExp(`^---\\nname: strict-theme-${theme}\\n`))
+    assert.ok(read(`themes/${theme}/index.html`).includes(`npx skills add strictthemes/strictthemes --skill strict-theme-${theme}`), theme)
+  }
+  assert.ok(existsSync(join(dist, "kit", "index.html")))
 })
 
 test("a normal build does not tell search engines to stay away", () => {
@@ -131,8 +166,9 @@ test("the sitemap lists every page a search engine may show, and no other", () =
     .sort()
   const listed = [...read("sitemap.xml").matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
   assert.deepEqual([...listed].sort(), canonical)
-  // The home page, the catalog, the spec, and for each theme its page and five previews.
-  assert.equal(listed.length, 3 + THEMES.length * 6)
+  // The home page, the catalog, the spec, the agent kit, and for each theme its page, its
+  // five previews and the kit in it.
+  assert.equal(listed.length, 4 + THEMES.length * 7)
   assert.equal(listed[0], "https://strictthemes.com/")
   assert.ok(!listed.some((url) => url.includes("/404") || url.endsWith("/build/")))
 
@@ -358,7 +394,10 @@ test("the site does not say who or what built the example pages", () => {
           : walk(join(dir, entry.name))
         : [join(dir, entry.name)]
     )
-  const files = walk(dist).filter((file) => /\.(html|json|txt|xml)$/.test(file))
+  // A block in the registry holds an example page's own source, sample text included
+  // ("a dictionary edited by hand"): like the built page, it is the page, not text about it.
+  const blocks = new Set(PAGES.flatMap(([theme, , pages]) => pages.map((page) => join(dist, "r", `${theme}-${page}.json`))))
+  const files = walk(dist).filter((file) => /\.(html|json|txt|xml)$/.test(file) && !blocks.has(file))
   assert.ok(files.length > 100)
   for (const file of files) {
     const text = readFileSync(file, "utf8")

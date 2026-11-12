@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { test } from 'node:test'
 import { contrastRatio, mix, namedFamilies, parseColor, shadcnRadiusClasses } from '@strictthemes/spec'
 import { FONTS } from '../src/fonts.ts'
+import { blockFromExample } from '../src/blocks.ts'
+import { fontClassFor, kitSourceFor } from '../src/kit.ts'
 import { buildRegistry, DEFAULT_BASE_URL, loadThemes } from '../src/registry.ts'
 
 const themesDir = join(import.meta.dirname, '..', 'themes')
@@ -371,4 +374,137 @@ test('prompts: the corners rule gives the theme\'s limit for full rounds', () =>
       }
     }
   }
+})
+
+test('every theme has a skill, and the files in skills/ are the generated ones', () => {
+  const skillsDir = join(import.meta.dirname, '..', '..', '..', 'skills')
+  assert.equal(registry.skills.length, themes.length)
+  for (const skill of registry.skills) {
+    assert.equal(skill.name, `strict-theme-${skill.theme}`)
+    // What a skill's front matter may hold: a name of lower-case letters, digits and hyphens, and one line of description.
+    assert.match(skill.source, /^---\nname: [a-z0-9-]+\ndescription: "[^\n]+"\n---\n\n# /)
+    const description = JSON.parse(/^description: (.+)$/m.exec(skill.source)?.[1] ?? '""') as string
+    assert.ok(description.length <= 1024, `${skill.name}: the description has ${description.length} characters`)
+    // A skill is read without a page brief: nothing in it may point at "this brief".
+    assert.doesNotMatch(skill.source, /this brief/i)
+    assert.equal(registry.files.get(`themes/${skill.theme}/SKILL.md`), skill.source)
+    const file = join(skillsDir, skill.name, 'SKILL.md')
+    assert.ok(existsSync(file), `${file} is missing: run npm run skills -w @strictthemes/themes`)
+    assert.equal(readFileSync(file, 'utf8'), skill.source, `${skill.name} is out of date: run npm run skills -w @strictthemes/themes`)
+  }
+  // No skill of a theme that no longer exists is left behind.
+  const kept = readdirSync(skillsDir).filter((name) => name.startsWith('strict-theme-')).sort()
+  assert.deepEqual(kept, registry.skills.map((skill) => skill.name).sort())
+})
+
+const repo = join(import.meta.dirname, '..', '..', '..')
+const full = buildRegistry(themesDir, DEFAULT_BASE_URL, join(repo, 'apps', 'site', 'examples'), join(repo, 'packages', 'kit'))
+
+test('a block is the page and what it imports, moved into one folder', () => {
+  const block = blockFromExample({
+    theme: 'kiln',
+    page: 'shop',
+    files: {
+      'App.tsx': [
+        'import { useState } from "react"',
+        'import { Leaf } from "lucide-react"',
+        'import { Button } from "@/components/ui/button"',
+        'import { Header } from "./components/site-header"',
+        'import { POTS } from "@/data"',
+        '// A sample of code on the page is not an import of the page.',
+        'const sample = `',
+        '  failed to resolve import "@orrin/icons" from "src/nav.tsx"`',
+        'export default function App() { return null }',
+      ].join('\n'),
+      'components/site-header.tsx': 'import { cn } from "@/lib/utils"\nexport const Header = () => null\n',
+      'components/ui/button.tsx': 'import { cn } from "@/lib/utils"\nexport const Button = () => null\n',
+      'components/theme-provider.tsx': 'export const ThemeProvider = () => null\n',
+      'lib/utils.ts': 'import { createCn } from "cn/config"\nexport const cn = createCn({})\n',
+      'data.ts': 'export const POTS = []\n',
+      'main.tsx': 'import App from "./App.tsx"\n',
+      'unused.ts': 'export const nothing = 1\n',
+    },
+  })
+  assert.ok(block)
+  assert.equal(block.name, 'kiln-shop')
+  assert.deepEqual(
+    block.files.map((file) => [file.target, file.type]),
+    [
+      ['components/kiln-shop/page.tsx', 'registry:component'],
+      ['components/kiln-shop/site-header.tsx', 'registry:component'],
+      ['components/ui/button.tsx', 'registry:ui'],
+      ['components/kiln-shop/data.ts', 'registry:component'],
+      ['lib/utils.ts', 'registry:lib'],
+    ],
+  )
+  const page = block.files[0]?.content ?? ''
+  assert.match(page, /from "@\/components\/kiln-shop\/site-header"/)
+  assert.match(page, /from "@\/components\/kiln-shop\/data"/)
+  assert.match(page, /from "@\/components\/ui\/button"/)
+  // What the project brings itself is not a dependency, and neither is a package named in sample text.
+  assert.deepEqual(block.dependencies, ['cn', 'lucide-react'])
+})
+
+test('every example page is a block in the registry', () => {
+  assert.equal(full.blocks.length, full.prompts.length)
+  for (const prompt of full.prompts) {
+    const name = `${prompt.theme}-${prompt.slug}`
+    const item = full.blocks.find((block) => block.name === name)
+    assert.ok(item, name)
+    assert.equal(item.type, 'registry:block')
+    // The theme is named in the install command, not fetched as a dependency: see the note in registry.ts.
+    assert.equal(item.registryDependencies, undefined)
+    assert.match(item.docs ?? '', new RegExp(`npx shadcn@latest add ${DEFAULT_BASE_URL}/${prompt.theme}\\.json ${DEFAULT_BASE_URL}/${name}\\.json`))
+    const targets = (item.files ?? []).map((file) => file.target)
+    assert.equal(targets[0], `components/${name}/page.tsx`)
+    assert.equal(new Set(targets).size, targets.length, `${name}: two files share a place`)
+    for (const file of item.files ?? []) {
+      // Every import of a project file points at a file the block brings.
+      for (const [, specifier = ''] of file.content.matchAll(/^import\s[^'"]*?["'](@\/[^"']+|\.[^"']+)["']/gm)) {
+        assert.ok(specifier.startsWith('@/'), `${name}: ${file.target} still imports ${specifier}`)
+        assert.ok(targets.some((target) => `@/${target.replace(/\.tsx?$/, '')}` === specifier), `${name}: ${file.target} imports ${specifier}, which the block does not bring`)
+      }
+    }
+    assert.ok(full.files.has(`r/${name}.json`))
+  }
+  // No block takes the name of a theme, a font or a kit item.
+  const names = [...full.items, ...full.blocks, ...full.kit].map((item) => item.name)
+  assert.equal(new Set(names).size, names.length)
+})
+
+test('the agent kit is written out for every theme, in that theme\'s own steps and type', () => {
+  const blocks = ['tool-call', 'approval', 'stream', 'citations']
+  for (const theme of themes) {
+    for (const block of blocks) {
+      const item = full.kit.find((candidate) => candidate.name === `${theme.slug}-agent-${block}`)
+      assert.ok(item, `${theme.slug}: ${block}`)
+      assert.equal(item.files?.length, 1)
+      assert.equal(item.files?.[0]?.target, `components/agent/${block}.tsx`)
+    }
+    const all = full.kit.find((candidate) => candidate.name === `${theme.slug}-agent-kit`)
+    assert.ok(all)
+    assert.equal(all.files?.length, blocks.length)
+    assert.deepEqual(all.dependencies, ['@base-ui/react', 'lucide-react'])
+    for (const file of all.files ?? []) {
+      // Nothing is left for the project to resolve: no kit token, and no class a theme may lack.
+      assert.doesNotMatch(file.content, /-sp-|\btype-(display|h1|h2|body|label)\b|__THEME__/, `${theme.slug}: ${file.target}`)
+      // A full round is not in every theme, a weight class may name a weight the theme does not have,
+      // and the only corner every theme has under shadcn's names is the base one.
+      assert.doesNotMatch(file.content, /\brounded-(full|sm|md|xl|2xl)\b|\bfont-(medium|semibold|bold)\b|\b(leading|tracking)-/, `${theme.slug}: ${file.target}`)
+    }
+  }
+  assert.equal(full.kit.length, themes.length * (blocks.length + 1))
+})
+
+test('a kit source takes a theme\'s spacing steps and the font its labels are set in', () => {
+  const relay = themes.find((theme) => theme.slug === 'relay')?.spec
+  const solace = themes.find((theme) => theme.slug === 'solace')?.spec
+  assert.ok(relay && solace)
+  const source = '<p className="flex gap-sp-md p-sp-lg md:p-sp-xl type-label text-body">__THEME__</p>'
+  // Relay: 12, 20 and 32px. Solace: 16, 28 and 48px.
+  assert.equal(kitSourceFor(source, relay), '<p className="flex gap-3 p-5 md:p-8 font-mono text-label text-body">Relay</p>')
+  assert.equal(kitSourceFor(source, solace), '<p className="flex gap-4 p-7 md:p-12 font-mono text-label text-body">Solace</p>')
+  assert.equal(fontClassFor(relay, 'body'), '')
+  assert.equal(fontClassFor(relay, 'h2'), 'font-heading')
+  assert.throws(() => kitSourceFor('<p className="p-sp-3xl" />', relay), /no spacing step "3xl"/)
 })

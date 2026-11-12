@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro"
-import { exampleFor, promptUrls, SITE_URL, themes } from "@/lib/themes"
+import { exampleFor, kitUrls, promptUrls, SITE_URL, themes } from "@/lib/themes"
 
 // The pages a search engine should know about, each at its canonical address:
 // the home page, the catalog, the spec, every theme page and every preview of
@@ -10,6 +10,8 @@ export const GET: APIRoute = () => {
     "/",
     "/themes/",
     "/spec/",
+    "/kit/",
+    ...themes.map((theme) => kitUrls(theme.slug).page),
     ...themes.flatMap((theme) => [
       `/themes/${theme.slug}/`,
       ...theme.prompts

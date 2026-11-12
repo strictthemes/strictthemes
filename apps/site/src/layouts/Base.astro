@@ -16,6 +16,7 @@ const canonical = new URL(Astro.url.pathname, SITE_URL).href
 const shareImage = new URL("/og.png", SITE_URL).href
 const nav = [
   { href: "/themes", label: "Themes" },
+  { href: "/kit", label: "Kit" },
   { href: "/spec", label: "Spec" },
   // Left out on a phone, where the header has no room for it: the footer has it too.
   { href: REPO_URL, label: "GitHub", wide: true },
@@ -25,6 +26,7 @@ const footer = [
     title: "Site",
     links: [
       { href: "/themes", label: "Themes" },
+      { href: "/kit", label: "Agent kit" },
       { href: "/spec", label: "The spec format" },
       { href: "/r/registry.json", label: "Registry index" },
       { href: "/llms.txt", label: "llms.txt" },

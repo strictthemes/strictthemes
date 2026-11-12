@@ -266,22 +266,12 @@ function themeChecks(spec: StrictSpec): string[] {
 }
 
 /**
- * Composes the full prompt for one page. The brief supplies the page; the
- * theme summary, the rules and most of the checklist are generated from the
- * theme's spec, so they cannot drift from it.
+ * The steps that get a project ready for the theme: install it, read
+ * `DESIGN.md`, look at the project, and teach `cn()` the type classes.
  */
-export function composePrompt(theme: Theme, brief: PageBrief, siteUrl: string): string {
+function setupSteps(theme: Theme, base: string): string[] {
   const { spec } = theme
-  const base = siteUrl.replace(/\/+$/, '')
-  const checks = [...brief.checks, ...themeChecks(spec)]
-  const dos = spec.sections.find((section) => section.canonical === "Do's and Don'ts")
   return [
-    `# Build ${/^[aeiou]/i.test(brief.page) ? 'an' : 'a'} ${brief.page} with the ${spec.name} theme`,
-    '',
-    `You are building one page in an existing project: ${brief.description} Follow this brief closely. \`DESIGN.md\` decides the tokens: colors, type, spacing steps and corners. This brief decides the layout, its widths included, and which token goes where. If this brief names a color, a type size, a spacing step or a corner that \`DESIGN.md\` does not have, \`DESIGN.md\` wins.`,
-    '',
-    '## Before you start',
-    '',
     `1. **Check the theme is installed.** The project should have \`DESIGN.md\` in its root and the ${spec.name} variables in its global CSS. If not, run \`npx shadcn@latest add ${base}/r/${theme.slug}.json\` and save ${base}/themes/${theme.slug}/DESIGN.md as \`DESIGN.md\` in the project root. In a project without shadcn, use ${base}/themes/${theme.slug}/tailwind.css instead. ${
       // A new shadcn project imports Geist. A theme set in Geist must not say to remove it.
       namedFamilies(spec.typography).includes('Geist')
@@ -301,6 +291,27 @@ export function composePrompt(theme: Theme, brief: PageBrief, siteUrl: string): 
           '   Then make every file in `components/ui` use it: where one has `import { cn } from "cn"`, change that line to import `cn` from the project\'s utils file (`@/lib/utils` in a default setup). Do the same for each component you add later. If the project uses `tailwind-merge` instead of the `cn` package, its components already import from the utils file: pass the same object to `extendTailwindMerge` and keep `clsx`.',
         ]
       : []),
+  ]
+}
+
+/**
+ * Composes the full prompt for one page. The brief supplies the page; the
+ * theme summary, the rules and most of the checklist are generated from the
+ * theme's spec, so they cannot drift from it.
+ */
+export function composePrompt(theme: Theme, brief: PageBrief, siteUrl: string): string {
+  const { spec } = theme
+  const base = siteUrl.replace(/\/+$/, '')
+  const checks = [...brief.checks, ...themeChecks(spec)]
+  const dos = spec.sections.find((section) => section.canonical === "Do's and Don'ts")
+  return [
+    `# Build ${/^[aeiou]/i.test(brief.page) ? 'an' : 'a'} ${brief.page} with the ${spec.name} theme`,
+    '',
+    `You are building one page in an existing project: ${brief.description} Follow this brief closely. \`DESIGN.md\` decides the tokens: colors, type, spacing steps and corners. This brief decides the layout, its widths included, and which token goes where. If this brief names a color, a type size, a spacing step or a corner that \`DESIGN.md\` does not have, \`DESIGN.md\` wins.`,
+    '',
+    '## Before you start',
+    '',
+    ...setupSteps(theme, base),
     `${typeNames(spec).length > 0 ? 5 : 4}. **Write real content.** If the user gave you details about their product, use them. Otherwise use the sample product in this brief and write the rest of the copy yourself: specific and plain, the way the samples read. Invent the company and people names; do not use real ones. Never use lorem ipsum. A link with no destination yet points to \`#\`. Set the page's \`<title>\` and meta description.`,
     '',
     `## The theme in short`,
@@ -327,4 +338,92 @@ export function composePrompt(theme: Theme, brief: PageBrief, siteUrl: string): 
     'Then tell the user which checks pass, which you could not verify, and anything in this brief you did not do and why.',
     '',
   ].join('\n')
+}
+
+/** A theme's skill: where it is kept in the repo and what the file holds. */
+export interface ThemeSkill {
+  theme: string
+  /** The skill's name, which is also its folder under `skills/`. */
+  name: string
+  /** The whole `SKILL.md`. */
+  source: string
+}
+
+/** A brief's wording, for a text that is read without one. */
+const withoutBrief = (text: string): string =>
+  text.replaceAll('This brief', 'The page brief').replaceAll('this brief', 'the page brief')
+
+/**
+ * Composes a theme's skill: what an agent needs to build any UI in the theme,
+ * not one page. It is the page prompt without the page: the same setup, the
+ * same summary, layout notes and rules, generated from the same spec, and the
+ * list of page briefs to fetch when the user asks for one of those pages.
+ */
+export function composeSkill(theme: Theme, siteUrl: string): ThemeSkill {
+  const { spec } = theme
+  const base = siteUrl.replace(/\/+$/, '')
+  const name = `strict-theme-${theme.slug}`
+  const dos = spec.sections.find((section) => section.canonical === "Do's and Don'ts")
+  const summary = (spec.description ?? '').trim()
+  const pages = theme.briefs.map((brief) => brief.page)
+  // One line of YAML, in quotation marks: a description may hold a colon.
+  const description = [
+    `Build UI in the ${spec.name} theme from strictthemes.com.`,
+    summary,
+    `Use it when the project's DESIGN.md is ${spec.name}, or when the user asks for the ${spec.name} theme.`,
+    `It installs the theme into a shadcn project, gives its layout rules${pages.length > 0 ? ` and its page briefs (${listOf(pages)})` : ''}, and checks the result with Strict Check.`,
+  ].filter((part) => part !== '').join(' ')
+  const body = [
+    `# ${spec.name}`,
+    '',
+    summary,
+    '',
+    `This skill is for building UI in the ${spec.name} theme: a page, a section or a component. \`DESIGN.md\` decides the tokens: colors, type, spacing steps and corners. The notes below say how the theme lays a page out and which token goes where.`,
+    '',
+    '## Before you start',
+    '',
+    ...setupSteps(theme, base),
+    '',
+    '## The theme in short',
+    '',
+    ...themeSummary(spec),
+    ...(theme.promptNotes
+      ? [
+          '',
+          'The layout notes below are written around a sample organisation and its pages. If the user gave you their own product, its name, pages and content replace the sample\'s, and the layout, the colors and the classes stay as the notes give them.',
+          '',
+          theme.promptNotes,
+        ]
+      : []),
+    '',
+    '## Rules',
+    '',
+    ...rules(spec),
+    ...(dos ? ['', `From the theme's own do's and don'ts:`, '', dos.body.trim()] : []),
+    '',
+    ...(theme.briefs.length > 0
+      ? [
+          '## Page briefs',
+          '',
+          `${spec.name} has a full brief for each of these pages: sections, layout, sample content and checks. When the user asks for one of them, fetch its brief and follow it. Where a brief and the notes above differ, the brief wins.`,
+          '',
+          ...theme.briefs.map((brief) => `- **${brief.title}:** ${brief.description} ${base}/themes/${theme.slug}/prompts/${brief.slug}.md`),
+          '',
+        ]
+      : []),
+    '## Check before you finish',
+    '',
+    'Build the project, then measure it against the theme with Strict Check:',
+    '',
+    '```bash',
+    'npx @strictthemes/check --dist dist',
+    '```',
+    '',
+    '`dist` is the folder the build wrote. Add `--path /pricing` for each page you touched other than `/`. Fix every error it lists by using a value the theme allows, and run it again until the last line starts with `Passed`. Do not mark code `strict-ignore` to get there.',
+    '',
+    'Then tell the user what you built, what the check reported, and anything you could not verify.',
+    '',
+  ].join('\n')
+  const source = ['---', `name: ${name}`, `description: ${JSON.stringify(description)}`, '---', '', withoutBrief(body)].join('\n')
+  return { theme: theme.slug, name, source }
 }

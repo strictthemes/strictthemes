@@ -1,0 +1,121 @@
+---
+name: strict-theme-recital
+description: "Build UI in the Recital theme from strictthemes.com. A warm, literary theme for long reading. Paper tones, a serif voice, and one oxblood accent. Use it when the project's DESIGN.md is Recital, or when the user asks for the Recital theme. It installs the theme into a shadcn project, gives its layout rules and its page briefs (essay page, journal index, handbook chapter, newsletter sign-up page and about page), and checks the result with Strict Check."
+---
+
+# Recital
+
+A warm, literary theme for long reading. Paper tones, a serif voice, and one oxblood accent.
+
+This skill is for building UI in the Recital theme: a page, a section or a component. `DESIGN.md` decides the tokens: colors, type, spacing steps and corners. The notes below say how the theme lays a page out and which token goes where.
+
+## Before you start
+
+1. **Check the theme is installed.** The project should have `DESIGN.md` in its root and the Recital variables in its global CSS. If not, run `npx shadcn@latest add https://strictthemes.com/r/recital.json` and save https://strictthemes.com/themes/recital/DESIGN.md as `DESIGN.md` in the project root. In a project without shadcn, use https://strictthemes.com/themes/recital/tailwind.css instead. If the global CSS still imports a font the theme does not use (a new shadcn project imports Geist), remove that import, and uninstall its package if nothing else uses it. Keep every font import the theme's install added, also one for a style no page uses yet.
+2. **Read `DESIGN.md` from start to finish.** It is the source of truth for every visual decision.
+3. **Look at the project before writing code.** Use its framework, router and file layout. For controls (buttons, inputs, tabs, menus, dialogs, accordions, data tables) use the components in `components/ui`, and add a missing one with `npx shadcn@latest add <name>` rather than writing your own, unless the page brief names a plain element. Layout is plain elements with theme classes: sections, panels, figures and lists need no component.
+4. **Teach `cn()` the theme's type classes.** shadcn's class merger does not know `text-display` or `text-h1`. It takes them for colors, so `cn("text-label text-muted-foreground")` silently drops one of the two, and a type class passed to a stock component does not replace its size. In a new shadcn project, `lib/utils.ts` only passes `cn` on from the `cn` package. Unless the file already holds the lines below, change it to:
+
+   ```ts
+   import { createCn } from "cn/config"
+
+   // The theme's type classes are font sizes, not colors.
+   export const cn = createCn({
+     extend: {
+       classGroups: {
+         "font-size": [{ text: ["display", "h1", "h2", "body", "label"] }],
+       },
+     },
+   })
+   ```
+
+   Then make every file in `components/ui` use it: where one has `import { cn } from "cn"`, change that line to import `cn` from the project's utils file (`@/lib/utils` in a default setup). Do the same for each component you add later. If the project uses `tailwind-merge` instead of the `cn` package, its components already import from the utils file: pass the same object to `extendTailwindMerge` and keep `clsx`.
+
+## The theme in short
+
+- **Fonts:** Fraunces for headings, Source Sans 3 for body text, Source Code Pro for labels and code.
+- **Type scale** (size/weight; each class also sets line height and tracking): `text-display` 60px/600, `text-h1` 40px/600, `text-h2` 28px/500, `text-body` 18px/400, `text-label` 13px/500.
+- **Font per size:** a type class does not set the font family. Headings (`<h1>` to `<h6>`) get the heading font on their own; on any other element add the font class: `font-heading` with `text-display`, `text-h1`, `text-h2`; `font-mono` with `text-label`.
+- **Spacing scale**, with the Tailwind step in brackets: 4px (`1`), 8px (`2`), 16px (`4`), 24px (`6`), 48px (`12`), 96px (`24`).
+- **Corners:** `rounded-sm` 3px, `rounded-md` 6px, `rounded-xl` 12px (the `lg` corner in `DESIGN.md`). `rounded-lg` is 6px as well: it is shadcn's name for the base corner, the one its stock buttons and inputs use.
+- **Colors (light mode):** primary #7B2D26, on-primary #FFF9F0, secondary #2B2622, on-secondary #FFF9F0, tertiary #B8892B, on-tertiary #1F1B18, neutral #6F665E, background #FBF7F0, surface #F3ECE1, foreground #1F1B18, border #DDD3C4, error #A3261C.
+
+The layout notes below are written around a sample organisation and its pages. If the user gave you their own product, its name, pages and content replace the sample's, and the layout, the colors and the classes stay as the notes give them.
+
+### How Recital pages are laid out
+
+- **Container:** one `<div>` wraps the whole page and is the container: `mx-auto max-w-3xl` (768px) with `px-4`, and `px-6` from `md` up, plus `text-body`, which every paragraph, list and card inherits: they need no size class of their own. Inside it sit the `<header>`, a `<main>` holding everything between the two, and the `<footer>`. The header, the footer and whatever the page brief calls wide (a figure, a table, a row of numbers) use its full width.
+- **Reading column:** all other content sits in a reading column inside the container: `mx-auto max-w-lg` (512px, 60 to 70 characters a line in this font). Headings, paragraphs, lists, block quotes, cards and forms are in it. One column only: no sidebar, and no text set in two columns.
+- **Wide blocks between text:** the page is a stack of blocks inside the container, each one either a reading column or a wide block. Where a wide block comes in the middle of the text, end the reading column before it and start a new one after it. The wide block carries the `my-12`; the column after it has no margin of its own, and its first element keeps its usual top margin, which collapses into the block's `mb-12`. Do not pull an element out of the column with a negative margin.
+- **Alignment:** text is left-aligned. Nothing is centered or justified, headings and short lines included. Only the two columns themselves are centered on the page.
+- **Vertical rhythm:** written as a top margin on each element, never as `space-y-*` on the column: `space-y-*` also puts its margin under every heading. A paragraph or a list that follows text has `mt-6`. An `<h2>` has `mt-12`, and the text under a heading has `mt-4`. A block quote, a figure, a card, a table or a block of code has `my-12`. A label and the thing it labels are `mt-2` apart, where the page brief gives no other margin. A new part of the page starts with `mt-24`, where the page brief says so. Where a part begins "In the reading column, with `mt-…`" (or "Wide, with `mt-…`"), that margin goes on the part's own reading column `<div>` (or wide block), and the part's first element takes no top margin of its own: an `<h2>` that opens it has no `mt-12`, and a card that opens it has `mb-12` in place of `my-12`. Where the page brief gives a block its own top margin, it replaces the top half of that block's `my-12`. A link or a button that stands on a line of its own sits in a block element (a `<p>` for a link, a `<div>` for a button), and the margin the page brief gives it goes on that element. These margins rely on collapsing: keep the columns and the parts in them in normal block flow, not flex or grid. A row inside a part that the page brief lays out with `flex` or `grid` (the header, a list item set as one row) is the exception, and the margins of its children do not collapse.
+- **Headings:** the `<h1>` is `text-h1`, and `text-display` only where the page brief says so. An `<h2>` is `text-h2`. An `<h3>` is `text-body font-semibold`, in the heading font it gets on its own, unless the page brief gives it another size. Sentence case, no full stop. A label heading, where the page brief names one, is an `<h2>` set as a label: `font-mono text-label text-muted-foreground`, with no top margin when it opens its part or its card.
+- **Standfirst:** the sentence or two under a title that sum the piece up: a `<p>` in `font-heading text-h2 font-normal italic`.
+- **Labels:** dates, bylines, reading times, captions, table headers, form labels, and button and badge text are labels: `font-mono text-label`. Write them in sentence case. Nothing is uppercased, in the text or with a class. A label on its own line is a block element such as a `<p>`. Parts of a label line are joined with ` · `.
+- **Dates:** written day, month in full, year: `12 March 2026`, and `12 March` where the year stands in a heading above the entry. Every date in a label, a heading or a list item of its own is a `<time>` with a `dateTime` (`2026-03-12`, or `2019` for a year alone), unless the page brief says it is plain text. A date or a year inside a sentence of running text, and a copyright year, are plain text.
+- **Text color:** headings, body text and form labels are `text-foreground`. Other labels are `text-muted-foreground`. A button's text color comes from its variant. Paragraphs are never muted.
+- **Emphasis:** `<em>` for emphasis, and nothing else: no bold in running text, no color, no underline. No small caps either. The theme loads real italics for the heading and the body font.
+- **Links:** a link in running text is `text-primary underline decoration-1 underline-offset-4 hover:text-foreground` and inherits its size. A link in the header, the footer or a list of titles is `text-foreground decoration-1 underline-offset-4 hover:underline`. The link for the current page has `aria-current="page"` and `underline`; mark one only where the page brief names the current page. Links get `transition-colors duration-150`.
+- **Header:** the `<header>` is itself the row, with `py-6` and no border: `flex flex-col items-start gap-y-2 md:flex-row md:items-baseline md:justify-between`. On the left the publication's name, a link to `/` in `font-heading text-h2`, styled as a header link and never marked as the current page. On the right a `<nav>` with the `aria-label` "Main" holding the links in `text-body` with `gap-6` between them. Below `md` the links sit on a second line under the name. No "Menu" button.
+- **Footer:** a `<footer>` in the container with `mt-24`. Inside it one element with a 1px top border and `py-12` holds the publication's name as plain text in `font-heading text-h2`, one sentence about it with `mt-2`, and a label line with the copyright with `mt-6`.
+- **Buttons:** the shadcn `Button` with `className="h-auto rounded-md px-6 py-2 font-mono text-label"`. The default variant (oxblood) is for the page's one main action. Any other button is `variant="secondary"` (ink). Its stock hover color cannot be told from its resting one in this theme: in `components/ui/button.tsx`, replace the `secondary` variant's `hover:bg-[color-mix(in_oklch,var(--secondary),var(--foreground)_5%)]` with `hover:bg-secondary/80`, once, and add no hover class on the page. The buttons of a group that are not the chosen one are `variant="outline"`. A button that sends a form needs `type="submit"`: this `Button` is `type="button"` unless told otherwise. A call to action that goes to another page or jumps within this one is an `<a>` with the same classes: write `cn(buttonVariants({ variant }), "…")`, because `buttonVariants` alone does not merge classes. Button text is sentence case, at most three words.
+- **Inputs:** the shadcn `Input` and `Textarea` with `className="h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"`. The stock `border-input` is about 1.4:1 against the page, too faint to find the field; `border-muted-foreground` reaches 3:1 in both modes. The stock `focus-visible:border-ring` and `aria-invalid:border-destructive` stay. They keep the fill they ship with, in dark mode too. Every field has a visible `<label>` above it with `block`, tied to it with `htmlFor`, and the field has `mt-2`.
+- **Errors:** an error is a line under its field with `mt-2`: `flex items-start gap-2 font-mono text-label text-destructive`, holding the `CircleAlert` icon (`shrink-0`) and a sentence that says what to do. The field gets `aria-invalid` and points to the line with `aria-describedby`. Fields are checked in code when the form is sent, with `noValidate` on the `<form>`, and focus moves to the first field with an error. An error line is removed when its own field changes (on `input`); the errors of the other fields stay until the next submit.
+- **Confirmations:** a message that replaces a form goes into an element with `role="status"` that is on the page from the start, empty: a status element that arrives together with its text is often not announced. The form and the status element share one wrapper, and the wrapper carries the top margin, so the message stands where the form stood. Never hide the empty status element. Give the message's first element `tabIndex={-1}` and move focus to it, because the button that had focus is gone.
+- **Badges:** the shadcn `Badge` with `className="h-auto rounded-sm bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"`. One or two words. At most one badge on a page.
+- **Cards:** a card is a plain element (an `<aside>` for a note beside the text) with `rounded-xl border bg-card p-6`. Inside it, a label comes first, with no top margin: a `<p>`, not a heading, unless the page brief calls it a label heading. What follows it has `mt-2` unless the page brief gives another margin. Use one only where the page brief asks for it. Never put a card inside a card, and do not use the shadcn `Card`: it ships its own padding and a ring.
+- **Block quotes:** a `<blockquote>` with `border-l-2 border-primary pl-6`. The quote is a `<p>` inside it in `font-heading text-h2 font-normal italic`, with no quotation marks. Who said it is a `<footer>` inside the `<blockquote>` with `mt-4`, a label with `not-italic`.
+- **Figures:** a `<figure>` is wide. Its panel is `rounded-xl border bg-card p-6`, drawn from plain elements with `bg-foreground`, `bg-background` and borders: no image files, no primary color, no gradient. The `<figcaption>` is a label under the panel with `mt-2`.
+- **Lists:** a list in running text is `list-disc` or `list-decimal` with `pl-6`, and `mt-2` between its items. A list of entries or titles, where the page brief gives each item a top border, is a `<ul>` (or the list element the page brief names) with no markers, no padding and no space between items, and no line under its last item.
+- **Rules:** every line is 1px and `border-border`, except the block quote's rule.
+- **Corners:** `rounded-sm` for badges, `rounded-md` for buttons and inputs, `rounded-xl` for cards and figures, `rounded-full` only for avatars.
+- **Surfaces:** flat. No shadows, no blur, no gradients in the code you write. A stock component that floats over the page (a menu, a dialog) keeps the one soft shadow it ships with.
+- **Icons:** from the project's icon set, with `size-4`, `strokeWidth={1.5}` and `aria-hidden="true"`. Use them only where the page brief or these notes name one.
+- **Small text:** a bare `<sup>` or `<small>` gets a size that is not in the type scale. Give it `text-label`.
+- **Motion:** in the code you write, the only transition is color. Nothing moves on scroll. Stock components keep the motion they ship with.
+
+## Rules
+
+- **Colors:** only the theme's colors, through the semantic classes (`bg-background`, `text-foreground`, `bg-card`, `bg-primary`, `text-primary-foreground`, `text-muted-foreground`, `border-border` and so on). No hex, rgb or named colors in components, and no Tailwind palette classes such as `bg-blue-500` or `text-gray-600`.
+- **Spacing:** padding, margin and gap use only the scale's steps (`1`, `2`, `4`, `6`, `12`, `24`) plus 0 and 1px. No arbitrary values such as `p-[18px]`, and no other steps such as `p-3` or `gap-5`. `auto` margins are fine. Widths and heights such as `w-64` or `size-4` are sizes, not spacing. This applies to the code you write: a stock component keeps the spacing inside it, unless the page brief changes it.
+- **Type:** every piece of text you write gets its size from one of `text-display`, `text-h1`, `text-h2`, `text-body`, `text-label`, set on the element or on a parent it inherits from. Put `text-body` on the outermost element of the page you write. No other sizes. A stock shadcn component keeps the size it ships with, unless `DESIGN.md` or the page brief gives that component its own style. A type class does not replace a weight class: where a stock component ships `font-medium` and the text should be regular, add `font-normal`.
+- **Fonts:** only the theme's fonts, through `font-sans`, `font-heading` and `font-mono`. Do not add a font.
+- **Corners:** only the `rounded-*` classes, which the theme already sets. No arbitrary radius, and `rounded-full` only where `DESIGN.md` or the page brief names a full round, such as an avatar or a status dot. The theme allows a full round on a box up to 64px across; Strict Check reports a larger one, and a pill counts by its height.
+- **Contrast:** all text meets WCAG AA against its background.
+- **Stock components:** a component from `components/ui`, and an `<a>` styled with `buttonVariants`, keeps the hover, pressed and disabled colors and the motion it ships with, unless the page brief changes them. They are the theme's colors under other names.
+- **Counts:** a number with a noun reads right at one: "1 set", not "1 sets". Where the page brief gives the words for only one of the two, write the other the same way.
+- **Sizes from data:** a height or a width that comes from data (a chart bar, a meter) is set with an inline `style`. That is the one use for an inline style.
+- **Focus:** every link and control shows a 2px outline on keyboard focus: `focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`. Keep `focus-visible:outline-solid` in it: in Tailwind 4 an `outline-none` on the same element, which stock components carry, otherwise hides the outline. An element that only gets focus from code (a heading or a message with `tabIndex={-1}`) gets the same outline written with `focus:` in place of `focus-visible:` (`focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring`): after a mouse click, a browser does not match `:focus-visible` on an element that code focuses. A link, a button or a field that code focuses keeps the `focus-visible:` classes it has: after a mouse click it shows no outline, which is how a browser treats every control, and is right. A stock component that ships its own focus ring (`Button`, `buttonVariants`, `Input`, `Textarea`, `Checkbox`, `Switch`, `AccordionTrigger`, the close button of a `Sheet`) must lose that ring. Do it once, in the component's file in `components/ui`, which is yours to change: replace its `focus-visible:ring-*` classes with the outline classes, and in a field replace its `aria-invalid:ring-*` classes, the `dark:` ones included, with `aria-invalid:ring-0`, or a field with an error shows a tinted ring. `Button` has two more sets. Its base classes also carry `aria-invalid:ring-*` classes: replace them with `aria-invalid:ring-0`, as in a field. Its `destructive` variant carries `focus-visible:ring-*` classes of its own, the `dark:` one included: delete them and put nothing in their place, because the base classes already give every variant the outline. Wherever this rule says replace, change the classes in the file and do not add `ring-0` beside them: an added class only wins where it comes later and passes through `cn`. The stock `focus-visible:border-ring` can stay. These ring changes go only into the files of components that this page uses and that can take focus on it: a `Badge` that is not a link keeps its ring classes. The `cn` import from the setup steps is another matter and goes into every file. A box that scrolls sideways (a code block, a wide table) gets `tabIndex={0}`, `role="region"`, an `aria-label` and the same outline, also at widths where it happens to fit. Where a focusable box touches the edges of a parent that has `overflow-hidden`, draw its outline inside it: `focus-visible:-outline-offset-2` in place of `focus-visible:outline-offset-2`.
+- **Not allowed:** purple or multi-color gradients; emoji used as icons or bullets; a card inside a card; glows and colored shadows.
+- **Dark mode:** the page must work with the `dark` class on `<html>`. Because every color comes from a semantic class, this needs no extra code; do not write `dark:` color overrides. A new shadcn project follows the system's mode and switches on the `d` key: leave that as it is, and add no mode switch of your own. If the page has a native `<select>` or a date or time field, tell the browser the mode, or its list and its picker stay light in dark mode: in the global CSS, give `:root` `color-scheme: light` and `.dark` `color-scheme: dark`.
+
+From the theme's own do's and don'ts:
+
+- Do give text room: wide margins and tall line height.
+- Do use italics for emphasis before reaching for color.
+- Don't use pure white, pure black or cool greys.
+- Don't use gradients, glows or glass effects.
+- Don't put a card inside a card.
+- Don't introduce a color, size or radius that is not a token above.
+
+## Page briefs
+
+Recital has a full brief for each of these pages: sections, layout, sample content and checks. When the user asks for one of them, fetch its brief and follow it. Where a brief and the notes above differ, the brief wins.
+
+- **Essay:** a long essay or article page built to be read from start to finish, with a block quote, a figure and footnotes. https://strictthemes.com/themes/recital/prompts/essay.md
+- **Journal:** the index page of a journal or blog, with a short introduction, a topic filter and a dated list of entries grouped by year. https://strictthemes.com/themes/recital/prompts/journal.md
+- **Chapter:** one chapter of a guide or handbook, read from start to finish, with a list of its sections, a table, an aside and links to the chapters before and after. https://strictthemes.com/themes/recital/prompts/chapter.md
+- **Newsletter:** the sign-up page of a newsletter or a small publication, with what it is, a sample of the writing, what readers say and a sign-up form. https://strictthemes.com/themes/recital/prompts/newsletter.md
+- **About:** an about page for a writer or a small publication, with who makes it, how it is made, a short history and a contact form. https://strictthemes.com/themes/recital/prompts/about.md
+
+## Check before you finish
+
+Build the project, then measure it against the theme with Strict Check:
+
+```bash
+npx @strictthemes/check --dist dist
+```
+
+`dist` is the folder the build wrote. Add `--path /pricing` for each page you touched other than `/`. Fix every error it lists by using a value the theme allows, and run it again until the last line starts with `Passed`. Do not mark code `strict-ignore` to get there.
+
+Then tell the user what you built, what the check reported, and anything you could not verify.

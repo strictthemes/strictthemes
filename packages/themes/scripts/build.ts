@@ -13,7 +13,8 @@ const option = (name: string): string | undefined => {
 const baseUrl = option('--base-url') ?? process.env.STRICT_REGISTRY_URL ?? DEFAULT_BASE_URL
 const out = option('--out') ?? join(root, 'dist')
 
-const registry = buildRegistry(join(root, 'themes'), baseUrl)
+// The example pages live with the site. Each becomes a block in the registry.
+const registry = buildRegistry(join(root, 'themes'), baseUrl, join(root, '..', '..', 'apps', 'site', 'examples'), join(root, '..', 'kit'))
 
 // A theme with any error or warning does not ship.
 let failed = false

@@ -123,7 +123,7 @@ test('mcp: check with dist measures the built pages', async (t) => {
   const result = await client.callTool({ name: 'check', arguments: { dir: broken, dist: 'dist', modes: ['light'], widths: [1280] } })
   if (result.isError === true && /No browser/.test(textOf(result))) return t.skip('no Chromium-based browser on this machine')
   assert.notEqual(result.isError, true)
-  assert.match(textOf(result), /^Rendered pages: \/ in light mode at 1280px$/m)
+  assert.match(textOf(result), /^Rendered pages: \/ in light mode at 1280px, also on hover and focus$/m)
   assert.match(textOf(result), /4 errors, 0 warnings\.$/m)
   assert.match(textOf(result), /Text is 13px, which is not in the type scale/)
 

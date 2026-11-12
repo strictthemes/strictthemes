@@ -49,18 +49,23 @@ jobs:
       # The site's tests build the site again, with the production address.
       - run: npm test
       # Strict Check on the site itself, against its own theme: the code, and
-      # five built pages in the runner's Chrome.
+      # seven built pages in the runner's Chrome.
+      # It runs through this repo's own action (action.yml), with the checker
+      # built above in place of the one on npm. The same options are in
+      # `strict-check` in apps/site/package.json, for running it by hand.
       - name: Strict Check on the site
-        run: npm run strict-check -w apps/site -- --report "$GITHUB_WORKSPACE/strict-check.txt"
-      - name: Show the report on the run's page
-        if: always()
-        run: |
-          test -f strict-check.txt || exit 0
-          {
-            echo '```'
-            cat strict-check.txt
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+        uses: ./
+        with:
+          command: node packages/check/dist/cli.js
+          dir: apps/site
+          spec: packages/themes/themes/strict-one/DESIGN.md
+          dist: dist
+          paths: / /themes/ /spec/ /themes/strict-one/ /kit/ /kit/strict-one/ /404.html
+          args: --exclude examples --exclude .kit --mode light
+      # The agent kit, as the registry writes it for each theme: in every theme,
+      # both color modes and two widths, with hover and focus.
+      - name: Strict Check on the agent kit in every theme
+        run: npm run strict-check:kit -w apps/site
       - name: Stamp the build
         run: echo "${GITHUB_SHA::8} $GITHUB_REF_NAME $(date -u '+%F %T UTC')" > apps/site/dist/deploy.txt
       - uses: actions/upload-artifact@v7
@@ -75,7 +80,7 @@ jobs:
         if: always()
         with:
           name: strict-check
-          path: strict-check.txt
+          path: strict-check.*
           if-no-files-found: ignore
           retention-days: 7
 

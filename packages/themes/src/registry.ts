@@ -13,8 +13,10 @@ import {
   type Finding,
   type StrictSpec,
 } from '@strictthemes/spec'
+import { blockFromExample, loadExamples, type ExampleSource } from './blocks.ts'
 import { FONTS } from './fonts.ts'
-import { composePrompt, mergeSetup, parseBrief, type PageBrief, type PagePrompt } from './prompts.ts'
+import { KIT_FOLDER, kitDependencies, kitSourceFor, loadKit, type KitBlock } from './kit.ts'
+import { composePrompt, composeSkill, mergeSetup, parseBrief, type PageBrief, type PagePrompt, type ThemeSkill } from './prompts.ts'
 
 export const DEFAULT_BASE_URL = 'https://strictthemes.com/r'
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json'
@@ -45,6 +47,8 @@ export interface RegistryItem {
   css?: Record<string, Record<string, never>>
   cssVars?: Record<string, Record<string, string>>
   font?: Record<string, unknown>
+  /** The files a block installs, each with its content and the place it goes. */
+  files?: { path: string; type: string; content: string; target: string }[]
 }
 
 export interface Theme {
@@ -64,6 +68,12 @@ export interface Registry {
   items: RegistryItem[]
   /** Every page prompt, composed and ready to paste. */
   prompts: PagePrompt[]
+  /** One skill per theme: how to build any UI in it. */
+  skills: ThemeSkill[]
+  /** One `registry:block` item per example page: the page as it was built, ready to install. */
+  blocks: RegistryItem[]
+  /** The agent kit, written out for each theme: one item per block, and one that holds them all. */
+  kit: RegistryItem[]
   /** Output files, keyed by path relative to the output directory. */
   files: Map<string, string>
 }
@@ -108,6 +118,10 @@ export function loadThemes(dir: string): Theme[] {
       return themeFromSource(name, readFileSync(join(dir, name, 'DESIGN.md'), 'utf8'), promptFiles)
     })
 }
+
+/** `a`, `a and b`, `a, b and c`. */
+const listOf = (parts: string[]): string =>
+  parts.length < 2 ? parts.join('') : `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`
 
 /** The first family of a font stack, without quotes. */
 const firstFamily = (stack: string): string => (stack.split(',')[0] ?? '').trim().replace(/^["']|["']$/g, '')
@@ -154,16 +168,30 @@ function fontItems(spec: StrictSpec): { role: Role; item: RegistryItem }[] {
  * installed font registers under its package's family name ("Archivo
  * Variable"), not the name in DESIGN.md.
  */
-export function buildRegistry(themesDir: string, baseUrl: string = DEFAULT_BASE_URL): Registry {
-  return buildRegistryFromThemes(loadThemes(themesDir), baseUrl)
+export function buildRegistry(themesDir: string, baseUrl: string = DEFAULT_BASE_URL, examplesDir?: string, kitDir?: string): Registry {
+  return buildRegistryFromThemes(
+    loadThemes(themesDir),
+    baseUrl,
+    examplesDir === undefined ? [] : loadExamples(examplesDir),
+    kitDir === undefined ? [] : loadKit(kitDir),
+  )
 }
 
+/** The name of a kit item in the registry: `relay-agent-tool-call`, or `relay-agent-kit` for all of them. */
+export const kitItemName = (theme: string, block: string): string => `${theme}-agent-${block}`
+
 /** The same build for themes that are already loaded, for example by a bundler. */
-export function buildRegistryFromThemes(themes: Theme[], baseUrl: string = DEFAULT_BASE_URL): Registry {
+export function buildRegistryFromThemes(
+  themes: Theme[],
+  baseUrl: string = DEFAULT_BASE_URL,
+  examples: ExampleSource[] = [],
+  kitBlocks: KitBlock[] = [],
+): Registry {
   const base = baseUrl.replace(/\/+$/, '')
   // The site the registry lives on: the registry URL without its last path segment.
   const siteUrl = base.replace(/\/[^/]+$/, '')
   const prompts: PagePrompt[] = []
+  const skills: ThemeSkill[] = []
   const themeItems: RegistryItem[] = []
   const fonts = new Map<string, RegistryItem>()
   const files = new Map<string, string>()
@@ -229,6 +257,9 @@ export function buildRegistryFromThemes(themes: Theme[], baseUrl: string = DEFAU
     files.set(`themes/${theme.slug}/nuxt-ui.css`, nuxt.css)
     files.set(`themes/${theme.slug}/app.config.ts`, nuxt.appConfig)
     files.set(`themes/${theme.slug}/tokens.json`, json(toDtcg(spec)))
+    const skill = composeSkill(theme, siteUrl)
+    skills.push(skill)
+    files.set(`themes/${theme.slug}/SKILL.md`, skill.source)
     for (const brief of theme.briefs) {
       const prompt = composePrompt(theme, brief, siteUrl)
       prompts.push({ ...brief, theme: theme.slug, prompt })
@@ -236,16 +267,90 @@ export function buildRegistryFromThemes(themes: Theme[], baseUrl: string = DEFAU
     }
   }
 
+  // A block is the example of one page prompt. An example whose theme or prompt is gone is left out.
+  const blocks: RegistryItem[] = []
+  for (const theme of themes) {
+    for (const brief of theme.briefs) {
+      const example = examples.find((candidate) => candidate.theme === theme.slug && candidate.page === brief.slug)
+      const block = example ? blockFromExample(example) : null
+      if (!block) continue
+      const stock = block.files.filter((file) => file.type === 'registry:ui').map((file) => file.target)
+      blocks.push({
+        $schema: ITEM_SCHEMA,
+        name: block.name,
+        type: 'registry:block',
+        title: `${theme.spec.name}: ${brief.title}`,
+        description: brief.description,
+        ...(block.dependencies.length > 0 ? { dependencies: block.dependencies } : {}),
+        // The theme is not a dependency. The command only fills in the variables of a theme it was
+        // asked for by name; one it fetches as a dependency leaves the project's colors as they were.
+        files: block.files,
+        docs: [
+          `This page needs the ${theme.spec.name} theme. In a project that does not have it yet, install both with one command: npx shadcn@latest add ${base}/${theme.slug}.json ${base}/${block.name}.json`,
+          `The page is ${block.folder}/page.tsx. Render its default export where the page should be, for example from src/App.tsx.`,
+          stock.length > 0
+            ? `It brings ${listOf(stock)} and lib/utils.ts in the form the page uses: with the theme's focus outline, and with a cn() that knows the theme's type classes. Say yes when the command asks to overwrite them, or compare them with yours first.`
+            : '',
+          `Its sample content is made up. The brief it was built from is ${siteUrl}/themes/${theme.slug}/prompts/${brief.slug}.md.`,
+        ].filter((line) => line !== '').join('\n\n'),
+      })
+    }
+  }
+
+  // The agent kit is one set of sources. Each theme gets them written out in its own spacing and type.
+  const kit: RegistryItem[] = []
+  for (const theme of kitBlocks.length > 0 ? themes : []) {
+    const { spec } = theme
+    const fileOf = (block: KitBlock) => ({
+      path: `${KIT_FOLDER}/${block.file}`,
+      type: 'registry:component',
+      content: kitSourceFor(block.source, spec),
+      target: `${KIT_FOLDER}/${block.file}`,
+    })
+    const needsTheme = (name: string) =>
+      `These files are written for the ${spec.name} theme: its spacing steps, its type classes and its colors. In a project that does not have the theme yet, install both with one command: npx shadcn@latest add ${base}/${theme.slug}.json ${base}/${name}.json`
+    for (const block of kitBlocks) {
+      const name = kitItemName(theme.slug, block.name)
+      const dependencies = kitDependencies(block)
+      kit.push({
+        $schema: ITEM_SCHEMA,
+        name,
+        type: 'registry:component',
+        title: `${spec.name}: ${block.title}`,
+        description: block.description,
+        ...(dependencies.length > 0 ? { dependencies } : {}),
+        files: [fileOf(block)],
+        docs: needsTheme(name),
+      })
+    }
+    const all = kitItemName(theme.slug, 'kit')
+    const dependencies = [...new Set(kitBlocks.flatMap(kitDependencies))].sort()
+    kit.push({
+      $schema: ITEM_SCHEMA,
+      name: all,
+      type: 'registry:block',
+      title: `${spec.name}: agent kit`,
+      description: `Blocks for an agent's side of a conversation, in the ${spec.name} theme: ${listOf(kitBlocks.map((block) => block.title.toLowerCase()))}.`,
+      ...(dependencies.length > 0 ? { dependencies } : {}),
+      files: kitBlocks.map(fileOf),
+      docs: needsTheme(all),
+    })
+  }
+
   const items = [...themeItems, ...[...fonts.values()].sort((a, b) => a.name.localeCompare(b.name))]
-  for (const item of items) files.set(`r/${item.name}.json`, json(item))
+  for (const item of [...items, ...blocks, ...kit]) files.set(`r/${item.name}.json`, json(item))
   files.set(
     'r/registry.json',
     json({
       $schema: 'https://ui.shadcn.com/schema/registry.json',
       name: 'strict',
       homepage: 'https://strictthemes.com',
-      items: items.map(({ $schema: _schema, ...rest }) => rest),
+      items: [...items, ...blocks, ...kit].map(({ $schema: _schema, files: itemFiles, ...rest }) => ({
+        ...rest,
+        // The index names a block's files; each block's own address holds their content.
+        ...(itemFiles ? { files: itemFiles.map(({ content: _content, ...file }) => file) } : {}),
+      })),
     }),
   )
-  return { themes, items, prompts, files }
+  return { themes, items, prompts, skills, blocks, kit, files }
 }

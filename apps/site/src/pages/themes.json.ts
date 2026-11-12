@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro"
 import { fontRoles } from "@strictthemes/spec"
-import { exampleFor, promptUrls, SITE_URL, themes } from "@/lib/themes"
+import { blockCommand, exampleFor, kitUrls, promptUrls, SITE_URL, themes } from "@/lib/themes"
 
 /** The family a role names, without its fallbacks or quotation marks. */
 const family = (stack: string | undefined): string | undefined =>
@@ -33,11 +33,29 @@ export const GET: APIRoute = () => {
           notes: theme.item.docs ?? "",
         },
         exports: theme.files
-          .filter((file) => file !== "DESIGN.md")
+          .filter((file) => file !== "DESIGN.md" && file !== "SKILL.md")
           .map((file) => `${SITE_URL}/themes/${theme.slug}/${file}`),
+        // How an agent builds any UI in the theme, as a skill file.
+        skill: {
+          name: theme.skill.name,
+          url: `${SITE_URL}${theme.skill.file}`,
+          install: theme.skill.command,
+        },
+        // Blocks for agent interfaces, written out for this theme.
+        kit: {
+          page: `${SITE_URL}${kitUrls(theme.slug).page}`,
+          install: theme.kit.command,
+          blocks: theme.kit.blocks.map((block) => ({
+            name: block.name,
+            title: block.title,
+            description: block.description,
+            install: block.command,
+          })),
+        },
         prompts: theme.prompts.map((prompt) => {
           const urls = promptUrls(theme.slug, prompt.slug)
           const example = exampleFor(theme.slug, prompt.slug)
+          const block = blockCommand(theme.slug, prompt.slug)
           return {
             slug: prompt.slug,
             title: prompt.title,
@@ -49,6 +67,8 @@ export const GET: APIRoute = () => {
                     preview: `${SITE_URL}${urls.preview}`,
                     date: example.date,
                     check: example.check,
+                    // The command that installs the example page itself, with its theme.
+                    ...(block ? { install: block } : {}),
                   },
                 }
               : {}),

@@ -40,11 +40,36 @@ export interface Rules {
   sizes: number[] | null
   sizeNames: Set<string>
   weights: number[] | null
+  /**
+   * The line height and letter spacing each type size is set with, in px, or
+   * null when the spec does not restrict type. A size two tokens share has two entries.
+   */
+  leading: TypeSetting[] | null
   /** Declared font families, lower-cased, or null when any font is allowed. */
   fonts: string[] | null
   tells: Record<string, RuleLevel>
   /** Every mode that can be checked: the base mode first. */
   modes: string[]
+}
+
+/** How one type token sets a size: its line height and letter spacing, in px. */
+export interface TypeSetting {
+  size: number
+  /** Null when the token names no line height. */
+  lineHeight: number | null
+  letterSpacing: number
+}
+
+/** A token's line height or letter spacing in px. A bare number and `em` are multiples of the font size. */
+function relativePx(value: string | number | undefined, size: number): number | null {
+  if (value === undefined) return null
+  const match = /^(-?\d*\.?\d+)(px|rem|em|%)?$/.exec(String(value).trim())
+  if (!match) return null
+  const n = Number(match[1])
+  if (match[2] === 'px') return n
+  if (match[2] === 'rem') return n * 16
+  if (match[2] === '%') return (n / 100) * size
+  return n * size
 }
 
 /** A CSS length in px. `rem` and `em` count as 16px. Returns null for anything else. */
@@ -125,6 +150,16 @@ export function rulesFor(spec: StrictSpec, options: RulesOptions = {}): Rules {
     typography.map((token) => Number(token.fontWeight)).filter((n) => Number.isFinite(n) && n > 0),
   )
   const fonts = namedFamilies(spec.typography).map((family) => family.toLowerCase())
+  const leading: TypeSetting[] = []
+  for (const token of typography) {
+    const size = toPx(token.fontSize)
+    if (size === null) continue
+    leading.push({
+      size,
+      lineHeight: relativePx(token.lineHeight, size),
+      letterSpacing: relativePx(token.letterSpacing, size) ?? 0,
+    })
+  }
 
   return {
     name: spec.name,
@@ -141,6 +176,7 @@ export function rulesFor(spec: StrictSpec, options: RulesOptions = {}): Rules {
     sizes: strict.typography.allow === 'scale' ? px(typography.map((token) => token.fontSize)) : null,
     sizeNames: new Set(Object.entries(spec.typography).filter(([, token]) => token.fontSize !== undefined).map(([name]) => name)),
     weights: strict.typography.allow === 'scale' && weights.length > 0 ? weights : null,
+    leading: strict.typography.allow === 'scale' && leading.length > 0 ? leading : null,
     fonts: strict.typography.fonts === 'declared' && fonts.length > 0 ? fonts : null,
     tells: strict.tells,
     modes,

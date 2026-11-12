@@ -26,6 +26,14 @@ export interface ElementData {
   fontWeight: number
   /** The first family of the computed font stack, without quotes. */
   fontFamily: string
+  /** Line height in px, or -1 when it is `normal` (the font's own). */
+  lineHeight: number
+  /** Letter spacing in px. 0 when it is `normal`. */
+  letterSpacing: number
+  /** Inside a `<sup>` or `<sub>`, where a line height of its own keeps the line it sits in from moving. */
+  raised: boolean
+  /** The outline's color when the page draws one, as a focus ring often is. Null for the browser's own (`auto`). */
+  outline: Rgba | null
   /** Padding, margin and gap set in px. `auto`, percentages and zero are left out. */
   spacing: { property: string; px: number }[]
   boxShadow: string
@@ -57,14 +65,39 @@ export interface PageData {
   canvas: [number, number, number]
   /** Elements marked `data-strict-ignore`. They and everything inside them were not measured. */
   ignored: number
+  /**
+   * A state pass: the selectors of the focused elements that look the same as
+   * they do unfocused, so nothing shows where the keyboard is.
+   */
+  unmarked?: string[]
+  /** A focus pass: how many focusable elements were looked at. */
+  focusable?: number
+}
+
+export interface CollectOptions {
+  /** Keep what each element looked like, to compare a later state pass with. */
+  remember?: boolean
+  /**
+   * A state pass, after hover or focus was forced on the elements matching
+   * `targets`: return only the elements that look different from the remembered pass.
+   */
+  state?: { name: 'hover' | 'focus'; targets: string }
 }
 
 /**
  * Reads the computed styles of every visible element. Runs inside the page,
  * so it must not use anything from outside its own body.
  */
-export function collect(): PageData {
+export function collect(options: CollectOptions = {}): PageData {
   const MAX_ELEMENTS = 6000
+  type Remembered = { looks: Map<Element, string>; marks: Map<Element, string> }
+  const store = window as unknown as { __strictCheck?: Remembered }
+  if (options.remember) store.__strictCheck = { looks: new Map(), marks: new Map() }
+  const remembered = store.__strictCheck
+  const state = options.state
+  const unmarked: string[] = []
+  /** The elements whose look changed in this state pass. */
+  const changed = new Set<Element>()
   const SKIP = new Set(['SCRIPT', 'STYLE', 'HEAD', 'META', 'LINK', 'TITLE', 'NOSCRIPT', 'TEMPLATE', 'BR', 'WBR'])
   const NOT_CARDS = new Set(['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA', 'TABLE', 'THEAD', 'TBODY', 'TR', 'TD', 'TH', 'IMG', 'SVG', 'VIDEO', 'CANVAS', 'LABEL'])
   const EMOJI = /\p{Emoji_Presentation}|\p{Extended_Pictographic}️/u
@@ -126,9 +159,15 @@ export function collect(): PageData {
 
   const viewportWidth = document.documentElement.clientWidth
   const scrollWidth = document.documentElement.scrollWidth
+  /** Focused elements with no mark of their own. One is still fine when something inside it changed. */
+  const pending: { element: Element; selector: string }[] = []
+  let focusable = 0
   const elements: ElementData[] = []
   let truncated = false
   let ignored = 0
+
+  /** A control whose focus shows on a sibling, as a hidden checkbox styled through its label does. */
+  const isPeer = (element: Element): boolean => element.classList.contains('peer') || /(^|\s)peer\//.test(element.className.toString())
 
   const describe = (element: Element, text: string): string => {
     const classes = [...element.classList].slice(0, 3).map((name) => `.${name}`).join('')
@@ -239,7 +278,12 @@ export function collect(): PageData {
     if (!isSvg || element.tagName.toLowerCase() === 'svg') {
       if (rect.width > 0 || rect.height > 0) {
         const color = toRgba(style.color)
-        elements.push({
+        const outline: Rgba | null =
+          // `auto` is the browser's own focus ring, in the browser's color: not the page's to get wrong.
+          style.outlineStyle !== 'none' && style.outlineStyle !== 'auto' && Number.parseFloat(style.outlineWidth) > 0 && toRgba(style.outlineColor)[3] > 0
+            ? toRgba(style.outlineColor)
+            : null
+        const data: ElementData = {
           selector: describe(element, text),
           tag: element.tagName.toLowerCase(),
           stock,
@@ -253,6 +297,10 @@ export function collect(): PageData {
           fontSize: Number.parseFloat(style.fontSize),
           fontWeight: Number(style.fontWeight),
           fontFamily: (style.fontFamily.split(',')[0] ?? '').trim().replace(/^["']|["']$/g, ''),
+          lineHeight: style.lineHeight === 'normal' ? -1 : Number.parseFloat(style.lineHeight),
+          letterSpacing: style.letterSpacing === 'normal' ? 0 : Number.parseFloat(style.letterSpacing) || 0,
+          raised: element.closest('sup, sub') !== null,
+          outline,
           spacing,
           boxShadow: style.boxShadow,
           textShadow: style.textShadow,
@@ -265,7 +313,43 @@ export function collect(): PageData {
           emoji: EMOJI.exec(ownText)?.[0] ?? null,
           card,
           nestedCard: card && parent.insideCard,
-        })
+        }
+        // What the eye would notice changing. Sizes are left out: a state that moves the layout by a
+        // pixel changes the box of everything after it.
+        const look = JSON.stringify([
+          data.color, data.background, data.backdrop, data.borders, data.radii, data.fontSize, data.fontWeight,
+          data.fontFamily, data.boxShadow, data.textShadow, data.backgroundImage, data.outline, style.textDecorationLine,
+        ])
+        // What marks an element as focused: a ring, an outline, a border, a fill or an underline.
+        const mark = JSON.stringify([
+          data.background, data.borders, data.boxShadow,
+          // An outline that is not drawn has a width and an offset all the same, and the browser changes them on focus.
+          style.outlineStyle === 'none' || Number.parseFloat(style.outlineWidth) === 0
+            ? null
+            : [style.outlineStyle, style.outlineWidth, style.outlineOffset, style.outlineColor],
+          style.textDecorationLine, style.borderTopWidth, style.borderBottomWidth,
+        ])
+        if (!state) {
+          elements.push(data)
+          if (remembered) {
+            remembered.looks.set(element, look)
+            remembered.marks.set(element, mark)
+          }
+        } else if (remembered) {
+          if (remembered.looks.get(element) !== look) {
+            elements.push(data)
+            changed.add(element)
+          }
+          if (
+            state.name === 'focus' &&
+            !hidden &&
+            element.matches(state.targets) &&
+            !element.matches(':disabled, [aria-disabled="true"], [tabindex="-1"]')
+          ) {
+            focusable++
+            if (remembered.marks.get(element) === mark) pending.push({ element, selector: data.selector })
+          }
+        }
       }
     }
     if (isSvg) return
@@ -285,6 +369,18 @@ export function collect(): PageData {
   const page: Layer = { left: -Infinity, top: -Infinity, right: Infinity, bottom: Infinity, color: base }
   visit(document.documentElement, { behind: base, layers: [page], opacity: 1, stock: false, insideCard: false, contained: false })
 
+  // A control may show its focus on a part of itself, as a field wrapper or a switch's track does.
+  for (const { element, selector } of pending) {
+    let marked = false
+    for (const other of changed) {
+      if (other !== element && (element.contains(other) || (element.parentElement?.contains(other) && isPeer(element)))) {
+        marked = true
+        break
+      }
+    }
+    if (!marked) unmarked.push(selector)
+  }
+
   return {
     viewportWidth,
     scrollWidth,
@@ -292,5 +388,6 @@ export function collect(): PageData {
     truncated,
     canvas: [Math.round(base[0]), Math.round(base[1]), Math.round(base[2])],
     ignored,
+    ...(state?.name === 'focus' ? { unmarked, focusable } : {}),
   }
 }

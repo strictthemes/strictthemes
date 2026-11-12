@@ -63,12 +63,19 @@ resolves to in this project; the page check measures it.
 | `spacing-off-scale` | Use the nearest step on the spacing scale. On a stock component, override its default in `className`. |
 | `type-off-scale` | Use one of the theme's `text-*` classes. Stock components often ship `text-sm`: override it. |
 | `weight-undeclared`, `font-undeclared` | Use a weight and a font family the theme declares. |
+| `line-height-off-scale`, `letter-spacing-off-scale` | The theme's type class sets the line height and the letter spacing for its size. Remove the `leading-` or `tracking-` class beside it. |
+| `focus-not-visible` | The control looks the same focused as not. Give it a `focus-visible:` outline or ring in a theme color. Do not remove an outline without putting a mark in its place. |
 | `radius-off-scale` | Use one of the theme's `rounded-*` classes. |
 | `contrast` | Pair each background with its own foreground, for example `bg-primary` with `text-primary-foreground`. Do not fade text with opacity. |
 | `tell-gradient`, `tell-glow`, `tell-nested-cards` | Remove it. Use a flat theme color; separate inner content with a border or space, not a second card. |
 | `tell-emoji` | Where the emoji stands for an icon or a bullet, use an icon from the project's icon set. Where it decorates text, remove it; that is not deleting content. |
 | `horizontal-scroll` | The report names the element past the edge. A grid or flex child that holds wide content needs `min-w-0`; a wide table or code block needs its own `overflow-x-auto` box. |
 | `mode-not-applied` | The page looks the same in that mode. If the project has that mode, fix the switch: the mode's name as a class on `<html>`. If it has none, tell the user and check with `--mode light`. |
+
+A place that ends with `(on hover)` or `(on focus)` was measured in that
+state: the check puts every link, button and field in hover and in focus and
+measures what changes. Fix the `hover:` or `focus-visible:` class, not the
+resting one.
 
 If the rendered check still reports a value after you changed the class,
 something overrides your class. Look at the element's other classes and at

@@ -78,6 +78,15 @@ export function describeRules(spec: StrictSpec, rules: Rules): string {
     const sizes = Object.fromEntries(Object.entries(spec.typography).map(([name, token]) => [name, token.fontSize]))
     lines.push(`Type sizes: ${named(sizes)}. Classes: ${[...rules.sizeNames].map((name) => `text-${name}`).join(', ')}. No other size, such as text-sm.`)
   } else lines.push('Type sizes: any.')
+  if (rules.leading) {
+    const round = (value: number): number => Math.round(value * 100) / 100
+    const settings = rules.leading
+      .filter((setting) => setting.lineHeight !== null)
+      .map((setting) => `${setting.size}px at ${round(setting.lineHeight ?? 0)}px${setting.letterSpacing !== 0 ? ` with ${round(setting.letterSpacing)}px` : ''}`)
+    if (settings.length > 0) {
+      lines.push(`Line height and letter spacing come with the size: ${settings.join(', ')}. A type class sets all three, so add no leading- or tracking- class.`)
+    }
+  }
   if (rules.weights) lines.push(`Font weights: ${rules.weights.join(', ')}.`)
   if (rules.fonts) {
     const families = [...new Set(Object.values(spec.typography).map((token) => token.fontFamily).filter((family) => family !== undefined))]
@@ -94,6 +103,7 @@ export function describeRules(spec: StrictSpec, rules: Rules): string {
     .map(([tell, severity]) => `${TELLS[tell] ?? tell} (${severity})`)
   if (tells.length > 0) lines.push(`Not allowed: ${tells.join(', ')}.`)
   lines.push(`Layout: no page may scroll sideways, at 1280px or at 375px.`)
+  lines.push(`States: hover and focus colors are held to the same colors and contrast, and every link, button and field has to show its focus (a ring, an outline, a border, a fill or an underline).`)
   lines.push(`Color modes: ${rules.modes.join(', ')}.`)
   return `${lines.join('\n')}\n`
 }

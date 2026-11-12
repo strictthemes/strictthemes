@@ -8,7 +8,7 @@ import PromptThumb from "@/components/PromptThumb.astro"
 import SectionHeader from "@/components/SectionHeader.astro"
 import { ThemePreview } from "@/components/ThemePreview"
 import Layout from "@/layouts/Base.astro"
-import { cssFontStack, exampleFor, promptUrls, themes, type ThemeView } from "@/lib/themes"
+import { cssFontStack, exampleFor, kitUrls, promptUrls, themes, type ThemeView } from "@/lib/themes"
 
 export const getStaticPaths: GetStaticPaths = () =>
   themes.map((theme) => ({ params: { slug: theme.slug }, props: { theme } }))
@@ -96,14 +96,15 @@ const prompts = theme.prompts.map((prompt) => ({
   example: exampleFor(theme.slug, prompt.slug),
   length: `${(Math.round(prompt.prompt.length / 100) / 10).toFixed(1)}k characters`,
 }))
-// Sections after the preview are numbered from here, since "Page prompts" is optional.
-const offset = prompts.length > 0 ? 1 : 0
+// Sections after "For your agent" are numbered from here, since "Page prompts" is optional.
+const offset = (prompts.length > 0 ? 1 : 0) + 1
 const num = (n: number) => String(n + offset).padStart(2, "0")
 
 // The sections of the page, for the row of links under its opening.
 const jumps = [
   { id: "preview", label: "Preview" },
   ...(prompts.length > 0 ? [{ id: "prompts", label: "Page prompts" }] : []),
+  { id: "agent", label: "For your agent" },
   { id: "colors", label: "Colors" },
   { id: "typography", label: "Typography" },
   { id: "shape", label: "Shape and space" },
@@ -118,6 +119,7 @@ const downloads: Record<string, string> = {
   "nuxt-ui.css": "Nuxt UI",
   "app.config.ts": "Nuxt UI config",
   "tokens.json": "W3C design tokens",
+  "SKILL.md": "The skill",
 }
 ---
 
@@ -258,6 +260,46 @@ const downloads: Record<string, string> = {
         </section>
       )
     }
+
+    <section class="flex flex-col gap-8">
+      <SectionHeader
+        number={String(offset + 1).padStart(2, "0")}
+        label="For your agent"
+        title="A skill, and blocks for agent interfaces."
+        id="agent"
+      />
+      <div class="grid gap-8 md:grid-cols-2">
+        <div class="flex min-w-0 flex-col gap-4">
+          <h3 class="font-heading text-h2">The {theme.name} skill</h3>
+          <p class="max-w-measure text-muted-foreground">
+            What an agent needs to build any page in this theme, not only the five above: how
+            to install it, how {theme.name} lays a page out, which color goes where, the rules,
+            and the check to run at the end. It is generated from the same spec as the page
+            prompts.
+          </p>
+          <Command command={theme.skill.command} label={`Add the ${theme.name} skill`} />
+          <p>
+            <a href={theme.skill.file} class="label text-link underline underline-offset-4">
+              Read the skill
+            </a>
+          </p>
+        </div>
+        <div class="flex min-w-0 flex-col gap-4">
+          <h3 class="font-heading text-h2">The agent kit in {theme.name}</h3>
+          <p class="max-w-measure text-muted-foreground">
+            Four blocks for an agent's side of a conversation: a tool call, an approval, a
+            streaming answer and its sources. They are written out in this theme's spacing
+            and type, and pass Strict Check in both modes.
+          </p>
+          <Command command={theme.kit.command} label={`Add the agent kit with ${theme.name}`} />
+          <p>
+            <a href={kitUrls(theme.slug).page} class="label text-link underline underline-offset-4">
+              See the kit in {theme.name}
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
 
     <section class="flex flex-col gap-8">
       <SectionHeader number={num(2)} label="Colors" title="Every color the theme allows." id="colors" />

@@ -1,0 +1,28 @@
+{
+  "blocks": [
+    {
+      "name": "tool-call",
+      "file": "tool-call.tsx",
+      "title": "Tool call",
+      "description": "One call an agent made to a tool: its name, whether it is running, done or failed, and on demand what went in and what came back."
+    },
+    {
+      "name": "approval",
+      "file": "approval.tsx",
+      "title": "Approval",
+      "description": "A request to do something the agent may not do on its own: what will happen, the exact command, and buttons to allow or deny it. The answer stays on screen."
+    },
+    {
+      "name": "stream",
+      "file": "stream.tsx",
+      "title": "Stream",
+      "description": "An answer that is still being written: the text so far with a caret, a line that says the agent is working, and a button to stop it."
+    },
+    {
+      "name": "citations",
+      "file": "citations.tsx",
+      "title": "Citations",
+      "description": "A numbered marker for running text and the list of sources it points at, each with its title, where it is from and the passage that was used."
+    }
+  ]
+}

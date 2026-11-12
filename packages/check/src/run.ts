@@ -5,6 +5,7 @@ import { checkRendered, serveStatic } from './render.ts'
 import type { Report } from './report.ts'
 import { rulesFor, type Rules } from './rules.ts'
 import { checkSource } from './source.ts'
+import type { State } from './types.ts'
 
 /** The check could not run: a missing folder or spec, a spec with errors, no browser. Not a failed check. */
 export class CheckError extends Error {
@@ -34,6 +35,8 @@ export interface RunOptions {
   exclude?: string[]
   /** Set to false to skip the source check. */
   source?: boolean
+  /** The states to also check interactive elements in. Default: hover and focus. An empty list checks none. */
+  states?: State[]
 }
 
 export interface LoadedSpec {
@@ -98,6 +101,7 @@ export async function runCheck(options: RunOptions): Promise<Report> {
       modes,
       widths,
       ...(options.browser !== undefined ? { browser: options.browser } : {}),
+      ...(options.states !== undefined ? { states: options.states } : {}),
     })
   } catch (error) {
     throw new CheckError(`The rendered check could not run: ${error instanceof Error ? error.message : String(error)}`)

@@ -33,7 +33,9 @@ export interface Summary {
 const location = (finding: CheckFinding): string =>
   finding.file !== undefined
     ? `${finding.file}:${finding.line ?? 1}`
-    : [finding.page, finding.selector ?? 'the page'].filter((part) => part !== undefined).join(' › ')
+    : [finding.page, `${finding.selector ?? 'the page'}${finding.state ? ` (on ${finding.state})` : ''}`]
+        .filter((part) => part !== undefined)
+        .join(' › ')
 
 /** Groups findings by rule and value: errors first, then by how often each occurs. */
 export function groupFindings(findings: CheckFinding[]): FindingGroup[] {
@@ -109,7 +111,7 @@ export function formatText(report: Report): string {
   if (report.rendered) {
     const scope = report.rendered.scope
     const where = scope
-      ? `: ${scope.paths.join(', ')} in ${scope.modes.join(' and ')} mode at ${scope.widths.map((width) => `${width}px`).join(' and ')}`
+      ? `: ${scope.paths.join(', ')} in ${scope.modes.join(' and ')} mode at ${scope.widths.map((width) => `${width}px`).join(' and ')}${scope.states?.length ? `, also on ${scope.states.join(' and ')}` : ''}`
       : ''
     lines.push(`Rendered pages${where}`, ...countLines(report.rendered.counts), '')
   }

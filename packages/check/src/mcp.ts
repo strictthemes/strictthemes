@@ -63,7 +63,7 @@ export function createServer(): McpServer {
     {
       title: 'Check UI against the theme',
       description:
-        "Checks a project's UI against its theme (DESIGN.md) and returns a report as text: each value that is off the theme, where it is, and a last line that starts with Passed or Failed and gives the score. It always reads the source code for off-theme classes, hand-written colors, gradients and emoji. With `dist` or `url` it also opens the pages in a headless browser, in every color mode at 1280px and 375px, and measures colors, contrast, type, spacing, corners and sideways scroll. Run it after changing UI; fix the errors and run it again until it passes.",
+        "Checks a project's UI against its theme (DESIGN.md) and returns a report as text: each value that is off the theme, where it is, and a last line that starts with Passed or Failed and gives the score. It always reads the source code for off-theme classes, hand-written colors, gradients and emoji. With `dist` or `url` it also opens the pages in a headless browser, in every color mode at 1280px and 375px, and measures colors, contrast, type, spacing, corners and sideways scroll, then puts links, buttons and fields in hover and in focus and measures what changes. Run it after changing UI; fix the errors and run it again until it passes.",
       inputSchema: {
         dir: z.string().describe('Absolute path of the project to check.'),
         spec: z.string().optional().describe('Path of the spec, when it is not DESIGN.md in the project folder. Relative to dir, or absolute.'),
@@ -76,10 +76,11 @@ export function createServer(): McpServer {
         modes: z.array(z.string()).optional().describe('Color modes to check, for example ["light"]. Default: every mode in the spec.'),
         widths: z.array(z.number()).optional().describe('Viewport widths in px. Default: [1280, 375].'),
         includeUi: z.boolean().optional().describe('Also read components/ui, the stock components, in the source check. Default: false.'),
+        states: z.boolean().optional().describe('Also check what changes on hover and on focus. Default: true.'),
       },
       annotations: { readOnlyHint: true, openWorldHint: false },
     },
-    async ({ dir, spec, dist, url, paths, modes, widths, includeUi }) => {
+    async ({ dir, spec, dist, url, paths, modes, widths, includeUi, states }) => {
       try {
         const report = await runCheck({
           dir,
@@ -90,6 +91,7 @@ export function createServer(): McpServer {
           ...(modes !== undefined ? { modes } : {}),
           ...(widths !== undefined ? { widths } : {}),
           ...(includeUi !== undefined ? { includeUi } : {}),
+          ...(states === false ? { states: [] } : {}),
         })
         // Text only, on purpose. Claude Code hands the model a tool's structured content in place of its
         // text when both are present, so a summary object here would hide every finding from the agent.

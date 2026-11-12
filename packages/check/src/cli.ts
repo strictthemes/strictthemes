@@ -25,6 +25,7 @@ Options:
   --mode <name>      A color mode to check. Repeat for more. Default: every mode in the spec.
   --width <px>       A viewport width. Repeat for more. Default: 1280 and 375.
   --browser <path>   A Chromium-based browser to use. Default: the Chrome on this machine.
+  --no-states        Check the pages as they load only, and not what changes on hover and on focus.
   --include-ui       Also read components/ui, the stock components, in the source check.
   --exclude <path>   A folder or file to leave out of the source check, relative to dir. Repeat for more.
   --no-source        Skip the source check.
@@ -46,7 +47,7 @@ function fail(message: string): never {
 }
 
 const VALUE_OPTIONS = new Set(['--spec', '--dist', '--url', '--path', '--mode', '--width', '--browser', '--exclude', '--report'])
-const FLAGS = new Set(['--include-ui', '--no-source', '--rules', '--json', '--help', '-h'])
+const FLAGS = new Set(['--include-ui', '--no-source', '--no-states', '--rules', '--json', '--help', '-h'])
 
 async function main(argv: string[]): Promise<number> {
   const values: Record<string, string[]> = {}
@@ -92,6 +93,7 @@ async function main(argv: string[]): Promise<number> {
       includeUi: flags.has('--include-ui'),
       exclude: values['--exclude'] ?? [],
       source: !flags.has('--no-source'),
+      ...(flags.has('--no-states') ? { states: [] } : {}),
     })
     process.stdout.write(flags.has('--json') ? formatJson(report) : formatText(report))
     // Written whether the check passes or fails: a failed job is the one whose report gets read.

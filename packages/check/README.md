@@ -93,28 +93,43 @@ bare `rounded` counts as a class only inside a string that is not a sentence.
 
 Opens each page in a headless browser, in every color mode of the spec and at
 two widths (1280px and 375px), and measures what the browser computed for
-every visible element.
+every visible element. Then it puts every link, button and field in hover,
+and after that in focus, and measures again whatever looks different.
 
 | Rule | Severity | What is measured |
 |---|---|---|
-| `color-off-token` | error | Text, background and border colors. Opacity is free: `bg-primary/80` is still primary. |
+| `color-off-token` | error | Text, background, border, outline and ring colors. Opacity is free: `bg-primary/80` is still primary. The browser's own focus ring (`outline: auto`) is left alone. |
 | `contrast` | error | Text against the background behind it, at the spec's WCAG level. Large text gets the lower ratio. |
 | `type-off-scale` | error | Font size of every element that holds text. |
 | `weight-undeclared` | warning | Font weight. |
+| `line-height-off-scale` | warning | The line height of text whose size is on the scale: it has to be the one that size's type token sets. Stock components, text fields and text in a `<sup>` or `<sub>` are skipped. |
+| `letter-spacing-off-scale` | warning | The letter spacing, the same way. |
 | `font-undeclared` | error | The first font family. |
 | `spacing-off-scale` | error | Padding, margin and gap. Stock components (`data-slot`) are skipped. |
 | `radius-off-scale` | warning or error | Corner radius, only on elements that paint a background or border. A box whose radius is half its shorter side or more is a full round: it passes up to the size the spec's `strict.rounded.full` gives, and is a warning above it or where the spec gives none. |
 | `tell-gradient` | as the spec says | A gradient with a purple stop, or with stops more than 40° of hue apart. |
-| `tell-glow` | as the spec says | A box or text shadow with a color in it. |
+| `tell-glow` | as the spec says | A box or text shadow with a color in it. A ring (a shadow with a spread and no offset or blur) is a line, not a glow: its color is checked as a color. |
 | `tell-nested-cards` | as the spec says | A card inside a card. |
 | `tell-emoji` | as the spec says | An emoji in text. |
 | `horizontal-scroll` | error | The page is wider than the window. |
+| `focus-not-visible` | warning | A link, button or field that looks the same focused as not: no ring, outline, border, fill or underline of its own or on a part of it. |
 | `mode-not-applied` | warning | The page looks the same in a mode as in the base one. That mode is then not measured, so a page with no dark mode gets one warning, not hundreds of color errors. |
 
 The allowed colors are the spec's tokens in each mode, plus the colors the
 shadcn export derives from them (such as `--sidebar` and `--muted`). The
 color mode is set through `prefers-color-scheme` and by putting the mode's
 name as a class on `<html>`.
+
+**Hover and focus.** The states are forced the way a browser's inspector
+forces them, so nothing is clicked, moved or scrolled. Hover goes on
+everything that can be clicked, on table rows, and on anything a Tailwind
+`hover:` or `group-hover:` class styles; focus goes on everything the Tab key
+reaches, as keyboard focus (`:focus-visible`). Only the elements that then
+look different are measured again, with every rule above, so a hover color
+that is off the theme or too faint to read is reported like any other, and
+its place in the report ends with `(on hover)` or `(on focus)`. Color
+transitions are switched off for the whole check, so no color is read
+mid-fade. `--no-states` leaves this part out.
 
 ## Leaving something out
 
@@ -145,12 +160,13 @@ Source code
   spacing         64 checked  1 off
   typography      21 checked  all on theme
 
-Rendered pages: / in light and dark mode at 1280px and 375px
-  colors         762 checked  all on theme
+Rendered pages: / in light and dark mode at 1280px and 375px, also on hover and focus
+  colors         798 checked  all on theme
   spacing        530 checked  4 off
-  typography    1674 checked  4 off
-  contrast       554 checked  all on theme
+  typography    2664 checked  4 off
+  contrast       578 checked  all on theme
   layout           4 checked  all on theme
+  states         112 checked  all on theme
 
 Errors in the source (1)
   spacing-off-scale
@@ -165,10 +181,12 @@ Errors on the rendered pages (2)
     Text is 14px, which is not in the type scale (12, 16, 24, 36, 56px).
     p.text-sm "Billed once a year"  [light, dark; 1280px, 375px]
 
-Failed: 99.7% of 3609 measured values follow the theme. 3 errors, 0 warnings.
+Failed: 99.8% of 4771 measured values follow the theme. 3 errors, 0 warnings.
 ```
 
-The "Rendered pages" line says which pages, modes and widths were opened.
+The "Rendered pages" line says which pages, modes and widths were opened, and
+which states were tried. `states` counts the focusable elements that show
+their focus.
 The same element in several modes and widths is listed once, with the modes
 and widths in brackets. An error or warning is one kind of problem, a rule
 and a value; `×3` after it means three places share it. When more than one page is checked, each place starts
@@ -181,8 +199,8 @@ A job runs the same command. It fails when the check finds errors (exit code
 1) or cannot run (exit code 2), and passes with warnings. `--report` writes
 the report to files the job keeps, whether the check passes or fails.
 
-Both examples assume a project with a `DESIGN.md` in its root, an `npm run
-build` that writes `dist`, and version 0.2 or later of this package.
+The examples assume a project with a `DESIGN.md` in its root and an `npm run
+build` that writes `dist`.
 
 ### GitLab CI
 
@@ -196,7 +214,7 @@ strict-check:
     - npm run build
     # The rendered check needs a browser, and the image has none.
     - apt-get update -qq && apt-get install -y -qq --no-install-recommends chromium > /dev/null
-    - npx --yes @strictthemes/check@0.2 --dist dist --report strict-check.txt --report strict-check.json
+    - npx --yes @strictthemes/check@0.5 --dist dist --report strict-check.txt --report strict-check.json
   artifacts:
     when: always
     paths:
@@ -207,6 +225,8 @@ strict-check:
 
 ### GitHub Actions
 
+This repo is also an action. It runs the check, shows the report on the run's
+page and fails the job when the check finds errors.
 `.github/workflows/strict-check.yml`:
 
 ```yaml
@@ -225,16 +245,10 @@ jobs:
       - run: npm ci
       - run: npm run build
       # The runner has Chrome, which the rendered check uses.
-      - run: npx --yes @strictthemes/check@0.2 --dist dist --report strict-check.txt --report strict-check.json
-      - name: Show the report on the run's page
-        if: always()
-        run: |
-          test -f strict-check.txt || exit 0
-          {
-            echo '```'
-            cat strict-check.txt
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: strictthemes/strictthemes@v1
+        with:
+          dist: dist
+          paths: / /pricing
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -242,19 +256,37 @@ jobs:
           path: strict-check.*
 ```
 
+| Input | Default | |
+|---|---|---|
+| `dir` | `.` | The project to check. Its `DESIGN.md` is read from this folder. |
+| `dist` | | The built site, relative to `dir`. Leave it and `url` empty to check the code only. |
+| `url` | | A site that is already running, in place of `dist`. |
+| `paths` | `/` | The pages to open, separated by spaces or one on a line. |
+| `spec` | `DESIGN.md` in `dir` | The spec to check against. |
+| `args` | | Other options of the command, such as `--mode light --exclude examples`. |
+| `version` | `0.5` | The version of this package to run. |
+| `command` | | The command that runs the check, when it should not come from npm, such as `npx strict-check` for the version in the project's lock file. |
+| `report` | `strict-check.txt` | Where the text report goes. The JSON report gets the same name ending in `.json`. |
+| `summary` | `true` | Show the report on the run's page. |
+
+Its outputs are `report` and `json` (the two paths) and `passed` (`true` or
+`false`). Without the action, the step is one line:
+`npx --yes @strictthemes/check@0.5 --dist dist --report strict-check.txt`.
+
 ### Notes for both
 
 - **More pages.** Without `--path` only `/` is opened. Add `--path /pricing`
   for each page that matters.
 - **A site without a dark mode** is reported as `mode-not-applied`. Pass
   `--mode light`.
-- **A monorepo.** Give the project's folder first (`@strictthemes/check@0.2
-  apps/web --dist dist`), and `--spec` when its `DESIGN.md` lives elsewhere.
+- **A monorepo.** Give the project's folder first (`@strictthemes/check@0.5
+  apps/web --dist dist`, or `dir: apps/web` in the action), and `--spec` when
+  its `DESIGN.md` lives elsewhere.
 - **A fixed version.** Add the package to the project
   (`npm install --save-dev @strictthemes/check`) and call `npx strict-check`,
   and the lock file decides the version.
-- **Time.** On this repo's site the check itself takes about 12 seconds for
-  five pages. Installing Chromium in a GitLab job takes about a minute.
+- **Time.** On this repo's site the check itself takes about 16 seconds for
+  seven pages, with hover and focus. Installing Chromium in a GitLab job takes about a minute.
 
 This repo runs the check on its own site in GitHub Actions: see
 `strict-check` in `apps/site/package.json` and the `build` job in
@@ -480,14 +512,33 @@ browser involved.
   The server refused the ninetieth, Cipher's `changelog.md`, because of its
   file name. The prompt is called `releases` since, and all ninety come
   back.
+- **Hover, focus, line height and letter spacing** (0.5.0, 2026-11-12): run
+  on all 115 example pages of the twenty-three themes, each against its own
+  theme, in both color modes at two widths. 114 passed with no finding. The
+  one warning, a footnote mark set solid in a `<sup>`, led to the exception
+  for `<sup>` and `<sub>`, and all 115 pass since. On this repo's own site
+  the line-height rule found table headings set with the body's line height,
+  now fixed. On the agent kit, built in every theme, the hover check found a
+  main button under 7:1 in the one theme that holds text to WCAG AAA. The
+  test page for states has a link that fades between colors over two
+  seconds; before 0.5.0 a dark-mode check read such a color mid-fade.
+- **The action** (2026-11-12): its script was run on a Mac in three cases (a
+  full check of this site, a check of code alone, and a failing check), and
+  wrote both reports, the summary and its outputs in each. It runs for real
+  in this repo's workflow, on Linux, from the first push that holds it.
 - The package is on npm since 2026-11-12. No one outside this repo is known
   to have run it.
 
 ## What it does not check yet
 
-- **Line height and letter spacing.** Only font size, weight and family.
-- **States.** Hover, focus and open menus are not triggered, so their colors
-  and contrast are not measured.
+- **States that need a script.** Hover and focus are forced in CSS. A menu,
+  a dialog or a tooltip that a script opens is not opened, and neither are
+  the pressed (`:active`) and checked states, so their colors are not
+  measured. Hover styles written in a plain stylesheet on something that
+  cannot be clicked are missed too, unless the element carries a `hover:`
+  class.
+- **Whether a focus mark is strong enough.** `focus-not-visible` reports a
+  control with no mark at all. A mark that is there but faint passes.
 - **Text over images or over a sibling.** The background behind text is taken
   from its ancestors. Text that sits over an image, or over an element that
   is not its ancestor, is measured against the wrong color unless it is

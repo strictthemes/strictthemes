@@ -1,7 +1,12 @@
 /** What a finding is about. Each category is counted on its own. */
-export type Category = 'colors' | 'spacing' | 'typography' | 'corners' | 'contrast' | 'tells' | 'layout'
+export type Category = 'colors' | 'spacing' | 'typography' | 'corners' | 'contrast' | 'tells' | 'layout' | 'states'
 
-export const CATEGORIES: Category[] = ['colors', 'spacing', 'typography', 'corners', 'contrast', 'tells', 'layout']
+export const CATEGORIES: Category[] = ['colors', 'spacing', 'typography', 'corners', 'contrast', 'tells', 'layout', 'states']
+
+/** A state the rendered check puts interactive elements in, besides how the page loads. */
+export type State = 'hover' | 'focus'
+
+export const STATES: State[] = ['hover', 'focus']
 
 export interface CheckFinding {
   rule: string
@@ -20,6 +25,8 @@ export interface CheckFinding {
   width?: number
   /** Rendered check: the page's path, when more than one page was checked. */
   page?: string
+  /** Rendered check: the state the element was in, when it was not the one the page loads in. */
+  state?: State
 }
 
 export interface Count {
@@ -39,7 +46,7 @@ export interface CheckResult {
   /** Source check: the folders and files left out with `exclude`. */
   excluded?: string[]
   /** Rendered check: the pages, color modes and widths that were opened. */
-  scope?: { paths: string[]; modes: string[]; widths: number[] }
+  scope?: { paths: string[]; modes: string[]; widths: number[]; states?: State[] }
 }
 
 export const emptyCounts = (): Counts =>

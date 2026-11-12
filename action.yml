@@ -1,0 +1,103 @@
+name: Strict Check
+description: Check a project's UI against its Strict design spec (DESIGN.md), in its code and on its built pages.
+author: StrictThemes
+branding:
+  icon: check-square
+  color: gray-dark
+
+inputs:
+  dir:
+    description: The project to check. Its DESIGN.md is read from this folder.
+    default: "."
+  dist:
+    description: The folder with the built site, relative to dir, for example dist. Build the project before this step. Leave it and url empty to check the code only.
+    default: ""
+  url:
+    description: The address of a site that is already running, in place of dist.
+    default: ""
+  paths:
+    description: The pages to open, one on a line or separated by spaces, for example "/ /pricing". Default is /.
+    default: ""
+  spec:
+    description: The spec to check against, when it is not DESIGN.md in dir.
+    default: ""
+  args:
+    description: Other options of the command, for example "--mode light --exclude examples".
+    default: ""
+  version:
+    description: The version of @strictthemes/check to run.
+    default: "0.5"
+  command:
+    description: The command that runs the check, when it should not come from npm. It replaces version.
+    default: ""
+  report:
+    description: The file the text report is written to. A file of the same name ending in .json gets the JSON report.
+    default: strict-check.txt
+  summary:
+    description: Show the report on the run's page. Set it to false to leave that out.
+    default: "true"
+
+outputs:
+  report:
+    description: The path of the text report.
+    value: ${{ steps.check.outputs.report }}
+  json:
+    description: The path of the JSON report.
+    value: ${{ steps.check.outputs.json }}
+  passed:
+    description: "true when the check found no errors, false when it found some."
+    value: ${{ steps.check.outputs.passed }}
+
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      # Inputs reach the script as environment variables, never as text pasted into it.
+      env:
+        INPUT_DIR: ${{ inputs.dir }}
+        INPUT_DIST: ${{ inputs.dist }}
+        INPUT_URL: ${{ inputs.url }}
+        INPUT_PATHS: ${{ inputs.paths }}
+        INPUT_SPEC: ${{ inputs.spec }}
+        INPUT_ARGS: ${{ inputs.args }}
+        INPUT_VERSION: ${{ inputs.version }}
+        INPUT_COMMAND: ${{ inputs.command }}
+        INPUT_REPORT: ${{ inputs.report }}
+        INPUT_SUMMARY: ${{ inputs.summary }}
+      run: |
+        set -uo pipefail
+        # Paths such as /* are text here, not patterns for the shell to fill in.
+        set -f
+        report="${INPUT_REPORT:-strict-check.txt}"
+        case "$report" in /*) ;; *) report="$GITHUB_WORKSPACE/$report" ;; esac
+        json="${report%.*}.json"
+
+        if [ -n "$INPUT_COMMAND" ]; then
+          read -r -a command <<< "$INPUT_COMMAND"
+        else
+          command=(npx --yes "@strictthemes/check@$INPUT_VERSION")
+        fi
+        options=("$INPUT_DIR")
+        [ -n "$INPUT_SPEC" ] && options+=(--spec "$INPUT_SPEC")
+        [ -n "$INPUT_DIST" ] && options+=(--dist "$INPUT_DIST")
+        [ -n "$INPUT_URL" ] && options+=(--url "$INPUT_URL")
+        for path in $INPUT_PATHS; do options+=(--path "$path"); done
+        read -r -a extra <<< "$INPUT_ARGS"
+        # Written this way so an empty list is nothing at all, also in an older bash.
+        options+=(${extra[@]+"${extra[@]}"} --report "$report" --report "$json")
+
+        "${command[@]}" "${options[@]}"
+        code=$?
+
+        echo "report=$report" >> "$GITHUB_OUTPUT"
+        echo "json=$json" >> "$GITHUB_OUTPUT"
+        echo "passed=$([ "$code" -eq 0 ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+        if [ "$INPUT_SUMMARY" != "false" ] && [ -f "$report" ]; then
+          {
+            echo '```'
+            cat "$report"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        fi
+        exit "$code"

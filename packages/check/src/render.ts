@@ -5,7 +5,7 @@ import type { Browser } from 'playwright-core'
 import { collect } from './collect.ts'
 import { evaluatePage } from './evaluate.ts'
 import { BASE_MODE, type Rules } from './rules.ts'
-import { mergeResults, type CheckResult } from './types.ts'
+import { mergeResults, STATES, type CheckResult, type State } from './types.ts'
 
 export interface RenderOptions {
   /** Paths to check on the site, e.g. `/` and `/pricing`. Default: `/`. */
@@ -18,7 +18,29 @@ export interface RenderOptions {
   browser?: string
   /** Milliseconds to wait after the page loads, for fonts and client rendering. Default: 300. */
   settle?: number
+  /** The states to also check interactive elements in. Default: hover and focus. An empty list checks none. */
+  states?: State[]
 }
+
+/**
+ * The elements each state is forced on. Hover: what can be clicked, and
+ * anything a Tailwind `hover:` or `group-hover:` class styles. Focus: what the
+ * Tab key reaches.
+ */
+const TARGETS: Record<State, string> = {
+  hover:
+    'a[href], button, summary, label, select, input, textarea, tr, [role="button"], [role="link"], [role="tab"], [role="menuitem"], [role="option"], [role="switch"], [role="checkbox"], [role="radio"], [tabindex], [class*="hover:"], .group, [class*="group/"]',
+  focus:
+    'a[href], button, summary, select, input:not([type="hidden"]), textarea, [role="button"], [role="link"], [role="tab"], [role="switch"], [role="checkbox"], [role="radio"], [tabindex], [contenteditable="true"]',
+}
+
+/** The pseudo-classes forced for each state. A browser shows `:focus-visible` to someone using the keyboard. */
+const PSEUDO: Record<State, string[]> = { hover: ['hover'], focus: ['focus', 'focus-visible'] }
+
+/** No more elements than this are put in a state on one page. */
+const MAX_TARGETS = 1500
+
+const NO_MOTION = '*, *::before, *::after { transition: none !important; }'
 
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -110,6 +132,7 @@ export async function checkRendered(baseUrl: string, rules: Rules, options: Rend
   const paths = options.paths?.length ? options.paths : ['/']
   const modes = options.modes?.length ? options.modes : rules.modes
   const widths = options.widths?.length ? options.widths : [1280, 375]
+  const states = options.states ?? STATES
   const browser = await launch(options.browser)
   const results: CheckResult[] = []
   try {
@@ -123,6 +146,9 @@ export async function checkRendered(baseUrl: string, rules: Rules, options: Rend
           if (!response || !response.ok()) {
             throw new Error(`${new URL(path, baseUrl).href} answered ${response ? response.status() : 'nothing'}.`)
           }
+          // Color transitions are cut for the whole check. Switching the mode starts one on every
+          // element that has a transition, and a color read mid-fade is neither mode's.
+          await page.addStyleTag({ content: NO_MOTION })
           await page.evaluate(
             ({ modes: all, mode: current, base }) => {
               for (const name of all) if (name !== base) document.documentElement.classList.toggle(name, name === current)
@@ -131,10 +157,32 @@ export async function checkRendered(baseUrl: string, rules: Rules, options: Rend
           )
           await page.evaluate(() => document.fonts.ready.then(() => undefined))
           await page.waitForTimeout(options.settle ?? 300)
-          const data = await page.evaluate(collect)
-          const result = evaluatePage(data, rules, { mode, width, ...(paths.length > 1 ? { path } : {}) })
+          const where = { mode, width, ...(paths.length > 1 ? { path } : {}) }
+          const data = await page.evaluate(collect, { remember: states.length > 0 })
+          const result = evaluatePage(data, rules, where)
           // The same marked elements are on the page in every mode and width: count them once.
           results.push(mode === modes[0] && width === widths[0] ? result : { ...result, ignored: 0 })
+          // A page that did not switch to this mode was reported once; its states would repeat that.
+          if (states.length === 0 || result.findings.some((finding) => finding.rule === 'mode-not-applied')) continue
+
+          // States are forced through the browser's own debugging protocol, as its inspector does,
+          // so nothing moves or scrolls.
+          const session = await context.newCDPSession(page)
+          try {
+            await session.send('DOM.enable')
+            await session.send('CSS.enable')
+            const { root } = await session.send('DOM.getDocument', { depth: 0 })
+            for (const state of states) {
+              const { nodeIds } = await session.send('DOM.querySelectorAll', { nodeId: root.nodeId, selector: TARGETS[state] })
+              const targets = nodeIds.slice(0, MAX_TARGETS)
+              for (const nodeId of targets) await session.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: PSEUDO[state] })
+              const changed = await page.evaluate(collect, { state: { name: state, targets: TARGETS[state] } })
+              results.push(evaluatePage(changed, rules, { ...where, state }))
+              for (const nodeId of targets) await session.send('CSS.forcePseudoState', { nodeId, forcedPseudoClasses: [] })
+            }
+          } finally {
+            await session.detach().catch(() => undefined)
+          }
         }
       }
       await context.close()
@@ -142,5 +190,5 @@ export async function checkRendered(baseUrl: string, rules: Rules, options: Rend
   } finally {
     await browser.close()
   }
-  return { ...mergeResults(results), scope: { paths, modes, widths } }
+  return { ...mergeResults(results), scope: { paths, modes, widths, ...(states.length > 0 ? { states } : {}) } }
 }

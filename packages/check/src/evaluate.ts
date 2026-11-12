@@ -1,7 +1,7 @@
 import { contrastRatio, deltaE, formatHex, parseColor, rgbToOklch, type Rgb } from '@strictthemes/spec'
 import type { ElementData, PageData, Rgba } from './collect.ts'
 import { BASE_MODE, onScale, scaleText, tellSeverity, type Rules } from './rules.ts'
-import { emptyCounts, type Category, type CheckFinding, type CheckResult } from './types.ts'
+import { emptyCounts, type Category, type CheckFinding, type CheckResult, type State } from './types.ts'
 
 export interface PageContext {
   /** The color mode the page was in, e.g. `light` or `dark`. */
@@ -10,6 +10,11 @@ export interface PageContext {
   width: number
   /** The page's path. Set it when more than one page is checked, so reports can tell them apart. */
   path?: string
+  /**
+   * Set for a state pass: `data` then holds only the elements that look
+   * different with hover or focus forced, and the page-wide checks are left out.
+   */
+  state?: State
 }
 
 const toRgb = (color: Rgba | [number, number, number]): Rgb => ({
@@ -44,17 +49,46 @@ function colorsIn(value: string): Rgb[] {
  * `ring-0` leaves one behind, in the text color.
  */
 function drawnShadows(value: string): string {
-  if (value === 'none') return ''
-  return value
-    .split(/,(?![^(]*\))/)
-    .filter((layer) => {
-      const lengths = layer.replace(/\([^)]*\)/g, '').match(/-?\d*\.?\d+(?=px\b)/g) ?? []
-      return lengths.length === 0 || lengths.some((length) => Number(length) !== 0)
-    })
+  return shadowLayers(value)
+    .filter((layer) => !layer.ring)
+    .map((layer) => layer.text)
     .join(', ')
 }
 
+interface ShadowLayer {
+  text: string
+  /** A hard line around the box: no offset and no blur, only a spread. Tailwind's `ring-*` draws one. */
+  ring: boolean
+}
+
+/** The layers of a computed shadow that draw something, each marked as a ring or a shadow. */
+function shadowLayers(value: string): ShadowLayer[] {
+  if (value === 'none' || value === '') return []
+  const layers: ShadowLayer[] = []
+  for (const text of value.split(/,(?![^(]*\))/)) {
+    const lengths = (text.replace(/\([^)]*\)/g, '').match(/-?\d*\.?\d+(?=px\b)/g) ?? []).map(Number)
+    if (lengths.length > 0 && lengths.every((length) => length === 0)) continue
+    const [x = 0, y = 0, blur = 0, spread = 0] = lengths
+    layers.push({ text: text.trim(), ring: lengths.length > 0 && x === 0 && y === 0 && blur === 0 && spread !== 0 })
+  }
+  return layers
+}
+
+/** The colors of the rings in a computed `box-shadow`, as the browser painted them. */
+function ringColors(value: string): Rgba[] {
+  return shadowLayers(value)
+    .filter((layer) => layer.ring)
+    .flatMap((layer) => colorsIn(layer.text))
+    .map((color): Rgba => [Math.round(color.r * 255), Math.round(color.g * 255), Math.round(color.b * 255), color.a])
+}
+
 const FAMILY_SUFFIX = / (variable|var|vf)$/i
+
+/** Text fields: the browser, not the page, sets their line height. */
+const FIELDS = new Set(['input', 'textarea', 'select'])
+
+/** A length for a message: `20.8px`, `0px`. */
+const px = (value: number): string => `${Math.round(value * 100) / 100}px`
 
 /**
  * Judges what `collect()` measured on one page, in one color mode at one
@@ -75,13 +109,14 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
       mode: context.mode,
       width: context.width,
       ...(context.path !== undefined ? { page: context.path } : {}),
+      ...(context.state !== undefined ? { state: context.state } : {}),
     })
   }
 
   // A page that does not switch to this mode would fail every color for one reason. Say that once.
   const own = rules.backgrounds[context.mode]
   const base = rules.backgrounds[BASE_MODE]
-  if (context.mode !== BASE_MODE && own && base && deltaE(own, base) > rules.tolerance) {
+  if (context.state === undefined && context.mode !== BASE_MODE && own && base && deltaE(own, base) > rules.tolerance) {
     const canvas = toRgb(data.canvas)
     const switched = deltaE(canvas, base) > rules.tolerance || deltaE(canvas, own) <= rules.tolerance
     check('colors', switched, () => ({
@@ -119,6 +154,10 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
         checkColor(element, element.background, 'Background')
         for (const border of new Set(element.borders.map((color) => color.join(',')))) {
           checkColor(element, border.split(',').map(Number) as Rgba, 'Border color')
+        }
+        if (element.outline) checkColor(element, element.outline, 'Outline color')
+        for (const ring of new Set(ringColors(element.boxShadow).map((color) => color.join(',')))) {
+          checkColor(element, ring.split(',').map(Number) as Rgba, 'Ring color')
         }
       }
     }
@@ -158,6 +197,29 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
           value: String(element.fontWeight),
           selector: element.selector,
           message: `Text is weight ${element.fontWeight}; the theme declares ${weights.join(', ')}.`,
+        }))
+      }
+      // Line height and letter spacing: each type size has the ones its token sets. Stock
+      // components keep what they ship with, and a text field's own line height is the browser's.
+      const settings = rules.leading?.filter((setting) => Math.abs(setting.size - element.fontSize) <= 0.5) ?? []
+      if (settings.length > 0 && !element.stock && !FIELDS.has(element.tag)) {
+        const heights = settings.map((setting) => setting.lineHeight).filter((value): value is number => value !== null)
+        if (heights.length > 0 && element.lineHeight >= 0 && !element.raised) {
+          check('typography', heights.some((value) => Math.abs(value - element.lineHeight) <= 0.5), () => ({
+            rule: 'line-height-off-scale',
+            severity: 'warning',
+            value: `${element.fontSize}px text, line height ${px(element.lineHeight)}`,
+            selector: element.selector,
+            message: `Text of ${element.fontSize}px has a line height of ${px(element.lineHeight)}; the theme sets that size with ${heights.map(px).join(' or ')}. Use the type class alone, without a \`leading-\` class.`,
+          }))
+        }
+        const spacings = settings.map((setting) => setting.letterSpacing)
+        check('typography', spacings.some((value) => Math.abs(value - element.letterSpacing) <= 0.1), () => ({
+          rule: 'letter-spacing-off-scale',
+          severity: 'warning',
+          value: `${element.fontSize}px text, letter spacing ${px(element.letterSpacing)}`,
+          selector: element.selector,
+          message: `Text of ${element.fontSize}px has a letter spacing of ${px(element.letterSpacing)}; the theme sets that size with ${[...new Set(spacings.map(px))].join(' or ')}. Use the type class alone, without a \`tracking-\` class.`,
         }))
       }
       if (rules.fonts) {
@@ -263,6 +325,22 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
       }))
     }
   }
+
+  // States: every focusable element has to show that it is focused.
+  if (context.state === 'focus') {
+    const unmarked = data.unmarked ?? []
+    counts.states.checked += Math.max(0, (data.focusable ?? 0) - unmarked.length)
+    for (const selector of unmarked) {
+      check('states', false, () => ({
+        rule: 'focus-not-visible',
+        severity: 'warning',
+        value: 'no focus mark',
+        selector,
+        message: `Looks the same focused as not: no ring, outline, border, fill or underline shows where the keyboard is. Give it a \`focus-visible:\` style in one of the ${rules.name} colors.`,
+      }))
+    }
+  }
+  if (context.state !== undefined) return { findings, counts, ignored: 0 }
 
   // Layout: the page must not scroll sideways.
   const culprits = data.elements.filter((element) => element.overflowing && !element.hidden)

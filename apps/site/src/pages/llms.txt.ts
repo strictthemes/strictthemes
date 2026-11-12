@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro"
 import { CHECK_DOCS_URL, MCP_URL, NPM_URL, REPO_URL } from "@/lib/brand"
-import { SITE_URL, themes } from "@/lib/themes"
+import { kitBlocks, SITE_URL, themes } from "@/lib/themes"
 
 // A plain-text map of the site for coding agents.
 export const GET: APIRoute = () => {
@@ -14,8 +14,9 @@ export const GET: APIRoute = () => {
     ...themes.flatMap((theme) => [
       `- [${theme.name}](${SITE_URL}/themes/${theme.slug}/DESIGN.md): ${theme.description}`,
       `  - Install: \`${theme.installCommand}\``,
+      `  - Skill: [${theme.skill.name}](${SITE_URL}${theme.skill.file}), how to build any page in the theme. Add it with \`${theme.skill.command}\``,
       `  - Other exports: ${theme.files
-        .filter((file) => file !== "DESIGN.md")
+        .filter((file) => file !== "DESIGN.md" && file !== "SKILL.md")
         .map((file) => `[${file}](${SITE_URL}/themes/${theme.slug}/${file})`)
         .join(", ")}`,
       ...(theme.prompts.length > 0
@@ -32,8 +33,13 @@ export const GET: APIRoute = () => {
     "",
     "## Registry",
     "",
-    `- [Registry index](${SITE_URL}/r/registry.json): every shadcn registry item (themes and fonts).`,
+    `- [Registry index](${SITE_URL}/r/registry.json): every shadcn registry item: the themes, their fonts, each example page as a block (\`<theme>-<page>\`), and the agent kit for each theme (\`<theme>-agent-kit\`).`,
+    `- A block or a kit item needs its theme. Install both with one command, the theme first: \`npx shadcn@latest add ${SITE_URL}/r/<theme>.json ${SITE_URL}/r/<theme>-<page>.json\`.`,
     `- [Themes index](${SITE_URL}/themes.json): every theme and its page prompts as JSON, with the install command and the address of each file.`,
+    "",
+    "## Agent kit",
+    "",
+    `- [Agent kit](${SITE_URL}/kit/): React blocks for an agent's side of a conversation (${kitBlocks.map((block) => block.title.toLowerCase()).join(", ")}), written out for each theme in its spacing, type and colors. For a theme: \`npx shadcn@latest add ${SITE_URL}/r/<theme>.json ${SITE_URL}/r/<theme>-agent-kit.json\`.`,
     "",
     "## Docs",
     "",

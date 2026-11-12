@@ -37,6 +37,9 @@ npm test
 ## How themes reach the page
 
 - [src/lib/themes.ts](src/lib/themes.ts) loads every `DESIGN.md` and builds the registry.
+  It also hands the registry the source of every example page, which becomes a
+  block (`/r/<theme>-<page>.json`), and the agent kit from `packages/kit`,
+  which is written out for each theme (`/r/<theme>-agent-kit.json`).
 - The layout writes each theme's variables scoped to `[data-theme="<slug>"]`, with
   dark values under `[data-mode="dark"]`. `:root` gets Strict One, the theme the
   site itself uses.
@@ -77,6 +80,24 @@ error.
 The theme pages and the home page show each example as a small live view
 ([PromptThumb.astro](src/components/PromptThumb.astro)): the built page in a
 frame, scaled down.
+
+## The agent kit's pages
+
+`/kit/` describes the kit, and `/kit/<theme>/` shows it in one theme with the
+commands that install it. The page in the frame is real:
+[scripts/build-kit.ts](scripts/build-kit.ts) runs after the examples are
+built, writes a small Vite project for each theme to `.kit/<theme>/` (the
+kit's files as the registry serves them for that theme, the demo page from
+`packages/kit/demo`, and the stylesheet of that theme's first example page)
+and builds it to `dist/kit/<theme>/build/`. `.kit/` is not kept in the repo.
+
+```bash
+npm run strict-check:kit
+```
+
+runs Strict Check on every one of them against its own theme, in both color
+modes at two widths with hover and focus, and fails on any error or warning.
+The workflow runs it after the site's own check.
 
 ## Theme cards
 
@@ -127,9 +148,10 @@ npm run strict-check
 ```
 
 Build the repo first (`npm run build` at the root): the script runs the check
-from `packages/check/dist` on the source and on five built pages (home,
-themes, spec, the Strict One page and the 404 page), in light mode, at 1280px
-and 375px. The workflow runs it on every pull request and on `master`, after
+from `packages/check/dist` on the source and on seven built pages (home,
+themes, spec, the Strict One page, the agent kit's page and the kit in Strict
+One, and the 404 page), in light mode, at 1280px and 375px, with hover and
+focus. The workflow runs it on every pull request and on `master`, after
 the tests, shows the report on the run's page and keeps it as
 `strict-check.txt`.
 
@@ -137,12 +159,14 @@ What is left out, and why:
 
 - `examples/` (`--exclude examples`): 115 projects, each in another
   theme and each checked against that theme when it was built.
+- `.kit/` (`--exclude .kit`): the agent kit's demo in every theme, which
+  `npm run strict-check:kit` checks against each theme.
 - [ThemeCard.astro](src/components/ThemeCard.astro) and every theme preview
   (`strict-ignore-file`, `data-strict-ignore`): they wear the theme they show.
 - The brand colors in [brand.ts](src/lib/brand.ts): the icon files and the
   share image are drawn once, in fixed colors.
 - Dark mode (`--mode light`): the site has none.
-- The other seventeen theme pages: they wear their own themes on the site's
+- The other twenty-two theme pages: they wear their own themes on the site's
   layout, so they do not pass against Strict One.
 
 ## Search engines

@@ -212,6 +212,10 @@ const element = (overrides: Partial<ElementData> = {}): ElementData => ({
   fontSize: 16,
   fontWeight: 400,
   fontFamily: 'IBM Plex Sans Variable',
+  lineHeight: 25.6,
+  letterSpacing: 0,
+  raised: false,
+  outline: null,
   spacing: [],
   boxShadow: 'none',
   textShadow: 'none',
@@ -295,6 +299,39 @@ test('rendered: each measured property is judged against the theme', () => {
   assert.deepEqual(rulesFound([element()], 'light', 1500), ['horizontal-scroll'])
 })
 
+test('rendered: each type size keeps the line height and letter spacing of its token', () => {
+  // Strict One sets 16px text at 1.6 and 36px text at 1.15 with -0.01em.
+  assert.deepEqual(rulesFound([element({ lineHeight: 25.6 }), element({ fontSize: 36, fontWeight: 700, lineHeight: 41.4, letterSpacing: -0.36 })]), [])
+  const loose = evaluatePage(page([element({ lineHeight: 32 })]), rules, { mode: 'light', width: 1280 }).findings
+  assert.deepEqual(loose.map((finding) => [finding.rule, finding.severity, finding.value]), [
+    ['line-height-off-scale', 'warning', '16px text, line height 32px'],
+  ])
+  assert.match(loose[0]?.message ?? '', /the theme sets that size with 25\.6px/)
+  assert.deepEqual(rulesFound([element({ letterSpacing: 1.6 })]), ['letter-spacing-off-scale'])
+  // A size that is off the scale is reported as that, once.
+  assert.deepEqual(rulesFound([element({ fontSize: 14, lineHeight: 30, letterSpacing: 2 })]), ['type-off-scale'])
+})
+
+test('rendered: a ring or an outline has to be one of the theme\'s colors', () => {
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgb(255, 0, 170) 0px 0px 0px 2px' })]), ['color-off-token'])
+  assert.deepEqual(rulesFound([element({ outline: [255, 0, 170, 1] })]), ['color-off-token'])
+  assert.deepEqual(rulesFound([element({ outline: [31, 59, 255, 1] })]), [])
+  // A blurred shadow in a color is still a glow.
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgb(31, 59, 255) 0px 0px 12px 0px' })]), ['tell-glow'])
+})
+
+test('rendered: a state pass judges what changed and leaves the page-wide checks out', () => {
+  const data = { ...page([element({ color: [255, 0, 170, 1] })], 2000), unmarked: ['a "Quiet"'], focusable: 3 }
+  const result = evaluatePage(data, rules, { mode: 'light', width: 1280, state: 'focus' })
+  assert.deepEqual(result.findings.map((finding) => [finding.rule, finding.state]).sort(), [
+    ['color-off-token', 'focus'],
+    ['contrast', 'focus'],
+    ['focus-not-visible', 'focus'],
+  ])
+  assert.equal(result.counts.layout.checked, 0)
+  assert.deepEqual(result.counts.states, { checked: 3, failed: 1 })
+})
+
 test('rendered: what cannot be seen or is not the page author\'s is left alone', () => {
   // A stock component keeps its own spacing.
   assert.deepEqual(rulesFound([element({ stock: true, spacing: [{ property: 'padding-left', px: 10 }] })]), [])
@@ -304,12 +341,19 @@ test('rendered: what cannot be seen or is not the page author\'s is left alone',
   assert.deepEqual(rulesFound([element({ hidden: true, fontSize: 1, color: [255, 0, 170, 1] })]), [])
   assert.deepEqual(rulesFound([element({ disabled: true, color: [107, 107, 107, 0.5] })]), [])
   // Large text needs 3:1, not 4.5:1.
-  assert.deepEqual(rulesFound([element({ fontSize: 36, fontWeight: 700, color: [107, 107, 107, 0.75] })]), [])
+  assert.deepEqual(rulesFound([element({ fontSize: 36, fontWeight: 700, lineHeight: 41.4, letterSpacing: -0.36, color: [107, 107, 107, 0.75] })]), [])
   // A neutral shadow is not a glow; a one-color fade is not a multi-color gradient.
   assert.deepEqual(rulesFound([element({ boxShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 2px 0px' })]), [])
+  // A ring is a line, not a glow, and may be any of the theme's colors.
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgba(31, 59, 255, 0.5) 0px 0px 0px 3px' })]), [])
+  // A stock component keeps its line height, and a text field's is the browser's.
+  assert.deepEqual(rulesFound([element({ stock: true, lineHeight: 16 })]), [])
+  assert.deepEqual(rulesFound([element({ tag: 'input', lineHeight: -1 })]), [])
+  // A footnote mark in a <sup> is set solid, so the line it sits in keeps its height.
+  assert.deepEqual(rulesFound([element({ tag: 'a', raised: true, fontSize: 12, lineHeight: 12, letterSpacing: 0.96 })]), [])
   // A shadow layer of no size draws nothing, whatever its color: `ring-0` leaves one in the text color.
   assert.deepEqual(rulesFound([element({ boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(7, 59, 76) 0px 0px 0px 0px' })]), [])
-  assert.deepEqual(rulesFound([element({ boxShadow: 'rgb(7, 59, 76) 0px 0px 0px 0px, rgb(7, 59, 76) 0px 0px 0px 3px' })]), ['tell-glow'])
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgb(7, 59, 76) 0px 0px 0px 0px, rgb(7, 59, 76) 0px 2px 8px 0px' })]), ['tell-glow'])
   assert.deepEqual(rulesFound([element({ backgroundImage: 'linear-gradient(rgb(245, 245, 244), rgb(255, 255, 255))', backdrop: null })]), [])
 })
 
@@ -431,11 +475,16 @@ test('source: a comment leaves a line, the next line or a whole file out', () =>
 const CSS = `
   :root { --background: #FFFFFF; --foreground: #111111; --primary: #1F3BFF; }
   .dark { --background: #0B0B0C; --foreground: #F5F5F4; --primary: #8091FF; }
-  html { background: var(--background); color: var(--foreground); font: 400 16px "IBM Plex Sans", sans-serif; }
+  html { background: var(--background); color: var(--foreground); font: 400 16px/1.6 "IBM Plex Sans", sans-serif; }
   body { margin: 0; padding: 16px; }
-  h1 { font: 700 36px Archivo, sans-serif; margin: 0 0 16px; }
-  a { color: var(--primary); }
+  h1 { font: 700 36px/1.15 Archivo, sans-serif; letter-spacing: -0.01em; margin: 0 0 16px; }
+  a { color: var(--primary); transition: color 2s; }
+  .pink:hover { color: #FF00AA; }
+  .quiet:focus, .quiet:focus-visible { outline: none; }
+  .ringed:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--primary); }
 `
+const statesPage = `<!doctype html><html><head><meta name="viewport" content="width=device-width"><style>${CSS}</style></head>
+<body><h1>States</h1><p style="margin:0"><a class="pink" href="#">Pink on hover</a> <a class="quiet" href="#">No focus mark</a> <a class="ringed" href="#">A ring</a></p></body></html>`
 const cleanPage = `<!doctype html><html><head><meta name="viewport" content="width=device-width"><style>${CSS}</style></head>
 <body><h1>Plain page</h1><p style="margin:0">Body text with <a href="#">a link</a>.</p></body></html>`
 const ignoredPage = cleanPage.replace(
@@ -448,7 +497,7 @@ const brokenPage = cleanPage.replace(
 )
 
 test('rendered: a real page is opened in every mode and width', async (t) => {
-  const dir = project({ 'index.html': cleanPage, 'broken/index.html': brokenPage, 'ignored/index.html': ignoredPage })
+  const dir = project({ 'index.html': cleanPage, 'broken/index.html': brokenPage, 'ignored/index.html': ignoredPage, 'states/index.html': statesPage })
   const server = await serveStatic(dir)
   try {
     let clean
@@ -464,6 +513,29 @@ test('rendered: a real page is opened in every mode and width', async (t) => {
     assert.ok(clean.counts.contrast.checked >= 12)
 
     assert.equal(clean.ignored, 0)
+    // The link was put in focus in each of the four passes, and the browser's own ring marked it.
+    assert.equal(clean.counts.states.checked, 4)
+    assert.deepEqual(clean.scope?.states, ['hover', 'focus'])
+
+    // Hover and focus are forced on what can be clicked, and only what changes is measured again.
+    const states = await checkRendered(server.url, rules, { paths: ['/states'], modes: ['light'], widths: [1280] })
+    assert.deepEqual(
+      states.findings.map((finding) => [finding.rule, finding.state, finding.value, finding.selector]),
+      [
+        // The link fades between colors over two seconds. The check cuts that short, on hover and
+        // when it switches the page to dark mode, or it would read a color on the way.
+        ['color-off-token', 'hover', '#FF00AA', 'a.pink "Pink on hover"'],
+        ['contrast', 'hover', '#FF00AA on #FFFFFF', 'a.pink "Pink on hover"'],
+        ['focus-not-visible', 'focus', 'no focus mark', 'a.quiet "No focus mark"'],
+      ],
+    )
+    assert.deepEqual(states.counts.states, { checked: 3, failed: 1 })
+    assert.match(formatText({ theme: rules.name, rendered: states }), /a\.pink "Pink on hover" \(on hover\)/)
+    assert.match(formatText({ theme: rules.name, rendered: states }), /in light mode at 1280px, also on hover and focus$/m)
+    // Asked for no states, the check is the one the page loads in.
+    const still = await checkRendered(server.url, rules, { paths: ['/states'], modes: ['light'], widths: [1280], states: [] })
+    assert.deepEqual(still.findings, [])
+    assert.equal(still.scope?.states, undefined)
 
     // An element marked data-strict-ignore is left out with everything in it, and counted once.
     const ignored = await checkRendered(server.url, rules, { paths: ['/ignored'] })
