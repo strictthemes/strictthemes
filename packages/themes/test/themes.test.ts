@@ -229,7 +229,7 @@ test('prompts: a theme with page prompts has five, in reading order', () => {
     avion: ['dashboard', 'status', 'list', 'detail', 'settings'],
     kiln: ['shop', 'collection', 'product', 'basket', 'studio'],
     ledger: ['overview', 'transactions', 'invoice', 'transfer', 'report'],
-    cipher: ['landing', 'docs', 'changelog', 'deploys', 'tokens'],
+    cipher: ['landing', 'docs', 'releases', 'deploys', 'tokens'],
     sorbet: ['welcome', 'today', 'progress', 'plans', 'profile'],
     atelier: ['home', 'collection', 'piece', 'house', 'appointment'],
     civic: ['start', 'question', 'review', 'confirmation', 'guidance'],

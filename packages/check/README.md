@@ -389,8 +389,11 @@ browser involved.
   site, called one by one through an MCP client: `get_theme` for all eighteen
   themes ended with the theme's `DESIGN.md` as the site serves it, and
   `get_prompt` for all ninety prompts returned the served file byte for
-  byte. The longest answer is 42,660 characters. Not tried: the tools against
-  the live site from the published package.
+  byte. The longest answer is 42,660 characters.
+- **The published package against the live site** (0.3.0, 2026-11-12): all
+  eighteen themes and eighty-nine of the ninety prompts came back as served.
+  The server refused the ninetieth, Cipher's `changelog.md`, because of its
+  file name; the prompt is called `releases` since.
 - The package is on npm since 2026-11-12. No one outside this repo is known
   to have run it.
 

@@ -4,6 +4,10 @@
 # Show the site's own "not found" page in place of the server's default one.
 ErrorDocument 404 /404.html
 
+# Cipher's release notes prompt was called "changelog" at first. The server in
+# front of Apache refuses any changelog.md, so the prompt could not be read.
+Redirect 301 /themes/cipher/prompts/changelog/ /themes/cipher/prompts/releases/
+
 # A theme's exports are opened in a browser as well as fetched by tools.
 # Apache sends .md with no type and .ts as video, so a browser downloads them.
 AddType text/markdown .md

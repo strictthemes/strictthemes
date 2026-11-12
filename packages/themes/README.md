@@ -97,7 +97,7 @@ has five:
 | Avion | dashboard, status, list, detail, settings |
 | Kiln | shop, collection, product, basket, studio |
 | Ledger | overview, transactions, invoice, transfer, report |
-| Cipher | landing, docs, changelog, deploys, tokens |
+| Cipher | landing, docs, releases, deploys, tokens |
 | Sorbet | welcome, today, progress, plans, profile |
 | Atelier | home, collection, piece, house, appointment |
 | Civic | start, question, review, confirmation, guidance |

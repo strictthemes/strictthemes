@@ -14,7 +14,7 @@ const PAGES: [slug: string, name: string, pages: string[]][] = [
   ["avion", "Avion", ["dashboard", "status", "list", "detail", "settings"]],
   ["kiln", "Kiln", ["shop", "collection", "product", "basket", "studio"]],
   ["ledger", "Ledger", ["overview", "transactions", "invoice", "transfer", "report"]],
-  ["cipher", "Cipher", ["landing", "docs", "changelog", "deploys", "tokens"]],
+  ["cipher", "Cipher", ["landing", "docs", "releases", "deploys", "tokens"]],
   ["sorbet", "Sorbet", ["welcome", "today", "progress", "plans", "profile"]],
   ["atelier", "Atelier", ["home", "collection", "piece", "house", "appointment"]],
   ["civic", "Civic", ["start", "question", "review", "confirmation", "guidance"]],
@@ -270,6 +270,19 @@ const examples = readdirSync(examplesDir, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((page) => ({ theme: theme.name, page: page.name }))
   )
+
+test("no served file has a name that web servers commonly refuse", () => {
+  // nginx on the production server answers 403 for any readme, changelog or
+  // license file ending in .md or .txt, so a prompt called changelog.md could
+  // not be read or copied.
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory() ? walk(join(dir, entry.name)) : [join(dir, entry.name)]
+    )
+  for (const file of walk(dist)) {
+    assert.doesNotMatch(file, /(readme|changelog|license)\.(md|txt)$/i, file)
+  }
+})
 
 test("every page prompt has an example page", () => {
   const prompts = THEMES.flatMap((theme) =>
