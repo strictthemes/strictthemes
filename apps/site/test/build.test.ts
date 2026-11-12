@@ -187,7 +187,7 @@ test("the home and themes pages show a card for every theme, in its own skin", (
 test("every page and llms.txt point to the project's code", () => {
   const repo = "https://github.com/strictthemes/strictthemes"
   for (const page of ["index.html", "themes/kiln/index.html", "spec/index.html", "404.html"]) {
-    assert.ok(read(page).includes(`<a class="hover:text-foreground" href="${repo}">Source on GitHub</a>`), page)
+    assert.match(read(page), new RegExp(`<footer[\\s\\S]*href="${repo}">Source on GitHub</a>`), page)
   }
   assert.ok(read("llms.txt").includes(`(${repo})`))
 })
@@ -283,4 +283,29 @@ test("the site says nothing about the shop it used to be", () => {
   for (const page of ["index.html", "themes/index.html", "spec/index.html", "404.html", "llms.txt"]) {
     assert.doesNotMatch(read(page), /wordpress/i, page)
   }
+})
+
+test("links inside a page point at something on that page", () => {
+  for (const page of ["index.html", "spec/index.html", ...THEMES.map((slug) => `themes/${slug}/index.html`)]) {
+    const html = read(page)
+    const targets = [...html.matchAll(/href="#([^"]+)"/g)].map((match) => match[1])
+    assert.ok(targets.length > 0, `${page} has no links to its own sections`)
+    for (const target of targets) {
+      assert.ok(html.includes(` id="${target}"`), `${page}: nothing is named "${target}"`)
+    }
+  }
+})
+
+test("the home page and llms.txt say how to run Strict Check", () => {
+  const command = "npx @strictthemes/check . --dist dist"
+  assert.ok(read("index.html").includes(command))
+  assert.ok(read("llms.txt").includes(command))
+})
+
+test("the header links to the code, and buttons that copy can be told apart", () => {
+  const repo = "https://github.com/strictthemes/strictthemes"
+  assert.match(read("index.html"), new RegExp(`<header[\\s\\S]*href="${repo}"[\\s\\S]*</header>`))
+  const labels = [...read("themes/index.html").matchAll(/data-copy aria-label="([^"]+)"/g)].map((match) => match[1])
+  assert.equal(labels.length, THEMES.length)
+  assert.equal(new Set(labels).size, labels.length)
 })

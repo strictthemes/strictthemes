@@ -1,5 +1,6 @@
 ---
 import Command from "@/components/Command.astro"
+import MoreTile from "@/components/MoreTile.astro"
 import ThemeCard from "@/components/ThemeCard.astro"
 import { ThemePreview } from "@/components/ThemePreview"
 import Layout from "@/layouts/Base.astro"
@@ -41,6 +42,19 @@ const previews = (slug: string) =>
             </li>
           ))
         }
+        <li class="lg:col-span-2">
+          <MoreTile
+            label="Your own"
+            title="Or write the fourteenth."
+            href="/spec"
+            link="Read the spec format"
+          >
+            <p>
+              A theme is one DESIGN.md file. The spec format says what goes in it, and the
+              linter tells you where it is wrong before an agent ever reads it.
+            </p>
+          </MoreTile>
+        </li>
       </ul>
     </section>
     {
@@ -58,7 +72,7 @@ const previews = (slug: string) =>
               </h2>
               <p class="max-w-measure text-muted-foreground">{theme.description}</p>
               <div class="max-w-measure">
-                <Command command={theme.installCommand} />
+                <Command command={theme.installCommand} label={`Install ${theme.name}`} />
               </div>
               <a
                 href={`/themes/${theme.slug}`}

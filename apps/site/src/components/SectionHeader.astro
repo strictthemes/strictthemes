@@ -3,12 +3,14 @@ interface Props {
   number: string
   label: string
   title: string
+  /** A name to link to this section by, as in /themes/kiln#colors. */
+  id?: string
 }
 
-const { number, label, title } = Astro.props
+const { number, label, title, id } = Astro.props
 ---
 
-<div class="grid gap-4 border-t border-foreground pt-4 md:grid-cols-12 md:gap-8">
+<div id={id} class="grid gap-4 border-t border-foreground pt-4 md:grid-cols-12 md:gap-8">
   <p class="label text-muted-foreground md:col-span-3">
     <span class="text-foreground">{number}</span> / {label}
   </p>

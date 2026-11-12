@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro"
-import { REPO_URL } from "@/lib/brand"
+import { CHECK_DOCS_URL, NPM_URL, REPO_URL } from "@/lib/brand"
 import { SITE_URL, themes } from "@/lib/themes"
 
 // A plain-text map of the site for coding agents.
@@ -37,6 +37,11 @@ export const GET: APIRoute = () => {
     "## Docs",
     "",
     `- [The Strict spec format](${SITE_URL}/spec): DESIGN.md plus the \`strict\` block, lint rules and exports.`,
+    "",
+    "## Tools",
+    "",
+    `- [Strict Check](${CHECK_DOCS_URL}): checks a project's code and its built pages against its DESIGN.md, and lists every value that is off the theme. Run \`npx @strictthemes/check . --dist dist\` in a project with a DESIGN.md in its root. It also runs as an MCP server and in CI.`,
+    `- [The spec linter](${NPM_URL.spec}): \`npx @strictthemes/spec lint DESIGN.md\` checks a spec, and \`export\` writes it out for Tailwind, shadcn, Nuxt UI or as design tokens.`,
     "",
     "## Source",
     "",

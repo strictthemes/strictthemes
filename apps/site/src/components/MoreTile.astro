@@ -1,0 +1,23 @@
+---
+// The tile that closes a grid of cards: it fills the places the last row
+// leaves open, and says where to go next.
+interface Props {
+  label: string
+  title: string
+  href: string
+  /** The words of the link. */
+  link: string
+  class?: string
+}
+
+const { label, title, href, link, class: className } = Astro.props
+---
+
+<div class:list={["flex h-full flex-col gap-4 rounded-md border border-border bg-card p-4 md:p-8", className]}>
+  <p class="label text-muted-foreground">{label}</p>
+  <h3 class="text-h2">{title}</h3>
+  <div class="flex max-w-measure flex-col gap-4 text-muted-foreground"><slot /></div>
+  <p class="mt-auto pt-4">
+    <a href={href} class="label text-primary underline underline-offset-4">{link}</a>
+  </p>
+</div>

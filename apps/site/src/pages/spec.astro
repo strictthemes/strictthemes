@@ -7,7 +7,20 @@ import Layout from "@/layouts/Base.astro"
 // The page is the package's own SPEC.md, so the site never drifts from it.
 const [heading = "", ...rest] = source.split("\n")
 const title = heading.replace(/^#\s*/, "")
-const html = marked.parse(rest.join("\n"), { async: false })
+const parsed = marked.parse(rest.join("\n"), { async: false })
+
+// Each main heading gets a name to link to, made from its words, and the page
+// gets a list of them.
+const contents: { id: string; title: string }[] = []
+const html = parsed.replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
+  const title = inner.replace(/<[^>]+>/g, "")
+  const id = title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
+  contents.push({ id, title })
+  return `<h2 id="${id}">${inner}</h2>`
+})
 ---
 
 <Layout
@@ -21,6 +34,21 @@ const html = marked.parse(rest.join("\n"), { async: false })
     </div>
   </section>
   <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
-    <article class="prose min-w-0 md:col-span-8 md:col-start-4" set:html={html} />
+    <nav aria-label="On this page" class="flex flex-col gap-2 md:sticky md:top-8 md:col-span-3 md:self-start">
+      <p class="label text-muted-foreground">On this page</p>
+      <ol class="flex flex-col border-t border-border">
+        {
+          contents.map((item, index) => (
+            <li class="border-b border-border">
+              <a href={`#${item.id}`} class="flex gap-4 py-2 hover:text-primary">
+                <span class="label py-1 text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
+                <span>{item.title}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+    <article class="prose min-w-0 md:col-span-8" set:html={html} />
   </div>
 </Layout>

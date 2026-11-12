@@ -24,3 +24,12 @@ export function markSvg(scale = 1): string {
       : `<path fill="${BRAND.onBlue}" transform="translate(16 16) scale(${scale}) translate(-16 -16)" d="${MARK_PATH}"/>`
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="${BRAND.blue}"/>${rails}</svg>\n`
 }
+
+/** The packages on npm, by their short name. */
+export const NPM_URL = {
+  spec: "https://www.npmjs.com/package/@strictthemes/spec",
+  check: "https://www.npmjs.com/package/@strictthemes/check",
+}
+
+/** Strict Check's own guide: every option, the rules, the MCP server and CI. */
+export const CHECK_DOCS_URL = `${REPO_URL}/tree/master/packages/check#readme`

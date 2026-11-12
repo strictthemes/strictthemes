@@ -1,7 +1,7 @@
 ---
 import "@/styles/global.css"
 import Logo from "@/components/Logo.astro"
-import { REPO_URL } from "@/lib/brand"
+import { CHECK_DOCS_URL, NPM_URL, REPO_URL } from "@/lib/brand"
 import { SITE_URL, themeScopeCss } from "@/lib/themes"
 
 interface Props {
@@ -17,6 +17,28 @@ const shareImage = new URL("/og.png", SITE_URL).href
 const nav = [
   { href: "/themes", label: "Themes" },
   { href: "/spec", label: "Spec" },
+  // Left out on a phone, where the header has no room for it: the footer has it too.
+  { href: REPO_URL, label: "GitHub", wide: true },
+]
+const footer = [
+  {
+    title: "Site",
+    links: [
+      { href: "/themes", label: "Themes" },
+      { href: "/spec", label: "The spec format" },
+      { href: "/r/registry.json", label: "Registry index" },
+      { href: "/llms.txt", label: "llms.txt" },
+    ],
+  },
+  {
+    title: "Code",
+    links: [
+      { href: REPO_URL, label: "Source on GitHub" },
+      { href: CHECK_DOCS_URL, label: "Strict Check guide" },
+      { href: NPM_URL.check, label: "Strict Check on npm" },
+      { href: NPM_URL.spec, label: "Spec linter on npm" },
+    ],
+  },
 ]
 const current = Astro.url.pathname
 ---
@@ -53,7 +75,7 @@ const current = Astro.url.pathname
       Skip to content
     </a>
     <header class="border-b border-border">
-      <div class="mx-auto flex max-w-page items-center justify-between gap-8 px-4 py-4 md:px-8">
+      <div class="mx-auto flex max-w-page items-center justify-between gap-4 px-4 py-4 md:gap-8 md:px-8">
         <a href="/" class="flex items-center gap-2">
           <Logo class="size-6" />
           <span class="flex items-baseline gap-2">
@@ -61,13 +83,16 @@ const current = Astro.url.pathname
             <span class="label text-muted-foreground">Themes</span>
           </span>
         </a>
-        <nav aria-label="Main" class="flex gap-8">
+        <nav aria-label="Main" class="flex gap-4 md:gap-8">
           {
             nav.map((link) => (
               <a
                 href={link.href}
                 aria-current={current.startsWith(link.href) ? "page" : undefined}
-                class="label text-muted-foreground underline-offset-4 hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:underline"
+                class:list={[
+                  "label py-2 text-muted-foreground underline-offset-4 hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:underline",
+                  link.wide && "hidden sm:block",
+                ]}
               >
                 {link.label}
               </a>
@@ -90,14 +115,24 @@ const current = Astro.url.pathname
             here is free and open source, under the MIT licence.
           </p>
         </div>
-        <ul class="label flex flex-col gap-2 text-muted-foreground md:col-span-3 md:col-start-10">
-          <li><a class="hover:text-foreground" href="/themes">Themes</a></li>
-          <li><a class="hover:text-foreground" href="/spec">The spec format</a></li>
-          <li><a class="hover:text-foreground" href="/r/registry.json">Registry index</a></li>
-          <li><a class="hover:text-foreground" href="/llms.txt">llms.txt</a></li>
-          <li><a class="hover:text-foreground" href={REPO_URL}>Source on GitHub</a></li>
-        </ul>
+        {
+          footer.map((group, index) => (
+            <nav
+              aria-label={group.title}
+              class:list={["flex flex-col gap-2 md:col-span-3", index === 0 && "md:col-start-7"]}
+            >
+              <p class="label">{group.title}</p>
+              <ul class="label flex flex-col text-muted-foreground">
+                {group.links.map((link) => (
+                  <li><a class="block py-1 hover:text-foreground" href={link.href}>{link.label}</a></li>
+                ))}
+              </ul>
+            </nav>
+          ))
+        }
       </div>
     </footer>
+    {/* Where a copy button says what happened, for a screen reader. */}
+    <p role="status" class="sr-only" data-status></p>
   </body>
 </html>

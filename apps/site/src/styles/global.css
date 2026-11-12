@@ -145,6 +145,19 @@
     }
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+    /* Lines of about the same length, so a heading never ends on one word. */
+    text-wrap: balance;
+    }
+  /* One focus ring for every link and button, in the theme's ring color. A
+     component that draws its own ring, as the stock shadcn ones do, keeps it. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    }
+  /* A heading reached from a link on its page stops below the page's edge,
+     and below the row of links that stays at the top of a theme page. */
+  [id] {
+    scroll-margin-top: 64px;
     }
   code, kbd, pre, samp {
     @apply font-mono;

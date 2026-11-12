@@ -104,6 +104,17 @@ const prompts = theme.prompts.map((prompt) => ({
 const offset = prompts.length > 0 ? 1 : 0
 const num = (n: number) => String(n + offset).padStart(2, "0")
 
+// The sections of the page, for the row of links under its opening.
+const jumps = [
+  { id: "preview", label: "Preview" },
+  ...(prompts.length > 0 ? [{ id: "prompts", label: "Page prompts" }] : []),
+  { id: "colors", label: "Colors" },
+  { id: "typography", label: "Typography" },
+  { id: "shape", label: "Shape and space" },
+  { id: "rules", label: "Rules" },
+  { id: "guidance", label: "Guidance" },
+]
+
 const downloads: Record<string, string> = {
   "DESIGN.md": "The spec",
   "tailwind.css": "Tailwind CSS v4",
@@ -150,9 +161,24 @@ const downloads: Record<string, string> = {
     </div>
   </section>
 
+  {/* The page is long: this row of links stays at the top of a wide window. */}
+  <nav aria-label="On this page" class="border-b border-border bg-background md:sticky md:top-0 md:z-10">
+    <ul class="mx-auto flex max-w-page flex-wrap gap-x-8 px-4 py-2 md:px-8">
+      {
+        jumps.map((jump) => (
+          <li>
+            <a href={`#${jump.id}`} class="label block py-2 text-muted-foreground hover:text-foreground">
+              {jump.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+
   <div class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
     <section class="flex flex-col gap-8">
-      <SectionHeader number="01" label="Preview" title="Stock shadcn components, this theme." />
+      <SectionHeader number="01" label="Preview" title="Stock shadcn components, this theme." id="preview" />
       <ThemePreview
         client:load
         slug={theme.slug}
@@ -168,6 +194,7 @@ const downloads: Record<string, string> = {
             number="02"
             label="Page prompts"
             title="Paste one into your agent. Get that page."
+            id="prompts"
           />
           <p class="max-w-measure text-muted-foreground">
             Each prompt is a full brief for one page in this theme: its sections,
@@ -217,6 +244,7 @@ const downloads: Record<string, string> = {
                   <button
                     type="button"
                     data-copy-url={prompt.urls.prompt}
+                    aria-label={`Copy prompt: ${prompt.title}`}
                     class="label rounded-sm border border-foreground px-4 py-2 hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-ring"
                   >
                     Copy prompt
@@ -225,7 +253,7 @@ const downloads: Record<string, string> = {
                     href={prompt.urls.prompt}
                     class="label py-2 text-primary underline underline-offset-4"
                   >
-                    Read the prompt
+                    Read the prompt<span class="sr-only">: {prompt.title}</span>
                   </a>
                 </div>
               </li>
@@ -236,7 +264,7 @@ const downloads: Record<string, string> = {
     }
 
     <section class="flex flex-col gap-8">
-      <SectionHeader number={num(2)} label="Colors" title="Every color the theme allows." />
+      <SectionHeader number={num(2)} label="Colors" title="Every color the theme allows." id="colors" />
       <ul class="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-8">
         {
           colors.map((color) => (
@@ -258,7 +286,7 @@ const downloads: Record<string, string> = {
     </section>
 
     <section class="flex flex-col gap-8">
-      <SectionHeader number={num(3)} label="Typography" title="Five sizes. Nothing in between." />
+      <SectionHeader number={num(3)} label="Typography" title="Five sizes. Nothing in between." id="typography" />
       <ul class="flex flex-col">
         {
           typography.map((token) => (
@@ -277,7 +305,7 @@ const downloads: Record<string, string> = {
     </section>
 
     <section class="flex flex-col gap-8">
-      <SectionHeader number={num(4)} label="Shape and space" title="Corners and spacing." />
+      <SectionHeader number={num(4)} label="Shape and space" title="Corners and spacing." id="shape" />
       <div class="grid gap-8 md:grid-cols-12">
         <ul class="flex flex-wrap gap-4 md:col-span-6">
           {
@@ -308,7 +336,7 @@ const downloads: Record<string, string> = {
     </section>
 
     <section class="flex flex-col gap-8">
-      <SectionHeader number={num(5)} label="Rules" title="What the strict block enforces." />
+      <SectionHeader number={num(5)} label="Rules" title="What the strict block enforces." id="rules" />
       <dl class="flex flex-col">
         {
           rules.map((rule) => (
@@ -322,7 +350,7 @@ const downloads: Record<string, string> = {
     </section>
 
     <section class="flex flex-col gap-8">
-      <SectionHeader number={num(6)} label="Guidance" title="What your agent reads." />
+      <SectionHeader number={num(6)} label="Guidance" title="What your agent reads." id="guidance" />
       <div class="flex flex-col">
         {
           sections.map((section) => (

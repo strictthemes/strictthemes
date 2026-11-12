@@ -1,10 +1,13 @@
 ---
 import Command from "@/components/Command.astro"
+import MoreTile from "@/components/MoreTile.astro"
 import PromptThumb from "@/components/PromptThumb.astro"
 import SectionHeader from "@/components/SectionHeader.astro"
 import ThemeCard from "@/components/ThemeCard.astro"
 import { ThemePreview } from "@/components/ThemePreview"
 import Layout from "@/layouts/Base.astro"
+import { CHECK_DOCS_URL } from "@/lib/brand"
+import { REPORT_SAMPLE } from "@/lib/report-sample"
 import { exampleFor, promptUrls, themes } from "@/lib/themes"
 
 const first = themes[0]
@@ -94,6 +97,24 @@ const roadmap = [
   },
 ]
 
+// What Strict Check does, in three lines.
+const checks = [
+  {
+    name: "The code",
+    body: "Off-theme classes, hand-written colors, fonts the theme does not declare, gradients and emoji. No build, no browser: fast enough to run after every edit.",
+  },
+  {
+    name: "The rendered pages",
+    body: "Colors, contrast, type, spacing and corners as the browser draws them, in every color mode, on a laptop and on a phone.",
+  },
+  {
+    name: "Where it runs",
+    body: "As a command, as an MCP server and a skill for coding agents, and as a job in CI.",
+  },
+]
+
+const promptCount = themes.reduce((sum, theme) => sum + theme.prompts.length, 0)
+
 // The hero's backdrop repeats the page grid's columns out to both edges of the
 // window. Sixty of them cover a window 5,800px wide; the number must be even,
 // so that the middle twelve sit under the page grid.
@@ -156,6 +177,19 @@ const BACKDROP_COLUMNS = 60
           </li>
         ))
       }
+      <li class="lg:col-span-2">
+        <MoreTile
+          label="Your own"
+          title="Or write the fourteenth."
+          href="/spec"
+          link="Read the spec format"
+        >
+          <p>
+            A theme is one DESIGN.md file. The spec format says what goes in it, and the linter
+            tells you where it is wrong before an agent ever reads it.
+          </p>
+        </MoreTile>
+      </li>
     </ul>
     {
       first && (
@@ -219,6 +253,19 @@ const BACKDROP_COLUMNS = 60
               </div>
             </li>
           ))}
+          <li class="md:col-span-2">
+            <MoreTile
+              label={`${promptCount} prompts`}
+              title="Four more pages for every theme."
+              href="/themes"
+              link="Browse the themes"
+            >
+              <p>
+                These are thirteen of the pages. Each theme's own page lists its five prompts,
+                with the page an agent built from each one, and a button that copies the prompt.
+              </p>
+            </MoreTile>
+          </li>
         </ul>
       </section>
     )
@@ -253,6 +300,49 @@ const BACKDROP_COLUMNS = 60
   <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
     <SectionHeader
       number={pages.length > 0 ? "04" : "03"}
+      label="Strict Check"
+      title="Then check what the agent built."
+      id="check"
+    />
+    <div class="grid gap-8 md:grid-cols-12">
+      <div class="flex min-w-0 flex-col gap-8 md:col-span-5">
+        <p class="text-muted-foreground">
+          An agent that has read the theme can still drift from it. Strict Check reads the
+          project's code, opens the built pages in a browser, and lists every color, size,
+          space and corner that is not in the theme. Run it after each change, or let the
+          agent run it and fix what it finds.
+        </p>
+        <Command command="npx @strictthemes/check . --dist dist" label="Run it in a project with a DESIGN.md" />
+        <dl class="flex flex-col">
+          {
+            checks.map((item) => (
+              <div class="flex flex-col gap-1 border-t border-border py-4">
+                <dt class="label">{item.name}</dt>
+                <dd class="text-muted-foreground">{item.body}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <p>
+          <a href={CHECK_DOCS_URL} class="label text-primary underline underline-offset-4">
+            Read the Strict Check guide
+          </a>
+        </p>
+      </div>
+      <div class="flex min-w-0 flex-col gap-2 md:col-span-6 md:col-start-7">
+        <span class="label text-muted-foreground">A report on a test page, shortened</span>
+        {/* Long lines wrap, as they do in a terminal. On a phone the block scrolls sideways instead, to keep its columns. */}
+        <pre
+          tabindex="0"
+          aria-label="A Strict Check report"
+          class="overflow-x-auto rounded-md border border-border bg-card p-4 text-body md:p-8 md:whitespace-pre-wrap"><code>{REPORT_SAMPLE}</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
+    <SectionHeader
+      number={pages.length > 0 ? "05" : "04"}
       label="Roadmap"
       title="What exists, and what is next."
     />

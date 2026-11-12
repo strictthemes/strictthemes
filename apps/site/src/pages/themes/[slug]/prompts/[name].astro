@@ -124,7 +124,8 @@ const toggle =
 
   <section class="flex flex-col gap-4 px-4 py-8 md:px-8" aria-label="Preview">
     <div class="flex flex-wrap items-center justify-between gap-4">
-      <div role="group" aria-label="Screen width" class="flex flex-wrap gap-2">
+      {/* A phone is narrower than every width on offer, so the switch shows from a tablet up. */}
+      <div role="group" aria-label="Screen width" class="hidden flex-wrap gap-2 md:flex">
         {
           widths.map((width, index) => (
             <button

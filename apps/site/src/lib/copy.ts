@@ -26,12 +26,28 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
-/** Shows a result on a button for a moment, then puts its label back. */
+const timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>()
+
+/**
+ * Shows a result on a button for a moment, then puts its label back. The
+ * result is also written to the page's status line, which a screen reader
+ * reads out: it does not announce a button whose own text changes.
+ */
 export function flash(button: HTMLElement, message: string): void {
   const label = button.dataset.label ?? button.textContent ?? ""
   button.dataset.label = label
   button.textContent = message
-  setTimeout(() => (button.textContent = label), 1600)
+  const status = document.querySelector("[data-status]")
+  if (status) status.textContent = message
+  // A second click starts the wait again, so the label is not put back early.
+  clearTimeout(timers.get(button))
+  timers.set(
+    button,
+    setTimeout(() => {
+      button.textContent = label
+      if (status?.textContent === message) status.textContent = ""
+    }, 1600)
+  )
 }
 
 /**
