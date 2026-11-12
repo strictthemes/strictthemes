@@ -10,7 +10,7 @@ const USAGE = `strict-check — check a project's UI against its Strict design s
 
 Usage:
   strict-check [dir] [options]   Check a project.
-  strict-check mcp               Serve the check as an MCP server over stdio, for coding agents.
+  strict-check mcp               Serve the check and the Strict themes as an MCP server over stdio, for coding agents.
 
   dir                The project to check. Default: the current directory.
 

@@ -58,17 +58,28 @@ after(async () => {
   rmSync(broken, { recursive: true, force: true })
 })
 
-test('mcp: the server names itself, explains itself and lists two read-only tools', async () => {
+test('mcp: the server names itself, explains itself and lists six read-only tools', async () => {
   assert.equal(client.getServerVersion()?.name, 'strict-check')
-  assert.match(client.getInstructions() ?? '', /Call "rules" before[\s\S]*Call "check" after/)
+  assert.match(client.getInstructions() ?? '', /Call "rules" before[\s\S]*Call "check" after[\s\S]*"list_themes"[\s\S]*"get_prompt"/)
   const { tools } = await client.listTools()
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ['check', 'rules'])
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), ['check', 'get_prompt', 'get_theme', 'list_prompts', 'list_themes', 'rules'])
   assert.ok(tools.every((tool) => tool.outputSchema === undefined))
   for (const tool of tools) {
     assert.ok((tool.description ?? '').length > 80, `${tool.name} needs a description an agent can act on`)
     assert.equal(tool.annotations?.readOnlyHint, true)
-    assert.deepEqual(tool.inputSchema.required, ['dir'])
   }
+  const required = Object.fromEntries(tools.map((tool) => [tool.name, tool.inputSchema.required ?? []]))
+  assert.deepEqual(required, {
+    rules: ['dir'],
+    check: ['dir'],
+    list_themes: [],
+    get_theme: ['theme'],
+    list_prompts: [],
+    get_prompt: ['theme', 'page'],
+  })
+  // The two that work on the project's own files reach nothing else; the four theme tools read strictthemes.com.
+  const open = Object.fromEntries(tools.map((tool) => [tool.name, tool.annotations?.openWorldHint]))
+  assert.deepEqual(open, { rules: false, check: false, list_themes: true, get_theme: true, list_prompts: true, get_prompt: true })
 })
 
 test('mcp: rules returns what the theme allows', async () => {

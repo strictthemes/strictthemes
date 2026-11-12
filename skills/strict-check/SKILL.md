@@ -120,3 +120,9 @@ commands. They take the same options:
   "Passed" or "Failed".
 
 `dir` is the absolute path of the project.
+
+The server has four more tools, for a project that has no `DESIGN.md` yet or
+a page the user wants built from a ready brief: `list_themes`, `get_theme`,
+`list_prompts` and `get_prompt` return the Strict themes and their page
+prompts from strictthemes.com. `get_theme` returns the theme's `DESIGN.md`,
+to save in the project's root.

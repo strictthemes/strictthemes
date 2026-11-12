@@ -204,7 +204,63 @@ test("llms.txt lists every theme", () => {
   }
 })
 
-// The example pages: what a coding agent built from a page prompt, kept in
+test("themes.json lists every theme and page prompt, and every address in it is a file the site serves", () => {
+  const index = JSON.parse(read("themes.json")) as {
+    version: number
+    site: string
+    themes: {
+      slug: string
+      name: string
+      description: string
+      fonts: { heading: string; body: string; mono: string }
+      page: string
+      spec: string
+      install: { command: string; notes: string }
+      exports: string[]
+      prompts: {
+        slug: string
+        title: string
+        description: string
+        url: string
+        example?: { preview: string; check: { score: number; errors: number; warnings: number } }
+      }[]
+    }[]
+  }
+  assert.equal(index.version, 1)
+  assert.equal(index.site, "https://strictthemes.com")
+  // The same themes and pages, in the same order, as the site shows.
+  assert.deepEqual(
+    index.themes.map((theme) => [theme.slug, theme.name, theme.prompts.map((prompt) => prompt.slug)]),
+    PAGES
+  )
+  /** The file in dist behind an address on the site. */
+  const served = (url: string) => {
+    assert.ok(url.startsWith("https://strictthemes.com/"), url)
+    const path = url.slice("https://strictthemes.com/".length)
+    return join(dist, path.endsWith("/") ? `${path}index.html` : path)
+  }
+  for (const theme of index.themes) {
+    assert.ok(theme.description.length > 20, theme.slug)
+    for (const font of [theme.fonts.heading, theme.fonts.body, theme.fonts.mono]) {
+      assert.match(font, /^[A-Z][A-Za-z0-9 ]+$/, `${theme.slug}: ${font}`)
+    }
+    assert.equal(theme.install.command, `npx shadcn@latest add https://strictthemes.com/r/${theme.slug}.json`)
+    assert.match(theme.install.notes, /adds type classes/, theme.slug)
+    assert.equal(theme.exports.length, 5, theme.slug)
+    for (const url of [theme.page, theme.spec, ...theme.exports]) assert.ok(existsSync(served(url)), url)
+    for (const prompt of theme.prompts) {
+      assert.ok(existsSync(served(prompt.url)), prompt.url)
+      assert.match(prompt.description, /\.$/, `${theme.slug}/${prompt.slug}`)
+      // Every prompt has a built example, and the index says how it scored.
+      assert.ok(prompt.example, `${theme.slug}/${prompt.slug}`)
+      assert.ok(existsSync(served(prompt.example.preview)), prompt.example.preview)
+      assert.equal(prompt.example.check.errors, 0, `${theme.slug}/${prompt.slug}`)
+    }
+  }
+  assert.ok(read("llms.txt").includes("(https://strictthemes.com/themes.json)"))
+})
+
+// The example pages: what was built from each page prompt, kept in
 // examples/<theme>/<page>/ and built into the site by scripts/build-examples.ts.
 const examplesDir = join(import.meta.dirname, "..", "examples")
 const examples = readdirSync(examplesDir, { withFileTypes: true })

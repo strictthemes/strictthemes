@@ -112,6 +112,11 @@ in Claude Code, Cursor or another MCP client:
 }
 ```
 
+The same server hands the agent the themes: `list_themes` and `get_theme`
+for a theme's `DESIGN.md` and install command, `list_prompts` and
+`get_prompt` for the page prompts. Ask for "a pricing page in a Strict
+theme" and the agent fetches the brief itself.
+
 Or give it the [skill](skills/strict-check/SKILL.md), which says when to run
 the check, how to read the report and how to fix each rule. The
 [guide](packages/check#readme) has every option, the rules, and a GitLab CI
@@ -123,7 +128,7 @@ and a GitHub Actions example.
 |---|---|---|
 | [`@strictthemes/spec`](packages/spec) | Parses, lints and exports Strict design specs (`DESIGN.md` + a `strict` rules block). Everything else builds on it. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/spec) |
 | [`@strictthemes/themes`](packages/themes) | The eighteen themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
-| [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
+| [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. The MCP server also serves the themes and page prompts. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
 | [`@strictthemes/site`](apps/site) | strictthemes.com, built with Astro: theme pages with live previews, a built example page for every page prompt, the registry and the spec docs. | Live |
 | [`skills/strict-check`](skills/strict-check/SKILL.md) | The skill that has a coding agent run Strict Check on its own work. | First version |
 

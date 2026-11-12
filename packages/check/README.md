@@ -266,19 +266,38 @@ the report and fixes what it finds. There are two ways to give it that.
 
 ### MCP server
 
-`strict-check mcp` serves two tools over stdio:
+`strict-check mcp` serves six tools over stdio. Two work on the project:
 
 | Tool | What it does |
 |---|---|
 | `rules` | Returns what the theme allows: colors in each mode, the spacing scale, type sizes, corners, fonts, contrast level and forbidden patterns. For reading before writing UI. The same text as `--rules`. |
 | `check` | Runs the check and returns the same report the command prints, as text. Its last line starts with "Passed" or "Failed". Takes `dir`, and optionally `spec`, `dist` or `url`, `paths`, `modes`, `widths`, `includeUi`. |
 
-Both only read, and both answer in text alone. Claude Code gives the model a
+Four hand the agent the [Strict themes](https://strictthemes.com/themes) and
+their page prompts, so a project with no theme can start from one without
+anyone pasting a prompt:
+
+| Tool | What it does |
+|---|---|
+| `list_themes` | Names every theme: its slug, what kind of site it suits, its fonts and the pages it has prompts for. |
+| `get_theme` | Returns one theme: the install command, what to do after the install, and its whole `DESIGN.md`, to save in the project's root. Takes `theme`. |
+| `list_prompts` | Says what each page prompt builds, for one theme (`theme`) or for all. For one theme it also says how the page built from each prompt scored in Strict Check, with a link to that page. |
+| `get_prompt` | Returns one page prompt word for word, as strictthemes.com serves it: about 40,000 characters, or 10,000 tokens. Takes `theme` and `page`. |
+
+All six only read, and all answer in text alone. Claude Code gives the model a
 tool's structured data in place of its text when a tool returns both, so a
 summary object beside the report would hide the findings from the agent.
 A check that finds problems is a normal result; a check that
 could not run (no spec, project not built, no browser) is a tool error with
 the reason.
+
+The four theme tools read `https://strictthemes.com/themes.json` and the
+theme's files on the same site, and keep the list for five minutes. They send
+nothing about the project. Without a connection they answer with a tool error
+that says so, and `rules` and `check` work as before. An unknown theme or page
+is an error that lists the ones there are. To read the themes from another
+copy of the site, such as a local build, set `STRICT_THEMES_URL` to its
+address in the server's environment.
 
 To connect it in Claude Code, Cursor or another MCP client:
 

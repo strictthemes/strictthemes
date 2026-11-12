@@ -32,4 +32,4 @@ body:
     attributes:
       label: Versions
       description: The package version, your Node version, and the coding agent or browser if one is involved.
-      placeholder: "@strictthemes/check 0.2.0, Node 24, Chrome 142"
+      placeholder: "@strictthemes/check 0.3.0, Node 24, Chrome 142"
