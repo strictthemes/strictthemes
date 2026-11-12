@@ -9,12 +9,6 @@ checks:
   - "The price break that applies to the quantity typed is marked in bold and in words, and the line total follows the quantity."
   - "A quantity that is not a whole number from 1 to 10,000 gets an error in words with an icon, tied to the field, and Add to quote then adds nothing."
   - "After Add to quote a confirmation is announced from a `role=status` element that was on the page from the start, and the only default button on the page is Add to quote."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,273 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light and dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Torvale Bearings Ltd" and its part `TVL-2047-RS`, a deep groove ball bearing with a 20 mm bore, a 47 mm outside diameter and a 14 mm width, with two rubber seals. Dynamic load rating 13.40 kN, static load rating 6.55 kN, limiting speed 13,000 r/min, mass 0.103 kg, operating temperature −30 to +110 °C. 1,240 in stock at Brigholt; more in 10 working days. Price breaks per bearing: 1 to 49 at £2.94, 50 to 249 at £2.61, 250 to 999 at £2.28, 1,000 and over at £1.97.

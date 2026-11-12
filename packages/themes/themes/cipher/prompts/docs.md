@@ -9,22 +9,6 @@ checks:
   - The "On this page" links jump to their headings and mark the one in view with `aria-current="location"`.
   - Below `lg` the page has one "Menu" button, and it opens the nav links and the sidebar's pages inside the header.
   - Code blocks and the flags table scroll sideways inside their own box at 375px, and the page does not.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,397 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,316 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,312 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the reference page for `plinth deploy` in the docs of **Plinth**, a command-line tool by Plinth Labs that deploys a web project from the terminal (version `2.4.0`). The page says what the command does, shows its usage, lists its flags, gives two examples and lists its exit codes. The previous page is `plinth init`, the next `plinth logs`. Write the text yourself, short and exact.

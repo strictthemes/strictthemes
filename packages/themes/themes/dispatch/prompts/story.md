@@ -9,22 +9,6 @@ checks:
   - The pull quote is set in Newsreader italic, between a 2px top rule and a 1px bottom rule, with who said it as a label.
   - The fact box is a `bg-card` box with a 1px border and square corners, and it is not inside another box.
   - The published and updated times are `<time>` elements with a `dateTime`.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,354 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,511 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,553 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Port Avery Ledger**, the daily paper of Port Avery, an invented harbour city. The story is the front page's lead: the Kessel Street Bridge closed on Tuesday 10 November after inspectors found cracked bearings and stays shut for six months, and the council votes tonight on a £48m repair. Write a story of 600 to 800 words in its body paragraphs alone (the subheading, the pull quote and the fact box come on top) in plain news language: the news first, then what it means for the 40,000 people who cross each day, then what the council says, the opposition's reply and what happens next. Quote the transport chief, Reuben Achterberg, and a café owner by the bridge, Selin Duraković. Every person and place is invented.

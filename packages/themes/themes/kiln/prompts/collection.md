@@ -9,22 +9,6 @@ checks:
   - Choosing "Jugs" shows the empty state, and its button shows every piece again and moves focus to the "All" button.
   - The tiles are two to a row at 375px with no sideways scroll, and four to a row on a wide screen.
   - The page has no terracotta (default) button.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,792 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,768 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,764 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio of two potters, Nell Varga and Tomas Reid, in Bramwick. This page is their Tableware collection. Glazes are Ash (pale grey-white), Oat (pale cream), Iron (dark brown) and Slate (dark blue-grey). The twelve pieces, in the studio's own order, with category, glaze, price and badge:

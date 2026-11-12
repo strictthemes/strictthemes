@@ -9,22 +9,6 @@ checks:
   - Acid lime appears once on the page, as the badge in the opening, and is never a text color.
   - The opening's heading is the page's only `<h1>` and its only `text-display` text.
   - At 375px the install command, the terminal's long lines and the config file scroll inside their own boxes, and the page does not.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,444 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,604 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,550 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Plinth**, a command-line tool that deploys a web project from the terminal: `plinth deploy` builds the current commit, uploads it and prints the address. Every branch gets a preview address; `main` goes to production. It is made by Plinth Labs, and the latest version is `2.4.0`, released on 10 November 2026, which added preview deploys for every branch. The install command is `curl -fsSL https://plinth.example/install.sh | sh`. The sample project is `orrin-web`. Write the rest of the copy yourself, plain and exact, the way a good tool's README reads.

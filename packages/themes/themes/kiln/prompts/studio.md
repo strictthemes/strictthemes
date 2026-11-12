@@ -9,22 +9,6 @@ checks:
   - The opening hours are a description list (`<dl>`) with a `<time>` for every time, and the address is an `<address>` that is not italic.
   - Each empty or wrong field of the contact form gets its own message in words with an icon, focus goes to the first of them, and a good message is replaced by a confirmation that takes focus.
   - The "Send message" button is the page's only terracotta button.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.5% of 3,027 measured values, with no errors and 2 warnings for the round avatars with initials, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.5% of 3,024 measured values, with no errors and 2 warnings for the round avatars with initials, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,018 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio at Unit 3, Coldharbour Yard, Bramwick BW4 2LT, in a dairy that closed in 1994. Nell Varga and Tomas Reid started it in 2019 with one wheel and a borrowed electric kiln; in 2021 they built a gas kiln in the yard. Ines Okafor joined in 2024 to pack orders and teach the Saturday class. The studio is open Thursday to Saturday, 10:00 to 16:00, and closed from 24 December to 2 January. Write the rest of the copy yourself, plain and specific.

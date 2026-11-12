@@ -9,12 +9,6 @@ checks:
   - "Every field has a visible label tied to it, and each quantity field has a name that says which part it is for."
   - "After Request a quote the form is replaced by a confirmation with the reference `TQ-26-04173` from a `role=status` element that was on the page from the start, and focus moves to its heading."
   - "Request a quote is the only default button on the page; every other button is the pale steel secondary."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,142 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Torvale Bearings Ltd". The buyer, from Pellam Pumps Ltd, has added three lines to a quote. Each part has four price breaks per bearing, for 1 to 49, 50 to 249, 250 to 999, and 1,000 and over:

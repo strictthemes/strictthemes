@@ -1,8 +1,8 @@
 // Builds the example pages in examples/<theme>/<page>/ into the built site, at
 // dist/themes/<theme>/prompts/<page>/build/. Runs after `astro build`.
 //
-// An example is the page a coding agent built from a theme's page prompt, kept
-// as the agent left it: index.html, src/ and public/ of a Vite + shadcn
+// An example is the page built from a theme's page prompt, kept as it came
+// out: index.html, src/ and public/ of a Vite + shadcn
 // project. Every example is built on its own, with its own copy of the stock
 // components, using the packages this site already depends on.
 import { existsSync, readdirSync } from "node:fs"

@@ -8,22 +8,6 @@ checks:
   - The quarter table has its amounts right-aligned in mono figures, a total row in a `<tfoot>` under a double rule, and the loss in the second quarter shown with a minus sign and the word "Loss".
   - Every note marker in the text is a link to its note, and the notes are an ordered list whose items have the `id`s the markers point to.
   - No paragraph in `text-body` is wider than `max-w-lg`, and none of them is muted.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first run showed a broken sentence in the theme's shared notes and three places where this brief and the notes gave different sizes for the key figures; both are fixed. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,270 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, a wrong reference in the theme's notes was corrected (the header named "the last note" for the Menu button). A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,266 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,271 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, has prepared the yearly report of "Hollis & Vane Ltd", a two-person print studio, for the year from 1 October 2025 to 30 September 2026, on 20 November 2026. Figures are rounded to whole pounds on this page, so they have no pence: here, instead of the Money note's two decimals, `£412,860` and `−£4,180`. Income £412,860, up 14% on last year; costs £356,240, up 11%; profit before tax £56,620, up 37%. By quarter (income, costs, net, margin, cash at the end of the quarter): Q1, Oct to Dec 2025: £98,420, £79,310, profit £19,110, 19.4%, £38,250. Q2, Jan to Mar 2026: £84,950, £89,130, loss £4,180, −4.9%, £29,870. Q3, Apr to Jun 2026: £109,760, £90,420, profit £19,340, 17.6%, £44,120. Q4, Jul to Sep 2026: £119,730, £97,380, profit £22,350, 18.7%, £54,310. The year: margin 13.7%, cash at the end £54,310. The loss in Q2 came from a new folding machine (£18,400, February).

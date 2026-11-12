@@ -8,22 +8,6 @@ checks:
   - The addresses are `<address>` elements and the numbers and dates are description lists (`<dl>`), with every date in a `<time>`.
   - The invoice's state is a mark and a word on the document and in the status sheet, and the "Due" badge is brass with dark text.
   - Clicking "Mark as paid" changes the state to Paid in both places, sets the amount due to £0.00, adds an activity row, announces the change and leaves the button disabled but focusable.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first run showed a broken sentence in the theme's shared notes, which is fixed. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,736 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 7 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, a wrong reference in the theme's notes was corrected (the header named "the last note" for the Menu button). A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,711 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,613 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses. The invoice is `INV-0142` from "Hollis & Vane", a two-person print studio (Hollis & Vane Ltd, Unit 4, Tanner's Yard, Kestle KS3 9QT, VAT number GB 318 4402 17), to "Larkspur Café" (Accounts, 18 Mill Row, Kestle KS1 4DE). It was issued on 13 November 2026 and is due today, 27 November. Four lines: menu cards (400 at £1.10, £440.00), table tents (120 at £2.50, £300.00), window posters (6 at £45.00, £270.00) and design and proofing (1 at £230.00). Subtotal £1,240.00, VAT at 20% £248.00, total £1,488.00.

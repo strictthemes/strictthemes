@@ -9,22 +9,6 @@ checks:
   - The reminder time is a native `<select>` with a visible label.
   - The "Delete my account" button stays disabled until the word `delete` is typed, keeps keyboard focus while disabled, and its warning is stated in words, not by the red color alone.
   - Profile has one raspberry button, "Save changes".
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 97.8% of 1,703 measured values, with no errors and 2 warnings for the round avatar and the stock pill-shaped switch, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 97.8% of 1,703 measured values, with no errors and 2 warnings for the round avatar and the stock pill-shaped switch, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,697 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. The person is Ines Okafor, ines.okafor@example.com, on the free plan since 2 September 2026. Her reminders: a morning nudge at 08:00 (on), an evening check-in (on), a weekly summary on Sundays (off), a note when a streak is at risk (on).

@@ -56,8 +56,8 @@ Failed: 67.7% of 93 measured values follow the theme. 6 errors, 0 warnings.
 ## Themes
 
 Eighteen themes, each with a light and a dark mode and five page prompts.
-Every link opens the theme's page, with a live preview and the pages a coding
-agent built from its prompts.
+Every link opens the theme's page, with a live preview and the pages built
+from its prompts.
 
 | Theme | What it is for |
 |---|---|

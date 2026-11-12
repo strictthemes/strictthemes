@@ -9,22 +9,6 @@ checks:
   - Choosing a showtime marks only that time with `aria-pressed="true"` across all days, and a sentence in an `aria-live` element states the chosen day, time and screen in words.
   - The "Book seats" link, the page's only default (gold) action, is on the page only once a time is chosen.
   - The still keeps its 16:9 shape at every width, has `role="img"` and an `aria-label`, and has a caption.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first runs showed that a poster in a row needs `self-start` to keep its proportions, which the theme's shared notes now say. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,088 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,088 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,102 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. The film is "Low Tide at Merrow", directed by Ada Kessler, Norway, 2026, 118 minutes, rated 15, in Norwegian with English subtitles. Maren, a ferry pilot, comes back to the island she left at nineteen to sell her late father's house, and finds the harbour town waiting for a storm that the radio keeps moving to the next night. It opens at the Vesper on Wednesday 11 November 2026. Credits: directed by Ada Kessler; written by Ada Kessler and Sindre Vold; Ingrid Solberg as Maren; cinematography by Hanne Kvist; music by Oskar Lunde; editing by Tora Brekke. The review is by Tomas Brecht in "The Oldmere Review": "Kessler keeps the storm offshore for two hours, and you feel every minute of the waiting."

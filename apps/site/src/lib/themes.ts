@@ -32,14 +32,11 @@ function promptFilesFor(slug: string): Record<string, string> {
 }
 
 /**
- * An example is the page a coding agent built from a page prompt, kept in
- * examples/<theme>/<page>/ as the agent left it. `example.json` beside it says
- * who built it and what Strict Check measured.
+ * An example is the page built from a page prompt, kept in
+ * examples/<theme>/<page>/ as it came out. `example.json` beside it says
+ * when it was built and what Strict Check measured.
  */
 export interface PromptExample {
-  /** The tool the page was built in, e.g. "Claude Code". */
-  tool: string
-  model: string
   /** The day it was built, as YYYY-MM-DD. */
   date: string
   /** Which text of the prompt it was built from: see `promptVersion`. */

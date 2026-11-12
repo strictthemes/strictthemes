@@ -10,12 +10,6 @@ checks:
   - "Reserving a gift adds its Reserved badge and turns its button into Cancel my reservation without moving focus, and the count of free gifts in its status line follows."
   - "The meter sits on the mist block and is drawn in its plum ink in both modes, the amount and the percentage beside it say the same in words, and a good share updates all three."
   - "The opening block element carries bg-candy text-candy-foreground and the bicycles block element bg-mist text-mist-foreground, so their text stays plum ink in dark mode, and nothing inside them has a text color class of its own."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,420 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the gift list of Clem Ashdown and Rafe Linnell, who marry on Saturday 17 July 2027 at Quillbrook Barn, Little Saltry, and are setting up their first home in the village. Six things for the house, two of them already reserved by other guests, and one bigger gift that guests share: two bicycles with baskets, £900 in all, of which 14 guests have given £540 so far. Write any other copy yourself, warm and plain.

@@ -1,5 +1,5 @@
 export { FONTS, type FontSource } from './fonts.ts'
-export { composePrompt, mergeSetup, parseBrief, type PageBrief, type PagePrompt, type PromptTest } from './prompts.ts'
+export { composePrompt, mergeSetup, parseBrief, type PageBrief, type PagePrompt } from './prompts.ts'
 export {
   SHARED_PROMPT_FILE,
   buildRegistry,

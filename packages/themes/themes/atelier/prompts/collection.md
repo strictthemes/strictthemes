@@ -8,22 +8,6 @@ checks:
   - Two looks have their caption beside the picture from `md` up, one on the right and one on the left; on a phone every caption sits under its picture.
   - Every picture has an `aria-label` that describes the photograph, and every look's caption names the pieces and gives a credit.
   - The credits for the whole shoot are a `<dl>`, and the season's text is at most `max-w-md` wide.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,695 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,703 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 2 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,823 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. This page is its lookbook for Autumn–Winter 2026, called *Still Water*: seven looks in undyed wool, black linen and silk the color of skin, shot in the empty Bains du Rhône swimming baths in Lyon in September 2026. Photography by Tomas Reyl, styling by Anouk Delmas, casting by Petra Laine, hair and make-up by Sami Okafor. The models are Yara Benali, Marit Ekwall and Joon Seo. Pieces include the Lune wrap coat (€1,480), the Ilse pleated skirt (€640), the Mira silk shirt (€520), the Sorel wide trousers (€590), the Nadia knitted dress (€760), the Tove belted cardigan (€540) and the Ren linen shirt-dress (€610).

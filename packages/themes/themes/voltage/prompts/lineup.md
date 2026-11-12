@@ -9,22 +9,6 @@ checks:
   - Each set has a Save button with `aria-pressed`; saving changes the saved count, and "Only my list" shows only saved sets.
   - Exactly one set carries the pink "New" badge, and no other element on the page is pink.
   - When no set matches, the list shows a sentence and a button that shows all sets again.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,041 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the theme's notes now say that the Menu button carries `ml-auto` below `md`, where the dates that carry it are hidden. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,971 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,962 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 375px. The agent reported 1 minor problem with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, on Friday 4 and Saturday 5 December 2026, with three stages: Crane Stage, Pump House and the Drawing Office (talks and workshops). In a label and in the stage `<select>` that stage is "Drawing Office", with no "the"; in a sentence it is "the Drawing Office". All acts are invented. Use these twenty sets, all times UTC+1:

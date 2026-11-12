@@ -1,5 +1,5 @@
 ---
-// The preview page of one page prompt: the page an agent built from it, in a
+// The preview page of one page prompt: the page built from it, in a
 // frame, with switches for the screen width and the color mode.
 import type { GetStaticPaths } from "astro"
 import type { PagePrompt } from "@strictthemes/themes"
@@ -43,13 +43,11 @@ const current = example.prompt === promptVersion(prompt.prompt)
 const count = (n: number, word: string) => `${n === 0 ? "no" : n} ${word}${n === 1 ? "" : "s"}`
 
 const facts = [
-  { name: "Built by", value: `${example.tool}, ${example.model}` },
   { name: "Built on", value: built },
   {
     name: "Built from",
     value: current ? "The prompt as it is now" : "An earlier version of the prompt, revised since",
   },
-  { name: "Edited by hand", value: "No" },
   {
     name: "Strict Check",
     value: `${check.score}% of ${check.values.toLocaleString("en-US")} measured values follow the theme: ${count(check.errors, "error")}, ${count(check.warnings, "warning")}`,
@@ -70,7 +68,7 @@ const toggle =
 
 <Layout
   title={`${prompt.title} in ${theme.name}: a page built from one prompt | Strict`}
-  description={`${description} Built by a coding agent from the ${theme.name} page prompt, and shown as it came out.`}
+  description={`${description} Built from the ${theme.name} page prompt, and shown as it came out.`}
   theme={theme.slug}
 >
   <section class="border-b border-border">
@@ -87,7 +85,7 @@ const toggle =
       <div class="flex flex-col gap-4 md:col-span-6">
         <p>{description}</p>
         <p class="text-muted-foreground">
-          This is the page a coding agent built from {
+          This is the page built from {
             current ? "the prompt" : "an earlier version of the prompt"
           }, in a new project with the {
             theme.name

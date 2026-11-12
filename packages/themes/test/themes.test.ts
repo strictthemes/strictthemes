@@ -335,15 +335,6 @@ test('prompts: a brief only names type and spacing the theme has', () => {
   }
 })
 
-test('prompts: a test run is only recorded with a tool, a date and a result', () => {
-  for (const prompt of registry.prompts) {
-    for (const run of prompt.tested) {
-      assert.ok(run.tool && run.result, `${prompt.slug}: incomplete test record`)
-      assert.match(String(run.date), /^\d{4}-\d{2}-\d{2}$/, prompt.slug)
-    }
-  }
-})
-
 test('prompts: the rules answer what test builds kept asking', () => {
   for (const prompt of registry.prompts) {
     // An element that code focuses needs `focus:`, not `focus-visible:`.

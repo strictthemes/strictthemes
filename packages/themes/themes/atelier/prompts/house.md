@@ -8,22 +8,6 @@ checks:
   - The timeline is an ordered list with a `<time>` for each year, and each entry has a 1px top border.
   - The portrait is a picture with an `aria-label` and a caption that names the person and the photographer.
   - The workshops are a list, each with its town, what it makes and since when, and no workshop is shown as a card or with a fill.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,763 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,770 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,787 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon. Inès Ardelle trained as a tailor in Lyon and cut coats for theatre for nine years before she opened the house in 2014 in two rooms above a print shop. The atelier moved to 7 rue Belvèze in 2019 and now has eleven people: five cutters and tailors, three in sewing, two in the shop and one who runs the office. The house makes two collections a year, never more than four hundred pieces of each design, and cuts much of it to order. Cloth comes from Lanificio Serra, a wool mill in Biella (since 2014), Tissage Vandamme, a linen weaver in Kortrijk (since 2017), and Seteria Olmo, a silk printer in Como (since 2021); knitwear is made by Tricots Pélissier, a family workshop in Yssingeaux, in the Haute-Loire (since 2020). The portrait is by the photographer Tomas Reyl.

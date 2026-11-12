@@ -10,7 +10,7 @@ and [`@strictthemes/spec`](../../packages/spec).
 | `/themes`, `/themes/<slug>` | The catalog and one page per theme. A theme page wears its own theme |
 | `/themes/<slug>/<file>` | A theme's exports: `DESIGN.md`, `tailwind.css`, `shadcn.css`, `nuxt-ui.css`, `app.config.ts`, `tokens.json` |
 | `/themes/<slug>/prompts/<page>.md` | A theme's page prompts, as Markdown to paste into a coding agent |
-| `/themes/<slug>/prompts/<page>/` | The preview of a page prompt: the page an agent built from it, in a frame, with switches for screen width and color mode |
+| `/themes/<slug>/prompts/<page>/` | The preview of a page prompt: the page built from it, in a frame, with switches for screen width and color mode |
 | `/themes/<slug>/prompts/<page>/build/` | That built page on its own |
 | `/r/<name>.json` | The shadcn registry: theme items, font items and `registry.json` |
 | `/spec` | The spec format, rendered from `packages/spec/SPEC.md` |
@@ -48,14 +48,14 @@ The site is light only. Previews switch between light and dark on their own.
 
 ## Example pages
 
-Every page prompt has an example: the page a coding agent built from it, kept
-as the agent left it in `examples/<theme>/<page>/`.
+Every page prompt has an example: the page built from it, kept as it came out
+in `examples/<theme>/<page>/`.
 
 | File | What it is |
 |---|---|
-| `index.html`, `src/`, `public/` | The agent's Vite + shadcn project, without its config and `node_modules` |
+| `index.html`, `src/`, `public/` | The page's Vite + shadcn project, without its config and `node_modules` |
 | `components.json` | Marks the folder as a shadcn project for Strict Check |
-| `example.json` | Who built it and when, what Strict Check measured, and `prompt`: a fingerprint of the prompt text it was built from |
+| `example.json` | When it was built, what Strict Check measured, and `prompt`: a fingerprint of the prompt text it was built from |
 
 [scripts/build-examples.ts](scripts/build-examples.ts) runs after `astro build`
 and builds each example on its own into

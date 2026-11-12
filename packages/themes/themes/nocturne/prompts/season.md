@@ -8,22 +8,6 @@ checks:
   - The season's title is the page's `<h1>` and its only `text-display` text, and the introduction's paragraphs are no wider than `max-w-xl`.
   - The season pass card states its price and what it includes in words, and its button is the page's only default (gold) action.
   - The cards on the page hold no poster or still, and no card sits inside another.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. In the first build the gold link's label did not fit the narrow pass card from 768px, and the agent let it wrap; the brief now says so, and the shared notes give a poster in a row `self-start`. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,733 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,726 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 768px. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,765 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 768px. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. The season is "Ilse Varga: the night films", a retrospective of an invented Hungarian director, six of her films shot mostly after dark, shown on Friday 20 November, Friday 27 November, Tuesday 1 December, Friday 4 December, Friday 11 December and Friday 18 December 2026, all at 20:30 on Screen 2. The films: "Corridor Light" (1989, 94 min), "The Long Blue" (1998, 142 min), "Kestrel Street" (2003, 101 min), "Winter Switchboard" (2009, 117 min), "The Last Tram Home" (2014, 88 min) and "Small Fires" (2019, 109 min). The first four films are shown on 35mm prints; "The Last Tram Home" and "Small Fires" were shot on digital and are shown that way. The season is curated by Petra Lindqvist, the Vesper's programmer. A season pass costs £38 for all six films, £30 for members.

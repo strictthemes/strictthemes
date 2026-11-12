@@ -9,22 +9,6 @@ checks:
   - The `<h1>` is five words or fewer, `text-display` from `md` up and `text-h1` below, and at 375px no word in it runs past the edge.
   - The three facts are white panels with a 1px border, in one row from `md` up and stacked below.
   - The page has one default (black) button, the hero's "Buy tickets"; the tickets panel's "Buy tickets" is blue.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.2% of 1,936 measured values, with no errors and 2 warnings for the round dots of the countdown, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the theme's notes now say that the Menu button carries `ml-auto` below `md`, where the dates that carry it are hidden. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.2% of 1,884 measured values, with no errors and 2 warnings for the round dots of the countdown, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,836 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, an old harbour in the city of Varsby. It runs on Friday 4 and Saturday 5 December 2026; the gates open on Friday at 16:00 (UTC+1). There are 19 acts on three stages: Crane Stage and Pump House for music, and the Drawing Office for design talks and workshops. A weekend ticket is €118, a day ticket from €64. All acts, people and places are invented: the first names on the bill are Ossa Bloom, The Night Ferries and Kettle Drum Union, then Lumen Varga, Sister Antenna, Pia Strand, Odd Weather, Gravel & Gold, Juno Halde and Neon Allotment.

@@ -9,22 +9,6 @@ checks:
   - Choosing a deployment's commit hash shows its log in the log panel, whose lines do not wrap, and the chosen row is marked by more than its background.
   - Commit hashes, branches, durations and times are in the mono font, and durations and times are right-aligned.
   - The one lime mark is the "live" badge on the deployment that serves production.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 98.5% of 5,451 measured values, with no errors and 2 warnings for the round status dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 98.4% of 5,247 measured values, with no errors and 2 warnings for the round status dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 5,195 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the console of **Plinth**, a deploy tool by Plinth Labs. The team is Orrin and the project `orrin-web`; the signed-in person is `mara.lind@orrin.example`. Invent 20 deployments over the last three days, the newest on 11 November 2026, the sample's fixed today (no clock): commits as seven-character hashes (`8f3c2a1`) with a one-line message, branches (`main`, `feat/search`, `fix/cart-total`, `chore/deps`), environments `production` (always from `main`) and `preview` (all other branches). States: one `queued` (the newest), one `building` (the one before it), two `failed`, one `canceled`, the rest `ready`. Durations from `38s` to `3m 12s`.

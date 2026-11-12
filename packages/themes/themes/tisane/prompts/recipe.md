@@ -8,22 +8,6 @@ checks:
   - Changing the servings with the minus and plus buttons rescales every amount in the ingredients list, and the new count is announced.
   - Amounts are rounded the way the brief says, so no amount shows more than one decimal place and counts show halves as "½".
   - The method is an ordered list of numbered steps, and the note from the kitchen is a card beside or after the steps, not inside another card.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,747 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,752 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,752 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: a recipe from the journal of "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold. The recipe is "Pear, ginger and lemon verbena tisane", the pot served in the room each autumn, written up by the person who runs the kitchen, Mara Hollis, on 6 November 2026. It serves four cups. Prep 10 minutes, simmer 15 minutes, steep 5 minutes.

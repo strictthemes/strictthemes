@@ -9,12 +9,6 @@ checks:
   - "Every stock state is a status dot and a word, and the green and the red appear nowhere else on the page."
   - "The count in the table's heading row follows the filters, and an empty result shows a sentence and a Clear filters button that moves focus to the first checkbox."
   - "At 375px the table scrolls sideways inside its own box, which can be reached with the keyboard, and the page itself does not scroll sideways."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,596 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Torvale Bearings Ltd" and its category "Deep groove ball bearings", sealed and shielded, from its TVL range. The part number gives the bore and the outside diameter: `TVL-2047-RS` has a 20 mm bore and a 47 mm outside diameter; `RS` means two rubber seals, `ZZ` two metal shields. The twelve parts, in this order (part number, bore d, outside diameter D, width B in mm, dynamic load rating C in kN, stock state, unit price for 1 to 49 in pounds):

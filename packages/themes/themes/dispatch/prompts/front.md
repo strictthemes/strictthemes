@@ -9,22 +9,6 @@ checks:
   - The "Live" strip shows a red dot and the word "Live", and the dot is never shown without the word.
   - Each section opens with a 2px rule above its name and holds three stories divided by 1px rules, which stack with top rules below `md`.
   - At 375px the lead headline is `text-h1` and comes before the lead picture, as it does at 1280px.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 3,545 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 3,526 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,543 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 375px. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Port Avery Ledger**, the daily paper of Port Avery, an invented harbour city. The date is Wednesday 11 November 2026. The lead story: the Kessel Street Bridge, the city's main river crossing, closed on Tuesday 10 November after inspectors found cracked bearings and stays shut for six months; the council holds an emergency vote on the £48m repair tonight. Every story, person, team and place is invented. Every story ran today and its label line shows a time, except that the swimmer's record in Sport ran yesterday and shows `TUE 10 NOV`. Write the headlines, standfirsts and bylines yourself, in plain news language: short headlines in uppercase, standfirsts that state the news in one sentence.

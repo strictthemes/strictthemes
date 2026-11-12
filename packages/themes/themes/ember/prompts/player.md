@@ -9,12 +9,6 @@ checks:
   - "Each meter has `role=meter` with its values and a heat fill whose step matches its value, and its figure is written beside it."
   - "The recent matches table states every result as Win or Loss in words, gives rating changes with a plus or minus sign, and scrolls sideways in its own box at 375px."
   - "Play ranked is the page's only default (red) button or link, and no text is set in a heat color or in `text-primary`."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 4,256 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Ashfall**, an invented free-to-play team arena game for PC by an invented studio, **Lowlight Games**. This is the profile of the viewer, **Juno Vane** (initials JV), who plays in Europe and mostly as Mender, and joined in March 2025. In **Season 4: Dry Lightning** (Ranked Clash): rating 2,418, tier Cinder, global rank 18, rank 6 in Europe, 383 matches, 212 wins, 171 losses, a win rate of 55.4%. Of the 383 matches, 234 were as Mender (61.1%), 92 as Flarecaster (24.0%), 42 as Bulwark (11.0%) and 15 as Cinderblade (3.9%). The season pass is at tier 14 of 60. Juno is online now; the last match ended at 09:40 today, Thursday 12 November 2026.

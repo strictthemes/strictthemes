@@ -9,22 +9,6 @@ checks:
   - The chart has a legend in words, the in bar always comes before the out bar, and a text alternative gives both amounts for every week.
   - The "Approve" button changes the payment's state in words, removes its badge, announces the change and leaves the button disabled but focusable.
   - Badges are brass with dark text and stand only on items that wait on the user.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. In the first build the chart's week labels ran past the sheet at 375px, so the page scrolled sideways, which Strict Check reports as an error. The brief now puts each label in a cell under its bars and gives the plot a fixed height. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,410 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, a wrong reference in the theme's notes was corrected (the header named "the last note" for the Menu button). A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,412 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,415 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses. The business is "Hollis & Vane", a two-person print studio; the signed-in person is Ada Hollis. It has two accounts: a current account (sort code 60-14-22, ending 4417, £48,213.56) and a tax reserve (ending 8830, £13,690.71). In November so far £18,420.00 came in and £11,962.38 went out. Invent the payees, the clients and the rest of the figures; keep them believable for a small studio.

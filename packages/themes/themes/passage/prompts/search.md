@@ -9,12 +9,6 @@ checks:
   - "Choosing the same port twice, or a date before today, gets an error line that says why in words."
   - "The adults and children steppers stop at their own limits and at nine passengers in all, and every minus and plus button has an aria-label."
   - "Every fare on the route cards has the pound sign and two decimals in Overpass Mono with tabular figures, and the page has one default button at a time."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,238 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light and dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Kestrel Ferries", a ferry line that sails from Harrowmouth (`HRW`) on the mainland to four island ports: Port Ellery (`PEL`), Brindle Ness (`BRN`), Wrenholm (`WRH`) and Tollan Quay (`TLQ`). Harrowmouth to Port Ellery takes 1 h 45 min direct, with five sailings a day; Brindle Ness 55 min, three a day; Wrenholm 2 h 30 min, two a day. Fares start at £29.00, £18.00 and £36.00 for one adult, one way. Children aged 4 to 15 need a ticket; under 4s travel free. Tickets are sold up to 180 days ahead. Write the rest of the copy yourself, plain and specific.

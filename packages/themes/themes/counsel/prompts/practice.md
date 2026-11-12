@@ -9,12 +9,6 @@ checks:
   - "The typical matters, the recent matters and the related briefings are lists with a 1px top border on each entry; each briefing's date is a `<time>` with a `dateTime`."
   - "Each of the two partners has a rectangular portrait with initials, a name in the heading font, a role in a label, and a telephone link and an email link that are never uppercased."
   - "No heading or text on the page is bold or italic, and nothing on the page is round."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,072 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in one office at 4 Chancery Row, Wexcombe WX1 2LN. This page is for its **Commercial disputes** team: 4 partners and 16 lawyers, led by David Achterberg (head of commercial disputes, partner since 2007; `01632 960 231`, d.achterberg@harrowvane.example) and Ruth Calloway (partner since 1 May 2026; `01632 960 237`, r.calloway@harrowvane.example). The team acts for owner-managed companies, their buyers and sellers, and their lenders, in the courts, in arbitration and at mediation, and settles most claims before trial. It is ranked in the first band for commercial disputes in the region by the Northern Legal Review, 2026, an invented directory. Every name, client and matter is invented: name no real firm, person, case or court ruling. Write the rest of the copy yourself, plain and exact.

@@ -10,12 +10,6 @@ checks:
   - "Sending the empty form gives the name, the email and the choice of coming each their own error line with an icon, tied to its field, and focus moves to the name field."
   - "A good reply replaces the form, inside the same card, with a confirmation that repeats the name and the number of guests, a screen reader announces it, and focus moves to its heading."
   - "The opening block element carries bg-mist text-mist-foreground, so its text stays plum ink in dark mode, and nothing inside it has a text color class of its own."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,635 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: replies to the wedding of Clem Ashdown and Rafe Linnell on Saturday 17 July 2027 at Quillbrook Barn, Little Saltry. Guests arrive from 13:30; the ceremony is at 14:00. Replies by Friday 30 April 2027. One reply covers up to 4 people named on an invitation. Four dinners: Roast chicken with tarragon, Wild mushroom pie (vegetarian), Summer vegetable tart (vegan), Children's plate (under 12). Clem's sister, Bea Ashdown, keeps the list: phone 01632 960 573, email hello@clemandrafe.example.

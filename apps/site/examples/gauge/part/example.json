@@ -1,6 +1,4 @@
 {
-  "tool": "Claude Code",
-  "model": "Claude Opus 5.5",
   "date": "2026-11-12",
   "prompt": "43aeb03d1e459a2c",
   "check": {

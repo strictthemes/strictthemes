@@ -9,22 +9,6 @@ checks:
   - Adding a habit with an empty name shows an error in words with an icon, tied to the field; a good name adds a card to the list and empties the field.
   - The "Add habit" button is the only raspberry button on the screen; the "Done" buttons are outline or secondary.
   - Every button and field on the page is at least 44px tall.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,589 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,591 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,584 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. The person is Ines Okafor. Today she has five habits, two of them already done: Drink 8 glasses of water (every day, done at 08:12), Read 10 pages (every day), Walk after lunch (every day, done at 13:05), Stretch for 5 minutes (every day), No phone after 22:00 (every day). Her streak is 12 days. Use these as the starting state.

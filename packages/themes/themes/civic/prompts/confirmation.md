@@ -8,22 +8,6 @@ checks:
   - The success is stated in words in the `<h1>`, with the check icon beside it; it is not shown by the green color alone.
   - What happens next is an ordered list (`<ol>`) of three steps, and each step's date is a `<time>` element with a `dateTime`.
   - The phone number is a `tel:` link and the email address a `mailto:` link, and the feedback link says what it is for in its own words.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,302 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,285 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,320 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its service "Apply for a resident's parking permit". Priya Okafor of 14 Wharf Row, Callowmere CM4 7QJ, sent her application on 11 November 2026 for a first permit in zone B for her petrol Velmar Arden, registration KX19 TDV, to start on 1 December 2026. Her reference number is `CPP-2611-4827`. A copy went to priya.okafor@mail.example. The permit costs £96 for 12 months, paid after approval. Help: 01632 960 418, Monday to Friday, 9am to 5pm, or permits@callowmere.example. Write the rest of the copy yourself, plain and short.

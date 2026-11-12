@@ -9,22 +9,6 @@ checks:
   - The address is an `<address>` element, and the still of the bar has `role="img"`, an `aria-label` and a caption.
   - Sending the contact form with an empty name, a malformed email or an empty message shows a sentence with an icon under each such field, and a good form is replaced by a confirmation in a `role="status"` element.
   - The "Send message" button is the page's only default (gold) button.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first runs showed that a poster in a row needs `self-start` to keep its proportions, which the theme's shared notes now say. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,271 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,210 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,196 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar, in a former rope works at 21 Tallow Row, Oldmere OM2 4LT. Phone 01632 960 418, email hello@vesper.example. Screen 1 has 212 seats, Screen 2 has 84, Screen 3 has 38. The bar is on the first floor and stays open until midnight on Fridays and Saturdays. The nearest tram stop is Tallow Row on the Harbour line, three minutes' walk. Opening times: Monday closed; Tuesday to Thursday doors 17:00, last film 21:00, bar closes 23:30; Friday and Saturday doors 16:00, last film 23:15, bar closes 00:00 (midnight); Sunday doors 13:00, last film 20:30, bar closes 22:30.

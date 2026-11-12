@@ -9,12 +9,6 @@ checks:
   - "The summary box is the only card in the article, with a pale grey fill, 4px corners and no border or shadow, and the pull quote is set in the heading font, upright, with a 1px rule at its left."
   - "The page has exactly one badge, New, and nothing else on the page is `bg-tertiary`; there is exactly one default (navy) button, Discuss this with Ruth."
   - "No heading or text on the page is bold or italic, the article names no real case, court ruling, statute or firm, and nothing on the page is round."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,425 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in one office at 4 Chancery Row, Wexcombe WX1 2LN. This page is a briefing by **Ruth Calloway**, a partner in its Commercial disputes team (made partner on 1 May 2026; `01632 960 237`, r.calloway@harrowvane.example), published on 10 November 2026, an 8 minute read: "Notice clauses after a sale: when a late letter ends a warranty claim". Its subject: a buyer of a company who finds a problem after completion usually has a warranty claim against the sellers, but the sale contract says how, to whom and by when the buyer must give notice of it, and a notice that misses one of those terms can end the claim before its merits are heard. Its example is a claim the firm defended this year for the sellers of Halden Print, an invented printing company: a £3.4m warranty claim, struck out because the buyer's notice arrived one day after the contract's deadline. Write the full text yourself, 1,000 to 1,200 words of running text, in the third person plural ("we"), plain and exact, as a careful letter to a client reads. Name no real case, judge, court ruling, statute or section of one, and no real firm or person: speak of "the contract", "the court" and "the buyer". Every name is invented.

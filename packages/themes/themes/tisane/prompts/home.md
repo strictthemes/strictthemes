@@ -9,22 +9,6 @@ checks:
   - The opening hours are a list of rows with the day on the left and the times on the right in the mono font, with a 1px rule between rows.
   - The newsletter email field has a visible label; an empty or malformed address gets a message in words with an icon, and a good one replaces the form with a confirmation that a screen reader announces.
   - No heading or text in the heading font has a bold, semibold or medium weight class.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,991 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,995 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,987 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold, in a former seed merchant's. It serves loose-leaf tea and herbal tisanes, soup and plates at lunch, and cakes baked each morning, and it sells the same teas by weight. Open Tuesday to Sunday, closed on Mondays. Write all the copy yourself, plain and specific, without superlatives.

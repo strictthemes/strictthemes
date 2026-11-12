@@ -9,12 +9,6 @@ checks:
   - "A good enquiry is replaced by a confirmation in an element with the status role that was on the page from the start; the confirmation's heading takes focus, and it repeats the practice area and the email address as written."
   - "The address is in an `<address>` element with `not-italic`, and the office hours are a `<dl>` with each time in a `<time>` element."
   - "The page has exactly one badge, Free consultation, and nothing else is `bg-tertiary`; Send enquiry is the page's one default (navy) button, and nothing on the page is round, bold or italic."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,977 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in five practice areas: Corporate, Commercial disputes, Employment, Real estate and Private client. Its one office is at 4 Chancery Row, Wexcombe WX1 2LN, on the second floor, with a lift. The main line is `01632 960 214` and the enquiries address enquiries@harrowvane.example. The office is open Monday to Friday 08:30–17:30 and closed at weekends. Every enquiry is checked for conflicts of interest before anyone replies; then a partner in the right team replies within one working day, and the first meeting, of up to an hour, is free. Every name is invented.

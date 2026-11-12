@@ -9,22 +9,6 @@ checks:
   - Sending without ticking the declaration shows the error summary with a link that moves focus to the checkbox, and an error line with an icon beside the checkbox; the button is never disabled.
   - The checkbox and its label make a target at least 44px tall, and the checkbox has 3px corners.
   - The price box shows the amount, the dates the permit covers and when payment is taken, with each date in a `<time>` element.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,863 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,865 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,878 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its service "Apply for a resident's parking permit". This page is step 3 of 3 for the applicant Priya Okafor: 14 Wharf Row, Callowmere CM4 7QJ, permit zone B, email priya.okafor@mail.example, phone 07700 900 214, proof of address "Council tax bill, uploaded 9 November 2026". Her vehicle: registration KX19 TDV, a Velmar Arden, petrol or diesel, the permit to start on 1 December 2026. As a first permit for a petrol or diesel vehicle it costs £96 for 12 months, 1 December 2026 to 30 November 2027, paid after approval. Write the rest of the copy yourself, plain and short.

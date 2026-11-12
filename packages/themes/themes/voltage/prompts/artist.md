@@ -9,22 +9,6 @@ checks:
   - The text about the act is on a white panel, not straight on the yellow page.
   - Each set gives its day and its times as `<time>` elements with a `dateTime`, and its stage in words.
   - The other acts on the same day are panels with a round avatar of initials, the act's name as a link, and its time and stage.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.1% of 2,121 measured values, with no errors and 2 warnings for the round avatars with initials, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the theme's notes now say that the Menu button carries `ml-auto` below `md`, where the dates that carry it are hidden. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.2% of 2,125 measured values, with no errors and 2 warnings for the round avatars with initials, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 375px, where the Menu button sits at the right end of the header. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,124 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, on Friday 4 and Saturday 5 December 2026. The act is **Ossa Bloom**, an invented electronic duo from Gothenburg, Sweden: Edda Lind builds the music, Sami Rahko the light. They play the Crane Stage on Friday, 22:40–23:50, and give a talk in the Drawing Office on Saturday, 15:00–15:45, "Light shows from scrap". Also on Friday: Gravel & Gold (Crane Stage, 19:00), The Night Ferries (Crane Stage, 20:40), Sister Antenna (Pump House, 21:00) and Basement Choir (Pump House, 23:00). All names are invented.

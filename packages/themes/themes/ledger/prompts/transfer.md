@@ -8,22 +8,6 @@ checks:
   - The review step states the amount in figures and in words (£1,240.50 is "One thousand, two hundred and forty pounds and fifty pence"), and "Change details" goes back with every value kept.
   - After "Send payment" a confirmation is announced from a `role="status"` element that was on the page from the start, it says that nothing was sent, and focus moves to it.
   - An amount above the account's available balance or above £10,000.00 is refused with its own error message.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first run showed a broken sentence in the theme's shared notes, which is fixed. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,217 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, a wrong reference in the theme's notes was corrected (the header named "the last note" for the Menu button). A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,230 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,221 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, used by "Hollis & Vane", a two-person print studio. Two accounts to pay from: the current account (ending 4417, £48,213.56 available) and the tax reserve (ending 8830, £13,690.71 available). Four saved payees, each with a sort code and an account number: Copperleaf Paper Mill, Brightwater Inks, Kestle Property Lettings and Marlowe Van Leasing.

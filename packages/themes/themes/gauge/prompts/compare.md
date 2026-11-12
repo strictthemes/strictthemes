@@ -8,12 +8,6 @@ checks:
   - "Every row whose values differ says Differs in words beside its property, and its values are `font-bold`; no row, cell or value is marked by color."
   - "Show only rows that differ hides the five rows whose values are the same and the count says so, and clearing it brings them back."
   - "Figures are right-aligned mono with `tabular-nums`, with the unit once in the property's name, and agree with the catalogue and the part page."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,956 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Torvale Bearings Ltd" and three deep groove ball bearings from its TVL range: `TVL-2047-RS` (20 × 47 × 14 mm, two rubber seals), `TVL-2047-ZZ` (the same size with two metal shields) and `TVL-2552-RS` (25 × 52 × 15 mm, two rubber seals, new this year). Their figures are the same as on the catalogue and the part page.

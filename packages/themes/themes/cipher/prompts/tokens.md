@@ -9,22 +9,6 @@ checks:
   - A revoke with a name that does not match shows an error and revokes nothing; with the exact name, the row is gone and a message is announced and focused.
   - The warning before revoking is said in words, not by the red color alone.
   - The new token wraps inside its box at 375px, and its expiry date shows in the table.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,942 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 7 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,943 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems that were still open: after the first run on that text, at 1280px the table was wider than its panel and the "Revoke" buttons were cut off; the brief now gives the page ten columns of the grid and shows each date without the time. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,946 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the console of **Plinth**, a deploy tool by Plinth Labs; team Orrin, project `orrin-web`, signed in as `mara.lind@orrin.example`. Today is the fixed sample date, 11 November 2026, not the clock. Four tokens to start: `ci-deploy` (scope `deploy:write`, created 14 Aug 2026, last used 11 Nov 2026, 09:12, expires never), `staging-bot` (`deploy:write`, created 2 Sep 2026, last used 10 Nov 2026, 17:40, expires 1 Dec 2026), `metrics-reader` (`read`, created 19 Sep 2026, last used 11 Nov 2026, 08:03, expires 19 Sep 2027) and `mara-laptop` (`admin`, created 30 Oct 2026, never used, expires 28 Jan 2027). A token is `plt_` followed by 32 letters and digits; invent one for each sample token.

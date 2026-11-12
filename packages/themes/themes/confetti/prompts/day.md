@@ -10,12 +10,6 @@ checks:
   - "Each question in the accordion opens and closes with the keyboard, its trigger is at least 44px tall, and its text is on the type scale."
   - "The page has no plum (default) button."
   - "The opening block element carries bg-candy text-candy-foreground and the at a glance block element bg-mist text-mist-foreground, so their text stays plum ink in dark mode."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,352 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the day of the wedding of Clem Ashdown and Rafe Linnell, Saturday 17 July 2027, at Quillbrook Barn, Saltry Lane, Little Saltry, ZQ4 7HB. The barn's phone on the day is 01632 960 214. The nearest station is Market Fenley, a 12-minute drive; minibuses leave the station forecourt for the barn at 13:00 and 13:15, and leave the barn for the station and The Old Granary at 22:30 and 23:30. Parking is free in the paddock. The local taxi firm, Fenley Cars, is on 01632 960 881. On Sunday 18 July there is brunch on the lawn from 11:00 to 13:00. Write any other copy yourself, warm and plain.

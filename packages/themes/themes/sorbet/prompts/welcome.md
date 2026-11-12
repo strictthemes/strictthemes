@@ -9,22 +9,6 @@ checks:
   - An empty name or a malformed email gets a message in words with an icon, tied to its field with `aria-describedby`, and focus moves to the first field with an error.
   - After a good sign-up, the form is replaced by a confirmation that a screen reader announces, and focus moves to it.
   - At 375px the preview sits under the opening text, and the page does not scroll sideways.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.7% of 1,745 measured values, with no errors and 2 warnings for the round avatar, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 7 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.7% of 1,751 measured values, with no errors and 2 warnings for the round avatar, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,750 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. You pick up to five habits, tick them off each day and watch a streak grow. It is free for five habits; Mossy Plus is $4 a month. The person in the preview is Ines, on Wednesday, 11 November 2026, with five habits: Drink 8 glasses of water, Read 10 pages, Walk after lunch, Stretch for 5 minutes, No phone after 22:00. Write the copy yourself, warm and plain, with no superlatives.

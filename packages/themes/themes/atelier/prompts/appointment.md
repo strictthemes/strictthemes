@@ -8,22 +8,6 @@ checks:
   - Every field has a visible label, the time is a native `<select>` whose first option is an empty prompt, and a Sunday or a Monday in the date field gets its own error when the form is sent.
   - Sending the form empty shows a message in words with an icon under each required field, and focus moves to the first of them.
   - A good booking is replaced by a confirmation in a `role="status"` element that was on the page from the start, and the confirmation repeats the date and the time.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,468 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the opening hours now stack below `lg`, because at 768px a day and its hours did not fit side by side. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,472 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 768px, where each day's hours sit under it. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,469 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 768px, where a day and its hours stack. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. A fitting is an hour in the atelier with one of its tailors, to try on pieces from Autumn–Winter 2026, *Still Water*, or to be measured for a coat cut to order. It is free. The atelier is at 7 rue Belvèze, 69001 Lyon, on the second floor, with a lift. It is open for fittings Tuesday to Friday 10:00–18:00 and Saturday 10:00–17:00, closed Sunday and Monday. Fittings start at 10:00, 11:30, 14:00, 15:30 and 17:00; on Saturdays the last one is 15:30. The house answers from atelier@maison-ardelle.example. "Today" is the visitor's clock, not a fixed date: a fitting can be booked from tomorrow on, with no last day.

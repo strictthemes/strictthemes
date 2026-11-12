@@ -8,22 +8,6 @@ checks:
   - The price is in the mono font with tabular figures, and the details and materials are a `<dl>`.
   - The button "Request this piece" has `aria-expanded` and `aria-controls`, and the form it opens is hidden with the `hidden` attribute while closed.
   - Sending the form with no size, no name or a malformed email shows a message in words with an icon for each, and moves focus to the first one; a good request is replaced by a confirmation that a screen reader announces and that names the size.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,539 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,537 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,593 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. This page is for the **Lune wrap coat** from Autumn–Winter 2026, *Still Water*: a long wrap coat without buttons, in undyed wool woven in Biella, half-lined in cupro, tied with a belt of the same cloth. €1,480. Sizes 34, 36, 38, 40 and 42. Each coat is cut to order in the Lyon atelier and is ready about four weeks after a request. The house answers requests by email within two working days. The coat in the pictures is worn by Marit Ekwall, who is 178 cm tall and wears size 36.

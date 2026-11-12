@@ -8,22 +8,6 @@ checks:
   - Removing a line updates the header's count and the totals, says so in a status message, and moves focus to the next line, the previous one, or the empty basket's heading.
   - The "Go to checkout" link is an `<a>` styled as the default button, the page's only terracotta button, and the page has no payment form.
   - Every price is in mono figures with two decimals and the pound sign against the figure.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,798 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,774 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,837 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio of two potters, Nell Varga and Tomas Reid, at Unit 3, Coldharbour Yard, Bramwick BW4 2LT. The basket holds two lines: Moor mug in Ash glaze, £28.00 each, quantity 2, at most 8 in stock; and Fold bowl in Iron glaze, £34.00, quantity 1, at most 6 in stock. Delivery: Standard post, 3 to 5 working days, £5.50, free when the subtotal is £100.00 or more; Tracked, next working day, £9.50; Collect from the studio, free, Thursday to Saturday, 10:00 to 16:00.

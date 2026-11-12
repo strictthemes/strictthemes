@@ -9,12 +9,6 @@ checks:
   - "Ticking an extra or changing the number of bicycles adds or removes its row in the fare summary, and the total adds up."
   - "Every checkbox ticks when its words are clicked and has a name that a screen reader reads."
   - "The page has no card number or other payment field, and ends at the Continue to payment button."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,477 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Kestrel Ferries", a booking for the 09:15 from Harrowmouth to Port Ellery (arriving 11:00) on Saturday 19 December 2026, on MV Isla Grey, for 2 adults. The fare is £78.00 for both, one way, with port fees. The extras: a car up to 5 m long and 2 m high, £46.00; seats in the quiet lounge for two, £24.00; priority boarding, £8.00; bicycles, £6.00 each, up to two. Prices include VAT. This page collects names and contact details only; payment is the next step, on another page.

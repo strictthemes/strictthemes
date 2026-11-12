@@ -90,8 +90,8 @@ A theme is ready when:
 - `npx @strictthemes/spec lint DESIGN.md` reports no errors;
 - it has a light and a dark mode, and text passes WCAG AA in both;
 - its fonts are free to use and to serve, and are on Fontsource;
-- each of its five page prompts has been run in a coding agent at least
-  once, and the page that came out was checked with Strict Check.
+- each of its five page prompts has an example page built from it, and that
+  page passes Strict Check with no errors.
 
 ## Licence
 

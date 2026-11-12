@@ -9,22 +9,6 @@ checks:
   - The three pieces sit at different columns and heights from `md` up, not in an even row, and each has a caption with its name and its price in the mono font.
   - The page has exactly one badge, and it is the only blush on the page.
   - "Most of the screen is empty: no section has a background, a border box or a card."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,015 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,013 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,014 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. It makes two collections a year in small numbers, cut in its own atelier from wool, linen and silk woven in Europe. The current collection is Autumn–Winter 2026, called *Still Water*: seven looks in undyed wool, black linen and silk the color of skin. Its pieces include the Lune wrap coat (€1,480), the Ilse pleated skirt (€640) and the Mira silk shirt (€520). Pictures are by the photographer Tomas Reyl. Write the rest of the copy yourself, short and plain: this page says little.

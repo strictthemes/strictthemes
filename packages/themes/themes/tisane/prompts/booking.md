@@ -9,22 +9,6 @@ checks:
   - A Monday, or a date before today, gets an error line that says why in words.
   - The summary card shows each value as soon as it is chosen or typed, and "Not chosen yet" for what is still missing.
   - After a good booking the form is replaced, inside the same card, by a confirmation that repeats the date, time, number of people and name, and focus moves to its heading.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,655 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,657 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,656 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: booking a table at "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold. Open Tuesday to Sunday, closed on Mondays. Tables for one to eight people; larger groups write to hello@lindenroom.example. Bookings open 60 days ahead, and half the tables are kept for people who walk in. Times every half hour from 9:30 to 16:00. Write the rest of the copy yourself, plain and short.

@@ -8,22 +8,6 @@ checks:
   - The quantity cannot go below 1 or above what is in stock, and a minus or plus button disabled at its limit keeps keyboard focus.
   - The "Add to basket" button is the page's only terracotta button; pressing it raises the count on the header's basket link and shows a confirmation that a screen reader announces.
   - The details are a description list (`<dl>`), and the price, the quantity and every measurement are in mono figures.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,607 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,513 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,504 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio of two potters, Nell Varga and Tomas Reid, in Bramwick. This page sells the Fold bowl, £34.00: a low bowl for soup, noodles or fruit, 16 cm across and 6 cm high, holding 550 ml, 420 g, thrown in buff stoneware with an unglazed, sanded foot. It comes in three glazes: Iron (dark brown), 6 in stock; Ash (pale grey-white), 2 in stock; and Slate (dark blue-grey), made to order and posted in about three weeks, at most 4 to an order. The price is the same in every glaze. This batch was fired on 6 November 2026.

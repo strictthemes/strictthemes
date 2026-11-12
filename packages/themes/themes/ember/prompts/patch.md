@@ -9,12 +9,6 @@ checks:
   - "Choosing a class in the filter shows only that class's rows, marks only the chosen button with `aria-pressed=true`, and the count line says how many changes are shown."
   - "The counts at the top (3 new, 8 balance changes, 10 fixes, 3 issues) match the items in the sections below."
   - "The page has one badge, Live, and no default (red) button or link."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,860 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Ashfall**, an invented free-to-play team arena game for PC by an invented studio, **Lowlight Games**. Two teams of five; four classes, Bulwark, Cinderblade, Flarecaster and Mender. This is **patch 4.2**, released on Tuesday 10 November 2026, the second patch of Season 4: Dry Lightning. The one before it was patch 4.1, on Tuesday 20 October 2026. Patch 4.2 brings 3 new things, 8 balance changes, 10 fixes, and lists 3 known issues. Write the fixes and the known issues yourself, in plain words, as a player would read them.

@@ -9,12 +9,6 @@ checks:
   - "An item that is owned, or that costs more than the balance, has a disabled button that keeps keyboard focus, and the reason is written under its price or on its button."
   - "After a purchase, a `role=status` element that was on the page from the start says what was bought and the new balance, and focus stays on the button that was pressed."
   - "The drawn pictures hold no text and no image file, and no tile holds a box with a border on all four sides."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,864 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Ashfall**, an invented free-to-play team arena game for PC by an invented studio, **Lowlight Games**. Its currency is **Flint**. Items change only how a player looks, never how they play. The shop turns over every Thursday; this week's runs from today, Thursday 12 November 2026, to Thursday 19 November. The viewer, **Juno Vane**, has **2,350 Flint** and already owns Lantern Coat. The featured bundle is the **Dry lightning bundle**, 1,800 Flint, which holds Stormglass Armour (skin for Bulwark, 1,400 Flint on its own), Forked Blade (weapon finish for Cinderblade, 900) and Thunderhead (banner, 300): 2,600 Flint bought one by one. The eight items of the week, with their kind, price and the heat color of their picture:

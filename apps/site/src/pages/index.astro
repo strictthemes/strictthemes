@@ -78,7 +78,7 @@ const roadmap = [
   },
   {
     name: "Page prompts",
-    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and eighty-six more. Five for each of the eighteen themes, each with a preview of the page an agent built from it.",
+    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and eighty-six more. Five for each of the eighteen themes, each with a preview of the page built from it.",
     status: "In testing",
   },
   {
@@ -230,8 +230,8 @@ const BACKDROP_COLUMNS = 60
         />
         <p class="max-w-measure text-muted-foreground">
           Every theme comes with five page prompts: full briefs for a landing page, an essay,
-          a dashboard, a shop and more. The pages below were each built by a coding agent from
-          one prompt, and are shown as they came out.
+          a dashboard, a shop and more. The pages below were each built from one prompt, and
+          are shown as they came out.
         </p>
         <ul class="grid gap-8 md:grid-cols-3">
           {pages.map(({ theme, prompt, urls, count }) => (
@@ -263,7 +263,7 @@ const BACKDROP_COLUMNS = 60
             >
               <p>
                 These are eighteen of the pages. Each theme's own page lists its five prompts,
-                with the page an agent built from each one, and a button that copies the prompt.
+                with the page built from each one, and a button that copies the prompt.
               </p>
             </MoreTile>
           </li>

@@ -9,22 +9,6 @@ checks:
   - The filter is a group of buttons with `aria-pressed`, and after each choice a `role="status"` element says how many results and fixtures are shown.
   - At 375px the league table scrolls sideways in its own box, which has the name "Coastal League table".
   - A match in progress shows the live marker with the word "Live" and the minute, and a finished one says "FT", "AET" or "PENS".
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 4,913 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 4,952 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 4,936 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Port Avery Ledger**, the daily paper of Port Avery, an invented harbour city. The day is Wednesday 11 November 2026. Three competitions: the Coastal League (eight men's clubs: Port Avery Harriers, Saltgate United, Westmere Athletic, Dunmore City, Brackwater Town, Calloway Rovers, Fenwick Albion, Holm Bay), the County Cup, and the Women's Coastal League. Today: four Coastal League results, one still being played; two County Cup results between four clubs from outside the league, which you name, one won after extra time and one on penalties; no Women's Coastal League match. Invent the scores, the table as it stood before today (every club has played twelve games; P is W + D + L, PTS is 3 × W + D, and the goal differences add up to 0), and six fixtures over the next four days, Thursday 12 to Sunday 15 November: two County Cup on Thursday between four other clubs from outside the league, four Coastal League on Saturday and Sunday, so that no club plays two days running, and none in the Women's league. The filter buttons, the status text and the empty sentence use the short name "Women's League"; the results' competition `<h3>`s and the fixture label lines use the full names (`COASTAL LEAGUE`, `COUNTY CUP`).

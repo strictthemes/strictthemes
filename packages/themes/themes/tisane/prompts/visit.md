@@ -9,22 +9,6 @@ checks:
   - The address is an `<address>` element, set upright, with the phone number and email address as links.
   - Every field of the contact form has a visible label, each empty or wrong field gets its own message in words with an icon, and a good message replaces the form with a confirmation that a screen reader announces.
   - At 375px the hours table and the map fit the screen without the page scrolling sideways.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,132 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,104 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 375px, where the map's tags stay inside it and clear of each other. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,108 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 375px. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold, AW3 7LN, on the corner of Mill Lane and Station Road, opposite Orchard Park. Phone 01632 960 418, email hello@lindenroom.example. Open Tuesday to Friday 9:00–17:00, Saturday 9:00–18:00, Sunday 10:00–16:00, closed on Mondays; the kitchen serves plates from 11:30 to 14:30. Ashby Wold station is a four-minute walk; the 12 and 31 buses stop outside the park.

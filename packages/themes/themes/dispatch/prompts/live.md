@@ -9,22 +9,6 @@ checks:
   - The "Show new update" button adds one update to the list, marks it "New" in words, and a `role="status"` element that was on the page from the start announces it.
   - After its one update is shown, the button is disabled and keeps keyboard focus.
   - The "Live" marker is a red dot with the word "Live" beside it, and the dot does not move.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 2,803 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.8% of 2,825 measured values, with no errors and 2 warnings for the round "Live" dot, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,915 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Port Avery Ledger**, the daily paper of Port Avery, an invented harbour city. The event is tonight's emergency council meeting on the Kessel Street Bridge, which closed on Tuesday 10 November after inspectors found cracked bearings and stays shut for six months: councillors vote on a £48m repair, paid for by a loan the opposition wants to cut. It runs from 18:00 on Wednesday 11 November 2026. Write twelve updates from 17:30 to 20:05, each one to three sentences, by two reporters, Malik Osei and Hana Lindqvist. Every person and place is invented.

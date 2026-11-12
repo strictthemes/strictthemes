@@ -9,22 +9,6 @@ checks:
   - Each error line has an icon and a sentence that says what to do, and its field has a red line beside it, so no error is shown by color alone.
   - The radio options are native radio inputs in rows at least 44px tall, and the three date fields each have their own label (Day, Month, Year).
   - While the error summary is shown the page's title starts with the word "Error", and it goes back to normal once the answers are good.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page: the first led to a revision of the theme's five briefs. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,249 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,250 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,254 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its service "Apply for a resident's parking permit". This page is step 2 of 3, "About your vehicle", for the applicant Priya Okafor of 14 Wharf Row, Callowmere CM4 7QJ, in permit zone B. Her answers, for testing: registration KX19 TDV, a Velmar Arden, petrol, the permit to start on 1 December 2026. The form opens empty. "Today" is 11 November 2026, fixed in code. Write the rest of the copy yourself, plain and short.

@@ -9,12 +9,6 @@ checks:
   - "The plan is an ordered list of four rows on the mist block, each with a clock time in the mono font as a time element and what happens in words."
   - "The opening block element carries bg-blush text-blush-foreground and the plan block element bg-mist text-mist-foreground, so in dark mode their text is still plum ink, and no element inside them has text-foreground, text-muted-foreground or text-primary."
   - "At 375px the names, the date and the place fit inside the opening block, and the page does not scroll sideways."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,784 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 2 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the wedding of Clem Ashdown and Rafe Linnell on Saturday 17 July 2027 at Quillbrook Barn, Saltry Lane, Little Saltry, ZQ4 7HB, near Market Fenley. Guests arrive from 13:30; the ceremony is at 14:00 in the barn, dinner at 17:00 at long tables, dancing from 20:00 with a ceilidh band, The Saltry Reelers, and the last minibus leaves for Market Fenley at 23:30. Replies by Friday 30 April 2027. Write any other copy yourself, warm and plain, with no superlatives.

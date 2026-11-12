@@ -26,14 +26,6 @@ function cornerClasses(spec: StrictSpec): string {
   return `${classes.join(', ')}.${note}`
 }
 
-/** One run of a prompt in a real tool. Only recorded for runs that happened. */
-export interface PromptTest {
-  tool: string
-  model?: string
-  date: string
-  result: string
-}
-
 /** A page brief: the hand-written part of a page prompt. */
 export interface PageBrief {
   /** File name without extension, e.g. `landing`. */
@@ -46,7 +38,6 @@ export interface PageBrief {
   order: number
   /** Checks specific to this page, added to the theme's own. */
   checks: string[]
-  tested: PromptTest[]
   /** The page specification, as Markdown. */
   body: string
 }
@@ -68,7 +59,7 @@ function checkText(check: unknown, slug: string): string {
   return check
 }
 
-/** Reads a brief: YAML front matter (`page`, `title`, `description`, `order`, `checks`, `tested`) and a Markdown body. */
+/** Reads a brief: YAML front matter (`page`, `title`, `description`, `order`, `checks`) and a Markdown body. */
 export function parseBrief(briefSlug: string, source: string): PageBrief {
   const match = /^---\n([\s\S]*?)\n---\n?([\s\S]*)$/.exec(source)
   if (!match) throw new Error(`${briefSlug}: a page brief needs YAML front matter`)
@@ -83,7 +74,6 @@ export function parseBrief(briefSlug: string, source: string): PageBrief {
     description: meta.description as string,
     order: typeof meta.order === 'number' ? meta.order : Number.MAX_SAFE_INTEGER,
     checks: Array.isArray(meta.checks) ? meta.checks.map((check) => checkText(check, briefSlug)) : [],
-    tested: Array.isArray(meta.tested) ? (meta.tested as PromptTest[]) : [],
     body: (match[2] ?? '').trim(),
   }
 }

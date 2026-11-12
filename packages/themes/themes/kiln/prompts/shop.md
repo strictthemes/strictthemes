@@ -9,22 +9,6 @@ checks:
   - No screenful shows more than one terracotta (default) button.
   - The email field has a visible label, a wrong address gets a message in words with an icon, and a good one is replaced by a confirmation that a screen reader announces.
   - No text on the page is uppercased.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 99.9% of 2,572 measured values, with no errors and 1 warning for a drawn piece inside the picture, which reads as a card inside a card, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,513 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,510 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode, where the drawn pieces keep their glaze colours. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio of two potters, Nell Varga and Tomas Reid, at Unit 3, Coldharbour Yard, Bramwick BW4 2LT. They make tableware and vases in small batches and fire the kiln about once a month; the last firing came out on 6 November 2026. Glazes are Ash (pale grey-white), Oat (pale cream), Iron (dark brown) and Slate (dark blue-grey). Prices are in pounds.

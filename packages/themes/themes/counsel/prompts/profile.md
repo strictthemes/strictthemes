@@ -9,12 +9,6 @@ checks:
   - "Admissions and education are a `<dl>` with each year in a `<time>` element, and the recent matters are a list with a 1px top border on each entry."
   - "The page has exactly one badge, New partner, and nothing else on the page is `bg-tertiary`; there is exactly one default (navy) button, Email Ruth."
   - "No heading or text on the page is bold or italic."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,417 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in one office at 4 Chancery Row, Wexcombe WX1 2LN. This page is for **Ruth Calloway**, a partner in its Commercial disputes team (4 partners and 16 lawyers, led by David Achterberg). She joined the firm as a trainee in 2011, was admitted as a solicitor in England and Wales in 2013, gained higher rights of audience in the civil courts in 2019 and was made partner on 1 May 2026. She read law at the University of Wexcombe (LLB, 2009) and took the Legal Practice Course at Wexcombe Law School (2010), both invented. She handles disputes that follow the sale of a company: warranty and indemnity claims, earn-outs and completion accounts. She speaks English and German. Direct line `01632 960 237`, email r.calloway@harrowvane.example; her assistant is Owen Pryce, `01632 960 238`. Every name, client and matter is invented: name no real firm, person, case or court ruling. Write her experience yourself, in the third person, plain and exact.

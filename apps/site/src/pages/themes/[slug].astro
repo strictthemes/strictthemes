@@ -95,10 +95,6 @@ const prompts = theme.prompts.map((prompt) => ({
   urls: promptUrls(theme.slug, prompt.slug),
   example: exampleFor(theme.slug, prompt.slug),
   length: `${(Math.round(prompt.prompt.length / 100) / 10).toFixed(1)}k characters`,
-  tested:
-    prompt.tested.length > 0
-      ? `Run ${prompt.tested.length === 1 ? "once" : `${prompt.tested.length} times`} in ${[...new Set(prompt.tested.map((test) => test.tool))].join(", ")}`
-      : "Not yet run in a tool",
 }))
 // Sections after the preview are numbered from here, since "Page prompts" is optional.
 const offset = prompts.length > 0 ? 1 : 0
@@ -200,8 +196,8 @@ const downloads: Record<string, string> = {
             Each prompt is a full brief for one page in this theme: its sections,
             layout, behavior, and a checklist the agent goes through before it
             says it is done. The rules in every prompt are generated from the
-            theme's strict block. Each preview is the page a coding agent built
-            from the prompt, shown as it came out.
+            theme's strict block. Each preview is the page built from the
+            prompt, shown as it came out.
           </p>
           <ul class="flex flex-col">
             {prompts.map((prompt) => (
@@ -224,7 +220,7 @@ const downloads: Record<string, string> = {
                   <h3 class="font-heading text-h2">{prompt.title}</h3>
                   <p>{prompt.description}</p>
                   <p class="label text-muted-foreground">
-                    {prompt.length} · {prompt.tested}
+                    {prompt.length}
                   </p>
                   {prompt.example && (
                     <p class="label text-muted-foreground">

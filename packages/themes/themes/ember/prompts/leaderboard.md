@@ -9,12 +9,6 @@ checks:
   - "The viewer's row (Juno Vane) has a `bg-heat-mid` bar at its left edge, the word You beside the name, and `aria-current=true`, and the bar is never the only sign."
   - "Every tier is a square rank mark followed by the tier's name in words, and no heat color is used for text."
   - "At 375px the table scrolls sideways in its own box with the name Ranking, and the page does not; the page has one badge, Rank 1, and no default (red) button."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 5,138 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Ashfall**, an invented free-to-play team arena game for PC by an invented studio, **Lowlight Games**. This is the Ranked Clash ladder of **Season 4: Dry Lightning**, in week 6 of 14, updated at 09:00 today, Thursday 12 November 2026. The viewer is **Juno Vane**, who plays in Europe: rating 2,418, 212 wins in 383 matches, global rank 18, rank 6 in Europe, tier Cinder. The ladder holds these nineteen players, in order of rating (region, rating, wins, matches, win rate):

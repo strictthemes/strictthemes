@@ -9,22 +9,6 @@ checks:
   - Every showtime is a `<time>` with a full `dateTime` such as `2026-11-13T20:30`, set in `font-mono` with `tabular-nums`.
   - The page has one badge, "Premiere", on the row of "Low Tide at Merrow", in `bg-tertiary text-tertiary-foreground`.
   - Every poster and the still have `role="img"` and an `aria-label`, keep their 2:3 and 16:9 shapes at 375px, and the page does not scroll sideways there.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Third run of this page. The second build showed that a poster in a row needs `self-start` to keep its proportions, which the agent added itself and the theme's shared notes now say. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,577 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,526 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,589 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode, and at 1280px in dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. The programme runs from Wednesday 11 November 2026 (today) to Sunday 15 November. Six films are on: "Low Tide at Merrow" (Ada Kessler, Norway, 2026, 118 min, rated 15, opening today, Wednesday 11 November), "Night Ferry to Halvik" (Jonas Brask, Denmark, 2025, 96 min, rated 12A), "The Glass Year" (Inès Lavalle, France, 2026, 131 min, rated 15), "A Room Above the Station" (Tomasz Wierzba, Poland, 2024, 104 min, rated PG), "Small Hours" (Noor Hadid, Lebanon, 2026, 88 min, rated 15) and "The Quiet Lift" (Mirela Dobre, Romania, 2025, 99 min, rated 12A). The Ilse Varga season starts after this week, on Friday 20 November, so none of its films is in this listing. Give each day four or five of the films, each with one to three times within that day's opening hours (17:30 to 21:00 on Wednesday and Thursday, 16:30 to 23:15 on Friday and Saturday, 13:30 to 20:30 on Sunday, so late shows are on Friday and Saturday only), on Screen 1, 2 or 3. "Low Tide at Merrow" is on every day.

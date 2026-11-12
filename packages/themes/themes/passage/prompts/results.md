@@ -9,12 +9,6 @@ checks:
   - "Choosing a sailing sets aria-pressed on its button, gives its card the primary border, and changes the summary's times, ship and fare."
   - "The sold-out sailing has no fare and no button, and sorting by price or by duration puts it last."
   - "At 375px the journey, the fare and the button fit inside each card without the page scrolling sideways."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,353 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Kestrel Ferries", a search for Harrowmouth to Port Ellery on Saturday 19 December 2026, one way, for 2 adults. Fares are for the whole booking (both adults), one way, and include port fees. Five sailings that day:

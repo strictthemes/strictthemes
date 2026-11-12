@@ -10,12 +10,6 @@ checks:
   - "The message field counts down the characters left, and reads 1 character left at one."
   - "No card sits inside another card, and the blush block holds no avatar, badge, link or field."
   - "The opening block element carries bg-blush text-blush-foreground, so its text stays plum ink in dark mode, and nothing inside it has a text color class of its own."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,172 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the guestbook of Clem Ashdown and Rafe Linnell, who marry on Saturday 17 July 2027 at Quillbrook Barn, Little Saltry. Six guests have written so far, newest first:

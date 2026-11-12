@@ -9,12 +9,6 @@ checks:
   - "The five practice areas, the three matters and the four partners are lists, each entry with a 1px top border or, for the partners, a portrait; the figures are a `<dl>`."
   - "Every portrait is a rectangle with 4px corners, a hairline border and the person's initials, with an `aria-label`, and nothing on the page is round."
   - "Every section after the first is divided from the one before by one hairline, with equal white space above and below it."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      Second run of this page: the first, a trial build, led to corrections in the theme's layout notes and in this brief. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,598 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952 by Arthur Harrow and Eleanor Vane. One office, at 4 Chancery Row, Wexcombe WX1 2LN. 14 partners and 86 lawyers in five practice areas: Corporate, Commercial disputes, Employment, Real estate and Private client. Partners include Helena Marsh (managing partner, Corporate), David Achterberg (head of Commercial disputes), Priya Raman (Employment) and Ruth Calloway (Commercial disputes, made partner on 1 May 2026). Commercial disputes is ranked in the first band for the region by the Northern Legal Review, 2026, an invented directory. The main line is 01632 960 214, the enquiries address enquiries@harrowvane.example, and the office is open Monday to Friday 08:30–17:30. Every name, client and matter is invented: name no real firm, person, case or court ruling. Write the rest of the copy yourself, plain and exact, the way a careful letter reads: no superlatives, no "leading" or "world-class".

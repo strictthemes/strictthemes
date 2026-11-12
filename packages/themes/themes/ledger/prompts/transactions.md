@@ -9,22 +9,6 @@ checks:
   - The total rows sum every transaction that matches the filters, on all pages, and change when a filter changes; the net row sits under a double rule in the heading font at its one weight.
   - Previous and Next are disabled at their end of the list and keep keyboard focus when they disable themselves.
   - An empty result shows a sentence and a "Clear filters" button, and after clearing, focus moves to the search field.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Third run of this page. The second showed a broken sentence in the theme's shared notes, which is fixed. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,857 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, a wrong reference in the theme's notes was corrected (the header named "the last note" for the Menu button). A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,867 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,891 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, and its customer "Hollis & Vane", a two-person print studio. The statement covers 30 October to 27 November 2026 on two accounts: the current account (ending 4417) and the tax reserve (ending 8830). Invent 28 transactions, newest first: client payments in (Larkspur Café, Brennan Wholesale, Odell & Pryce Architects), payments out for rent, paper stock (Copperleaf Paper Mill), ink, software, card fees and a van lease, and two transfers to the tax reserve, each shown as two rows with the same date and amount: "To tax reserve" out of the current account and "From current account" into the tax reserve, so four of the 28 rows are transfers. Each has a reference such as `INV-0139` or `RENT NOV`.

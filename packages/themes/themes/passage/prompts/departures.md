@@ -9,12 +9,6 @@ checks:
   - "Choosing a destination shows only the sailings that go there or call there, its button has aria-pressed set to true, and a status line says how many are shown."
   - "Exactly one row carries a badge, Boarding, in cyan with navy text, and it is the only badge on the page."
   - "Every time is on the 24-hour clock with two-digit hours, every sailing time on the board stands beside its destination in Overpass Mono with tabular figures, and the board's date and update time are fixed sample text, not the visitor's clock."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 3,553 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: the departures board of "Kestrel Ferries" at Harrowmouth (`HRW`), Berths 1 to 4, Harbour Road, Harrowmouth, HW1 4QS. The board shows Friday 18 December 2026 and was last updated at 07:48: both are fixed sample text, and every state below is fixed with them. High winds are forecast for the afternoon, so the 14:00 to Wrenholm is cancelled. The eleven sailings:

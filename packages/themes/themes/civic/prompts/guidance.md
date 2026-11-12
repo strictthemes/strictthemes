@@ -9,22 +9,6 @@ checks:
   - There is exactly one signal-yellow notice, with dark text, the word "Important" beside its icon, and no link or muted text inside it.
   - The page has one civic-blue main action, "Apply for a permit", which is a link styled as a button.
   - Paragraphs are short (at most three sentences), and no text is muted except hints, captions and the updated date.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,134 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 6 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,138 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,155 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its guidance "Resident parking permits: who can get one and what it costs", updated on 4 November 2026. Permits are for homes in zones A to D, last 12 months, and at most two are given per address. Prices for 12 months, first permit and second permit at the same address: petrol or diesel £96 and £144, hybrid £72 and £108, fully electric £30 and £45. Visitor permits are £24 for a book of 20 day permits. From 1 April 2027, petrol and diesel permits go up to £102 and £150. Homes at Linden Yard, built without parking, cannot get a permit. Use these facts as they are; write the rest of the copy yourself, plain and short.

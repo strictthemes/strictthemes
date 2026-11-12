@@ -8,22 +8,6 @@ checks:
   - The lists of who can apply and what you need are real lists (`<ul>`), and the time it takes is stated in words.
   - The other ways to apply give a phone number, opening hours and a postal address in an `<address>` element, with no text in a color under 7:1.
   - No heading or paragraph is centered (only the words inside the full-width "Start now" link on a phone sit in its middle), and no content on the page is wider than 720px.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,446 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,446 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,437 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its service "Apply for a resident's parking permit". A permit lets a resident park one vehicle in their permit zone (zones A to D). It lasts 12 months and costs £30 to £144 a year, by vehicle type and whether it is the first or second permit at the address. Applying online takes about 10 minutes, and the council decides within 5 working days. Phone: 01632 960 418, Monday to Friday, 9am to 5pm. In person or by post: Parking Services, Callowmere Council, Guildhall, Market Street, Callowmere CM1 1AA. Use these facts as they are; write the rest of the copy yourself, plain and short.

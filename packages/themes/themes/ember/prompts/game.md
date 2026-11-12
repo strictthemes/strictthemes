@@ -9,12 +9,6 @@ checks:
   - "Each class tile has a drawn picture with `role=img` and an `aria-label`, and its difficulty is written in words."
   - "The season meter has `role=meter` with its values, and the days of the season are written beside it."
   - "The system requirements are a table with real header cells, in a box that scrolls sideways at 375px while the page does not."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      Second run of this page: the first, a trial build, led to corrections in this brief. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,781 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in dark mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Ashfall**, an invented free-to-play team arena game for PC by an invented studio, **Lowlight Games**. Two teams of five fight over a burning salt flat in rounds; the first team to win four rounds wins the match. Four classes: **Bulwark** (front line, difficulty low), **Cinderblade** (close damage, difficulty high), **Flarecaster** (ranged damage, difficulty medium) and **Mender** (support, difficulty medium). The modes are Ranked Clash, Quick Clash and, since patch 4.2, Duel Pits, a 2v2 mode. **Season 4: Dry Lightning** runs from Tuesday 6 October 2026 to Tuesday 12 January 2027, 98 days; by today, Thursday 12 November 2026, 37 of them have gone and 61 are left and it is week 6 of 14. It brought the map Glasswater Yard and a 60-tier season pass. Patch 4.2 came out on Tuesday 10 November 2026.

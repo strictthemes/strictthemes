@@ -9,12 +9,6 @@ checks:
   - "The boarding code is drawn from plain elements in a grid, has role img and an aria-label that names the booking reference, and is not an image file or a real QR code."
   - "Confirmed shows its success dot beside the word, and the journey reads from Harrowmouth at 09:15 on the left to Port Ellery at 11:00 on the right."
   - "Every time on the page is on the 24-hour clock with two-digit hours, in a time element."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,561 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Kestrel Ferries", booking `KF-7Q4M2R`, confirmed and paid. The 09:15 from Harrowmouth (`HRW`) to Port Ellery (`PEL`), arriving 11:00, on Saturday 19 December 2026, on MV Isla Grey from Berth 2; 1 h 45 min, direct. Two adults, Maren Holt and Tomas Holt, with two bicycles. Paid £90.00: the fare of £78.00 and two bicycles at £6.00 each. Check-in closes at 08:45 and boarding starts at 08:50. The boarding pass went to maren.holt@mail.example. A booking can be changed up to 24 hours before the sailing for £10.00, and cancelled up to 7 days before for a refund less £15.00.

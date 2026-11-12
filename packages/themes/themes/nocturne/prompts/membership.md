@@ -9,22 +9,6 @@ checks:
   - The page has one default (gold) button, "Join the Vesper", and asks for no card or bank details.
   - An empty name, or an empty or malformed email address, shows a sentence with an icon under the field, sets `aria-invalid` and moves focus to the first field with an error.
   - A good sign-up replaces the form with a confirmation in a `role="status"` element that names the plan, the price and the start date, and says no payment was taken.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first runs showed that a poster in a row needs `self-start` to keep its proportions, which the theme's shared notes now say. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,051 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the brief now says that the title breaks onto three lines, as it does. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,056 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,060 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. Three plans: **Friend** (£6 a month, or £60 a year): 10% off every ticket, members' screenings once a month, the printed programme by post. **Regular** (£12 a month, or £120 a year), the recommended one: two free tickets a month, 20% off every other ticket, priority booking for seasons and premieres, 10% off at the bar. **Patron** (£25 a month, or £250 a year): everything in Regular, four free tickets a month, a named seat in Screen 2, and an invitation to the season launches. A yearly plan costs ten months. Membership starts on the day of sign-up, Wednesday 11 November 2026.

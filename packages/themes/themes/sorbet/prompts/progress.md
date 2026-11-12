@@ -9,22 +9,6 @@ checks:
   - Every habit's completion is given in words and numbers ("6 of 7 days", "86%"), and its meter is not the only way to read it.
   - Butter yellow appears only on the good-news badge, never as text, a bar or a border.
   - At 375px the month chart fits its card without sideways scroll.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first run showed that the sample counts could not all be true at once and that the bars need a plot of fixed height; both are fixed in the brief. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,329 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,353 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,352 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 2 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. The person is Ines Okafor, with five habits: Drink 8 glasses of water, Read 10 pages, Walk after lunch, Stretch for 5 minutes, No phone after 22:00. Today is Wednesday, 11 November 2026. Her streak is 12 days; her best was 19, in September. The daily counts, out of 5: 13 to 29 October are 2, 3, 5, 4, 5, 5, 5, 2, 4, 4, 5, 3, 4, 5, 3, 5, 3; the 12 days from 30 October to 10 November are all at 5 (that is the streak); today is at 2 so far. So the last 7 days come to 32 of 35 and the last 30 to 129 of 150. Invent which days each habit was done so that the totals agree: over the week, Drink 8 glasses of water and Walk after lunch (the two done today) are at 7 of 7 and the other three at 6 of 7; over the month, Drink 8 glasses of water 29, Walk after lunch 28, Read 10 pages 25, Stretch for 5 minutes 24, No phone after 22:00 23, of 30, so no habit is at 100% in the month.

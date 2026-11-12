@@ -297,8 +297,6 @@ test("every example has a preview page that says how it was made", () => {
     const facts = JSON.parse(
       readFileSync(join(examplesDir, theme, page, "example.json"), "utf8")
     ) as {
-      tool: string
-      model: string
       date: string
       prompt: string
       check: { score: number; errors: number }
@@ -324,12 +322,35 @@ test("every example has a preview page that says how it was made", () => {
     const html = read(`themes/${theme}/prompts/${page}/index.html`)
     assert.ok(html.includes(`src="/themes/${theme}/prompts/${page}/build/"`), `${theme}/${page}: frame`)
     assert.ok(html.includes(`data-copy-url="/themes/${theme}/prompts/${page}.md"`), `${theme}/${page}: copy`)
-    assert.ok(html.includes(`${facts.tool}, ${facts.model}`), `${theme}/${page}: who built it`)
     assert.ok(html.includes(`${facts.check.score}% of`), `${theme}/${page}: score`)
     // The theme page shows it next to its prompt.
     const themePage = read(`themes/${theme}/index.html`)
     assert.ok(themePage.includes(`href="/themes/${theme}/prompts/${page}/"`), `${theme}/${page}: link`)
     assert.ok(themePage.includes(`src="/themes/${theme}/prompts/${page}/build/"`), `${theme}/${page}: small view`)
+  }
+})
+
+test("the site does not say who or what built the example pages", () => {
+  const walk = (dir: string): string[] =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory()
+        ? // The built examples themselves are the pages, not text about them.
+          entry.name === "build" || entry.name === "_astro"
+          ? []
+          : walk(join(dir, entry.name))
+        : [join(dir, entry.name)]
+    )
+  const files = walk(dist).filter((file) => /\.(html|json|txt|xml)$/.test(file))
+  assert.ok(files.length > 100)
+  for (const file of files) {
+    const text = readFileSync(file, "utf8")
+    for (const phrase of [/Claude/, /\bOpus\b/, /Built by/i, /Edited by hand/i, /agent built from/i, /Run once in/i]) {
+      assert.doesNotMatch(text, phrase, file)
+    }
+  }
+  for (const { theme, page } of examples) {
+    const facts = JSON.parse(readFileSync(join(examplesDir, theme, page, "example.json"), "utf8")) as Record<string, unknown>
+    assert.deepEqual(Object.keys(facts).sort(), ["check", "date", "prompt"], `${theme}/${page}`)
   }
 })
 

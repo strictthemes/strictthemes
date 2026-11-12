@@ -8,12 +8,6 @@ checks:
   - "Each document row has its type, format, revision, a `<time>` for its date, its size in a right-aligned mono column whose header carries the unit, and a download link whose name says which file it is."
   - "The count in the table's heading row follows the filter and is announced, and the four filters show 10, 4, 3 and 3 documents."
   - "Download all is the only default button on the page, and the page does not scroll sideways at 375px."
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-12"
-    result: >-
-      A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,883 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Torvale Bearings Ltd" and the documents for its TVL range of deep groove ball bearings. Ten documents, newest first (title, type, format, revision, date, size in MB):

@@ -8,22 +8,6 @@ checks:
   - The lists of what to bring and what to leave at home say so in their headings, so that their icons are not the only sign.
   - Every question in the FAQ opens and closes with Enter and with Space, and shows the focus outline.
   - Every passage longer than two sentences sits on a white panel, not straight on the yellow page.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      First run of this page, on briefs revised after another page of the theme was built. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,700 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run on the prompt as revised after the problems the earlier test builds reported: after the first run on that text, the theme's notes now say that the Menu button carries `ml-auto` below `md`, where the dates that carry it are hidden. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,578 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 4 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 2,559 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 3 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, Kajgatan 2, in the invented city of Varsby, on Friday 4 and Saturday 5 December 2026. The gates open at 16:00 on Friday and at 12:00 on Saturday, the last set ends at 00:30 on Friday and at 01:00 on Saturday, and last entry is at 22:00. The docks are a 12-minute walk from Varsby Central station, and tram 4 stops at the gate. Most of the site is indoors in old harbour halls; the Crane Stage is outdoors under a roof. All names and places are invented; the contact address is `info@tremordays.example`.

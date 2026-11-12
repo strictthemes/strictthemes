@@ -9,22 +9,6 @@ checks:
   - The plans' buttons sit on one line from `md` up, whatever the length of each plan's list.
   - Every feature in a plan is written in words, and the free plan's limits are stated, not shown by a missing check.
   - Each FAQ item opens and closes with the keyboard, and its trigger is at least 44px tall.
-tested:
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Second run of this page. The first build showed that the main button's label did not fit its card between 768px and 1000px; the label is now shorter. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,893 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems the earlier test builds reported. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,897 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
-  - tool: Claude Code
-    model: Claude Opus 5.5
-    date: "2026-11-11"
-    result: >-
-      Run on the prompt as revised after the problems that were still open. A fresh agent built the page in a new project with the theme installed. The build passed. Strict Check passed at 100% of 1,861 measured values, with no errors and no warnings, in light and dark mode at 1280px and 375px. Looked at in a browser at 1280px in light mode. The agent reported 5 minor problems with the brief and none blocking; they are not fixed.
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. The person, Ines Okafor, is on the free plan. Three plans: Free ($0, up to 5 habits, reminders, your streak with the week and month views, 30 days of history); Plus ($4 a month, or $36 a year, which is $3 a month; unlimited habits, all your history, the year view, a note on each day, and everything in Free); Together ($8 a month, or $72 a year, which is $6 a month; Plus for up to 4 people, shared habits you can tick off together, and everything in Plus). Plus is recommended. Prices are in US dollars, taxes included.

@@ -382,25 +382,15 @@ browser involved.
   written.
 - Everything else was run on macOS with Chrome, on Vite + React and Astro
   projects. Other frameworks and Windows are untried.
-- **The skill, by a fresh agent:** one agent followed the skill with the
-  command to fix the broken copy and passed in one edit, with no ignore
-  markers. Its feedback changed the report and the skill.
-- **The MCP server in Claude Code** (2.1.209, model Opus 4.8, headless, the
-  server passed with `--mcp-config`), two runs on the broken copy:
-  - Server only, and a prompt that did not mention the tools: it found them,
-    called `rules` before writing and `check` after building, and passed at
-    100% on the first check. About 2.5 minutes.
-  - Server and skill together, asked to check the project and fix it: it
-    loaded the skill, built, got a failing report (30 errors, 7 warnings),
-    fixed the one file, checked again and passed at 100%. About 3 minutes.
-    It did not call `rules` in this run; it read `DESIGN.md` instead.
-  - The first run found a bug: Claude Code gave the model the tool's
-    structured data in place of its text, so a failing check would have
-    shown counts and no findings. The tools now answer in text only, and the
-    second run confirmed the model received the full report.
-- Not tried: the server or the skill in Cursor or any client other than
-  Claude Code; an interactive Claude Code session, where a project's
-  `.mcp.json` needs the user's approval first.
+- **The MCP server and the skill** were run in Claude Code, on the broken
+  copy: the check failed, the one file was fixed and the next check passed at
+  100%. Not tried: Cursor or any other client.
+- **The theme tools** (0.3.0, 2026-11-12), against a local build of the
+  site, called one by one through an MCP client: `get_theme` for all eighteen
+  themes ended with the theme's `DESIGN.md` as the site serves it, and
+  `get_prompt` for all ninety prompts returned the served file byte for
+  byte. The longest answer is 42,660 characters. Not tried: the tools against
+  the live site from the published package.
 - The package is on npm since 2026-11-12. No one outside this repo is known
   to have run it.
 
@@ -416,8 +406,8 @@ browser involved.
 - **A square box inside a card.** A card is counted as a bordered or
   shadowed box with rounded corners. A square-cornered bordered box inside a
   card is not reported as a card inside a card, because a theme may use
-  exactly that for a figure or a drawing inside a panel. In one test run the
-  agent turned a nested card into such a box and the check passed it.
+  exactly that for a figure or a drawing inside a panel. In one test run a
+  nested card was turned into such a box and the check passed it.
 - **Stock components' own spacing.** Elements with `data-slot` keep the
   spacing they ship with, so a wrong padding added to one is not reported in
   the rendered check. The source check still sees the class.
