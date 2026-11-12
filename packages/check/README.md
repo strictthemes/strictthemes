@@ -349,7 +349,7 @@ browser involved.
   layout.
 - **In CI (2026-11-12).** The site's check runs in this repo's GitHub
   Actions workflow on every pull request and on `master`: the source, without
-  the sixty-five example projects (`--exclude examples`), and the home,
+  the ninety example projects (`--exclude examples`), and the home,
   themes, spec, Strict One and 404 pages in light mode. It passes at 100% of
   15,202 measured values, with no errors and no warnings, on an
   `ubuntu-latest` runner with the runner's own Chrome.

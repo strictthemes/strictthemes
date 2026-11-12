@@ -272,4 +272,102 @@ export const FONTS: Record<string, FontSource> = {
     import: 'Azeret_Mono',
     dependency: '@fontsource-variable/azeret-mono',
   },
+  // Counsel
+  'Marcellus': {
+    cssFamily: 'Marcellus',
+    generic: 'serif',
+    import: 'Marcellus',
+    dependency: '@fontsource/marcellus',
+    weight: ['400'],
+  },
+  'Jost': {
+    cssFamily: 'Jost Variable',
+    generic: 'sans-serif',
+    import: 'Jost',
+    dependency: '@fontsource-variable/jost',
+  },
+  'Courier Prime': {
+    cssFamily: 'Courier Prime',
+    generic: 'monospace',
+    import: 'Courier_Prime',
+    dependency: '@fontsource/courier-prime',
+    weight: ['400'],
+  },
+  // Passage
+  'Overpass': {
+    cssFamily: 'Overpass Variable',
+    generic: 'sans-serif',
+    import: 'Overpass',
+    dependency: '@fontsource-variable/overpass',
+  },
+  'Karla': {
+    cssFamily: 'Karla Variable',
+    generic: 'sans-serif',
+    import: 'Karla',
+    dependency: '@fontsource-variable/karla',
+  },
+  'Overpass Mono': {
+    cssFamily: 'Overpass Mono Variable',
+    generic: 'monospace',
+    import: 'Overpass_Mono',
+    dependency: '@fontsource-variable/overpass-mono',
+  },
+  // Ember
+  'Oxanium': {
+    cssFamily: 'Oxanium Variable',
+    generic: 'sans-serif',
+    import: 'Oxanium',
+    dependency: '@fontsource-variable/oxanium',
+  },
+  'Sofia Sans': {
+    cssFamily: 'Sofia Sans Variable',
+    generic: 'sans-serif',
+    import: 'Sofia_Sans',
+    dependency: '@fontsource-variable/sofia-sans',
+  },
+  'Martian Mono': {
+    cssFamily: 'Martian Mono Variable',
+    generic: 'monospace',
+    import: 'Martian_Mono',
+    dependency: '@fontsource-variable/martian-mono',
+  },
+  // Gauge
+  'Chivo': {
+    cssFamily: 'Chivo Variable',
+    generic: 'sans-serif',
+    import: 'Chivo',
+    dependency: '@fontsource-variable/chivo',
+  },
+  'Libre Franklin': {
+    cssFamily: 'Libre Franklin Variable',
+    generic: 'sans-serif',
+    import: 'Libre_Franklin',
+    dependency: '@fontsource-variable/libre-franklin',
+  },
+  'Roboto Mono': {
+    cssFamily: 'Roboto Mono Variable',
+    generic: 'monospace',
+    import: 'Roboto_Mono',
+    dependency: '@fontsource-variable/roboto-mono',
+  },
+  // Confetti
+  'Caprasimo': {
+    cssFamily: 'Caprasimo',
+    generic: 'serif',
+    import: 'Caprasimo',
+    dependency: '@fontsource/caprasimo',
+    weight: ['400'],
+  },
+  'Nunito': {
+    cssFamily: 'Nunito Variable',
+    generic: 'sans-serif',
+    import: 'Nunito',
+    dependency: '@fontsource-variable/nunito',
+  },
+  'Ubuntu Sans Mono': {
+    cssFamily: 'Ubuntu Sans Mono Variable',
+    generic: 'monospace',
+    import: 'Ubuntu_Sans_Mono',
+    dependency: '@fontsource-variable/ubuntu-sans-mono',
+  },
 }

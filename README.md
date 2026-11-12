@@ -27,7 +27,7 @@ tier.
 ## Start
 
 **1. Install a theme** into a shadcn project. This one is Strict One; the
-[other twelve](#themes) install the same way.
+[other seventeen](#themes) install the same way.
 
 ```bash
 npx shadcn@latest add https://strictthemes.com/r/strict-one.json
@@ -55,7 +55,7 @@ Failed: 67.7% of 93 measured values follow the theme. 6 errors, 0 warnings.
 
 ## Themes
 
-Thirteen themes, each with a light and a dark mode and five page prompts.
+Eighteen themes, each with a light and a dark mode and five page prompts.
 Every link opens the theme's page, with a live preview and the pages a coding
 agent built from its prompts.
 
@@ -74,6 +74,11 @@ agent built from its prompts.
 | [Tisane](https://strictthemes.com/themes/tisane) | A soft, unhurried theme for food, wellness and places to stay. Oat paper, olive green, a peach accent and a rounded serif. |
 | [Voltage](https://strictthemes.com/themes/voltage) | A bold poster of a theme for launches, events and music. A yellow page, black ink, thick shapes and electric blue. |
 | [Nocturne](https://strictthemes.com/themes/nocturne) | A dusky, cinematic theme for film, music and nightlife. Lilac-grey paper by day, aubergine and gold by night. |
+| [Counsel](https://strictthemes.com/themes/counsel) | A composed, formal theme for law firms, advisers and private offices. White paper, midnight navy, and gold used once. |
+| [Passage](https://strictthemes.com/themes/passage) | A clear, airy theme for travel and booking. Pale-water paper, deep navy ink, and one hue of blue from light to dark. |
+| [Ember](https://strictthemes.com/themes/ember) | A hot, dark-first theme for games, esports and sport. Blue-black, ember red, and an amber signal from the same fire. |
+| [Gauge](https://strictthemes.com/themes/gauge) | A plain, exact theme for hardware, parts and spec sheets. Nine steel greys, dense tables, and no accent color at all. |
+| [Confetti](https://strictthemes.com/themes/confetti) | A light, cheerful theme for invitations, parties and gift lists. Lilac-white paper, plum ink, and pastel pink, sky and lilac. |
 
 To write your own, read [the spec format](https://strictthemes.com/spec) and
 lint the file as you go:
@@ -117,7 +122,7 @@ and a GitHub Actions example.
 | Package | What it does | Status |
 |---|---|---|
 | [`@strictthemes/spec`](packages/spec) | Parses, lints and exports Strict design specs (`DESIGN.md` + a `strict` rules block). Everything else builds on it. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/spec) |
-| [`@strictthemes/themes`](packages/themes) | The thirteen themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
+| [`@strictthemes/themes`](packages/themes) | The eighteen themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
 | [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
 | [`@strictthemes/site`](apps/site) | strictthemes.com, built with Astro: theme pages with live previews, a built example page for every page prompt, the registry and the spec docs. | Live |
 | [`skills/strict-check`](skills/strict-check/SKILL.md) | The skill that has a coding agent run Strict Check on its own work. | First version |

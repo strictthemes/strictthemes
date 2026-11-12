@@ -43,6 +43,22 @@
 @import "@fontsource-variable/syne";
 @import "@fontsource-variable/onest";
 @import "@fontsource-variable/azeret-mono";
+/* The five themes built from the palette audit. */
+@import "@fontsource/marcellus/400.css";
+@import "@fontsource-variable/jost";
+@import "@fontsource/courier-prime/400.css";
+@import "@fontsource-variable/overpass";
+@import "@fontsource-variable/karla";
+@import "@fontsource-variable/overpass-mono";
+@import "@fontsource-variable/oxanium";
+@import "@fontsource-variable/sofia-sans";
+@import "@fontsource-variable/martian-mono";
+@import "@fontsource-variable/chivo";
+@import "@fontsource-variable/libre-franklin";
+@import "@fontsource-variable/roboto-mono";
+@import "@fontsource/caprasimo/400.css";
+@import "@fontsource-variable/nunito";
+@import "@fontsource-variable/ubuntu-sans-mono";
 
 /* The example pages are built on their own, each with its own stylesheet. */
 @source not "../../examples";

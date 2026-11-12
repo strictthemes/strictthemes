@@ -18,6 +18,11 @@ The free themes, each written as one [Strict spec](../spec/SPEC.md)
 | [Tisane](themes/tisane/DESIGN.md) | Food, wellness and places to stay. Oat paper, olive, peach. | Young Serif, Albert Sans, Reddit Mono |
 | [Voltage](themes/voltage/DESIGN.md) | Launches, events and music. A yellow page, black ink, electric blue. | Unbounded, Familjen Grotesk, Space Mono |
 | [Nocturne](themes/nocturne/DESIGN.md) | Film, music and nightlife. Lilac-grey by day, aubergine and gold by night. | Syne, Onest, Azeret Mono |
+| [Counsel](themes/counsel/DESIGN.md) | Law firms, advisers and private offices. White paper, midnight navy, gold used once. | Marcellus, Jost, Courier Prime |
+| [Passage](themes/passage/DESIGN.md) | Travel and booking. Pale-water paper, navy ink, one hue of blue. | Overpass, Karla, Overpass Mono |
+| [Ember](themes/ember/DESIGN.md) | Games, esports and sport. Blue-black, ember red, an amber signal. Dark first. | Oxanium, Sofia Sans, Martian Mono |
+| [Gauge](themes/gauge/DESIGN.md) | Hardware, parts and spec sheets. Nine steel greys and no accent color. | Chivo, Libre Franklin, Roboto Mono |
+| [Confetti](themes/confetti/DESIGN.md) | Invitations, parties and gift lists. Lilac-white paper, plum ink, pastel blocks. | Caprasimo, Nunito, Ubuntu Sans Mono |
 
 Every theme has a light and a dark mode and lints with no errors or warnings.
 The tests also hold the themes apart: no two share a heading font, a body font,
@@ -72,8 +77,9 @@ variable. [src/fonts.ts](src/fonts.ts) maps each family name used in a
 - Variable fonts are used where they exist. A font with no variable version
   lists its weights in the catalog, and the theme imports each weight beyond
   regular (IBM Plex Mono, DM Mono, Space Mono).
-- Instrument Serif, Young Serif and Fragment Mono have one weight. Their themes
-  use that weight only, so nothing is set in a faked bold.
+- Instrument Serif, Young Serif, Fragment Mono, Marcellus and Caprasimo have
+  one weight. Their themes use that weight only, so nothing is set in a faked
+  bold. Counsel sets Courier Prime in its regular weight only, too.
 - A font whose theme sets text in italics names its italic file in the catalog
   (Fraunces, Source Sans 3, Bodoni Moda, Newsreader, Instrument Serif).
 - A theme using a family that is not in the catalog cannot be built: the tests
@@ -99,6 +105,11 @@ has five:
 | Tisane | home, menu, booking, recipe, visit |
 | Voltage | launch, lineup, tickets, artist, info |
 | Nocturne | programme, film, season, membership, visit |
+| Counsel | firm, practice, profile, insight, enquiry |
+| Passage | search, results, details, ticket, departures |
+| Ember | game, patch, leaderboard, store, player |
+| Gauge | catalogue, part, compare, quote, downloads |
+| Confetti | invitation, rsvp, gifts, day, guestbook |
 
 Only part of a prompt is written by hand:
 
@@ -122,6 +133,72 @@ A prompt is written for a shadcn project, so it names corners by the class
 such a project has for them. shadcn calls its base corner `lg`, which moves
 every larger corner of a spec one name up: Recital's 12px `lg` corner is
 `rounded-xl`, and `rounded-lg` is 6px. The summary in each prompt says so.
+
+### The five themes from the palette audit
+
+Counsel, Passage, Ember, Gauge and Confetti were added on 2026-11-12. Each
+started from a color palette picked in an audit of popular palettes, and from a
+kind of site that palette suits and the thirteen themes did not cover:
+
+| Theme | Palette | For | Sample organisation |
+|---|---|---|---|
+| Counsel | Black & Gold Elegance | law firms and advisers | Harrow & Vane LLP, a commercial law firm |
+| Passage | Ocean Blue Serenity | travel and booking | Kestrel Ferries |
+| Ember | Fiery Red Sunset | games and esports | Ashfall, a team arena game |
+| Gauge | Light Steel | hardware, parts and spec sheets | Torvale Bearings Ltd |
+| Confetti | Pastel Dreamland Adventure | invitations, parties and gift lists | a wedding at Quillbrook Barn |
+
+A palette gives the hues and nothing else. The roles, the dark mode, the
+fonts, the type scale, the spacing, the corners and the rules were written for
+each theme, and each palette color got a role it can carry at WCAG AA: a pastel
+is a fill with dark text on it and never text itself, and a gold or a cyan
+carries dark text, not white.
+
+The process was the one used for the ten newer themes, with what those rounds
+had shown already written into the instructions.
+
+1. **Briefs.** One agent for each theme wrote its layout notes and five briefs
+   from the theme's `DESIGN.md` and from the notes and briefs of two of the
+   thirteen themes. The five agents raised three concerns about tokens, and
+   all three were changed before any page was built:
+   - **Ember.** The three heat colors of the leaderboard were too close to the
+     page to tell apart, and the light border too pale. The heat scale is now
+     `#DC2F02`, `#F48C06`, `#FFBA08`, and the light border `#E5CBAE`.
+   - **Counsel.** In dark mode the badge had the color of the border. The dark
+     tertiary is now `#E5E5E5` with navy text.
+   - **Confetti.** Text on a pastel fill turned pale in dark mode, where the
+     page's text is pale. Each pastel (`blush`, `candy`, `mist`) now has its
+     own `on-` color, a plum that stays the same in both modes, so
+     `bg-blush text-blush-foreground` reads in both.
+2. **Four trial builds**: the Counsel firm page, the Ember game page and the
+   Gauge part and catalogue pages. All four passed Strict Check at 100% with
+   no errors and no warnings. They led to corrections in two themes: Counsel's
+   notes still described the old dark badge, and Ember's game brief was made
+   exact about how the opening section fills the first screen and about the
+   type in its table. The two Gauge prompts did not change, so those two
+   builds are the published ones.
+3. **The other twenty-one pages, and the two corrected ones again.** Every
+   build was made by a fresh agent (Claude Opus 5.5) in a new Vite + shadcn
+   project with the theme installed, from the composed prompt alone, and
+   checked with Strict Check in light and dark mode at 1280px and 375px.
+
+All twenty-five published pages built and passed Strict Check at 100% with no
+errors and no warnings, each on its first check: 71,783 measured values in
+all. Every page was looked at in a browser at 1280px, and at least one page of
+each theme in dark mode. The agents reported no blocking problem and 100 minor
+ones, about four a page. They are not fixed. Most are gaps an agent filled
+sensibly: which element a label is, whether a value is trimmed, a row that
+wraps at one width. One is worth knowing when writing a brief:
+
+- **A weight class on a row does not reach its cells.** In Tailwind 4 a type
+  class such as `text-body` sets its weight through a variable, and a child
+  with its own type class does not inherit `font-bold` from a parent. A brief
+  that wants a bold row has to put the weight on each cell (Gauge's compare
+  page).
+
+A test also changed. A color of a theme's own has a text class, such as
+`text-blush-foreground`, which the test of the type scale read as a type size
+the theme lacks. It now skips a theme's own colors.
 
 ### All thirteen themes: the problems that were still open
 
@@ -589,6 +666,12 @@ install added the theme's fonts and variables, and every project built. They
 were looked at in the browser on the site, where stock shadcn components wear
 each theme: all ten in light mode, Voltage also in dark mode. They were not
 looked at in an installed project.
+
+The five themes added on 2026-11-12 were each installed with the shadcn CLI
+from a local copy of the registry into a new Vite + Base UI project, and every
+project built. Their twenty-five example pages were built in copies of those
+projects and looked at in a browser: every page in light or dark mode, and at
+least one page of each theme in dark mode.
 
 Not tested yet: a Next.js project (where the extra font-weight import is also
 untried), the Nuxt UI output of any theme but Strict One, and the dark mode of

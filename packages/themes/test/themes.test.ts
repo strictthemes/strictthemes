@@ -51,10 +51,11 @@ test('Strict One loads every weight of its mono font and has a tertiary class', 
   assert.equal(item.cssVars?.dark?.tertiary, '#FF4F00')
 })
 
-test('there are thirteen themes with unique names', () => {
+test('there are eighteen themes with unique names', () => {
   assert.deepEqual(themes.map((t) => t.slug), [
-    'atelier', 'avion', 'cipher', 'civic', 'dispatch', 'kiln', 'ledger',
-    'nocturne', 'recital', 'sorbet', 'strict-one', 'tisane', 'voltage',
+    'atelier', 'avion', 'cipher', 'civic', 'confetti', 'counsel', 'dispatch',
+    'ember', 'gauge', 'kiln', 'ledger', 'nocturne', 'passage', 'recital',
+    'sorbet', 'strict-one', 'tisane', 'voltage',
   ])
   assert.equal(new Set(themes.map((t) => t.spec.name)).size, themes.length)
 })
@@ -236,6 +237,11 @@ test('prompts: a theme with page prompts has five, in reading order', () => {
     tisane: ['home', 'menu', 'booking', 'recipe', 'visit'],
     voltage: ['launch', 'lineup', 'tickets', 'artist', 'info'],
     nocturne: ['programme', 'film', 'season', 'membership', 'visit'],
+    counsel: ['firm', 'practice', 'profile', 'insight', 'enquiry'],
+    passage: ['search', 'results', 'details', 'ticket', 'departures'],
+    ember: ['game', 'patch', 'leaderboard', 'store', 'player'],
+    gauge: ['catalogue', 'part', 'compare', 'quote', 'downloads'],
+    confetti: ['invitation', 'rsvp', 'gifts', 'day', 'guestbook'],
   }
   // Every theme has page prompts.
   assert.deepEqual(themes.map((t) => t.slug).sort(), Object.keys(pages).sort())
@@ -314,10 +320,12 @@ test('prompts: a brief only names type and spacing the theme has', () => {
       [...Object.values(spec.spacing), ...spec.strict.spacing.extra].map((value) => String(Number.parseFloat(value) / 4)),
     )
     const sizes = new Set(Object.keys(spec.typography))
+    // A color of the theme's own has classes too, such as `text-blush-foreground`.
+    const ownColors = Object.keys(spec.colors).map((color) => color.split('-')[0])
     for (const brief of [...theme.briefs, { slug: '_shared', body: theme.promptNotes }]) {
       const where = `${theme.slug}/${brief.slug}`
       for (const [, name] of brief.body.matchAll(/`[^`]*?\btext-([a-z0-9]+)\b/g)) {
-        if (notSizes.includes(name ?? '')) continue
+        if (notSizes.includes(name ?? '') || ownColors.includes(name ?? '')) continue
         assert.ok(sizes.has(name ?? ''), `${where}: text-${name} is not in the type scale`)
       }
       for (const [, , step] of brief.body.matchAll(/\b(p[xytblr]?|m[xytblr]?|gap(?:-[xy])?|space-[xy])-(\d+(?:\.\d+)?)\b/g)) {

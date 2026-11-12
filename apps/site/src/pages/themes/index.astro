@@ -4,6 +4,7 @@ import MoreTile from "@/components/MoreTile.astro"
 import ThemeCard from "@/components/ThemeCard.astro"
 import { ThemePreview } from "@/components/ThemePreview"
 import Layout from "@/layouts/Base.astro"
+import { closingTileInThemeGrid } from "@/lib/grid"
 import { exampleFor, promptUrls, themes } from "@/lib/themes"
 
 /** A theme's page prompts that have a built example to look at. */
@@ -15,7 +16,7 @@ const previews = (slug: string) =>
 
 <Layout
   title="Themes | Strict"
-  description="Thirteen free themes for AI-built UI. Each is one DESIGN.md file with light and dark modes, and installs into shadcn with one command."
+  description="Eighteen free themes for AI-built UI. Each is one DESIGN.md file with light and dark modes, and installs into shadcn with one command."
 >
   <section class="border-b border-border">
     <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
@@ -33,7 +34,7 @@ const previews = (slug: string) =>
 
   <div class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
     <section class="flex flex-col gap-8" aria-labelledby="all-themes">
-      <h2 id="all-themes" class="label text-muted-foreground">All thirteen, each in its own skin</h2>
+      <h2 id="all-themes" class="label text-muted-foreground">All eighteen, each in its own skin</h2>
       <ul class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {
           themes.map((theme) => (
@@ -42,10 +43,10 @@ const previews = (slug: string) =>
             </li>
           ))
         }
-        <li class="lg:col-span-2">
+        <li class={closingTileInThemeGrid(themes.length)}>
           <MoreTile
             label="Your own"
-            title="Or write the fourteenth."
+            title="Or write the nineteenth."
             href="/spec"
             link="Read the spec format"
           >

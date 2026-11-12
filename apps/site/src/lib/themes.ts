@@ -103,6 +103,11 @@ const ORDER = [
   "tisane",
   "voltage",
   "nocturne",
+  "counsel",
+  "passage",
+  "ember",
+  "gauge",
+  "confetti",
 ]
 const rank = (slug: string) =>
   ORDER.includes(slug) ? ORDER.indexOf(slug) : ORDER.length

@@ -83,7 +83,7 @@ A good pull request:
 A theme is one folder in `packages/themes/themes`: a `DESIGN.md` and five page
 prompts in `prompts/`. Before writing one, open a theme idea issue, so we can
 agree on what it is for. A new theme should do a job the others do not: look
-at [the thirteen](https://strictthemes.com/themes) first.
+at [the eighteen](https://strictthemes.com/themes) first.
 
 A theme is ready when:
 

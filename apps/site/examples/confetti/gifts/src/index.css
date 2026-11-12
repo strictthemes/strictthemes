@@ -1,0 +1,180 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/nunito";
+@import "@fontsource-variable/ubuntu-sans-mono";
+@import "@fontsource/caprasimo";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Caprasimo', serif;
+    --font-sans: 'Nunito Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: var(--radius);
+    --radius-xl: 24px;
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --text-display: 64px;
+    --text-display--line-height: 1;
+    --text-display--font-weight: 400;
+    --text-display--letter-spacing: -0.01em;
+    --text-h1: 40px;
+    --text-h1--line-height: 1.1;
+    --text-h1--font-weight: 400;
+    --text-h2: 24px;
+    --text-h2--line-height: 1.2;
+    --text-h2--font-weight: 400;
+    --text-body: 17px;
+    --text-body--line-height: 1.6;
+    --text-body--font-weight: 400;
+    --text-label: 13px;
+    --text-label--line-height: 1.3;
+    --text-label--font-weight: 500;
+    --text-label--letter-spacing: 0.02em;
+    --color-tertiary: var(--tertiary);
+    --color-tertiary-foreground: var(--tertiary-foreground);
+    --color-blush: var(--blush);
+    --color-blush-foreground: var(--blush-foreground);
+    --color-candy: var(--candy);
+    --color-candy-foreground: var(--candy-foreground);
+    --color-mist: var(--mist);
+    --color-mist-foreground: var(--mist-foreground);
+    --font-mono: 'Ubuntu Sans Mono Variable', monospace;
+}
+
+:root {
+    --background: #FBF7FD;
+    --foreground: #2E1A3F;
+    --card: #FFFFFF;
+    --card-foreground: #2E1A3F;
+    --popover: #FFFFFF;
+    --popover-foreground: #2E1A3F;
+    --primary: #4A2A63;
+    --primary-foreground: #FFFFFF;
+    --secondary: #CDB4DB;
+    --secondary-foreground: #2E1A3F;
+    --muted: #f1ecf4;
+    --muted-foreground: #6B5480;
+    --accent: #eeedf0;
+    --accent-foreground: #2E1A3F;
+    --destructive: #B3123F;
+    --border: #DCCBE6;
+    --input: #DCCBE6;
+    --ring: #4A2A63;
+    --chart-1: #d7b2f8;
+    --chart-2: #bc8de4;
+    --chart-3: #a26ecd;
+    --chart-4: #8653af;
+    --chart-5: #6d3e91;
+    --radius: 14px;
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #2E1A3F;
+    --sidebar-primary: #4A2A63;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #eeedf0;
+    --sidebar-accent-foreground: #2E1A3F;
+    --sidebar-border: #DCCBE6;
+    --sidebar-ring: #4A2A63;
+    --tertiary: #A2D2FF;
+    --tertiary-foreground: #2E1A3F;
+    --blush: #FFC8DD;
+    --blush-foreground: #2E1A3F;
+    --candy: #FFAFCC;
+    --candy-foreground: #2E1A3F;
+    --mist: #BDE0FE;
+    --mist-foreground: #2E1A3F;
+}
+
+.dark {
+    --background: #1E1229;
+    --foreground: #F7EEFA;
+    --card: #2A1A38;
+    --card-foreground: #F7EEFA;
+    --popover: #2A1A38;
+    --popover-foreground: #F7EEFA;
+    --primary: #FFAFCC;
+    --primary-foreground: #2E1A3F;
+    --secondary: #CDB4DB;
+    --secondary-foreground: #2E1A3F;
+    --muted: #291d33;
+    --muted-foreground: #BFAACC;
+    --accent: #3a2b48;
+    --accent-foreground: #F7EEFA;
+    --destructive: #FF9BB0;
+    --border: #4B3460;
+    --input: #4B3460;
+    --ring: #FFAFCC;
+    --chart-1: #ffafcc;
+    --chart-2: #e381a7;
+    --chart-3: #ca608c;
+    --chart-4: #ac4571;
+    --chart-5: #8d325a;
+    --sidebar: #2A1A38;
+    --sidebar-foreground: #F7EEFA;
+    --sidebar-primary: #FFAFCC;
+    --sidebar-primary-foreground: #2E1A3F;
+    --sidebar-accent: #3a2b48;
+    --sidebar-accent-foreground: #F7EEFA;
+    --sidebar-border: #4B3460;
+    --sidebar-ring: #FFAFCC;
+    --tertiary: #A2D2FF;
+    --tertiary-foreground: #2E1A3F;
+    --blush: #FFC8DD;
+    --blush-foreground: #2E1A3F;
+    --candy: #FFAFCC;
+    --candy-foreground: #2E1A3F;
+    --mist: #BDE0FE;
+    --mist-foreground: #2E1A3F;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  code, kbd, pre, samp {
+    @apply font-mono;
+    }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    }
+}
