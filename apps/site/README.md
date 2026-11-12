@@ -6,7 +6,7 @@ and [`@strictthemes/spec`](../../packages/spec).
 
 | Path | What it is |
 |---|---|
-| `/` | Home: what Strict is, a card for each of the eighteen themes, the roadmap |
+| `/` | Home: what Strict is, a card for each of the twenty-three themes, the roadmap |
 | `/themes`, `/themes/<slug>` | The catalog and one page per theme. A theme page wears its own theme |
 | `/themes/<slug>/<file>` | A theme's exports: `DESIGN.md`, `tailwind.css`, `shadcn.css`, `nuxt-ui.css`, `app.config.ts`, `tokens.json` |
 | `/themes/<slug>/prompts/<page>.md` | A theme's page prompts, as Markdown to paste into a coding agent |
@@ -135,7 +135,7 @@ the tests, shows the report on the run's page and keeps it as
 
 What is left out, and why:
 
-- `examples/` (`--exclude examples`): ninety projects, each in another
+- `examples/` (`--exclude examples`): 115 projects, each in another
   theme and each checked against that theme when it was built.
 - [ThemeCard.astro](src/components/ThemeCard.astro) and every theme preview
   (`strict-ignore-file`, `data-strict-ignore`): they wear the theme they show.

@@ -38,6 +38,22 @@ function colorsIn(value: string): Rgb[] {
   return matches.map((match) => parseColor(match)).filter((rgb): rgb is Rgb => rgb !== null && rgb.a > 0)
 }
 
+/**
+ * The layers of a computed `box-shadow` or `text-shadow` that draw something.
+ * A layer whose offsets, blur and spread are all zero paints nothing: Tailwind's
+ * `ring-0` leaves one behind, in the text color.
+ */
+function drawnShadows(value: string): string {
+  if (value === 'none') return ''
+  return value
+    .split(/,(?![^(]*\))/)
+    .filter((layer) => {
+      const lengths = layer.replace(/\([^)]*\)/g, '').match(/-?\d*\.?\d+(?=px\b)/g) ?? []
+      return lengths.length === 0 || lengths.some((length) => Number(length) !== 0)
+    })
+    .join(', ')
+}
+
 const FAMILY_SUFFIX = / (variable|var|vf)$/i
 
 /**
@@ -227,7 +243,7 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
     }
     const glow = tellSeverity(rules, 'glow-shadows')
     if (glow && (element.boxShadow !== 'none' || element.textShadow !== 'none')) {
-      const colored = colorsIn(`${element.boxShadow} ${element.textShadow}`).some((color) => rgbToOklch(color).c > CHROMATIC)
+      const colored = colorsIn(`${drawnShadows(element.boxShadow)} ${drawnShadows(element.textShadow)}`).some((color) => rgbToOklch(color).c > CHROMATIC)
       check('tells', !colored, () => ({
         rule: 'tell-glow',
         severity: glow,

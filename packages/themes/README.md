@@ -23,6 +23,11 @@ The free themes, each written as one [Strict spec](../spec/SPEC.md)
 | [Ember](themes/ember/DESIGN.md) | Games, esports and sport. Blue-black, ember red, an amber signal. Dark first. | Oxanium, Sofia Sans, Martian Mono |
 | [Gauge](themes/gauge/DESIGN.md) | Hardware, parts and spec sheets. Nine steel greys and no accent color. | Chivo, Libre Franklin, Roboto Mono |
 | [Confetti](themes/confetti/DESIGN.md) | Invitations, parties and gift lists. Lilac-white paper, plum ink, pastel blocks. | Caprasimo, Nunito, Ubuntu Sans Mono |
+| [Tideline](themes/tideline/DESIGN.md) | Surf schools, outdoor centres and the coast. Sand paper, deep-sea ink, lagoon and coral blocks. | Epilogue, Manrope, Geist Mono |
+| [Relay](themes/relay/DESIGN.md) | Sports clubs, leagues and race days. Navy bands, an amber main action, large scores. | Saira, Rubik, Kode Mono |
+| [Veranda](themes/veranda/DESIGN.md) | Guesthouses, small hotels and places to stay. Cream paper, slate ink, clay, sage and sand. | Cormorant, Outfit, Cutive Mono |
+| [Solace](themes/solace/DESIGN.md) | Therapists, coaches and private practices. Blush paper, indigo ink, no signal color. | Literata, Mulish, Xanh Mono |
+| [Primer](themes/primer/DESIGN.md) | Courses, schools and learning tools. Cream paper, deep-teal ink, four chart colors. | Lexend, Plus Jakarta Sans, Fira Code |
 
 Every theme has a light and a dark mode and lints with no errors or warnings.
 The tests also hold the themes apart: no two share a heading font, a body font,
@@ -77,11 +82,14 @@ variable. [src/fonts.ts](src/fonts.ts) maps each family name used in a
 - Variable fonts are used where they exist. A font with no variable version
   lists its weights in the catalog, and the theme imports each weight beyond
   regular (IBM Plex Mono, DM Mono, Space Mono).
-- Instrument Serif, Young Serif, Fragment Mono, Marcellus and Caprasimo have
-  one weight. Their themes use that weight only, so nothing is set in a faked
-  bold. Counsel sets Courier Prime in its regular weight only, too.
+- Instrument Serif, Young Serif, Fragment Mono, Marcellus, Caprasimo, Cutive
+  Mono and Xanh Mono have one weight. Their themes use that weight only, so
+  nothing is set in a faked bold. Counsel sets Courier Prime in its regular
+  weight only, too.
 - A font whose theme sets text in italics names its italic file in the catalog
-  (Fraunces, Source Sans 3, Bodoni Moda, Newsreader, Instrument Serif).
+  (Fraunces, Source Sans 3, Bodoni Moda, Newsreader, Instrument Serif,
+  Cormorant, Literata, Mulish).
+- A label font is found by its name, which has to hold "mono" or "code".
 - A theme using a family that is not in the catalog cannot be built: the tests
   check this.
 
@@ -110,6 +118,11 @@ has five:
 | Ember | game, patch, leaderboard, store, player |
 | Gauge | catalogue, part, compare, quote, downloads |
 | Confetti | invitation, rsvp, gifts, day, guestbook |
+| Tideline | home, lessons, forecast, booking, guide |
+| Relay | home, fixtures, standings, membership, report |
+| Veranda | home, rooms, room, reserve, menu |
+| Solace | home, approach, profile, fees, appointment |
+| Primer | catalogue, course, lesson, progress, plans |
 
 Only part of a prompt is written by hand:
 
@@ -157,6 +170,13 @@ from a local copy of the registry into a new Vite + Base UI project, and every
 project built. Their twenty-five example pages were built in copies of those
 projects and looked at in a browser: every page in light or dark mode, and at
 least one page of each theme in dark mode.
+
+Tideline, Relay, Veranda, Solace and Primer, added later the same day, were
+each installed the same way, and every project built. Their twenty-five
+example pages were built in copies of those projects and pass Strict Check
+with no errors or warnings in light and dark mode at 1280px and 375px. Each
+was looked at as a full-page picture at 1280px, and at least one page of each
+theme in dark mode and at 375px.
 
 Not tested yet: a Next.js project (where the extra font-weight import is also
 untried), the Nuxt UI output of any theme but Strict One, and the dark mode of

@@ -73,12 +73,12 @@ const roadmap = [
   },
   {
     name: "Free themes",
-    body: "Eighteen themes with light and dark modes, served as a shadcn registry.",
+    body: "Twenty-three themes with light and dark modes, served as a shadcn registry.",
     status: "Built",
   },
   {
     name: "Page prompts",
-    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and eighty-six more. Five for each of the eighteen themes, each with a preview of the page built from it.",
+    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and 111 more. Five for each of the twenty-three themes, each with a preview of the page built from it.",
     status: "In testing",
   },
   {
@@ -124,7 +124,7 @@ const BACKDROP_COLUMNS = 60
 
 <Layout
   title="Strict: themes and guardrails for AI-built UI"
-  description="A Strict theme is one DESIGN.md file your coding agent reads and a linter checks. Eighteen free themes install into shadcn with one command."
+  description="A Strict theme is one DESIGN.md file your coding agent reads and a linter checks. Twenty-three free themes install into shadcn with one command."
 >
   <section class="relative border-b border-border">
     <div aria-hidden="true" class="column-backdrop pointer-events-none absolute inset-0 hidden md:grid">
@@ -139,8 +139,8 @@ const BACKDROP_COLUMNS = 60
       </h1>
       <p class="rise md:col-span-6" style="--i:2">
         A Strict theme is one DESIGN.md file: tokens an agent can read, rules a
-        linter can check, and exports for shadcn, Tailwind and Nuxt UI. Eighteen
-        themes and ninety page prompts, all free.
+        linter can check, and exports for shadcn, Tailwind and Nuxt UI. Twenty-three
+        themes and 115 page prompts, all free.
       </p>
       <div class="rise flex flex-wrap items-center gap-4 md:col-span-12" style="--i:3">
         <a
@@ -149,7 +149,7 @@ const BACKDROP_COLUMNS = 60
         >
           Browse the themes
         </a>
-        <a href="/spec" class="label text-primary underline underline-offset-4">
+        <a href="/spec" class="label text-link underline underline-offset-4">
           Read the spec format
         </a>
       </div>
@@ -164,7 +164,7 @@ const BACKDROP_COLUMNS = 60
   </section>
 
   <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
-    <SectionHeader number="01" label="Themes" title="Eighteen themes, free to use." />
+    <SectionHeader number="01" label="Themes" title="Twenty-three themes, free to use." />
     <p class="max-w-measure text-muted-foreground">
       Each one is a different job and a different look: a shop, a bank, a newspaper, a public
       service, a launch night. Every card below is drawn in its theme's own colors, fonts and
@@ -181,7 +181,7 @@ const BACKDROP_COLUMNS = 60
       <li class={closingTileInThemeGrid(themes.length)}>
         <MoreTile
           label="Your own"
-          title="Or write the nineteenth."
+          title="Or write the twenty-fourth."
           href="/spec"
           link="Read the spec format"
         >
@@ -202,8 +202,8 @@ const BACKDROP_COLUMNS = 60
               Nothing in this box is styled by hand. Install a theme and the components you
               already have take its colors, corners and fonts.
             </p>
-            <a href="/themes" class="label text-primary underline underline-offset-4">
-              See all eighteen this way
+            <a href="/themes" class="label text-link underline underline-offset-4">
+              See all twenty-three this way
             </a>
           </div>
           <div class="md:col-span-8">
@@ -248,12 +248,12 @@ const BACKDROP_COLUMNS = 60
                 <p class="label text-muted-foreground">{theme.name}</p>
                 <h3 class="text-h2">{prompt.title}</h3>
                 <p class="flex flex-wrap gap-x-4 gap-y-2">
-                  <a href={urls.preview} class="label text-primary underline underline-offset-4">
+                  <a href={urls.preview} class="label text-link underline underline-offset-4">
                     Preview<span class="sr-only"> the {prompt.title} page</span>
                   </a>
                   <a
                     href={`/themes/${theme.slug}`}
-                    class="label text-primary underline underline-offset-4"
+                    class="label text-link underline underline-offset-4"
                   >
                     All {count} {theme.name} prompts
                   </a>
@@ -269,7 +269,7 @@ const BACKDROP_COLUMNS = 60
               link="Browse the themes"
             >
               <p>
-                These are eighteen of the pages. Each theme's own page lists its five prompts,
+                These are twenty-three of the pages. Each theme's own page lists its five prompts,
                 with the page built from each one, and a button that copies the prompt.
               </p>
             </MoreTile>
@@ -332,7 +332,7 @@ const BACKDROP_COLUMNS = 60
           }
         </dl>
         <p>
-          <a href={CHECK_DOCS_URL} class="label text-primary underline underline-offset-4">
+          <a href={CHECK_DOCS_URL} class="label text-link underline underline-offset-4">
             Read the Strict Check guide
           </a>
         </p>

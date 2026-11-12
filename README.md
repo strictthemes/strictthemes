@@ -55,7 +55,7 @@ Failed: 67.7% of 93 measured values follow the theme. 6 errors, 0 warnings.
 
 ## Themes
 
-Eighteen themes, each with a light and a dark mode and five page prompts.
+Twenty-three themes, each with a light and a dark mode and five page prompts.
 Every link opens the theme's page, with a live preview and the pages built
 from its prompts.
 
@@ -79,6 +79,11 @@ from its prompts.
 | [Ember](https://strictthemes.com/themes/ember) | A hot, dark-first theme for games, esports and sport. Blue-black, ember red, and an amber signal from the same fire. |
 | [Gauge](https://strictthemes.com/themes/gauge) | A plain, exact theme for hardware, parts and spec sheets. Nine steel greys, dense tables, and no accent color at all. |
 | [Confetti](https://strictthemes.com/themes/confetti) | A light, cheerful theme for invitations, parties and gift lists. Lilac-white paper, plum ink, and pastel pink, sky and lilac. |
+| [Tideline](https://strictthemes.com/themes/tideline) | A sunny, sturdy theme for surf schools, outdoor centres and the coast. Sand paper, deep-sea ink, and lagoon, sun and coral in flat blocks. |
+| [Relay](https://strictthemes.com/themes/relay) | A fast, loud theme for sports clubs, leagues and race days. White kit, navy bands, an amber main action, and scores set large. |
+| [Veranda](https://strictthemes.com/themes/veranda) | A warm, unhurried theme for guesthouses, small hotels and places to stay. Cream paper, slate ink, and clay, sage and sand used sparingly. |
+| [Solace](https://strictthemes.com/themes/solace) | A soft, steady theme for therapists, coaches and private practices. Blush paper, indigo ink, and mauve greys with no signal color. |
+| [Primer](https://strictthemes.com/themes/primer) | A bright, clear theme for courses, schools and learning tools. Cream paper, deep-teal ink, a blue action, and four chart colors. |
 
 To write your own, read [the spec format](https://strictthemes.com/spec) and
 lint the file as you go:
@@ -138,7 +143,7 @@ and a GitHub Actions example.
 | Package | What it does | Status |
 |---|---|---|
 | [`@strictthemes/spec`](packages/spec) | Parses, lints and exports Strict design specs (`DESIGN.md` + a `strict` rules block). Everything else builds on it. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/spec) |
-| [`@strictthemes/themes`](packages/themes) | The eighteen themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
+| [`@strictthemes/themes`](packages/themes) | The twenty-three themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
 | [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. The MCP server also serves the themes and page prompts. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
 | [`@strictthemes/site`](apps/site) | strictthemes.com, built with Astro: theme pages with live previews, a built example page for every page prompt, the registry and the spec docs. | Live |
 | [`@strictthemes/mcp`](apps/mcp) | The themes and page prompts as a hosted MCP server, a Cloudflare Worker. | Live at mcp.strictthemes.com |

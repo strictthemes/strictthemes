@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto"
 
-import { fontRoles, type StrictSpec } from "@strictthemes/spec"
+import { contrastRatio, fontRoles, parseColor, type StrictSpec } from "@strictthemes/spec"
 import {
   buildRegistryFromThemes,
   FONTS,
@@ -105,6 +105,11 @@ const ORDER = [
   "ember",
   "gauge",
   "confetti",
+  "tideline",
+  "relay",
+  "veranda",
+  "solace",
+  "primer",
 ]
 const rank = (slug: string) =>
   ORDER.includes(slug) ? ORDER.indexOf(slug) : ORDER.length
@@ -200,6 +205,17 @@ const declarations = (vars: Record<string, string>): string =>
     .join("")
 
 /**
+ * The color of a text link on the page: the theme's primary color where it can
+ * be read there, and the text color where it cannot (Relay's amber is a fill).
+ */
+function linkColor(vars: Record<string, string>): string {
+  const primary = parseColor(vars.primary ?? "")
+  const background = parseColor(vars.background ?? "")
+  const readable = primary && background && contrastRatio(primary, background) >= 4.5
+  return (readable ? vars.primary : vars.foreground) ?? "currentColor"
+}
+
+/**
  * CSS that scopes every theme's variables to `[data-theme="<slug>"]`, and its
  * dark values to `[data-mode="dark"]` on the same element. `:root` gets the
  * site's own theme.
@@ -223,8 +239,8 @@ export function themeScopeCss(): string {
           ? `:root,[data-theme="${theme.slug}"]`
           : `[data-theme="${theme.slug}"]`
       return (
-        `${selector}{${declarations(theme.light)}${fonts}}` +
-        `[data-theme="${theme.slug}"][data-mode="dark"]{${declarations(theme.dark)}}`
+        `${selector}{${declarations(theme.light)}${declarations({ link: linkColor(theme.light) })}${fonts}}` +
+        `[data-theme="${theme.slug}"][data-mode="dark"]{${declarations(theme.dark)}${declarations({ link: linkColor(theme.dark) })}}`
       )
     })
     .join("\n")

@@ -27,6 +27,11 @@ const PAGES: [slug: string, name: string, pages: string[]][] = [
   ["ember", "Ember", ["game", "patch", "leaderboard", "store", "player"]],
   ["gauge", "Gauge", ["catalogue", "part", "compare", "quote", "downloads"]],
   ["confetti", "Confetti", ["invitation", "rsvp", "gifts", "day", "guestbook"]],
+  ["tideline", "Tideline", ["home", "lessons", "forecast", "booking", "guide"]],
+  ["relay", "Relay", ["home", "fixtures", "standings", "membership", "report"]],
+  ["veranda", "Veranda", ["home", "rooms", "room", "reserve", "menu"]],
+  ["solace", "Solace", ["home", "approach", "profile", "fees", "appointment"]],
+  ["primer", "Primer", ["catalogue", "course", "lesson", "progress", "plans"]],
 ]
 const THEMES = PAGES.map(([slug]) => slug)
 

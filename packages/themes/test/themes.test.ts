@@ -51,11 +51,12 @@ test('Strict One loads every weight of its mono font and has a tertiary class', 
   assert.equal(item.cssVars?.dark?.tertiary, '#FF4F00')
 })
 
-test('there are eighteen themes with unique names', () => {
+test('there are twenty-three themes with unique names', () => {
   assert.deepEqual(themes.map((t) => t.slug), [
     'atelier', 'avion', 'cipher', 'civic', 'confetti', 'counsel', 'dispatch',
-    'ember', 'gauge', 'kiln', 'ledger', 'nocturne', 'passage', 'recital',
-    'sorbet', 'strict-one', 'tisane', 'voltage',
+    'ember', 'gauge', 'kiln', 'ledger', 'nocturne', 'passage', 'primer',
+    'recital', 'relay', 'solace', 'sorbet', 'strict-one', 'tideline', 'tisane',
+    'veranda', 'voltage',
   ])
   assert.equal(new Set(themes.map((t) => t.spec.name)).size, themes.length)
 })
@@ -242,6 +243,11 @@ test('prompts: a theme with page prompts has five, in reading order', () => {
     ember: ['game', 'patch', 'leaderboard', 'store', 'player'],
     gauge: ['catalogue', 'part', 'compare', 'quote', 'downloads'],
     confetti: ['invitation', 'rsvp', 'gifts', 'day', 'guestbook'],
+    tideline: ['home', 'lessons', 'forecast', 'booking', 'guide'],
+    relay: ['home', 'fixtures', 'standings', 'membership', 'report'],
+    veranda: ['home', 'rooms', 'room', 'reserve', 'menu'],
+    solace: ['home', 'approach', 'profile', 'fees', 'appointment'],
+    primer: ['catalogue', 'course', 'lesson', 'progress', 'plans'],
   }
   // Every theme has page prompts.
   assert.deepEqual(themes.map((t) => t.slug).sort(), Object.keys(pages).sort())

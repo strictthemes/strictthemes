@@ -40,7 +40,7 @@ const html = parsed.replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
         {
           contents.map((item, index) => (
             <li class="border-b border-border">
-              <a href={`#${item.id}`} class="flex gap-4 py-2 hover:text-primary">
+              <a href={`#${item.id}`} class="flex gap-4 py-2 hover:text-link">
                 <span class="label py-1 text-muted-foreground">{String(index + 1).padStart(2, "0")}</span>
                 <span>{item.title}</span>
               </a>

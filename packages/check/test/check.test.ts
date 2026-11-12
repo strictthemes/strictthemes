@@ -307,6 +307,9 @@ test('rendered: what cannot be seen or is not the page author\'s is left alone',
   assert.deepEqual(rulesFound([element({ fontSize: 36, fontWeight: 700, color: [107, 107, 107, 0.75] })]), [])
   // A neutral shadow is not a glow; a one-color fade is not a multi-color gradient.
   assert.deepEqual(rulesFound([element({ boxShadow: 'rgba(0, 0, 0, 0.1) 0px 1px 2px 0px' })]), [])
+  // A shadow layer of no size draws nothing, whatever its color: `ring-0` leaves one in the text color.
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgb(7, 59, 76) 0px 0px 0px 0px' })]), [])
+  assert.deepEqual(rulesFound([element({ boxShadow: 'rgb(7, 59, 76) 0px 0px 0px 0px, rgb(7, 59, 76) 0px 0px 0px 3px' })]), ['tell-glow'])
   assert.deepEqual(rulesFound([element({ backgroundImage: 'linear-gradient(rgb(245, 245, 244), rgb(255, 255, 255))', backdrop: null })]), [])
 })
 

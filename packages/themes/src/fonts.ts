@@ -370,4 +370,104 @@ export const FONTS: Record<string, FontSource> = {
     import: 'Ubuntu_Sans_Mono',
     dependency: '@fontsource-variable/ubuntu-sans-mono',
   },
+  // Tideline
+  'Epilogue': {
+    cssFamily: 'Epilogue Variable',
+    generic: 'sans-serif',
+    import: 'Epilogue',
+    dependency: '@fontsource-variable/epilogue',
+  },
+  'Manrope': {
+    cssFamily: 'Manrope Variable',
+    generic: 'sans-serif',
+    import: 'Manrope',
+    dependency: '@fontsource-variable/manrope',
+  },
+  'Geist Mono': {
+    cssFamily: 'Geist Mono Variable',
+    generic: 'monospace',
+    import: 'Geist_Mono',
+    dependency: '@fontsource-variable/geist-mono',
+  },
+  // Relay
+  'Saira': {
+    cssFamily: 'Saira Variable',
+    generic: 'sans-serif',
+    import: 'Saira',
+    dependency: '@fontsource-variable/saira',
+  },
+  'Rubik': {
+    cssFamily: 'Rubik Variable',
+    generic: 'sans-serif',
+    import: 'Rubik',
+    dependency: '@fontsource-variable/rubik',
+  },
+  'Kode Mono': {
+    cssFamily: 'Kode Mono Variable',
+    generic: 'monospace',
+    import: 'Kode_Mono',
+    dependency: '@fontsource-variable/kode-mono',
+  },
+  // Veranda
+  'Cormorant': {
+    cssFamily: 'Cormorant Variable',
+    generic: 'serif',
+    import: 'Cormorant',
+    dependency: '@fontsource-variable/cormorant',
+    italic: 'wght-italic.css',
+  },
+  'Outfit': {
+    cssFamily: 'Outfit Variable',
+    generic: 'sans-serif',
+    import: 'Outfit',
+    dependency: '@fontsource-variable/outfit',
+  },
+  'Cutive Mono': {
+    cssFamily: 'Cutive Mono',
+    generic: 'monospace',
+    import: 'Cutive_Mono',
+    dependency: '@fontsource/cutive-mono',
+    weight: ['400'],
+  },
+  // Solace
+  'Literata': {
+    cssFamily: 'Literata Variable',
+    generic: 'serif',
+    import: 'Literata',
+    dependency: '@fontsource-variable/literata',
+    italic: 'wght-italic.css',
+  },
+  'Mulish': {
+    cssFamily: 'Mulish Variable',
+    generic: 'sans-serif',
+    import: 'Mulish',
+    dependency: '@fontsource-variable/mulish',
+    italic: 'wght-italic.css',
+  },
+  'Xanh Mono': {
+    cssFamily: 'Xanh Mono',
+    generic: 'monospace',
+    import: 'Xanh_Mono',
+    dependency: '@fontsource/xanh-mono',
+    weight: ['400'],
+  },
+  // Primer
+  'Lexend': {
+    cssFamily: 'Lexend Variable',
+    generic: 'sans-serif',
+    import: 'Lexend',
+    dependency: '@fontsource-variable/lexend',
+  },
+  'Plus Jakarta Sans': {
+    cssFamily: 'Plus Jakarta Sans Variable',
+    generic: 'sans-serif',
+    import: 'Plus_Jakarta_Sans',
+    dependency: '@fontsource-variable/plus-jakarta-sans',
+  },
+  'Fira Code': {
+    cssFamily: 'Fira Code Variable',
+    generic: 'monospace',
+    import: 'Fira_Code',
+    dependency: '@fontsource-variable/fira-code',
+  },
 }

@@ -449,9 +449,9 @@ browser involved.
   layout.
 - **In CI (2026-11-12).** The site's check runs in this repo's GitHub
   Actions workflow on every pull request and on `master`: the source, without
-  the ninety example projects (`--exclude examples`), and the home,
-  themes, spec, Strict One and 404 pages in light mode. It passes at 100% of
-  15,202 measured values, with no errors and no warnings, on an
+  the example projects (`--exclude examples`), and the home, themes, spec,
+  Strict One and 404 pages in light mode. With eighteen themes on the site it
+  passed at 100% of 15,202 measured values, with no errors and no warnings, on an
   `ubuntu-latest` runner with the runner's own Chrome.
 - Before the repo moved to GitHub the same check ran in a GitLab pipeline, in
   a `node:24` image with Chromium from Debian's packages, and measured the

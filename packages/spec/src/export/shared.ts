@@ -36,7 +36,8 @@ export function cssFontFamily(value: string): string {
 }
 
 const MONO_HINT = /mono|code|courier|consolas|menlo/i
-const SERIF_HINT = /serif|georgia|times|garamond|playfair|merriweather|baskerville|caslon|didot|bodoni/i
+const SERIF_HINT =
+  /serif|georgia|times|garamond|playfair|merriweather|baskerville|caslon|didot|bodoni|fraunces|newsreader|marcellus|caprasimo|cormorant|literata/i
 
 /**
  * A quoted font stack that ends in a generic family, so text still renders in

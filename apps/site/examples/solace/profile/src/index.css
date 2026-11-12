@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/mulish/wght-italic.css";
+@import "@fontsource-variable/literata/wght-italic.css";
+@import "@fontsource-variable/mulish";
+@import "@fontsource/xanh-mono";
+@import "@fontsource-variable/literata";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Literata Variable', serif;
+    --font-sans: 'Mulish Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: 6px;
+    --radius-md: 12px;
+    --radius-lg: var(--radius);
+    --radius-xl: 20px;
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+    --text-display: 56px;
+    --text-display--line-height: 1.1;
+    --text-display--font-weight: 400;
+    --text-display--letter-spacing: -0.01em;
+    --text-h1: 38px;
+    --text-h1--line-height: 1.2;
+    --text-h1--font-weight: 400;
+    --text-h2: 24px;
+    --text-h2--line-height: 1.3;
+    --text-h2--font-weight: 500;
+    --text-body: 17px;
+    --text-body--line-height: 1.7;
+    --text-body--font-weight: 400;
+    --text-label: 14px;
+    --text-label--line-height: 1.3;
+    --text-label--font-weight: 400;
+    --text-label--letter-spacing: 0.02em;
+    --color-tertiary: var(--tertiary);
+    --color-tertiary-foreground: var(--tertiary-foreground);
+    --font-mono: 'Xanh Mono', monospace;
+}
+
+:root {
+    --background: #F2E9E4;
+    --foreground: #22223B;
+    --card: #FAF5F2;
+    --card-foreground: #22223B;
+    --popover: #FAF5F2;
+    --popover-foreground: #22223B;
+    --primary: #22223B;
+    --primary-foreground: #F2E9E4;
+    --secondary: #C9ADA7;
+    --secondary-foreground: #22223B;
+    --muted: #e8dfdc;
+    --muted-foreground: #4A4E69;
+    --accent: #e9e4e3;
+    --accent-foreground: #22223B;
+    --destructive: #9B2C2C;
+    --border: #DFD0C9;
+    --input: #DFD0C9;
+    --ring: #22223B;
+    --chart-1: #bdbfee;
+    --chart-2: #9d9ed8;
+    --chart-3: #8182c0;
+    --chart-4: #6767a3;
+    --chart-5: #515186;
+    --radius: 12px;
+    --sidebar: #FAF5F2;
+    --sidebar-foreground: #22223B;
+    --sidebar-primary: #22223B;
+    --sidebar-primary-foreground: #F2E9E4;
+    --sidebar-accent: #e9e4e3;
+    --sidebar-accent-foreground: #22223B;
+    --sidebar-border: #DFD0C9;
+    --sidebar-ring: #22223B;
+    --tertiary: #9A8C98;
+    --tertiary-foreground: #22223B;
+}
+
+.dark {
+    --background: #191929;
+    --foreground: #F2E9E4;
+    --card: #22223B;
+    --card-foreground: #F2E9E4;
+    --popover: #22223B;
+    --popover-foreground: #F2E9E4;
+    --primary: #C9ADA7;
+    --primary-foreground: #22223B;
+    --secondary: #4A4E69;
+    --secondary-foreground: #F2E9E4;
+    --muted: #242332;
+    --muted-foreground: #B8ADB6;
+    --accent: #333249;
+    --accent-foreground: #F2E9E4;
+    --destructive: #F0A3A3;
+    --border: #3A3B57;
+    --input: #3A3B57;
+    --ring: #C9ADA7;
+    --chart-1: #c9ada7;
+    --chart-2: #be9b94;
+    --chart-3: #a47f77;
+    --chart-4: #89655d;
+    --chart-5: #6f4f48;
+    --sidebar: #22223B;
+    --sidebar-foreground: #F2E9E4;
+    --sidebar-primary: #C9ADA7;
+    --sidebar-primary-foreground: #22223B;
+    --sidebar-accent: #333249;
+    --sidebar-accent-foreground: #F2E9E4;
+    --sidebar-border: #3A3B57;
+    --sidebar-ring: #C9ADA7;
+    --tertiary: #9A8C98;
+    --tertiary-foreground: #22223B;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+  html {
+    @apply font-sans;
+    }
+  code, kbd, pre, samp {
+    @apply font-mono;
+    }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+    }
+}
