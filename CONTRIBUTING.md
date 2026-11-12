@@ -42,6 +42,7 @@ The repo is an npm workspace:
 | `packages/themes` | The themes, their page prompts and the registry build |
 | `packages/check` | Strict Check: the command, the MCP server and the library |
 | `apps/site` | strictthemes.com |
+| `apps/mcp` | The hosted MCP server, a Cloudflare Worker |
 | `skills/strict-check` | The skill for coding agents |
 
 Run the site locally with `npm run dev --workspace @strictthemes/site`.

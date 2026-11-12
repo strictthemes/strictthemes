@@ -397,6 +397,12 @@ test("the home page and llms.txt say how to run Strict Check", () => {
   assert.ok(read("llms.txt").includes(command))
 })
 
+test("the home page and llms.txt give the address of the hosted MCP server", () => {
+  const address = "https://mcp.strictthemes.com/mcp"
+  assert.ok(read("index.html").includes(`<code data-command>${address}</code>`))
+  assert.ok(read("llms.txt").includes(`(${address})`))
+})
+
 test("the header links to the code, and buttons that copy can be told apart", () => {
   const repo = "https://github.com/strictthemes/strictthemes"
   assert.match(read("index.html"), new RegExp(`<header[\\s\\S]*href="${repo}"[\\s\\S]*</header>`))

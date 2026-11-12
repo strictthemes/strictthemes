@@ -117,6 +117,17 @@ for a theme's `DESIGN.md` and install command, `list_prompts` and
 `get_prompt` for the page prompts. Ask for "a pricing page in a Strict
 theme" and the agent fetches the brief itself.
 
+For the themes alone there is nothing to install. The same four tools are
+hosted at `https://mcp.strictthemes.com/mcp`:
+
+```json
+{
+  "mcpServers": {
+    "strict-themes": { "type": "http", "url": "https://mcp.strictthemes.com/mcp" }
+  }
+}
+```
+
 Or give it the [skill](skills/strict-check/SKILL.md), which says when to run
 the check, how to read the report and how to fix each rule. The
 [guide](packages/check#readme) has every option, the rules, and a GitLab CI
@@ -130,6 +141,7 @@ and a GitHub Actions example.
 | [`@strictthemes/themes`](packages/themes) | The eighteen themes, five page prompts for each, and the build that turns them into a shadcn registry. | First version, served from strictthemes.com/r |
 | [`@strictthemes/check`](packages/check) | Strict Check: checks a project's code and its rendered pages against a spec, and scores it. Command, MCP server and library. The MCP server also serves the themes and page prompts. | First version, [on npm](https://www.npmjs.com/package/@strictthemes/check) |
 | [`@strictthemes/site`](apps/site) | strictthemes.com, built with Astro: theme pages with live previews, a built example page for every page prompt, the registry and the spec docs. | Live |
+| [`@strictthemes/mcp`](apps/mcp) | The themes and page prompts as a hosted MCP server, a Cloudflare Worker. | Live at mcp.strictthemes.com |
 | [`skills/strict-check`](skills/strict-check/SKILL.md) | The skill that has a coding agent run Strict Check on its own work. | First version |
 
 Planned: a generator that writes a `DESIGN.md` from a site's address, theme

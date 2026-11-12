@@ -33,3 +33,6 @@ export const NPM_URL = {
 
 /** Strict Check's own guide: every option, the rules, the MCP server and CI. */
 export const CHECK_DOCS_URL = `${REPO_URL}/tree/master/packages/check#readme`
+
+/** The hosted MCP server: the themes and their page prompts for a client that takes an address. */
+export const MCP_URL = "https://mcp.strictthemes.com/mcp"

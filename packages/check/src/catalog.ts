@@ -41,7 +41,7 @@ export type CatalogTheme = z.infer<typeof themeSchema>
 export type CatalogPrompt = z.infer<typeof promptSchema>
 
 /** The site the themes are read from, without a slash at the end. */
-export function catalogBase(env: Record<string, string | undefined> = process.env): string {
+export function catalogBase(env: Record<string, string | undefined> = typeof process === 'undefined' ? {} : process.env): string {
   const base = (env.STRICT_THEMES_URL ?? '').trim() || CATALOG_URL
   if (!/^https?:\/\//.test(base)) throw new CatalogError(`STRICT_THEMES_URL is "${base}", which is not an http or https address.`)
   return base.replace(/\/+$/, '')

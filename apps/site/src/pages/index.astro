@@ -6,7 +6,7 @@ import SectionHeader from "@/components/SectionHeader.astro"
 import ThemeCard from "@/components/ThemeCard.astro"
 import { ThemePreview } from "@/components/ThemePreview"
 import Layout from "@/layouts/Base.astro"
-import { CHECK_DOCS_URL } from "@/lib/brand"
+import { CHECK_DOCS_URL, MCP_URL } from "@/lib/brand"
 import { closingTileInPageGrid, closingTileInThemeGrid } from "@/lib/grid"
 import { REPORT_SAMPLE } from "@/lib/report-sample"
 import { exampleFor, promptUrls, themes } from "@/lib/themes"
@@ -233,6 +233,13 @@ const BACKDROP_COLUMNS = 60
           a dashboard, a shop and more. The pages below were each built from one prompt, and
           are shown as they came out.
         </p>
+        <div class="flex max-w-measure flex-col gap-2">
+          <Command command={MCP_URL} label="Or connect your agent to the MCP server" />
+          <p class="text-muted-foreground">
+            With that address in its MCP settings, an agent lists the themes and fetches a
+            prompt by itself.
+          </p>
+        </div>
         <ul class="grid gap-8 md:grid-cols-3">
           {pages.map(({ theme, prompt, urls, count }) => (
             <li class="flex flex-col gap-4">

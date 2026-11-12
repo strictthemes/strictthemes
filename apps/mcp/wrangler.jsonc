@@ -1,0 +1,15 @@
+// The hosted MCP server, as a Cloudflare Worker. `npm run dev -w apps/mcp` runs it on this machine;
+// `npm run deploy -w apps/mcp` puts it online, for someone signed in to the Cloudflare account that
+// holds strictthemes.com.
+{
+  "name": "strict-themes-mcp",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-10-01",
+  // The MCP library reads a little of Node's standard library.
+  "compatibility_flags": ["nodejs_compat"],
+  // Served at its own address under the site's domain, and not at a workers.dev one.
+  "routes": [{ "pattern": "mcp.strictthemes.com", "custom_domain": true }],
+  "workers_dev": false,
+  // Keeps the Worker's request log, to see whether it is used and whether it fails.
+  "observability": { "enabled": true }
+}

@@ -389,10 +389,12 @@ A client then connects to `https://your-site/mcp`:
 }
 ```
 
-The handler behind the command, `handleThemesRequest` in
-[src/http.ts](src/http.ts), takes a web `Request` and returns a `Response`.
-That is the shape a function on Netlify, Cloudflare Workers, Deno or Bun has,
-but it has only been run in Node.
+The server behind the command, `answerThemesSite` in
+[src/themes-http.ts](src/themes-http.ts), takes a web `Request` and returns a
+`Response`, and uses nothing of Node. [apps/mcp](../../apps/mcp) runs it as a
+Cloudflare Worker, and that is the server at
+`https://mcp.strictthemes.com/mcp`: connect to it if you only want the themes
+and have no reason to host your own.
 
 ### Skill
 

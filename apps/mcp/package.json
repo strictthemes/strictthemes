@@ -1,0 +1,13 @@
+{
+  "name": "@strictthemes/mcp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "mcp.strictthemes.com: the Strict themes and their page prompts as a hosted MCP server, on Cloudflare Workers.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "npx -y wrangler@4 dev",
+    "deploy": "npx -y wrangler@4 deploy",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  }
+}
