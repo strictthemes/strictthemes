@@ -133,6 +133,11 @@ hosted at `https://mcp.strictthemes.com/mcp`:
 }
 ```
 
+Have a site and no spec? `npx @strictthemes/check generate https://your-site.example`
+measures its pages on your machine and writes a `DESIGN.md` from the colors,
+type, spacing and corners they use, with a `strict` block. It is a starting
+point: the roles and the notes need a read.
+
 Or give it the [skill](skills/strict-check/SKILL.md), which says when to run
 the check, how to read the report and how to fix each rule. The
 [guide](packages/check#readme) has every option, the rules, the GitHub Action

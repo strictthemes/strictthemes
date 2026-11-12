@@ -4,6 +4,7 @@ import { extname, join, normalize, resolve, sep } from 'node:path'
 import type { Browser } from 'playwright-core'
 import { collect } from './collect.ts'
 import { evaluatePage } from './evaluate.ts'
+import type { MeasuredPage } from './generate.ts'
 import { BASE_MODE, type Rules } from './rules.ts'
 import { mergeResults, STATES, type CheckResult, type State } from './types.ts'
 
@@ -191,4 +192,53 @@ export async function checkRendered(baseUrl: string, rules: Rules, options: Rend
     await browser.close()
   }
   return { ...mergeResults(results), scope: { paths, modes, widths, ...(states.length > 0 ? { states } : {}) } }
+}
+
+export interface MeasureOptions {
+  /** Pages to measure on the site. Default: `/`. */
+  paths?: string[]
+  /** Path to a Chromium-based browser. Default: the Chrome installed on this machine. */
+  browser?: string
+  /** Milliseconds to wait after the page loads. Default: 800, as a site that is not yours may render late. */
+  settle?: number
+}
+
+/**
+ * Opens each page of a running site at 1280px and measures it, as it loads
+ * and with dark mode asked for: the browser's color scheme set to dark, and
+ * when that changes nothing, the class `dark` on `<html>` too. The dark
+ * measurement is kept only when the page's own color then differs.
+ */
+export async function measurePages(baseUrl: string, options: MeasureOptions = {}): Promise<MeasuredPage[]> {
+  const paths = options.paths?.length ? options.paths : ['/']
+  const browser = await launch(options.browser)
+  const measured: MeasuredPage[] = []
+  try {
+    for (const path of paths) {
+      const href = new URL(path, baseUrl).href
+      const open = async (scheme: 'light' | 'dark', withClass: boolean) => {
+        const context = await browser.newContext({ colorScheme: scheme, viewport: { width: 1280, height: 900 } })
+        try {
+          const page = await context.newPage()
+          const response = await page.goto(href, { waitUntil: 'load', timeout: 45000 })
+          if (!response || !response.ok()) throw new Error(`${href} answered ${response ? response.status() : 'nothing'}.`)
+          await page.addStyleTag({ content: NO_MOTION }).catch(() => undefined)
+          if (withClass) await page.evaluate(() => document.documentElement.classList.add('dark'))
+          await page.evaluate(() => document.fonts.ready.then(() => undefined))
+          await page.waitForTimeout(options.settle ?? 800)
+          return await page.evaluate(collect, {})
+        } finally {
+          await context.close()
+        }
+      }
+      const light = await open('light', false)
+      const differs = (data: typeof light): boolean => data.canvas.some((channel, index) => channel !== light.canvas[index])
+      let dark = await open('dark', false)
+      if (!differs(dark)) dark = await open('dark', true)
+      measured.push({ path: href, light, ...(differs(dark) ? { dark } : {}) })
+    }
+  } finally {
+    await browser.close()
+  }
+  return measured
 }

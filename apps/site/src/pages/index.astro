@@ -321,6 +321,10 @@ const BACKDROP_COLUMNS = 60
           agent run it and fix what it finds.
         </p>
         <Command command="npx @strictthemes/check . --dist dist" label="Run it in a project with a DESIGN.md" />
+        <Command
+          command="npx @strictthemes/check generate https://your-site.example"
+          label="No DESIGN.md yet? Measure a site you have and write one"
+        />
         <dl class="flex flex-col">
           {
             checks.map((item) => (

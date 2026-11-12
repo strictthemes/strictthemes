@@ -42,8 +42,10 @@ strict-check [dir] [options]
                    report, any other the text. Repeat for more.
 ```
 
-`strict-check mcp` starts the MCP server instead, and `strict-check mcp --http`
-the hosted one; see below.
+`strict-check generate <url>` writes a spec from a site instead of checking
+one; see [Start from a site you have](#start-from-a-site-you-have).
+`strict-check mcp` starts the MCP server, and `strict-check mcp --http` the
+hosted one; see below.
 
 Exit code: `0` when there are no errors, `1` when there are, `2` when the
 check could not run (no spec, a spec with errors, no browser). Warnings do
@@ -52,6 +54,53 @@ not fail a check.
 The rendered check needs a Chromium-based browser. It uses the Chrome or Edge
 already on the machine, or the Chromium a Linux system installs from its own
 packages, and downloads nothing.
+
+## Start from a site you have
+
+No `DESIGN.md` yet, but a site that already looks the way you want? Measure
+it:
+
+```bash
+npx @strictthemes/check generate https://your-site.example --path / --path /pricing
+```
+
+It opens each page at 1280px on your machine, in the same headless browser
+the check uses, and writes a `DESIGN.md` from what the pages use:
+
+- **Colors**, each with the role the pages give it: the page, its main text,
+  the fill of most links and buttons as `primary` with the text on it,
+  quieter text, a surface, the commonest border. What is left gets a name
+  from its hue (`blue`, `grey-2`).
+- **Type:** the body size, one smaller size as `label`, and up to three
+  larger ones, each with its font, weight, line height and letter spacing.
+- **Spacing:** the paddings, margins and gaps used most, up to eight steps.
+- **Corners:** up to three radii, and the largest fully round box.
+- **A dark mode,** when the page looks different with the browser's color
+  scheme set to dark or with the class `dark` on `<html>`.
+- **A `strict` block,** so the check can hold new UI to all of it.
+
+```
+strict-check generate <url> [options]
+
+--path <path>      A page to measure. Repeat for more. Default: the url's own path.
+--out <file>       Where to write the spec. Default: DESIGN.md
+--name <name>      The spec's name. Default: the site's host name.
+--browser <path>   A Chromium-based browser to use.
+--force            Replace the file when it is there.
+```
+
+Then it checks the same pages against the new spec and prints the share that
+follows it, and lists what it could not settle. A tidy site comes out near
+100%. A site with many one-off values does not, and the list says which
+colors, sizes and spacings were left out: add the ones that belong, or fix
+the rest on the site.
+
+The spec is a starting point. It records what the pages do, not what was
+meant: its prose sections say what was measured and ask for your words. Read
+the roles before you trust them. Measure your own site, or one whose design
+you may take.
+
+Nothing is sent anywhere: the pages are read by the browser on your machine.
 
 ## What it checks
 
@@ -458,6 +507,10 @@ gives the text of `--rules`.
 it takes what `collect()` measured in a page and returns findings, with no
 browser involved.
 
+`measurePages(url, { paths })` measures a site's pages in light and dark,
+and `generateSpec(measured, { name, source, date })` turns that into the text
+of a `DESIGN.md` and a list of notes. The `generate` command is those two.
+
 ## What was tested
 
 - The five pages built from the Strict One prompts (landing, pricing, article,
@@ -528,6 +581,23 @@ browser involved.
   in this repo's workflow, on Linux, from the first push that holds it.
 - The package is on npm since 2026-11-12. No one outside this repo is known
   to have run it.
+
+## What the generator does not do
+
+- **It was tried on six pages,** not on many: two of this repo's example
+  pages, where it gave back the theme's type scale, spacing and corners
+  exactly, this repo's home page, and the home pages of three public sites,
+  where some roles needed a read. No one outside this repo is known to have
+  run it.
+- **It reads one width.** What changes on a phone is not measured.
+- **It cannot name intent.** A color used once on a badge and a brand color
+  look the same to it apart from how often they appear.
+- **A dark mode is found two ways only:** the browser's color scheme, and
+  the class `dark`. A site that switches with `data-theme` or a script gets
+  a light spec.
+- **Hover and focus colors are not measured,** so a hover color that is not
+  used elsewhere on the page is missing from the spec.
+- **Pages behind a login** cannot be opened.
 
 ## What it does not check yet
 

@@ -48,7 +48,7 @@ export const GET: APIRoute = () => {
     "## Tools",
     "",
     `- [MCP server for the themes](${MCP_URL}): connect an MCP client to this address (Streamable HTTP, no key) to list the themes, get a theme's DESIGN.md and install command, and fetch a page prompt. Its tools are \`list_themes\`, \`get_theme\`, \`list_prompts\` and \`get_prompt\`.`,
-    `- [Strict Check](${CHECK_DOCS_URL}): checks a project's code and its built pages against its DESIGN.md, and lists every value that is off the theme. Run \`npx @strictthemes/check . --dist dist\` in a project with a DESIGN.md in its root. It also runs in CI and as an MCP server (\`npx -y @strictthemes/check mcp\`), which has tools for the check and for reading these themes and page prompts.`,
+    `- [Strict Check](${CHECK_DOCS_URL}): checks a project's code and its built pages against its DESIGN.md, and lists every value that is off the theme. Run \`npx @strictthemes/check . --dist dist\` in a project with a DESIGN.md in its root. It also runs in CI and as an MCP server (\`npx -y @strictthemes/check mcp\`), which has tools for the check and for reading these themes and page prompts. For a site that has no DESIGN.md, \`npx @strictthemes/check generate <url>\` measures its pages locally and writes one.`,
     `- [The spec linter](${NPM_URL.spec}): \`npx @strictthemes/spec lint DESIGN.md\` checks a spec, and \`export\` writes it out for Tailwind, shadcn, Nuxt UI or as design tokens.`,
     "",
     "## Source",
