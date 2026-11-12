@@ -1,0 +1,35 @@
+name: Bug
+description: Something does not work as the docs say it should.
+labels: [bug]
+body:
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where is the bug?
+      options:
+        - A theme (colors, fonts, exports, installing it)
+        - A page prompt
+        - The spec linter or an export (@strictthemes/spec)
+        - Strict Check (@strictthemes/check)
+        - The site strictthemes.com
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you got instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to see it
+      description: The command you ran and what it printed, or the smallest file that shows the bug.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Versions
+      description: The package version, your Node version, and the coding agent or browser if one is involved.
+      placeholder: "@strictthemes/check 0.2.0, Node 24, Chrome 142"

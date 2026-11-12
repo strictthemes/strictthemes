@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read the docs first
+    url: https://strictthemes.com/spec
+    about: The spec format, the lint rules and the exports. Strict Check's guide is in packages/check.
+  - name: Report a security problem
+    url: https://github.com/strictthemes/strictthemes/security/advisories/new
+    about: In private, please. Not in a public issue.

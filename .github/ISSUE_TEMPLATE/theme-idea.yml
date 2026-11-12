@@ -1,0 +1,22 @@
+name: Theme idea
+description: Propose a new theme, or a change to one of the thirteen.
+labels: [theme]
+body:
+  - type: textarea
+    id: job
+    attributes:
+      label: What is it for?
+      description: The kind of product or page, and why none of the existing themes fits it.
+    validations:
+      required: true
+  - type: textarea
+    id: look
+    attributes:
+      label: What does it look like?
+      description: Colors, fonts, corners, mood. Links to references help.
+  - type: checkboxes
+    id: build
+    attributes:
+      label: Would you build it?
+      options:
+        - label: I would like to write this theme myself

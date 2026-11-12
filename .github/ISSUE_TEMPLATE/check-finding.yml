@@ -1,0 +1,39 @@
+name: Strict Check got it wrong
+description: The check reported something that is on the theme, or missed something that is off it.
+labels: [check]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Which way was it wrong?
+      options:
+        - It reported a value that follows the theme
+        - It missed a value that does not follow the theme
+        - The message was wrong or unclear
+    validations:
+      required: true
+  - type: textarea
+    id: code
+    attributes:
+      label: The code
+      description: The smallest piece of markup or CSS that shows it.
+      render: html
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: The theme
+      description: The name of the Strict theme, or the tokens and the strict block of your own DESIGN.md.
+      render: yaml
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: What the check printed
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version of @strictthemes/check
