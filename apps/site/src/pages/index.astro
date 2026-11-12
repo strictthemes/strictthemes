@@ -93,6 +93,11 @@ const roadmap = [
     status: "Planned",
   },
 ]
+
+// The hero's backdrop repeats the page grid's columns out to both edges of the
+// window. Sixty of them cover a window 5,800px wide; the number must be even,
+// so that the middle twelve sit under the page grid.
+const BACKDROP_COLUMNS = 60
 ---
 
 <Layout
@@ -100,11 +105,8 @@ const roadmap = [
   description="A Strict theme is one DESIGN.md file your coding agent reads and a linter checks. Thirteen free themes install into shadcn with one command."
 >
   <section class="relative border-b border-border">
-    <div
-      aria-hidden="true"
-      class="pointer-events-none absolute inset-0 mx-auto hidden max-w-page grid-cols-12 gap-8 px-8 md:grid"
-    >
-      {Array.from({ length: 12 }).map(() => <div class="bg-card/60" />)}
+    <div aria-hidden="true" class="column-backdrop pointer-events-none absolute inset-0 hidden md:grid">
+      {Array.from({ length: BACKDROP_COLUMNS }).map(() => <div class="bg-card/60" />)}
     </div>
     <div class="relative mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
       <p class="label rise text-muted-foreground md:col-span-12">

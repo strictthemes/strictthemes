@@ -172,6 +172,19 @@
   .prose th, .prose td { border-bottom: 1px solid var(--border); padding: 8px 16px 8px 0; vertical-align: top; }
 }
 
+/* The home page's column backdrop: the page grid's columns, carried on past
+   the page's width to both edges of the window. Each column is as wide as one
+   of the page's twelve (the page's width less two paddings and eleven gaps),
+   and the row is centered, so the middle twelve sit under the page grid. */
+@utility column-backdrop {
+    --column-gap: calc(var(--spacing) * 8);
+    grid-auto-flow: column;
+    grid-auto-columns: calc((min(100%, var(--container-page)) - 13 * var(--column-gap)) / 12);
+    column-gap: var(--column-gap);
+    justify-content: center;
+    overflow: hidden;
+}
+
 /* One staggered reveal on page load. It only moves the text: content is never
    hidden, so a screenshot or a paused tab still shows the page. */
 @keyframes rise {
