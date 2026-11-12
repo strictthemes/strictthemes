@@ -42,7 +42,8 @@ strict-check [dir] [options]
                    report, any other the text. Repeat for more.
 ```
 
-`strict-check mcp` starts the MCP server instead; see below.
+`strict-check mcp` starts the MCP server instead, and `strict-check mcp --http`
+the hosted one; see below.
 
 Exit code: `0` when there are no errors, `1` when there are, `2` when the
 check could not run (no spec, a spec with errors, no browser). Warnings do
@@ -315,6 +316,84 @@ To connect it in Claude Code, Cursor or another MCP client:
 From a checkout of this repo it is `"command": "node"` with
 `"args": ["/absolute/path/to/packages/check/dist/cli.js", "mcp"]`.
 
+### Hosting the theme tools
+
+`strict-check mcp --http` serves the four theme tools alone, over HTTP, so a
+client that only takes an address can use them without installing anything.
+It has no `rules` and no `check`: those read a project's files, and a hosted
+server cannot see them.
+
+```bash
+npx -y @strictthemes/check mcp --http --port 8787
+```
+
+- **The address** is `/mcp` on that port, over Streamable HTTP. `/` answers
+  with one line that says what the server is; every other path is a 404.
+- **No sessions.** Every request stands alone and gets a plain JSON answer,
+  so one process, several processes or a function that starts for each
+  request all work. Only `POST` reaches the tools; `GET` and `DELETE` get
+  405.
+- **It listens on `127.0.0.1`** unless `--host` says otherwise, because it is
+  meant to sit behind a proxy that holds the certificate.
+- **It needs no key and stores nothing.** It reads `themes.json` and the
+  theme's files from strictthemes.com (or from `STRICT_THEMES_URL`) and keeps
+  each for five minutes. A request body over 64 KB is refused.
+- **The log**, on stderr, has one line for each request: method, path, status
+  and time. It has nothing about who sent it.
+- A page in a browser may call it: it answers with
+  `Access-Control-Allow-Origin: *`. It reads nothing private.
+
+On a Linux server it is a service and one proxy rule. A unit for systemd, with
+the package installed in `/opt/strict-themes-mcp`:
+
+```ini
+[Unit]
+Description=Strict themes MCP server
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/node /opt/strict-themes-mcp/node_modules/@strictthemes/check/dist/cli.js mcp --http --port 8787
+Restart=always
+RestartSec=2
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target
+```
+
+And the rule for nginx, inside the site's `server` block:
+
+```nginx
+location = /mcp {
+    proxy_pass http://127.0.0.1:8787;
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_read_timeout 30s;
+    client_max_body_size 64k;
+}
+```
+
+A client then connects to `https://your-site/mcp`:
+
+```json
+{
+  "mcpServers": {
+    "strict-themes": { "type": "http", "url": "https://your-site/mcp" }
+  }
+}
+```
+
+The handler behind the command, `handleThemesRequest` in
+[src/http.ts](src/http.ts), takes a web `Request` and returns a `Response`.
+That is the shape a function on Netlify, Cloudflare Workers, Deno or Bun has,
+but it has only been run in Node.
+
 ### Skill
 
 [`skills/strict-check/SKILL.md`](https://github.com/strictthemes/strictthemes/blob/master/skills/strict-check/SKILL.md) tells an
@@ -390,10 +469,15 @@ browser involved.
   themes ended with the theme's `DESIGN.md` as the site serves it, and
   `get_prompt` for all ninety prompts returned the served file byte for
   byte. The longest answer is 42,660 characters.
+- **The server over HTTP** (0.4.0, 2026-11-12), started with
+  `mcp --http` on a Mac and reading the live site: Claude Code connected to
+  it as an HTTP server and called `list_prompts`. Not tried: behind a proxy
+  on a real server, and any other client.
 - **The published package against the live site** (0.3.0, 2026-11-12): all
   eighteen themes and eighty-nine of the ninety prompts came back as served.
   The server refused the ninetieth, Cipher's `changelog.md`, because of its
-  file name; the prompt is called `releases` since.
+  file name. The prompt is called `releases` since, and all ninety come
+  back.
 - The package is on npm since 2026-11-12. No one outside this repo is known
   to have run it.
 

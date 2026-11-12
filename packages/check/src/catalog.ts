@@ -51,7 +51,22 @@ const TIMEOUT_MS = 15_000
 /** The longest answer taken: a page prompt is about 40,000 characters. */
 const MAX_CHARS = 1_000_000
 
+const FRESH_MS = 5 * 60_000
+/** Files kept at most. A hosted server is asked for the same few again and again. */
+const KEPT_FILES = 200
+const texts = new Map<string, { at: number; text: string }>()
+
+/** A file of the site, read once and kept for five minutes. */
 async function fetchText(url: string): Promise<string> {
+  const kept = texts.get(url)
+  if (kept && Date.now() - kept.at < FRESH_MS) return kept.text
+  const text = await fetchFresh(url)
+  if (texts.size >= KEPT_FILES) texts.delete(texts.keys().next().value as string)
+  texts.set(url, { at: Date.now(), text })
+  return text
+}
+
+async function fetchFresh(url: string): Promise<string> {
   let response: Response
   try {
     response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS), headers: { 'User-Agent': 'strict-check-mcp' } })
@@ -65,7 +80,6 @@ async function fetchText(url: string): Promise<string> {
   return text
 }
 
-const FRESH_MS = 5 * 60_000
 const cache = new Map<string, { at: number; catalog: Catalog }>()
 
 /** Every theme and its page prompts, read from the site and kept for five minutes. */

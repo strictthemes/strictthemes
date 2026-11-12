@@ -18,13 +18,20 @@ import { formatText } from './report.ts'
 import { CheckError, loadSpec, runCheck } from './run.ts'
 
 export const SERVER_NAME = 'strict-check'
-export const SERVER_VERSION = '0.3.0'
+export const SERVER_VERSION = '0.4.0'
+/** The server that is hosted for everyone: the theme tools alone, over HTTP. */
+export const THEMES_SERVER_NAME = 'strict-themes'
 
 const INSTRUCTIONS = `Strict Check tells you whether a project's UI follows its theme, the DESIGN.md in the project's root.
 Call "rules" before you write or change UI, to see the colors, spacing, type sizes and corners the theme allows.
 Call "check" after you change UI. Fix every error it lists and call it again until it passes. Build the project first and pass "dist" so the pages themselves are measured, not only the code.
 Fix a finding by using a value the theme allows. Do not mark code strict-ignore to make a check pass: that marker is for content that shows another theme on purpose.
 A project with no theme yet can take one of the Strict themes. "list_themes" names them, and "get_theme" returns one theme's DESIGN.md and how to install it. Each theme has page prompts: "list_prompts" says what each builds, and "get_prompt" returns the full brief for one page. Use a brief when the user asked for that page, and let what the user said about their own product replace its sample content.`
+
+const THEMES_INSTRUCTIONS = `This server hands you the Strict themes and their page prompts, from strictthemes.com. They are free to use.
+A Strict theme is one DESIGN.md file with a light and a dark mode that installs into a shadcn project. "list_themes" names the themes, and "get_theme" returns one theme's DESIGN.md and how to install it: save that file as DESIGN.md in the project's root.
+Each theme has page prompts. "list_prompts" says what each builds, and "get_prompt" returns the full brief for one page. Use a brief when the user asked for that page, and let what the user said about their own product replace its sample content.
+This server cannot see the user's project. To check a project against its theme, the user connects Strict Check on their own machine: npx -y @strictthemes/check mcp`
 
 const failure = (error: unknown) => ({
   isError: true,
@@ -112,6 +119,19 @@ export function createServer(): McpServer {
     },
   )
 
+  registerThemeTools(server)
+  return server
+}
+
+/** The hosted server: the four theme tools and nothing that reads a project. */
+export function createThemesServer(): McpServer {
+  const server = new McpServer({ name: THEMES_SERVER_NAME, version: SERVER_VERSION }, { instructions: THEMES_INSTRUCTIONS })
+  registerThemeTools(server)
+  return server
+}
+
+/** The tools that read the Strict themes and their page prompts from strictthemes.com. */
+function registerThemeTools(server: McpServer): void {
   server.registerTool(
     'list_themes',
     {
@@ -135,7 +155,7 @@ export function createServer(): McpServer {
     {
       title: 'One theme and how to install it',
       description:
-        "Returns one Strict theme: the command that installs it into a shadcn project, what to do after the install, the theme's page prompts, and its whole DESIGN.md (colors in both modes, type, spacing, corners, components and rules). Save that DESIGN.md in the project's root: the `rules` and `check` tools read it from there.",
+        "Returns one Strict theme: the command that installs it into a shadcn project, what to do after the install, the theme's page prompts, and its whole DESIGN.md (colors in both modes, type, spacing, corners, components and rules). Save that DESIGN.md in the project's root: Strict Check reads it from there.",
       inputSchema: {
         theme: z.string().describe('The theme\'s slug, as list_themes gives it, for example "kiln".'),
       },
@@ -178,7 +198,7 @@ export function createServer(): McpServer {
     {
       title: 'One page prompt in full',
       description:
-        "Returns one page prompt, word for word as strictthemes.com serves it: a complete brief for building one page with a Strict theme, about 10,000 tokens. It has the install step, the theme in short, the page's parts in order with their classes and sample content, the behavior, the rules and a checklist to go through at the end. Call it when the user asked for that page, then build the page from it and run `check` on the result.",
+        "Returns one page prompt, word for word as strictthemes.com serves it: a complete brief for building one page with a Strict theme, about 10,000 tokens. It has the install step, the theme in short, the page's parts in order with their classes and sample content, the behavior, the rules and a checklist to go through at the end. Call it when the user asked for that page, then build the page from it and run Strict Check on the result.",
       inputSchema: {
         theme: z.string().describe('The theme\'s slug, for example "kiln".'),
         page: z.string().describe('The page\'s slug, as list_prompts gives it, for example "product".'),
@@ -195,8 +215,6 @@ export function createServer(): McpServer {
       }
     },
   )
-
-  return server
 }
 
 /** Serves the tools over stdin and stdout until the client disconnects. */

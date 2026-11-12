@@ -11,6 +11,9 @@ const USAGE = `strict-check — check a project's UI against its Strict design s
 Usage:
   strict-check [dir] [options]   Check a project.
   strict-check mcp               Serve the check and the Strict themes as an MCP server over stdio, for coding agents.
+  strict-check mcp --http        Serve the Strict themes alone as an MCP server over HTTP, to host for others.
+                                 --port <n> (default 8787) and --host <address> (default 127.0.0.1).
+                                 The MCP address is /mcp on that port.
 
   dir                The project to check. Default: the current directory.
 
@@ -105,7 +108,28 @@ async function main(argv: string[]): Promise<number> {
   }
 }
 
-if (process.argv[2] === 'mcp') {
+if (process.argv[2] === 'mcp' && process.argv.includes('--http')) {
+  const option = (name: string): string | undefined => {
+    const at = process.argv.indexOf(name)
+    return at === -1 ? undefined : process.argv[at + 1]
+  }
+  const port = option('--port')
+  if (port !== undefined && !/^\d{1,5}$/.test(port)) fail(`--port needs a number, and got "${port}".`)
+  const host = option('--host')
+  const { serveHttp } = await import('./http.ts')
+  try {
+    const { url } = await serveHttp({
+      ...(port !== undefined ? { port: Number(port) } : {}),
+      ...(host !== undefined ? { host } : {}),
+      // One line a request, for the service's log.
+      log: (line) => console.error(line),
+    })
+    // On stderr, like every message of the server that is not an answer.
+    console.error(`The Strict themes are served as an MCP server at ${url}`)
+  } catch (error) {
+    fail(`Could not start the server: ${error instanceof Error ? error.message : String(error)}`)
+  }
+} else if (process.argv[2] === 'mcp') {
   // Loaded only here, so a plain check does not pay for the MCP library.
   const { serve } = await import('./mcp.ts')
   await serve()
