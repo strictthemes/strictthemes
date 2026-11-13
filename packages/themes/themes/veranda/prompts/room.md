@@ -48,7 +48,7 @@ A section with the hairline from the layout notes, as a grid (`grid gap-6 md:gri
 - A label in `text-muted-foreground`: `From`.
 - With `mt-2`, a `<p>` with `flex items-baseline gap-2`: the price `£128` in a `<span>` with `font-heading text-h1 tabular-nums`, then `a night` in a `<span>`, a label in `text-muted-foreground`.
 - With `mt-2`, a label in `text-foreground`: `Sleeps 2 · Breakfast included`.
-- With `mt-6`, a facts list from the layout notes, three rows: Arrive (`15:00–20:00`, two `<time>` elements), Leave by (`10:30`, a `<time>`), July and August (`Two nights or more`). It has only hairlines, no corners, so it is not a card in a card.
+- With `mt-6`, a facts list from the layout notes, three rows: Arrive (`15:00–20:00`, two `<time>` elements in the `<dd>`'s body text, not a label), Leave by (`10:30`, a `<time>`), July and August (`Two nights or more`). It has only hairlines, no corners, so it is not a card in a card.
 - With `mt-6`, a `<p>` holding the page's one default button, an `<a>` styled as a button with `w-full whitespace-normal text-center` added, so its words can wrap where the panel is narrow: "Request this room", to `/reserve?room=marram`.
 - With `mt-4`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "A request, not a payment. We reply within a day."
 
@@ -56,7 +56,7 @@ A section with the hairline from the layout notes, as a grid (`grid gap-6 md:gri
 
 - A label line in `text-muted-foreground`: `At the front of the house`.
 - With `mt-2`, an `<h2>`: "The room".
-- With `mt-4`, three paragraphs in `text-body`, the second and third with `mt-4`. Say that this was the room the harbour pilot kept for himself, and that the bay window faces south over the harbour wall, so the sun is in it from breakfast until late afternoon; that the bed is a king with linen sheets and wool blankets, and a writing table with two chairs stands in the bay; and that the bathroom has a deep bath with a shower over it, and the room is above the breakfast room, so the first kettle can be heard at about half past seven.
+- With `mt-4`, three paragraphs in `text-body`, the second and third with `mt-4`. Say that this was the room the harbour pilot kept for himself, and that the bay window faces south over the harbour wall, so the sun is in it from breakfast until late afternoon; that the bed is a king with linen sheets and wool blankets, and a writing table with two chairs stands in the bay; and that the bathroom has a deep bath with a shower over it, and the room is above the breakfast room, so the first kettle can be heard at about 07:30, in a `<time>`.
 - With `mt-12`, a label heading, an `<h3>`: "The facts".
 - With `mt-4`, a facts list from the layout notes, six rows:
   - Bed: King bed, 150 cm wide
@@ -85,7 +85,7 @@ A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-sta
 | Spring and autumn | 1 April to 30 June, and 1 September to 31 October | £152 |
 | Summer | 1 July to 31 August | £178 |
 
-The season in each row is a `TableHead` with `scope="row"`, given `h-auto`, the body cells' classes and `font-sans text-body font-normal text-foreground text-left` in place of the header look. The dates are plain text in `text-body`. The price is a label with `tabular-nums whitespace-nowrap text-right`, here in `text-foreground` and not muted, because the three figures are what the table is for. At 375px the table fits: the season and the dates wrap, the price does not.
+The season in each row is a `TableHead` with `scope="row"`, given `h-auto`, the body cells' classes and `font-sans text-body font-normal text-foreground text-left` in place of the header look. The dates are plain text in `text-body`. The price is a label with `tabular-nums whitespace-nowrap text-right`, its `whitespace-nowrap` in place of the body cells' `whitespace-normal`, here in `text-foreground` and not muted, because the three figures are what the table is for. At 375px the table fits: the season and the dates wrap, the price does not.
 
 ### 5. Other rooms
 

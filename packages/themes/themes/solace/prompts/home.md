@@ -61,7 +61,7 @@ A section with the `id` `how-it-starts` and `scroll-mt-7`, that is not a grid:
 
   The steps, word for word:
 
-  1. "You write to me": "Use the form, and say as much or as little as you like. A name and a way to reach you is enough." Label: `I reply within 2 working days`.
+  1. "You write to me": "Fill in a short form, and say as much or as little as you like. A name and a way to reach you is enough." Label: `I reply within 2 working days`.
   2. "We speak for 20 minutes": "A call, by phone or video. You can ask me anything, and I ask what you hope for. There is no charge." Label: `20 minutes · Free`.
   3. "We meet for a first session": "In the room or online. At the end we each say whether we would like to go on. Either answer is fine." Label: `50 minutes · £68`.
 
@@ -79,7 +79,7 @@ A section in the grid, with two parts:
 **The note**, in columns 9–12 (`md:col-start-9 md:col-span-4`), with `mt-12 md:mt-0`: a card from the layout notes.
 
 - An `<h3>` in `text-h2`: "In short".
-- With `mt-4`, a `<dl>` of three rows. Here, instead of the Description lists note, a row is a plain `<div>` with no hairline, the second and third with `mt-4`: the `<dt>` holds a badge from the layout notes, and the `<dd>`, with `mt-2`, one line in `text-body`. The rows: "In person" / "The Garden Room, 14 Orchard Row, Larkmere"; "Online" / "By video, with a link I send the day before"; "Evenings" / "On Wednesdays, until 20:00".
+- With `mt-4`, a `<dl>` of three rows. Here, instead of the Description lists note, a row is a plain `<div>` with no hairline, the second and third with `mt-4`: the `<dt>` holds a badge from the layout notes and takes no text color of its own, because the badge brings its colors; and the `<dd>`, with `mt-2`, one line in `text-body`. The rows: "In person" / "The Garden Room, 14 Orchard Row, Larkmere"; "Online" / "By video, with a link I send the day before"; "Evenings" / "On Wednesdays, until 20:00".
 
 These three are the page's only badges.
 
@@ -87,7 +87,7 @@ These three are the page's only badges.
 
 A section in the grid, with its content in columns 1–8 (`md:col-span-8`):
 
-- A label line in `text-muted-foreground`: `Fees from 1 January 2027`.
+- A label line in `text-muted-foreground`: `Fees from 1 January 2027`, with only the date in a `<time dateTime="2027-01-01">`.
 - With `mt-4`, the fee in one line: an `<h2>` in `text-h1` (here, instead of the notes' `text-h2`), "A session is 50 minutes and costs £68".
 - With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The first call is 20 minutes and free. I send one invoice a month, and there is no charge if you cancel with 48 hours' notice."
 - With `mt-7`, a `<p>` holding one link in running text: "Fees, paying and cancelling", to `/fees`.
@@ -97,7 +97,7 @@ A section in the grid, with its content in columns 1–8 (`md:col-span-8`):
 A section in the grid, with one card in columns 1–8 (`md:col-span-8`), built as the note The one action says. The section's `aria-labelledby` names the card's `<h2>`.
 
 - The `<h2>`: "When you are ready".
-- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "Write to me with the form. I reply within two working days, and nothing is booked until we have spoken."
+- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The button leads to a short form. I reply within two working days, and nothing is booked until we have spoken."
 - With `mt-7`, a `<div>` holding the default button "Request a first session", an `<a>` to `/first-session`. The page's one default button.
 
 ### 8. Footer
@@ -106,7 +106,7 @@ The footer from the layout notes.
 
 ### On a phone
 
-Every part is one column. The `<h1>` is `text-h1` and wraps over three lines. The list of what people bring comes 28px under its heading and sentence. The three step cards stack, 16px apart, each as tall as its own text. The portrait keeps its 72px and the name stays beside it; the label line under the name wraps. The In short card comes 48px under the text. The fee's line wraps over three or four lines. The button is as wide as its words.
+Every part is one column. The `<h1>` is `text-h1` and wraps over two lines. The list of what people bring comes 28px under its heading and sentence. The three step cards stack, 16px apart, each as tall as its own text. The portrait keeps its 72px and the name stays beside it; the label line under the name wraps. The In short card comes 48px under the text. The fee's line wraps over three lines. The button is as wide as its words.
 
 ### Behavior
 

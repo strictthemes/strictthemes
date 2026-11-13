@@ -196,7 +196,7 @@ We counted the lines and words of the real files, with `wc` and a short script o
 | `DESIGN.md` generated from this site's home page | 137 | 587 |
 | The skill generated with it | 68 | 701 |
 | `skills/strict-check/SKILL.md` in the repo | 135 | 1,293 |
-| The 23 theme skills in `skills/` | 117 to 165, median 135 | 3,868 to 7,952, median 5,212 |
+| The 23 theme skills in `skills/` | 121 to 169, median 139 | 4,630 to 8,669, median 5,977 |
 | The design section of the instruction file above | 2 | 57 |
 
 Read the fifth row as a warning as much as a guide. The theme skills are long because each carries the layout notes for five pages: where the header goes, how a price is set, which button variant does what. At 5,212 words in the middle one, they are long for a skill. That cost is paid only in a session that builds UI in that theme. The same text in an instruction file would be paid in every session.

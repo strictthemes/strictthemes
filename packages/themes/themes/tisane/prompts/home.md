@@ -35,7 +35,7 @@ A section with `mt-18`: an `<h2>` "In season", then with `mt-4` one sentence tha
 Each card is a card with a picture at its top, as the layout notes describe:
 
 - The picture, `aspect-3/2`, with an `aria-label` that says what it shows: a plain `<div>` with no `<figure>` and no caption, as the Cards note says.
-- In the `<div>` with `p-6`: a label in `text-muted-foreground` naming the kind, for example `Tea`, `Plate` or `Cake`; with `mt-2` an `<h3>` in `text-h2` with the item's name; with `mt-4` one or two sentences about it; and with `mt-4` the price as a label in `text-foreground`, for example `£4.20 a pot`.
+- In the `<div>` with `p-6`: a label in `text-muted-foreground` naming the kind, for example `Tea`, `Plate` or `Cake`; with `mt-2` an `<h3>` in `text-h2` with the item's name; with `mt-4` one or two sentences about it; and with `mt-4` the price as a label in `text-foreground`, the price first: `£4.20 a pot`, `£7.50 with rye bread`, `£3.60 a slice`.
 
 Sample items: Pear and ginger tisane (a pot, £4.20), Roast squash and lentil soup (with rye bread, £7.50), Pear and cardamom loaf (a slice, £3.60). No badge on this page.
 
@@ -69,7 +69,7 @@ Inside the card:
 - A label: `Four letters a year`.
 - With `mt-2`, an `<h2>` "News from the room".
 - With `mt-4`, one sentence: a short letter when the season's teas come in, nothing else.
-- With `mt-6`, the form. Add the field with `npx shadcn@latest add input` if the project has none, and give the new file the edits the Added components note lists. The label "Email address", then with `mt-2` a row `<div>` with `md:flex md:items-start md:gap-4`. In the row: a `<div>` with `md:flex-1` holding the `Input` of type `email` (the `Input` has no margin of its own here: the row carries the `mt-2`), and the `secondary` button "Sign up", `type="submit"`, with `mt-4 md:mt-0` on the button itself. Here, instead of the notes' `<div>` with `mt-6`, the button carries `mt-4`, since it shares the row from `md` and on a phone sits right under its field. The error line sits under the row, with `mt-2`.
+- With `mt-6`, the form. Add the field with `npx shadcn@latest add input` if the project has none, and give the new file the edits the Added components note lists. The label "Email address", then with `mt-2` a row `<div>` with `md:flex md:gap-4` and no `items-*` class, so the button stretches to the field's 46px height instead of stopping short of its bottom. In the row: a `<div>` with `md:flex-1` holding the `Input` of type `email` (the `Input` has no margin of its own here: the row carries the `mt-2`), and the `secondary` button "Sign up", `type="submit"`, with `mt-4 md:mt-0` on the button itself. Here, instead of the notes' `<div>` with `mt-6`, the button carries `mt-4`, since it shares the row from `md` and on a phone sits right under its field. The error line sits under the row, with `mt-2`.
 - After the form, the empty `role="status"` element, as the layout notes describe.
 
 ### 7. Footer
@@ -79,5 +79,5 @@ The footer from the layout notes.
 ### Behavior
 
 - An empty address shows "Write your email address." and a malformed one "Check the email address: it needs an @ and a domain." Focus goes to the field.
-- A good address replaces the form with the confirmation in the status element: an `<h3>` in `text-h2`, "You are on the list", and with `mt-4` one sentence saying the next letter comes when the winter teas arrive, in December. The heading and the sentence are inside the message `<div>`, which has `mt-6` because the card's text stays above it; the `mt-4` goes on the sentence. The heading has `tabIndex={-1}` and gets the focus. The card's label, heading and sentence above the form stay. No button follows the confirmation.
+- A good address replaces the form with the confirmation in the status element: an `<h3>` in `text-h2`, "You are on the list", and with `mt-4` one sentence saying the next letter comes when the winter teas arrive, in December. A month alone is not a date: "December" is plain text, not a `<time>`. The heading and the sentence are inside the message `<div>`, which has `mt-6` because the card's text stays above it; the `mt-4` goes on the sentence. The heading has `tabIndex={-1}` and gets the focus. The card's label, heading and sentence above the form stay. No button follows the confirmation.
 - The other links need no behavior.

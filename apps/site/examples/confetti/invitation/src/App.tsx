@@ -4,23 +4,17 @@ import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const container = "mx-auto max-w-[1088px] px-6"
-
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
 const navLink = cn(
   "inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
   focusOutline
 )
-
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusOutline
 )
-
-const card = "flex flex-col gap-3 rounded-xl border border-border bg-card p-6"
-
-const smallFigure = "font-mono text-label text-muted-foreground tabular-nums"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 
 const navItems = [
   { label: "Reply", href: "/rsvp" },
@@ -70,15 +64,14 @@ export function App() {
       </header>
 
       <main className={cn(container, "flex flex-col gap-22 pt-10 pb-22")}>
+        {/* Opening */}
         <section
           aria-labelledby="opening-heading"
           className="flex flex-col items-center gap-6 rounded-xl bg-blush p-6 text-center text-blush-foreground md:px-10 md:py-22"
         >
           <div className="flex flex-col items-center gap-3">
             <div className="flex flex-col items-center gap-2">
-              <p className="font-mono text-label">
-                Together with their families
-              </p>
+              <p className="font-mono text-label">Together with their families</p>
               <h1 id="opening-heading" className="text-h1 md:text-display">
                 Clem &amp; Rafe
               </h1>
@@ -91,13 +84,14 @@ export function App() {
             <p className="font-heading text-h2 md:text-h1">
               <time dateTime="2027-07-17">Saturday 17 July 2027</time>
             </p>
-            <p className="font-mono text-label">
+            <p className="font-mono text-label tabular-nums">
               <time dateTime="14:00">14:00</time> · Quillbrook Barn, Little
               Saltry
             </p>
           </div>
         </section>
 
+        {/* When and where */}
         <section
           aria-labelledby="when-where-heading"
           className="flex flex-col gap-6"
@@ -106,7 +100,7 @@ export function App() {
             When and where
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-            <div className={cn(card, "md:col-span-4")}>
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4">
               <CalendarDays
                 className="size-6 text-foreground"
                 strokeWidth={1.5}
@@ -123,8 +117,7 @@ export function App() {
                 </p>
               </div>
             </div>
-
-            <div className={cn(card, "md:col-span-4")}>
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4">
               <MapPin
                 className="size-6 text-foreground"
                 strokeWidth={1.5}
@@ -143,8 +136,7 @@ export function App() {
                 </p>
               </div>
             </div>
-
-            <div className={cn(card, "md:col-span-4")}>
+            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4">
               <Shirt
                 className="size-6 text-foreground"
                 strokeWidth={1.5}
@@ -153,8 +145,8 @@ export function App() {
               <h3 className="text-h2">What to wear</h3>
               <div className="flex flex-col gap-2">
                 <p className="text-body">
-                  Come in your summer best. Flat shoes are a good idea, since
-                  the drinks are on the grass of the orchard.
+                  Come in your summer best. Wear flat shoes, because the drinks
+                  are on the grass of the orchard.
                 </p>
                 <p className={smallFigure}>Evenings in the valley turn cool</p>
               </div>
@@ -162,6 +154,7 @@ export function App() {
           </div>
         </section>
 
+        {/* A note from us */}
         <section
           aria-labelledby="note-heading"
           className="grid grid-cols-1 md:grid-cols-12"
@@ -173,8 +166,8 @@ export function App() {
             <div className="flex flex-col gap-3">
               <p className="max-w-xl text-body">
                 We met eight years ago at a ceilidh in Market Fenley, where
-                neither of us knew the steps. We still do not, and we would
-                like to get them wrong again with all of you.
+                neither of us knew the steps. We still do not, and we would like
+                to get them wrong again with all of you.
               </p>
               <p className="max-w-xl text-body">
                 There will be long tables, a lot of food and a band that plays
@@ -186,20 +179,21 @@ export function App() {
           </div>
         </section>
 
+        {/* The plan */}
         <section
           aria-labelledby="plan-heading"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col gap-6 rounded-xl bg-mist p-6 text-mist-foreground md:col-span-8 md:col-start-3 md:p-10">
             <div className="flex flex-col gap-2">
-              <p className="font-mono text-label">
+              <p className="font-mono text-label tabular-nums">
                 <time dateTime="2027-07-17">Saturday 17 July 2027</time>
               </p>
               <h2 id="plan-heading" className="text-h2">
                 The plan
               </h2>
             </div>
-            <ol className="flex flex-col gap-3">
+            <ol className="flex list-none flex-col gap-3 p-0">
               {plan.map((row) => (
                 <li key={row.time} className="flex items-baseline gap-6">
                   <time
@@ -215,6 +209,7 @@ export function App() {
           </div>
         </section>
 
+        {/* Reply */}
         <section
           aria-labelledby="reply-heading"
           className="grid grid-cols-1 md:grid-cols-12"
@@ -265,7 +260,10 @@ export function App() {
             </p>
             <p className="font-mono text-label text-muted-foreground">
               Questions:{" "}
-              <a href="mailto:hello@clemandrafe.example" className={textLink}>
+              <a
+                href="mailto:hello@clemandrafe.example"
+                className={cn(textLink, "wrap-break-word")}
+              >
                 hello@clemandrafe.example
               </a>
             </p>

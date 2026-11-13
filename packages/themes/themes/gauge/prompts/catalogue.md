@@ -33,7 +33,7 @@ Build these parts in order; the footer is as the layout notes describe it.
 
 ### 1. Header
 
-The product's name, the four nav links with Catalogue as the current page, the sales line at the right end from `md` up, and the "Menu" button below `md`.
+The product's name, the four nav links with Catalogue marked as the current section (`aria-current="true"` in both navs, as the Breadcrumb note says), the sales line at the right end from `md` up, and the "Menu" button below `md`.
 
 ### 2. Page header
 
@@ -43,7 +43,7 @@ Under the page header row, as the next item of the container, one paragraph in `
 
 ### 3. Filters
 
-A grid row. The filters are a panel spanning three columns from `lg` up, full width below: an `<aside>` with the `aria-label` "Filters", holding a heading row with the `<h2>` "Filters" and, at its right end, a `secondary` button "Clear filters", disabled with the plain `disabled` prop while no filter is set. Under the heading row, four groups, each divided from the one before by a 1px rule: the group itself has `border-t border-border pt-4`, except the first. The panel's `gap-4` spaces them.
+A grid row. The filters are a panel spanning three columns from `lg` up, full width below: an `<aside>` with the `aria-label` "Filters", holding a heading row with the `<h2>` "Filters" and, at its right end, a `secondary` button "Clear filters", disabled with the plain `disabled` prop while no filter is set. Under the heading row, four groups, each divided from the one before by a 1px rule: the group itself has `border-t border-border pt-4`, except the first. The panel's `gap-4` spaces them. The filters and the table keep the grid's stretch, so the row ends level: the shorter panel grows to the taller one's height.
 
 - **Bore:** a group labelled "Bore (mm)" with three checkboxes, "10 to 17", "20 to 30" and "35 to 45", all clear.
 - **Seals:** a group labelled "Seals" with two checkboxes, "Rubber seals, RS" and "Metal shields, ZZ", all clear.
@@ -52,7 +52,7 @@ A grid row. The filters are a panel spanning three columns from `lg` up, full wi
 
 ### 4. Parts table
 
-The table is a panel with rows spanning nine columns from `lg` up, full width below. Its heading row holds the `<h2>` "Parts" and, at its right end, the count as a small figure in an element with `aria-live="polite"`: `12 parts` with no filter set, and `4 of 12 parts` when filters leave four (`1 of 12 parts`, `0 of 12 parts`).
+The table is a panel with rows spanning nine columns from `lg` up, full width below. Its heading row holds the `<h2>` "Parts" and, at its right end, the count as a small figure in an element with `aria-live="polite"`: `12 parts` with no filter set, and the "of" form whenever a filter is set, even if every part matches: `4 of 12 parts` when filters leave four (`12 of 12 parts`, `1 of 12 parts`, `0 of 12 parts`).
 
 The shadcn `Table` with the label "Parts", one row a part, and these columns, with these headers:
 

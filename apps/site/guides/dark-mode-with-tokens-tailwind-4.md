@@ -68,7 +68,7 @@ You still need `dark:` now and then, for something that is not a color swap: a d
 
 This is the line a new shadcn project has in `src/index.css`. With it, the compiled selector is `.dark\:underline:is(.dark *)`.
 
-Keep `dark:` rare. The stock shadcn button has nine `dark:` classes for small adjustments, such as `dark:bg-input/30`. The 558-line shop page in this site's registry has none. A page that needs many is a sign that a token is missing.
+Keep `dark:` rare. The stock shadcn button has nine `dark:` classes for small adjustments, such as `dark:bg-input/30`. The 567-line shop page in this site's registry has none. A page that needs many is a sign that a token is missing.
 
 ## 4. Switch the class, and honor the system setting
 

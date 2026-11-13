@@ -43,12 +43,12 @@ The shadcn `Table` with the label "Lines" and six columns:
 
 - **Part number:** a text link in `font-mono text-body`, `/part` for `TVL-2047-RS` and `#` for the others.
 - **Description:** the sentence from the sample, with `whitespace-normal`; its header has `min-w-48`, so the column does not collapse on a phone.
-- **Quantity:** right-aligned, header too. The cell holds a stack with `flex flex-col items-end gap-2`: an `Input` in the quantity look of the Inputs note with `w-24`, no visible label but the `aria-label` "Quantity of TVL-2047-RS" (with the line's part number), then the error line when there is one, with `max-w-48`; the cell has `whitespace-normal` so the line can wrap. The column grows while an error shows; that is expected.
-- **Unit price (£):** the price of the break the quantity falls in, `2.28`, right-aligned, header too.
+- **Quantity:** right-aligned, header too. The cell holds a stack with `flex flex-col items-end gap-2`: an `Input` in the quantity look of the Inputs note with `w-24`, no visible label but the `aria-label` "Quantity of TVL-2047-RS" (with the line's part number), then the error line when there is one, with `max-w-48 text-left`, so a wrapped sentence reads on from its icon; the cell has `whitespace-normal` so the line can wrap. The column grows while an error shows; that is expected.
+- **Unit price (£):** the price of the break the quantity falls in, `2.28`, right-aligned, header too. While the quantity is not valid it shows the 1 to 49 price.
 - **Line total (£):** `570.00`, right-aligned, header too. While the quantity is not valid it reads `0.00`.
 - **The last column** has the header "Action", made `sr-only`, and holds a `secondary` button "Remove" with the `aria-label` "Remove TVL-2047-RS". While only one line is left, its "Remove" is disabled with the plain `disabled` prop.
 
-The `<tfoot>` has one row: its first cell spans the first four columns and holds the label "Subtotal, excluding VAT", right-aligned; the next cell holds the sum of the line totals, `1,137.80`, in `font-heading text-h2 tabular-nums`, right-aligned; the last cell is empty. Its cells get `border-t border-border`; there is no double rule.
+The `<tfoot>` has one row: its first cell spans the first four columns and holds the label "Subtotal, excluding VAT", right-aligned; the next cell holds the sum of the line totals, `1,137.80`, in `font-heading text-h2 tabular-nums`, right-aligned; the last cell is empty. The `TableFooter`'s own top border is the rule above it, as the Tables note says.
 
 On a phone the table scrolls in its box.
 
@@ -77,7 +77,7 @@ Every field starts empty but the select.
   - `weekdays`: add `gap-1`. `weekday`: replace its arbitrary text size and `font-normal` with `font-mono text-label`, the label style, in sentence case as the library writes them (`Mo`, `Tu`). `week`: replace its stock top margin with `mt-1` and add `gap-1`, so the gutter is 4px both ways, which is where the focus outline fits.
   - `today`: leave only `text-foreground`; delete its corner class, `bg-muted` and the `data-[selected=true]:` class. A grey fill would mark today by a color alone.
   - The `Chevron` component: give `ChevronLeftIcon` and `ChevronRightIcon` `strokeWidth={1.5}`.
-  - `CalendarDayButton`: give its `<Button>` `ref={ref}`. The stock file makes that ref and never attaches it, and without it the arrow keys move nothing. In its classes, delete `border-0`, the three `group-data-[focused=true]/day:` classes that draw the ring (`…:border-ring`, `…:ring-[3px]`, `…:ring-ring/50`) and `dark:hover:text-foreground`, which would make the chosen day's figure unreadable on hover in dark mode; replace the small text size in `[&>span]:` with `[&>span]:text-label`; and add `font-mono text-body tabular-nums group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold`. A day is then a mono figure; today has a 1px border in the text color and a bold figure, and the bold still shows when today is the chosen day; the chosen day keeps the stock graphite fill (`data-[selected-single=true]:bg-primary`); the focused day shows the outline `button.tsx` already has.
+  - `CalendarDayButton`: in its classes, delete `border-0`, the three `group-data-[focused=true]/day:` classes that draw the ring (`…:border-ring`, `…:ring-[3px]`, `…:ring-ring/50`) and `dark:hover:text-foreground`, which would make the chosen day's figure unreadable on hover in dark mode; replace the small text size in `[&>span]:` with `[&>span]:text-label`; and add `font-mono text-body tabular-nums group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold`. A day is then a mono figure; today has a 1px border in the text color and a bold figure, and the bold still shows when today is the chosen day; the chosen day keeps the stock graphite fill (`data-[selected-single=true]:bg-primary`); the focused day shows the outline `button.tsx` already has.
 - `button.tsx`, the `ghost` variant, which only the calendar's days and arrows use: replace `hover:bg-muted` with `hover:bg-accent`, the fill of a highlighted row in a select, and delete `dark:hover:bg-muted/50`, which cannot be seen on the popup in dark mode. No button of the page itself is `ghost`.
 
 Then write `components/ui/date-picker.tsx`, a `DatePicker` with the props `id`, `labelId`, `value` (a `Date` or `undefined`), `onValueChange`, `today`, `aria-invalid` and `aria-describedby`. It keeps `open` in state and renders a `Popover` with:
@@ -116,7 +116,6 @@ Rendered inside the confirmation element only after a good submit, when the `<fo
   - Town: "Enter the town."
   - Postcode, trimmed and ignoring case: anything that is not a UK postcode shape (one or two letters, a digit, an optional letter or digit, an optional space, a digit and two letters): "Enter a postcode such as AC7 1RT."
   - Required by empty: "Enter a date." Before 16 November 2026: "Choose 16 November 2026 or later. We need two working days."
-- Every value is trimmed before it is checked, so a field of spaces is empty.
 - With no errors, the form is removed, the confirmation fills the status element, and focus moves to its `<h2>`, so that the message is not read twice.
 - Only the "Remove" of a lone line is disabled, and with the plain `disabled` prop, so no button on this page gets `focusableWhenDisabled`, and `components/ui/button.tsx` needs no `data-disabled:` classes.
 - The links need no behavior beyond their `href`.

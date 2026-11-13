@@ -48,7 +48,7 @@ The card itself is `grid grid-cols-2 gap-5`, in place of its column stack, and h
 2. The plot, `flex h-40 items-end justify-center gap-3 border-b border-border`: the bottom border is the axis, the only line. It holds two columns, each `flex h-full w-12 flex-col items-center justify-end gap-1`: the figure above the bar, `96` or `98`, as the Charts note sets a chart's figures; then the bar, `w-full shrink-0 bg-azure`, with its height as a percentage in an inline `style`.
 3. The labels under the axis, `flex justify-center gap-3`: two small figures, each `w-12 text-center`: `Mon`, `Tue`.
 
-The heights are worked out in code from the value and the chart's axis, (value − axis start) ÷ (axis end − axis start): the first chart's axis runs from 95 to 100, so its bars are 20% and 60%; the second's runs from 0 to 120, so its bars are 80% and 82%. Both bars of both charts are azure: it is one series. At 375px the two charts still stand side by side.
+The heights are worked out in code from the value and the chart's axis, (value − axis start) ÷ (axis end − axis start): the first chart's axis runs from 95 to 100, so its bars are 20% and 60%; the second's runs from 0 to 120, so its bars are 80% and 81.67%. Do not round: the heights are not shown as figures. Both bars of both charts are azure: it is one series. At 375px the two charts still stand side by side.
 
 The `<figcaption>` under the card is a small figure: `From lesson 4: where the axis starts changes what a chart says.`
 

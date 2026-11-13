@@ -23,35 +23,32 @@ const MONTHS = [
   "December",
 ]
 
-function pad(value: number) {
-  return String(value).padStart(2, "0")
-}
-
-/** The machine form of a local date, 2026-11-19, read from its local parts. */
+/** The local calendar day as YYYY-MM-DD, never through UTC. */
 export function toDateTime(date: Date) {
-  return [
-    date.getFullYear(),
-    pad(date.getMonth() + 1),
-    pad(date.getDate()),
-  ].join("-")
+  const y = String(date.getFullYear()).padStart(4, "0")
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${y}-${m}-${d}`
 }
 
-/**
- * A date written out: Thursday 19 November 2026. The joiner goes after the
- * day's number and after the month.
- */
-export function formatLongDate(date: Date, joiner = " ") {
-  const rest = [
-    date.getDate(),
-    MONTHS[date.getMonth()],
-    date.getFullYear(),
-  ].join(joiner)
-
-  return WEEKDAYS[date.getDay()] + " " + rest
+/** "Thursday 19 November 2026", with non-breaking spaces after the day's
+ * number and before the year, so that only the weekday can wrap away. */
+export function formatDate(date: Date) {
+  return `${WEEKDAYS[date.getDay()]} ${date.getDate()}\u00a0${
+    MONTHS[date.getMonth()]
+  }\u00a0${date.getFullYear()}`
 }
 
-/** Tomorrow by the visitor's clock, at local midnight. */
+/** Local midnight of the day after today, by the visitor's clock. */
 export function getTomorrow() {
   const now = new Date()
   return new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+}
+
+/** Compares two dates as local calendar days: negative when a is earlier. */
+export function compareDays(a: Date, b: Date) {
+  return (
+    new Date(a.getFullYear(), a.getMonth(), a.getDate()).getTime() -
+    new Date(b.getFullYear(), b.getMonth(), b.getDate()).getTime()
+  )
 }

@@ -1,4 +1,11 @@
-import * as React from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type MouseEvent,
+  type ReactNode,
+} from "react"
 import { ChevronLeft, CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -7,11 +14,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 const PAGE_TITLE =
   "Check your application – Apply for a resident's parking permit – Callowmere Council"
 
-const DECLARATION_ERROR = "Tick the box to confirm your answers are correct"
-
-const SENT_MESSAGE =
-  "In the full service, your application would be sent now and the confirmation page would open."
-
 const CONTAINER = "mx-auto max-w-[720px] px-4 md:px-6"
 
 const FOCUS =
@@ -19,13 +21,15 @@ const FOCUS =
 
 const TEXT_LINK = `text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 ${FOCUS}`
 
-type Row = {
+const DECLARATION_ERROR = "Tick the box to confirm your answers are correct"
+
+type Answer = {
   question: string
-  answer: React.ReactNode
+  answer: ReactNode
   change: string
 }
 
-const detailRows: Row[] = [
+const yourDetails: Answer[] = [
   { question: "Name", answer: "Priya Okafor", change: "name" },
   {
     question: "Address",
@@ -57,7 +61,7 @@ const detailRows: Row[] = [
   },
 ]
 
-const vehicleRows: Row[] = [
+const yourVehicle: Answer[] = [
   {
     question: "Registration number",
     answer: "KX19 TDV",
@@ -80,9 +84,7 @@ const vehicleRows: Row[] = [
   },
 ]
 
-const footerLinks = ["Accessibility", "Privacy", "Cookies", "Contact the council"]
-
-function SummaryList({ rows }: { rows: Row[] }) {
+function SummaryList({ rows }: { rows: Answer[] }) {
   return (
     <dl className="mt-6 border-t border-border">
       {rows.map((row) => (
@@ -91,13 +93,13 @@ function SummaryList({ rows }: { rows: Row[] }) {
           className="border-b border-border py-4 md:grid md:grid-cols-12 md:items-start md:gap-x-4"
         >
           <dt className="text-body font-bold md:col-span-4">{row.question}</dt>
-          <dd className="mt-1 break-words md:col-span-6 md:mt-0">
+          <dd className="mt-1 wrap-break-word md:col-span-6 md:mt-0">
             {row.answer}
           </dd>
           <dd className="mt-2 md:col-span-2 md:mt-0 md:text-right">
             <a
               href="#"
-              className={`inline-flex min-h-11 items-center ${TEXT_LINK}`}
+              className={`inline-flex min-h-11 items-center md:items-start ${TEXT_LINK}`}
             >
               Change<span className="sr-only"> {row.change}</span>
             </a>
@@ -109,51 +111,48 @@ function SummaryList({ rows }: { rows: Row[] }) {
 }
 
 export function App() {
-  const [confirmed, setConfirmed] = React.useState(false)
-  const [fieldError, setFieldError] = React.useState(false)
-  const [summaryShown, setSummaryShown] = React.useState(false)
-  const [failedSends, setFailedSends] = React.useState(0)
-  const [message, setMessage] = React.useState("")
+  const [confirmed, setConfirmed] = useState(false)
+  const [declarationError, setDeclarationError] = useState(false)
+  const [showSummary, setShowSummary] = useState(false)
+  const [status, setStatus] = useState("")
+  const [sendCount, setSendCount] = useState(0)
 
-  const summaryRef = React.useRef<HTMLDivElement>(null)
-  const checkboxRef = React.useRef<HTMLElement>(null)
-  const labelRef = React.useRef<HTMLLabelElement>(null)
+  const summaryRef = useRef<HTMLDivElement>(null)
+  const checkboxRef = useRef<HTMLElement>(null)
+  const checkboxLabelRef = useRef<HTMLLabelElement>(null)
 
-  React.useEffect(() => {
-    document.title = summaryShown ? `Error: ${PAGE_TITLE}` : PAGE_TITLE
-  }, [summaryShown])
+  useEffect(() => {
+    document.title = showSummary ? `Error: ${PAGE_TITLE}` : PAGE_TITLE
+  }, [showSummary])
 
-  React.useEffect(() => {
-    if (failedSends > 0) {
+  useEffect(() => {
+    if (sendCount > 0 && showSummary) {
       summaryRef.current?.focus()
     }
-  }, [failedSends])
+  }, [sendCount, showSummary])
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setSendCount((count) => count + 1)
 
     if (!confirmed) {
-      setFieldError(true)
-      setSummaryShown(true)
-      setMessage("")
-      setFailedSends((count) => count + 1)
+      setDeclarationError(true)
+      setShowSummary(true)
+      setStatus("")
       return
     }
 
-    setFieldError(false)
-    setSummaryShown(false)
-    setMessage(SENT_MESSAGE)
+    setDeclarationError(false)
+    setShowSummary(false)
+    setStatus(
+      "In the full service, your application would be sent now and the confirmation page would open."
+    )
   }
 
-  function handleConfirmedChange(checked: boolean) {
-    setConfirmed(checked)
-    setFieldError(false)
-  }
-
-  function handleSummaryLink(event: React.MouseEvent<HTMLAnchorElement>) {
+  function goToCheckbox(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
     checkboxRef.current?.focus({ preventScroll: true })
-    labelRef.current?.scrollIntoView()
+    checkboxLabelRef.current?.scrollIntoView()
   }
 
   return (
@@ -199,22 +198,23 @@ export function App() {
           </a>
         </p>
 
-        {summaryShown && (
+        {showSummary && (
           <div
             ref={summaryRef}
             tabIndex={-1}
+            role="group"
             aria-labelledby="error-summary-title"
-            className="mt-6 rounded-xl border-2 border-destructive bg-background p-6 focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+            className="mt-6 rounded-xl border-2 border-destructive bg-background p-6 focus:outline-2 focus:outline-offset-2 focus:outline-ring focus:outline-solid"
           >
             <p id="error-summary-title" className="font-heading text-h2">
               Your answers need a change
             </p>
-            <ul className="mt-4">
+            <ul className="mt-4 list-none p-0">
               <li>
                 <a
                   href="#declaration"
-                  onClick={handleSummaryLink}
-                  className={`font-bold text-destructive underline underline-offset-4 ${FOCUS}`}
+                  onClick={goToCheckbox}
+                  className={`font-bold text-destructive underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${FOCUS}`}
                 >
                   {DECLARATION_ERROR}
                 </a>
@@ -228,15 +228,15 @@ export function App() {
         </p>
         <h1 className="mt-2 text-h1">Check your application</h1>
         <p className="mt-6">
-          Read your answers below. If any are wrong, change them before you
-          send your application.
+          Read your answers before you send them. If any answer is wrong, change
+          it first.
         </p>
 
         <h2 className="mt-10 text-h2">Your details</h2>
-        <SummaryList rows={detailRows} />
+        <SummaryList rows={yourDetails} />
 
         <h2 className="mt-10 text-h2">Your vehicle</h2>
-        <SummaryList rows={vehicleRows} />
+        <SummaryList rows={yourVehicle} />
 
         <div className="mt-10 rounded-xl border border-border bg-card p-6">
           <h2 className="text-h2">What you will pay</h2>
@@ -247,8 +247,8 @@ export function App() {
             <time dateTime="2027-11-30">30 November 2027</time>
           </p>
           <p className="mt-4">
-            You pay after the council approves your application. We will email
-            you a link to pay.
+            You pay nothing now. If the council approves your application, it
+            will email you a link to pay.
           </p>
         </div>
 
@@ -261,11 +261,9 @@ export function App() {
             </p>
 
             <div
-              className={
-                fieldError ? "mt-6 border-l-4 border-destructive pl-4" : "mt-6"
-              }
+              className={`mt-6 ${declarationError ? "border-l-4 border-destructive pl-4" : ""}`}
             >
-              {fieldError && (
+              {declarationError && (
                 <p
                   id="declaration-error"
                   className="flex items-start gap-2 text-body font-bold text-destructive"
@@ -282,27 +280,25 @@ export function App() {
                 </p>
               )}
               <div
-                className={
-                  fieldError
-                    ? "mt-2 flex min-h-11 items-start gap-4"
-                    : "flex min-h-11 items-start gap-4"
-                }
+                className={`flex min-h-11 items-start gap-4 ${declarationError ? "mt-2" : ""}`}
               >
                 <Checkbox
                   ref={checkboxRef}
                   id="declaration"
-                  name="declaration"
-                  className="mt-0.5"
-                  checked={confirmed}
-                  onCheckedChange={handleConfirmedChange}
                   aria-labelledby="declaration-label"
                   aria-describedby={
-                    fieldError ? "declaration-error" : undefined
+                    declarationError ? "declaration-error" : undefined
                   }
-                  aria-invalid={fieldError || undefined}
+                  aria-invalid={declarationError || undefined}
+                  checked={confirmed}
+                  onCheckedChange={(checked) => {
+                    setConfirmed(checked)
+                    setDeclarationError(false)
+                  }}
+                  className="mt-0.5"
                 />
                 <label
-                  ref={labelRef}
+                  ref={checkboxLabelRef}
                   id="declaration-label"
                   htmlFor="declaration"
                   className="text-body"
@@ -325,8 +321,8 @@ export function App() {
           </form>
 
           <div role="status">
-            {message && (
-              <p className="mt-6 text-body text-foreground">{message}</p>
+            {status && (
+              <p className="mt-6 text-body text-foreground">{status}</p>
             )}
           </div>
         </div>
@@ -335,11 +331,16 @@ export function App() {
       <footer className="border-t border-border bg-card">
         <div className={`${CONTAINER} py-10`}>
           <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6">
-              {footerLinks.map((link) => (
-                <li key={link}>
+            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+              {[
+                "Accessibility",
+                "Privacy",
+                "Cookies",
+                "Contact the council",
+              ].map((item) => (
+                <li key={item}>
                   <a href="#" className={`inline-block py-2 ${TEXT_LINK}`}>
-                    {link}
+                    {item}
                   </a>
                 </li>
               ))}

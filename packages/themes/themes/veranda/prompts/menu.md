@@ -45,7 +45,7 @@ The first section, with `pt-12`, as a grid (`grid gap-6 md:grid-cols-12 md:items
     - Supper, Thursday to Saturday: `18:30–20:30`
   - With `mt-6`, a `<p>` in `text-body`: "Tell us by 14:00 if you would like supper.", with the time in a `<time>`.
 
-**The key.** A `<dl>` with `flex flex-wrap gap-x-6 gap-y-2` and four entries. Each entry is a `<div>` with `flex items-baseline gap-2`: the `<dt>` is the letter, a label in `text-foreground`; the `<dd>` is the word, a label in `text-muted-foreground`. The entries: `V` Vegetarian, `VG` Vegan, `GF` No gluten, `DF` No dairy.
+**The key.** A `<dl>` with `flex flex-wrap gap-x-6 gap-y-2` and four entries. Each entry is a `<div>` with `flex items-baseline gap-2`: the `<dt>` is the letter, a label in `text-foreground`; the `<dd>` is the word, a label in `text-muted-foreground`. The entries: `V` Vegetarian, `VG` Vegan, `GF` No gluten, `DF` No dairy. The key has no heading and no `aria-label`: its terms say what it is.
 
 ### 3. Breakfast
 
@@ -66,7 +66,7 @@ A section with the hairline from the layout notes and the `id` `breakfast`, as a
   - The hairline: an empty `<span>` with `aria-hidden="true"` and `min-w-4 flex-1 border-b border-border`. It runs from the name to the price on the baseline of the name.
   - The price: a `<p>` label in `text-foreground` with `shrink-0 whitespace-nowrap tabular-nums`, `£13.50`.
 - With `mt-2`, the description: a `<p>` in `text-body`, at most `max-w-xl`.
-- Where the dish has letters, with `mt-2`, a `<p>` label in `text-muted-foreground` holding them, joined with ` · `: `VG · GF`. Each letter is a `<span>` with `aria-hidden="true"`, followed by a `<span>` with `sr-only` that holds its word from the key and a comma or a full stop ("Vegan, ", "No gluten."), so a screen reader says the words and not the letters. The ` · ` between letters sits in the hidden part. A dish with no letters has no such line.
+- Where the dish has letters, with `mt-2`, a `<p>` label in `text-muted-foreground` holding them, joined with ` · `: `VG · GF`. Each letter is a `<span>` with `aria-hidden="true"`, followed by a `<span>` with `sr-only` that holds its word from the key and a comma or a full stop ("Vegan, ", "No gluten."), so a screen reader says the words and not the letters. The ` · ` between two letters is a third `<span>` with `aria-hidden="true"`, after the `sr-only` one: `<span aria-hidden="true">VG</span><span className="sr-only">Vegan, </span><span aria-hidden="true"> · </span>`. A dish with no letters has no such line.
 
 The name may wrap onto a second line on a phone; the price never wraps, and stays on the row of the name's first line.
 

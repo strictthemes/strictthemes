@@ -34,8 +34,8 @@ No picture, no button and no badge in this section: the heading and the white sp
 
 A section with the `id` `practice-areas`, in the grid, with two parts:
 
-- **Heading**, in columns 1–4 (`md:col-span-4`): an `<h2>` in `text-h2`, "Practice areas", then with `mt-4` one sentence in `text-body`: "Five teams, each led by partners who have practised in Wexcombe for most of their careers."
-- **The list**, in columns 5–12 (`md:col-start-5 md:col-span-8`), with `mt-8 md:mt-0`: a `<ul>` as a list of entries (see the layout notes), five entries, each with `py-8`. From `md` up each `<li>` is also `md:grid md:grid-cols-8 md:items-baseline md:gap-x-8`, with two parts:
+- **Heading**, a `<div>` in columns 1–4 (`md:col-span-4`): an `<h2>` in `text-h2`, "Practice areas", then with `mt-4` one sentence in `text-body`: "Five teams, each led by partners who have practised in Wexcombe for most of their careers."
+- **The list**, in columns 5–12 (`md:col-start-5 md:col-span-8`), with `mt-8 md:mt-0`: a `<ul>` as a list of entries (see the layout notes), which is itself the grid item and carries these classes, five entries, each with `py-8`. From `md` up each `<li>` is also `md:grid md:grid-cols-8 md:items-baseline md:gap-x-8`, with two parts:
   - In columns 1–3 (`md:col-span-3`): the area's name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link. Only Commercial disputes links to `/practice/commercial-disputes`; the other four point to `#`.
   - In columns 4–8 (`md:col-span-5`), with `mt-2 md:mt-0`: one sentence in `text-body`, at most `max-w-xl`, saying what the team does.
 
@@ -80,7 +80,7 @@ A section in the grid, with its content in columns 1–7 (`md:col-span-7`):
 
 - An `<h2>` in `text-h2`: "Talk to a partner".
 - With `mt-4`, one or two sentences in `text-body`, at most `max-w-xl`: tell us briefly what the matter is, and a partner in the right team replies within one working day.
-- With `mt-8`, a row with `flex flex-wrap items-center gap-x-8 gap-y-4`: the default button "Make an enquiry", an `<a>` styled with `buttonVariants` and the Buttons classes, to `/contact`, the page's one default button; and beside it a `<p>` label line: `Or call 01632 960 214`, where the number is a `tel:01632960214` link styled as a link in running text.
+- With `mt-8`, a row with `flex flex-wrap items-center gap-x-8 gap-y-4`: the default button "Make an enquiry", an `<a>` styled with `buttonVariants` and the Buttons classes, to `/contact`, the page's one default button; and beside it a `<p>` label line in `text-foreground`: `Or call 01632 960 214`, where the number is a `tel:01632960214` link styled as a link in running text.
 
 ### 8. Footer
 

@@ -32,18 +32,18 @@ The first item of `<main>`: a stack with `gap-4` and `lg:max-w-4xl`, so no line 
 
 The next item of `<main>`: a row of two columns with a rule between them, as the layout notes describe. The key points come first in the source, so on a phone they sit above the updates.
 
-**Key points:** the column itself is the box, an `<aside>` with the `aria-labelledby` of its heading, carrying the box classes from the layout notes, `flex flex-col gap-4` and `lg:col-span-4 lg:order-2`. It takes no rule beside it: its own border divides it from the updates, and from `lg` up the updates column keeps `lg:pr-6`. From `lg` up it stays in view while the updates scroll (`lg:sticky lg:top-6 lg:self-start`; without `self-start` a grid item does not stick). Inside it: an `<h2>` label in `font-mono text-label uppercase text-foreground`, `KEY POINTS`, then a `<ul>` with `list-disc pl-6` and `flex flex-col gap-2`, holding four points, each one sentence in `text-body`. Below `lg` it is the same box, not sticky.
+**Key points:** the column itself is the box, an `<aside>` with the `aria-labelledby` of its heading, carrying the box classes from the layout notes, `flex flex-col gap-4` and `lg:col-span-4 lg:order-2`. It takes no rule beside it: its own border divides it from the updates, and from `lg` up the updates column keeps `lg:pr-6`. From `lg` up it stays in view while the updates scroll (`lg:sticky lg:top-6 lg:self-start`; without `self-start` a grid item does not stick). Inside it: an `<h2>` label in `font-mono text-label uppercase text-foreground`, `KEY POINTS`, then a `<ul>` with `list-disc pl-6` and `flex flex-col gap-2`, holding four points, each one sentence in `text-body`, written as of the 20:05 vote result. They do not change when the new update is shown. Below `lg` it is the same box, not sticky.
 
 **Updates,** a `<section>` with `min-w-0 lg:col-span-8 lg:order-1 lg:pr-6`. Here, instead of the stacked-column rule, it takes no top border below `lg`: the box's own border above it divides them. A stack with `gap-4`, opening with an `<h2>` "Updates" that is `sr-only`:
 
 - A row with `flex flex-wrap items-center justify-between gap-4`: the order control at the left and the "Show new update" button at the right.
 - The order control: a button group with the `aria-label` "Order of updates" and two buttons, "Newest first" (chosen at the start) and "Oldest first".
-- The "Show new update" button: `variant="secondary"`, with the `RefreshCw` icon before the text with `gap-2`.
+- The "Show new update" button: `variant="secondary"`, with the `RefreshCw` icon before the text. The icon stays when the text changes.
 - The updates: an `<ol>` with `flex flex-col gap-4`, no markers and no padding, each item after the first with a 1px top border and `pt-4`. Each update is an `<article>`, a stack with `gap-2`:
   - A label line with `flex flex-wrap items-baseline gap-x-4 gap-y-1`, its parts separate items spaced by the gap, here instead of the Labels note's ` · `: the time as a `<time>` in `text-foreground` (`19:42`), the kind in words (`KEY EVENT`, `UPDATE`, `QUOTE`, `ANALYSIS`) in `text-muted-foreground`, and the reporter's name in `text-muted-foreground`.
   - For a key event only, an `<h3>` headline in `text-h2`. Other updates have no headline, so their time and kind label them. Four of the twelve are key events, among them the vote result at 20:05: `REPAIR PASSES 31 TO 22`.
   - One to three paragraphs in `text-body`, capped at `max-w-xl`.
-  - A quote update has one paragraph that says who spoke and when, then a `<blockquote>` with `flex flex-col gap-1 border-l-2 pl-4`: the quote as a `<p>` in `font-sans text-body italic`, one or two sentences that do not count toward the update's one to three, then who said it as a label in `text-muted-foreground`.
+  - A quote update has one paragraph that says who spoke and when, then a `<blockquote>` with `flex flex-col gap-1 border-l-2 pl-4`: the quote as a `<p>` in `font-sans text-body italic`, one or two sentences that do not count toward the update's one to three, then who said it as a `<p>` label in `text-muted-foreground`. The `<blockquote>` is capped at `max-w-xl`, like the paragraphs.
 - The status element from the Announcements note, right after the row of controls, empty at the start.
 
 ### 4. Footer
@@ -55,6 +55,6 @@ The footer from the layout notes.
 - All of this works on the sample data in component state. Each update has a time, a kind, a reporter, an optional headline and its text.
 - The list starts newest first. Choosing "Oldest first" reverses it; the chosen button's `aria-pressed` and variant follow the choice. The status element says "Showing oldest first" or "Showing newest first". Pressing the chosen one again does nothing, as the Button groups note says.
 - One more update is prepared but not shown at the start: a 20:12 `UPDATE` saying the repair work will start on Monday. "Show new update" adds it to the list at its place by time: at the top when the list is newest first, at the end when it is oldest first. It carries the "New" label from the Red note as the first item of its label line, which stays for the rest of the visit. The live head's last update time changes to 20:12.
-- The status element then says "New update at 20:12: repair work to start on Monday." Focus stays on the button.
+- The same status element then says "New update at 20:12: repair work to start on Monday.", in place of any order message. Focus stays on the button.
 - There is one prepared update, so the button is then disabled, with `focusableWhenDisabled` so focus stays on it (and the `data-disabled:` classes from the Buttons note, which this page needs, so it looks disabled), and its text changes to "No new updates". It is not removed.
 - Nothing scrolls or moves on its own when the update arrives.

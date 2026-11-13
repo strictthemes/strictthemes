@@ -26,7 +26,7 @@ The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-
 - A `<p>` holding the state from the layout notes, `Confirmed`.
 - With `mt-2`, the `<h1>` "Your crossing is booked" in `text-h1`.
 - With `mt-3`, one or two sentences in `text-body`: the boarding pass went to maren.holt@mail.example, and it can be shown on a phone or on paper.
-- With `mt-3`, a label line in `text-muted-foreground`: `Booked on Thursday 12 November 2026 · Paid £90.00`, the date in a `<time>` and the price in `tabular-nums`.
+- With `mt-3`, a label line in `text-muted-foreground`: `Booked on Thursday 12 November 2026 · Paid £90.00`, the date in a `<time>` and the price in a `<span>` with `text-foreground tabular-nums`, as the Prices note asks.
 
 ### 3. Boarding pass and what to bring
 
@@ -49,7 +49,7 @@ The tear line, a `<div>` with `relative border-t border-dashed` and `aria-hidden
 
 The second part, a `<div>` with `flex items-center gap-5 p-5`:
 
-- **The boarding code**, drawn from plain elements and not a real QR code: a `<div>` with `grid size-32 shrink-0 grid-cols-8`, `role="img"` and the `aria-label` "Boarding code for booking KF-7Q4M2R", holding 64 `<span>`s, row by row. A `1` below is a `<span>` with `bg-foreground`, a `0` an empty `<span>`, so each cell is 16px square and the code is navy on white in light mode and pale on navy in dark mode. No border, no corners, no gap. The eight rows:
+- **The boarding code**, drawn from plain elements and not a real QR code: a `<div>` with `grid size-32 shrink-0 grid-cols-8 grid-rows-8`, `role="img"` and the `aria-label` "Boarding code for booking KF-7Q4M2R", holding 64 `<span>`s, row by row. A `1` below is a `<span>` with `bg-foreground`, a `0` an empty `<span>`, so each cell is 16px square and the code is navy on white in light mode and pale on navy in dark mode. No border, no corners, no gap. The eight rows:
   - `11101011`
   - `10101001`
   - `11100110`
@@ -64,7 +64,7 @@ At 375px the code and its text fit side by side: about 295px inside the card, 12
 
 **Actions.** After the ticket, with `mt-5`, a `<div>` with `flex flex-wrap items-center gap-5`: a `secondary` button, "Print boarding pass", and a link in running text, "Departures on the day", that goes to `/departures`. This page has no default button.
 
-**What to bring.** A card as an `<aside>` with `aria-labelledby` pointing at its heading: a label `Before you leave home`, then with `mt-2` an `<h2>` "What to bring", then with `mt-5` a `<ul>` with no markers and no padding, and `divide-y`. Each `<li>` is `flex items-start gap-3 py-3 first:pt-0 last:pb-0`: an icon with `mt-1` (so it sits on the first line) and a sentence in `text-body`:
+**What to bring.** A card as an `<aside>` with `aria-labelledby` pointing at its heading: a label `Before you leave home`, then with `mt-2` an `<h2>` "What to bring", then with `mt-5` a `<ul>` with no markers and no padding, and `divide-y`. Each `<li>` is `flex items-start gap-3 py-3 first:pt-0 last:pb-0`: an icon with `mt-1` (so it sits on the first line) and no color class, so it takes `text-foreground`, and a sentence in `text-body`:
 
 - `IdCard`: Photo ID for each adult, such as a passport or a driving licence.
 - `Smartphone`: This boarding pass, on your phone or printed.
@@ -73,7 +73,7 @@ At 375px the code and its text fit side by side: about 295px inside the card, 12
 
 ### 4. Change or cancel
 
-A section with `mt-16`, in columns 1–8 of a grid: an `<h2>` "Change or cancel", then with `mt-3` one sentence: changes and refunds are made from this page or at the desk, and the fare difference is charged or refunded. Then with `mt-5` a description list as the layout notes describe, on the page, not in a card, with three rows: `Change up to 24 hours before` with `£10.00`, a price label; `Cancel up to 7 days before` with `Refund less £15.00`; `Cancel later` with `No refund`. Then with `mt-5` a `<p>` holding a link in running text, "Change this booking", to `#`.
+A section with `mt-16`, in columns 1–8 of a grid: an `<h2>` "Change or cancel", then with `mt-3` one sentence: changes and refunds are made from this page or at the desk, and the fare difference is charged or refunded. Then with `mt-5` a description list as the layout notes describe, on the page, not in a card, with three rows: `Change up to 24 hours before` with `£10.00`, a price label; `Cancel up to 7 days before` with `Refund less £15.00`, a label in `text-foreground` with `tabular-nums`; `Cancel later` with `No refund`, a label in `text-foreground`. Then with `mt-5` a `<p>` holding a link in running text, "Change this booking", to `#`.
 
 ### 5. Footer
 

@@ -38,19 +38,19 @@ Heading: "The year in figures". Under it a `<dl>` laid out as `grid grid-cols-1 
 
 Heading: "What happened". Three short paragraphs in a stack with `gap-4`, each at most `max-w-lg` wide, written plainly in the first person plural of the business, about 60 words each: income grew with two new café clients and a busy summer of event print; costs rose with paper prices, about 9% over the year; the second quarter was a loss because the folding machine was paid for in February, and cash was lowest at the end of March.
 
-Where a sentence relies on a note, it ends with a note marker, in order: the first paragraph's sentence with the year's income ends with marker 1, the second paragraph's sentence about paper prices with marker 2, the third paragraph's sentence about the folding machine with marker 3. A marker is a `<sup>` with `text-label` (a bare `<sup>` gets a size outside the type scale) and `relative -top-1 align-baseline` (so it does not open up its line), holding a text link to the note, `#note-2`, with the number as its text and the `aria-label` "Note 2". Note 4 has no marker.
+Where a sentence relies on a note, it ends with a note marker, in order: the first paragraph's sentence with the year's income ends with marker 1, the second paragraph's sentence about paper prices with marker 2, the third paragraph's sentence about the folding machine with marker 3. A marker is a `<sup>` with `text-label` (a bare `<sup>` gets a size outside the type scale) in the body font, with no `font-mono`, and `relative -top-1 align-baseline` (so it does not open up its line), holding a text link to the note, `#note-2`, with the number as its text and the `aria-label` "Note 2". Note 4 has no marker.
 
 ### 5. By quarter
 
 Heading: "By quarter". One sentence above the table in `text-body`, at most `max-w-lg` wide: "Income and costs exclude VAT. Cash is the balance of both accounts on the last day of each quarter."
 
-Then a sheet with rows holding the table and no heading row of its own: the section's `<h2>` names it. The table has the label "The year by quarter" and these columns: Quarter, Income, Costs, Net, Margin and Cash at end; every column but the first is right-aligned, headers too. Each Quarter cell holds a `<div>` with `flex flex-col gap-1` (not on the `<td>` itself): the quarter, `Q1`, in `text-body`, and the months as a small figure, `Oct–Dec 2025`.
+Then a sheet with rows holding the table and no heading row of its own: the section's `<h2>` names it. The table has the label "The year by quarter" and these columns: Quarter, Income, Costs, Net, Margin and Cash at end; every column but the first is right-aligned, headers too. The Quarter cells and the total row's "Year" cell are `TableCell`s, not row headers. Each Quarter cell holds a `<div>` with `flex flex-col gap-1` (not on the `<td>` itself): the quarter, `Q1`, in `text-body`, and the months as a small figure, `Oct–Dec 2025`.
 
 - **Income, Costs and Cash at end** are mono figures with no sign and no color.
 - **Net** is a signed amount whose word is "Profit" or "Loss" in place of "In" and "Out": a profit is `text-primary` with a plus sign, the loss `text-destructive` with the minus sign U+2212.
 - **Margin** is a mono figure with one decimal and a `%`, with the minus sign for the loss and no color.
 
-The `<tfoot>` has one row, the total row, under the double rule: "Year" and the year's income, costs, net and margin, and the cash at the end of the year, all in `font-heading text-h2 tabular-nums`. "Year" is in `text-foreground`. The net is a signed amount as in the body rows: the word "Profit" as a label in `text-muted-foreground` (`font-mono text-label uppercase`, not the heading font), then `+£56,620` in `font-heading text-h2 tabular-nums text-primary`, with its plus sign. The margin, `13.7%`, and the other figures have no sign and no color. The table scrolls in its box on a phone.
+The `<tfoot>` has one row, the total row, under the double rule: "Year" and the year's income, costs, net and margin, and the cash at the end of the year, all in `font-heading text-h2 tabular-nums`. "Year" is set like the figures, not as a label, so it takes the row's text color. The net is a signed amount as in the body rows: the word "Profit" as a label in `text-muted-foreground` (`font-mono text-label uppercase`, not the heading font), then `+£56,620` in `font-heading text-h2 tabular-nums text-primary`, with its plus sign. The margin, `13.7%`, and the other figures have no sign and no color. The table scrolls in its box on a phone.
 
 ### 6. Notes
 

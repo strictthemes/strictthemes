@@ -24,14 +24,14 @@ The header from the layout notes. "Visit" is the current page.
 
 The first `<section>`, a grid (`md:grid-cols-12`):
 
-- Columns 1–7: a label "Visit"; with `mt-2`, the `<h1>` "Find the Vesper" in `text-h1 md:text-display`; with `mt-6`, one paragraph within `max-w-xl` about the building: a rope works from 1871, a cinema since 1934, three screens and a bar on the first floor.
+- Columns 1–7: a label "Visit"; with `mt-2`, the `<h1>` "Find the Vesper" in `text-h1 md:text-display`; with `mt-6` (one step more than the rhythm's `mt-4`, under the large title, on purpose), one paragraph within `max-w-xl` about the building: a rope works from 1871, a cinema since 1934, three screens and a bar on the first floor.
 - Columns 9–12, with `mt-12 md:mt-0`: a card from the layout notes. A label "Address"; with `mt-2`, an `<address>` in `text-body` with `not-italic`, in three lines, "21 Tallow Row", "Oldmere" and "OM2 4LT", broken with `<br />`; with `mt-4`, a `<p>` holding the phone number and, under it with no margin, a `<p>` holding the email address, each a text link (`tel:` and `mailto:`). Do not uppercase the email address.
 
 ### 3. Opening times
 
 The second `<section>`, with `mt-24`. An `<h2>` "Opening times" in `text-h2 md:text-h1`, then with `mt-4` one sentence: the box office opens half an hour before the first film.
 
-With `mt-6`, in columns 1–8 of a grid (`md:grid-cols-12`), the `Table` from the layout notes (add it with `npx shadcn@latest add table`), with the `label` "Opening times". Columns: Day, Doors open, Last film starts, Bar closes. One row per day, Monday to Sunday; the first cell of each row is a `TableHead` with `scope="row"` and, in place of the column headers' label classes, `py-2 font-sans text-body font-normal text-foreground`; like every cell it keeps `px-4` and `first:pl-0 last:pr-0`. The column headers are `<th scope="col">`. Every time is a `<time>` (`dateTime="17:00"`) in `font-mono tabular-nums`. Monday is closed: its row says "Closed" in words in the Doors open cell, and its other two cells hold "—" with a visually hidden "Closed". Today, Wednesday, is not marked.
+With `mt-6`, in columns 1–8 of a grid (`md:grid-cols-12`), the `Table` from the layout notes (add it with `npx shadcn@latest add table`), with the `label` "Opening times". Columns: Day, Doors open, Last film starts, Bar closes. One row per day, Monday to Sunday; the first cell of each row is a `TableHead` with `scope="row"` and, in place of the column headers' `font-mono text-label uppercase text-muted-foreground`, `py-2 font-sans text-body font-normal text-foreground`; like every cell it keeps `px-4` and `first:pl-0 last:pr-0`. The column headers are `<th scope="col">`. Every time is a `<time>` (`dateTime="17:00"`) in `font-mono tabular-nums`. Monday is closed: its row says "Closed" in words in the Doors open cell, and its other two cells hold "—" with a visually hidden "Closed". Today, Wednesday, is not marked.
 
 The stock cells do not wrap, so the table is about 480px wide: at 375px it is wider than the screen and scrolls sideways inside its own box, and the page does not.
 
@@ -66,7 +66,7 @@ The fifth `<section>`, with `mt-24`. An `<h2>` "Getting here" in `text-h2 md:tex
 The sixth `<section>`, with `mt-24` and the `id` "contact", a grid (`md:grid-cols-12`):
 
 - Columns 1–5: an `<h2>` "Write to us" in `text-h2 md:text-h1`, then with `mt-4` one sentence: questions about access, private hire or lost property, answered within two working days.
-- Columns 7–12, with `mt-12 md:mt-0`: a wrapper holding the form and the status element from the layout notes.
+- Columns 7–12, with `mt-12 md:mt-0`: this grid item is itself the wrapper holding the form and the status element from the layout notes.
 
 The form, with `noValidate`:
 
@@ -82,6 +82,6 @@ The footer from the layout notes.
 
 ### Behavior
 
-- When the form is sent, check it in code: the name must not be empty ("Enter your name."), the email must not be empty and must look like an address, with one `@` and a dot after it ("Enter an email address such as name@example.com."), and the message must be at least 20 characters ("Write a few words more, so we can help: at least 20 characters."). Show every error at once and move focus to the first field with an error.
+- When the form is sent, check it in code: the name must not be empty ("Enter your name."), the email must not be empty and must look like an address: no spaces, one `@` with text before it, and after it a dot with text on both sides ("Enter an email address such as name@example.com."), and the message must be at least 20 characters ("Write a few words more, so we can help: at least 20 characters."). Show every error at once and move focus to the first field with an error.
 - A good form is replaced by the confirmation. Its `<h3>`: "Thank you, your message is with us", with no full stop. Under it, with `mt-4`, one sentence that names the topic and the email address the reply goes to: "We will answer your question about access at mara@example.com within two working days." The topic reads "your question" for General question, "your question about access", "your question about private hire" and "your message about lost property". Nothing is sent anywhere: this is a demo.
 - The phone and email links use `tel:01632960418` and `mailto:hello@vesper.example`. No link needs behavior.

@@ -24,7 +24,7 @@ The header from the layout notes. "Fees" is the current page, in the header and 
 
 The first section, in the grid, with its `aria-labelledby` naming the `<h1>`:
 
-- A label line in `text-muted-foreground`, columns 1–12 (`md:col-span-12`): `Fees from 1 January 2027`.
+- A label line in `text-muted-foreground`, columns 1–12 (`md:col-span-12`): `Fees from 1 January 2027`, with only the date in a `<time dateTime="2027-01-01">`.
 - With `mt-4`, the `<h1>` in `text-h1 md:text-display`, columns 1–9 (`md:col-span-9`): "Fees, said plainly". The words "said plainly" are an `<em>` with `italic`.
 - With `mt-7`, a `<p>` in columns 1–7 (`md:col-start-1 md:col-span-7`, which overlap the `<h1>`'s, so it starts a row under it), at most `max-w-xl`, in `text-body`: "Here is what a session costs, how to pay and how to cancel. If something is not answered here, ask me. It is an ordinary question."
 
@@ -94,7 +94,7 @@ No `Accordion` component here: the plain buttons above are the whole mechanism.
 A section in the grid, with one card in columns 1–7 (`md:col-span-7`), built as the note The one action says. The section's `aria-labelledby` names the card's `<h2>`.
 
 - The `<h2>`: "If you would like to start".
-- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "Write to me with the form. The first call is free, and nothing is charged until we have met for a first session."
+- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The button leads to a short form. The first call is free, and nothing is charged until we have met for a first session."
 - With `mt-7`, a `<div>` holding the default button "Request a first session", an `<a>` to `/first-session`. The page's one default button.
 
 ### 7. Footer

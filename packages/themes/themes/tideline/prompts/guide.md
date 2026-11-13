@@ -32,7 +32,7 @@ A full-width section, with its `aria-labelledby` pointing at the `<h1>`. It hold
 
 Here, in place of a section, the `<main>`'s item is a `<div>` with the grid classes of the layout notes' parts side by side (`grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-x-6 md:items-start`), holding two things, in this order in the code: the facts, an `<aside>`, and the article, an `<article>`. Below `md` the facts come first, so a visitor in the car park finds them without scrolling; from `md` up the article stands on the left and the facts on the right, placed by classes alone.
 
-**The facts,** an `<aside>` with `md:col-span-4 md:col-start-9`, `flex flex-col gap-6` and `aria-labelledby` pointing at the first card's heading. It holds two cards from the layout notes.
+**The facts,** an `<aside>` with `md:col-span-4 md:col-start-9`, `flex flex-col gap-6` and the `aria-label` "Plan your visit", a name for both its cards. It holds two cards from the layout notes.
 
 The first card, in its `gap-4`: an `<h2>` "At a glance", then rows from the layout notes, stacked, as the Rows note says: a `<dl>` with six rows, the term a label in `text-muted-foreground` over the value in `text-body text-foreground`. Word for word:
 

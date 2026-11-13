@@ -34,7 +34,7 @@ In its own reading column, with `mt-12`: that column `<div>` is the wrapper of t
 
 In the reading column, with `mt-24`:
 
-- A label: the letter's number and date, e.g. `Letter 112 · 1 March 2026`.
+- A label: the letter's number and date, e.g. `Letter 112 · 8 November 2026`; the date is a Sunday in the last two weeks.
 - With `mt-2`, an `<h2>`: the letter's title.
 - Three paragraphs from the letter, the first with `mt-4` and the others with `mt-6`, about 150 words, with one `<em>`.
 - A block quote (`my-12`): one sentence from later in the same letter, with no name under it.

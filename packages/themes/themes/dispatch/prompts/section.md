@@ -42,7 +42,7 @@ The next item of `<main>`: a row of two columns with a rule between them, as the
 The list is a `<ul>` of story rows divided by rules. Each row is an `<article>`, `grid grid-cols-1 gap-2 md:grid-cols-12 md:gap-0`:
 
 - `md:col-span-2 md:pr-4`: a row with `flex flex-wrap items-baseline gap-2` holding the time as a label in `text-muted-foreground`, a `<time>` in the Dates note's forms (`09:40` today, `TUE 10 NOV` back to Sunday 8 November). Below `md` this row sits above the whole second column: picture, kicker and headline.
-- `md:col-span-10`: a stack with `gap-2`: a kicker, an `<h3>` in `text-h2` that is a link, one sentence in `text-body`, and the byline as a label in `text-muted-foreground`.
+- `md:col-span-10`: a stack with `gap-2`: a kicker, an `<h3>` in `text-h2` that is a link, one sentence in `text-body`, and the byline alone as a label in `text-muted-foreground` (`BY MALIK OSEI`): here, instead of the Story unit note's label line, the time stays in the first column.
 
 Eight rows are shown at the start, newest first. Two of the first eight have a picture, `aspect-video`, at the top of their second column. The newest story has the "New" label from the Red note after its time, in that row.
 
@@ -63,5 +63,5 @@ The footer from the layout notes.
 
 - All of it works on the sample data in component state: twenty stories after the lead, each with a time, a kicker, a headline, a sentence and a byline.
 - "Load more" adds the next six stories at the end of the list. Focus moves to the headline link of the first story it added, and the status element says "6 more stories shown." The count label changes to match.
-- The second click shows the last six, the status element says "The last 6 stories shown." (a new text, so it is announced again), and it replaces the row's button with the sentence "That is every Politics story from the last four days." in `text-body`. Focus is already on the first new story, so it is not lost when the button goes.
+- The second click shows the last six, the status element says "The last 6 stories shown." (a new text, so it is announced again), and it replaces the row's button with the sentence "That is every Politics story from the last four days.", a `<p>` in `text-body` with `max-w-xl`. Focus is already on the first new story, so it is not lost when the button goes.
 - New stories appear at once, with no animation, and the page does not scroll on its own beyond what moving focus needs.

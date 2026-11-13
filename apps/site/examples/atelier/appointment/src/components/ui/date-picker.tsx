@@ -1,5 +1,6 @@
 import * as React from "react"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { CalendarIcon } from "lucide-react"
+import type { Matcher } from "react-day-picker"
 
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -7,24 +8,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { formatLongDate, toDateTime } from "@/lib/date"
+import { formatDate, toDateTime } from "@/lib/date"
 import { cn } from "@/lib/utils"
-
-// A non-breaking space (U+00A0): the date breaks after the weekday only.
-const NBSP = String.fromCharCode(160)
-
-type CalendarProps =React.ComponentProps<typeof Calendar>
 
 type DatePickerProps = {
   id: string
   labelId: string
   value: Date | undefined
-  onValueChange: (value: Date) => void
+  onValueChange: (value: Date | undefined) => void
   className?: string
+  disabled?: Matcher | Matcher[]
+  startMonth?: Date
+  ref?: React.Ref<HTMLButtonElement>
   "aria-invalid"?: boolean
   "aria-describedby"?: string
-  disabled?: CalendarProps["disabled"]
-  startMonth?: Date
 }
 
 function DatePicker({
@@ -33,10 +30,11 @@ function DatePicker({
   value,
   onValueChange,
   className,
-  "aria-invalid": ariaInvalid,
-  "aria-describedby": ariaDescribedBy,
   disabled,
   startMonth,
+  ref,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
@@ -44,8 +42,9 @@ function DatePicker({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
+        ref={ref}
         id={id}
-        aria-labelledby={labelId + " " + id + "-value"}
+        aria-labelledby={`${labelId} ${id}-value`}
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
         className={cn(
@@ -53,11 +52,9 @@ function DatePicker({
           className
         )}
       >
-        <span id={id + "-value"} className="min-w-0">
+        <span id={`${id}-value`} className="min-w-0">
           {value ? (
-            <time dateTime={toDateTime(value)}>
-              {formatLongDate(value, NBSP)}
-            </time>
+            <time dateTime={toDateTime(value)}>{formatDate(value)}</time>
           ) : (
             <span className="text-muted-foreground">Choose a day</span>
           )}

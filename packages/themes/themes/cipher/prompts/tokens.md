@@ -26,7 +26,7 @@ The `<h1>` "Settings". No actions.
 
 ### 3. Settings links
 
-Two columns from `lg` up, the full width below: a `<nav>` with the `aria-label` "Settings", holding a `<ul>` of five links styled as sidebar links from the layout notes, each a block with `py-1` in `text-body`, the items with no margin: General (`#`), Members (`#`), Domains (`#`), API tokens (`/settings/tokens`, the current page), Billing (`#`). Below `lg` the `<ul>` is a row, `flex flex-wrap gap-x-6 gap-y-2`. From `lg` up the `<nav>` stays in view (`lg:sticky lg:top-6 lg:self-start`).
+Here the console grid is a single column below `lg`, not `md`. Two columns from `lg` up, the full width below: a `<nav>` with the `aria-label` "Settings", holding a `<ul>` of five links styled as sidebar links from the layout notes, each a block with `py-1` in `text-body` in the body font, the items with no margin: General (`#`), Members (`#`), Domains (`#`), API tokens (`/settings/tokens`, the current page), Billing (`#`). Below `lg` the `<ul>` is a row, `flex flex-wrap gap-x-6 gap-y-2`. From `lg` up the `<nav>` stays in view (`lg:sticky lg:top-6 lg:self-start`).
 
 ### 4. API tokens
 
@@ -41,7 +41,7 @@ Ten columns from `lg` up, the full width below, with `min-w-0`. In this order:
 
 A panel with rows. Its heading row holds the label heading, here an `<h3>` "Tokens" (under the `<h2>` "API tokens"), in the label-heading classes, not the `<h3>` style, and at the right end the count as a small figure (`4 tokens`). Add the components with `npx shadcn@latest add table badge input select`. The table's `label` is "API tokens"; give the `<table>` `min-w-2xl`. Columns:
 
-- **Name:** `font-mono`. On the token created last in this visit, the signal badge "new" follows the name with `gap-2`: the page's one lime mark.
+- **Name:** `font-mono`. A token's name is `font-mono` wherever it shows: in the messages too, and the "Name" and "Type ci-deploy to confirm" inputs add `font-mono` to the input classes. On the token created last in this visit, the signal badge "new" follows the name with `gap-2`: the page's one lime mark.
 - **Token:** the first eight characters, `plt_` and four more, and an ellipsis (`plt_7Kq2…`), `font-mono text-muted-foreground`, never the whole token.
 - **Scope:** `font-mono`, lowercase.
 - **Created**, **Last used** and **Expires:** right-aligned, a `<time>` with a `dateTime` in `font-mono tabular-nums`; a token never used, or one that never expires, shows the word `never`. Each shows the date alone (`11 Nov 2026`): the time a token was last used goes in its `dateTime` and is not shown, so that the seven columns fit the panel at 1280px.
@@ -57,7 +57,7 @@ The form has `noValidate` and three fields, each at most `max-w-md` wide:
 
 - "Name": an `Input` with helper text: lowercase letters, numbers and hyphens, up to 32 characters.
 - "Scope": a `Select` with `font-mono` and `read`, `deploy:write` and `admin`, starting on `deploy:write`, with helper text that says what the chosen scope can do and changes with it.
-- "Expires": a `Select` with `font-mono`, since its options are durations: 30 days, 90 days, 1 year and Never, starting on 90 days.
+- "Expires": a `Select` with `font-mono`, since its options are durations: `30 days`, `90 days`, `1 year` and `never`, lowercase as the table prints them, starting on `90 days`.
 
 With `mt-6`, the default button "Create token", `type="submit"`.
 
@@ -65,7 +65,7 @@ When a token is made, the form goes. Inside the status element, in this order:
 
 1. A `<p>` with `tabIndex={-1}`, which gets focus: `Token ci-preview created.`
 2. With `mt-3`, one sentence: copy it now; it is shown once, Plinth keeps only a hash of it, and it expires on the date (a `<time>`, such as `9 Feb 2027`), or never.
-3. With `mt-6`, the token in a `<code>` with `block break-all rounded-sm bg-muted px-2 py-1 font-mono text-body`. No border, so it is not a box in the panel; on a phone it wraps, not scrolls.
+3. With `mt-6`, the token in a `<code>` with `block break-all rounded-sm bg-secondary/10 px-2 py-1 font-mono text-body` (`bg-muted` cannot be seen on the panel in dark mode). No border, so it is not a box in the panel; on a phone it wraps, not scrolls.
 
 After the status element, in the wrapper and rendered only while a token is shown, a row with `mt-6` and `flex flex-wrap gap-2`: the "Copy" button from the code-block recipe (`outline`), which copies the token, here in the default size in place of `size="sm"`, so it is as tall as "Done"; and a `secondary` button "Done". Here, in place of the recipe's "beside it", the Copy button's hidden status is not in the row: it is the wrapper's last child, rendered at all times, so it is on the page before the first copy.
 
@@ -76,4 +76,5 @@ After the status element, in the wrapper and rendered only while a token is show
 - "Done" empties the status element, brings back an empty form and focuses the Name field; the whole token is gone for good.
 - "Revoke" opens the confirmation and moves focus to its field. "Revoke token" is always enabled; when the field does not hold the token's name exactly, it shows the error "Type ci-deploy exactly to revoke this token." under the field. "Cancel" closes it and focuses that row's "Revoke".
 - With the exact name, "Revoke token" removes the row, closes the confirmation, updates the count, puts `Token ci-deploy revoked.` in the status element under the paragraph and moves focus to it. With no tokens left, the count reads `0 tokens` and the table's body is one row, across all columns: "No tokens. Create one below."
+- Revoking the token that is shown leaves it shown until "Done". `Token ci-deploy revoked.` stays until the next revoke.
 - The "Menu" button works as the notes say; links need nothing more.

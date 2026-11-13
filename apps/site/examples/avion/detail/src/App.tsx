@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent, type ReactNode } from "react"
+import * as React from "react"
 import { Check, CircleAlert } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -15,235 +15,220 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-const FOCUS =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const LABEL = "font-mono text-label uppercase"
-const FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const BUTTON = "px-5 font-mono text-label uppercase"
-const NAV_LINK = cn(LABEL, "transition-colors duration-150", FOCUS)
+const navLink = cn(
+  "font-mono text-label text-muted-foreground uppercase transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const label = "font-mono text-label uppercase text-muted-foreground"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const buttonText = "px-5 font-mono text-label uppercase"
 
+const SIGNED_IN = "Tomas Reyes"
 const SHIPMENT_ID = "NG-48213"
-const SIGNED_IN = "Priya Nair"
+// The sample's "now": 11 Nov, 13:50.
+const NOW = { iso: "2026-11-11T13:50", text: "11 Nov, 13:50" }
 
-const NAV = [
+const navItems = [
   { label: "Overview", href: "/" },
   { label: "Shipments", href: "/shipments", current: true },
   { label: "Depots", href: "/depots" },
   { label: "Reports", href: "/reports" },
 ]
 
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-]
-
 type Stamp = { iso: string; text: string }
 
-function stamp(date: Date): Stamp {
-  const pad = (n: number) => String(n).padStart(2, "0")
-  const hh = pad(date.getHours())
-  const mm = pad(date.getMinutes())
-  return {
-    iso: `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${hh}:${mm}`,
-    text: `${date.getDate()} ${MONTHS[date.getMonth()]}, ${hh}:${mm}`,
-  }
+type Step = {
+  name: string
+  reached?: Stamp
+  expected?: Stamp
 }
 
-function at(iso: string): Stamp {
-  return stamp(new Date(iso))
-}
-
-type Tone = "success" | "failed" | "caution" | "neutral"
-
-const DOT: Record<Tone, string> = {
-  success: "bg-success",
-  failed: "bg-destructive",
-  caution: "bg-tertiary",
-  neutral: "bg-muted-foreground",
-}
-
-function State({ tone, children }: { tone: Tone; children: ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span
-        aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", DOT[tone])}
-      />
-      <span className="text-body text-foreground">{children}</span>
-    </span>
-  )
-}
-
-function PanelHeading({
-  id,
-  children,
-  aside,
-}: {
-  id: string
-  children: ReactNode
-  aside?: ReactNode
-}) {
-  return (
-    <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
-      <h2 id={id} className={cn(LABEL, "text-muted-foreground")}>
-        {children}
-      </h2>
-      {aside}
-    </div>
-  )
-}
-
-const PANEL = "rounded-xl border bg-card p-5"
-const ROWS_PANEL = "overflow-hidden rounded-xl border bg-card"
-const ROWS_HEAD = "border-b px-5 pt-5 pb-3"
-
-type Step = { name: string; time: Stamp }
-
-const STEPS: Step[] = [
-  { name: "Booked", time: at("2026-11-10T15:22") },
-  { name: "Collected", time: at("2026-11-10T17:48") },
-  { name: "At depot", time: at("2026-11-10T21:06") },
-  { name: "Out for delivery", time: at("2026-11-11T08:40") },
-  { name: "Delivered", time: at("2026-11-11T13:45") },
+const steps: Step[] = [
+  {
+    name: "Booked",
+    reached: { iso: "2026-11-10T15:22", text: "10 Nov, 15:22" },
+  },
+  {
+    name: "Collected",
+    reached: { iso: "2026-11-10T17:05", text: "10 Nov, 17:05" },
+  },
+  {
+    name: "At depot",
+    reached: { iso: "2026-11-10T21:48", text: "10 Nov, 21:48" },
+  },
+  {
+    name: "Out for delivery",
+    reached: { iso: "2026-11-11T08:40", text: "11 Nov, 08:40" },
+  },
+  {
+    name: "Delivered",
+    expected: { iso: "2026-11-11T13:45", text: "11 Nov, 13:45" },
+  },
 ]
 const CURRENT_STEP = 3
 
 type TimelineEvent = {
   id: string
-  time: Stamp
+  at: Stamp
   text: string
   by: string
-  state?: { tone: Tone; word: string }
+  state?: { word: string; dot: string }
 }
 
-const EVENTS: TimelineEvent[] = [
+const initialEvents: TimelineEvent[] = [
   {
     id: "e6",
-    time: at("2026-11-11T10:15"),
-    text: "Road closure on the B1170 at Ferrow Bridge. The van is taking the diversion through Linden Road, and the new arrival time is 13:45.",
-    by: "Route monitor",
-    state: { tone: "caution", word: "Delayed" },
+    at: { iso: "2026-11-11T11:32", text: "11 Nov, 11:32" },
+    text: "The A614 is closed at Fernley after a collision, so the van is taking the diversion through Kelham Lane and will miss the 12:00 slot.",
+    by: "Marcus Hale, driver",
+    state: { word: "Delayed", dot: "bg-tertiary" },
   },
   {
     id: "e5",
-    time: at("2026-11-11T08:40"),
-    text: "Loaded onto van NV-217 and left Easton Vale depot on route 14.",
-    by: "Tomasz Wierzba",
+    at: { iso: "2026-11-11T08:40", text: "11 Nov, 08:40" },
+    text: "Loaded onto van 14 and left Ashby Cross depot on route AC-07.",
+    by: "Marcus Hale, driver",
   },
   {
     id: "e4",
-    time: at("2026-11-11T06:55"),
-    text: "Sorted to delivery route 14 with 38 other stops.",
-    by: "Sorter 3, Easton Vale",
+    at: { iso: "2026-11-11T06:15", text: "11 Nov, 06:15" },
+    text: "Sorted to delivery route AC-07, stop 9 of 23.",
+    by: "Route planner",
   },
   {
     id: "e3",
-    time: at("2026-11-10T21:06"),
-    text: "Arrived at Easton Vale depot and scanned in, 4 parcels.",
-    by: "Dock scanner D2",
+    at: { iso: "2026-11-10T21:48", text: "10 Nov, 21:48" },
+    text: "Arrived at Ashby Cross depot and scanned in at bay 3.",
+    by: "Depot scanner, Ashby Cross",
   },
   {
     id: "e2",
-    time: at("2026-11-10T17:48"),
-    text: "Collected from the sender's warehouse at Millbeck Trade Park.",
-    by: "Marcus Hale",
+    at: { iso: "2026-11-10T17:05", text: "10 Nov, 17:05" },
+    text: "Collected from the sender's warehouse, one parcel of 12.40 kg.",
+    by: "Lena Ortiz, driver",
   },
   {
     id: "e1",
-    time: at("2026-11-10T15:22"),
-    text: "Booked for next-day delivery before 12:00.",
-    by: "Customer portal",
+    at: { iso: "2026-11-10T15:22", text: "10 Nov, 15:22" },
+    text: "Shipment booked through the customer portal for next-day delivery.",
+    by: "Hollowmere Home Goods",
   },
 ]
 
-const ITEMS = [
+const items = [
   {
-    sku: "HB-TN-2204",
-    description: "Two-person trekking tent, moss green",
+    sku: "KT-1180",
+    description: "Stainless steel kettle, 1.7 l",
     quantity: 2,
-    weight: 6.8,
+    unitKg: 1.4,
   },
   {
-    sku: "HB-SB-0915",
-    description: "Down sleeping bag, comfort to −5 °C",
+    sku: "MG-0425",
+    description: "Stoneware mug set of four",
     quantity: 3,
-    weight: 4.2,
+    unitKg: 2.1,
   },
   {
-    sku: "HB-ST-0310",
-    description: "Folding camp stove, steel",
-    quantity: 1,
-    weight: 1.6,
-  },
-  {
-    sku: "HB-MT-1188",
-    description: "Self-inflating sleeping mat, long",
+    sku: "TL-3302",
+    description: "Linen tea towels, pack of three",
     quantity: 4,
-    weight: 5.8,
+    unitKg: 0.35,
+  },
+  {
+    sku: "CB-0917",
+    description: "Oak chopping board, large",
+    quantity: 1,
+    unitKg: 1.9,
   },
 ]
+const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
+const totalKg = items.reduce(
+  (sum, item) => sum + item.quantity * item.unitKg,
+  0
+)
+const kg = (value: number) => value.toFixed(2)
 
-const TOTAL_QUANTITY = ITEMS.reduce((sum, item) => sum + item.quantity, 0)
-const TOTAL_WEIGHT = ITEMS.reduce((sum, item) => sum + item.weight, 0)
+type Note = { id: string; text: string; by: string; at: Stamp }
 
-type Note = { id: string; text: string; by: string; time: Stamp }
-
-const FIRST_NOTES: Note[] = [
+const initialNotes: Note[] = [
   {
     id: "n2",
-    text: "Called the recipient about the delay. Ruth Ainsley is at the clinic until 17:00, so an afternoon delivery is fine.",
-    by: "Priya Nair",
-    time: at("2026-11-11T09:12"),
+    text: "Customer asked us to leave it with the neighbour at number 14 if nobody answers.",
+    by: "Dev Ahuja",
+    at: { iso: "2026-11-11T11:48", text: "11 Nov, 11:48" },
   },
   {
     id: "n1",
-    text: "Sender asks that the parcels go to the clinic's side door on Orchard Row, not the main entrance.",
-    by: "Daniel Okafor",
-    time: at("2026-11-10T15:40"),
+    text: "Called the recipient to confirm the new window. They are home until 17:00.",
+    by: "Priya Nair",
+    at: { iso: "2026-11-11T09:12", text: "11 Nov, 09:12" },
   },
 ]
 
-function plural(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
+function State({ dot, word }: { dot: string; word: string }) {
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span
+        aria-hidden="true"
+        className={cn("size-2 shrink-0 rounded-full", dot)}
+      />
+      <span className="text-body text-foreground">{word}</span>
+    </span>
+  )
+}
+
+function PanelHeading({
+  children,
+  aside,
+}: {
+  children: React.ReactNode
+  aside?: React.ReactNode
+}) {
+  return (
+    <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
+      <h2 className={label}>{children}</h2>
+      {aside}
+    </div>
+  )
 }
 
 export function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [delivered, setDelivered] = useState<Stamp | null>(null)
-  const [notes, setNotes] = useState<Note[]>(FIRST_NOTES)
-  const [draft, setDraft] = useState("")
-  const [noteError, setNoteError] = useState(false)
-  const noteRef = useRef<HTMLTextAreaElement>(null)
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const [delivered, setDelivered] = React.useState(false)
+  const [events, setEvents] = React.useState(initialEvents)
+  const [notes, setNotes] = React.useState(initialNotes)
+  const [draft, setDraft] = React.useState("")
+  const [noteError, setNoteError] = React.useState(false)
+  const [status, setStatus] = React.useState("")
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+  const noteRef = React.useRef<HTMLTextAreaElement>(null)
 
-  const events: TimelineEvent[] = delivered
-    ? [
-        {
-          id: "e7",
-          time: delivered,
-          text: "Handed over at the clinic's side door on Orchard Row and signed for.",
-          by: SIGNED_IN,
-          state: { tone: "success", word: "Delivered" },
-        },
-        ...EVENTS,
-      ]
-    : EVENTS
+  function onHeaderKeyDown(event: React.KeyboardEvent) {
+    if (menuOpen && event.key === "Escape") {
+      setMenuOpen(false)
+      menuButtonRef.current?.focus()
+    }
+  }
 
   function markDelivered() {
     if (delivered) return
-    setDelivered(stamp(new Date()))
+    setDelivered(true)
+    setEvents((current) => [
+      {
+        id: "e7",
+        at: NOW,
+        text: "Delivered to the recipient at the front door and signed for.",
+        by: SIGNED_IN,
+        state: { word: "Delivered", dot: "bg-success" },
+      },
+      ...current,
+    ])
+    setStatus(`Shipment ${SHIPMENT_ID} marked as delivered.`)
   }
 
-  function addNote(event: FormEvent<HTMLFormElement>) {
+  function addNote(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const text = draft.trim()
     if (!text) {
@@ -252,52 +237,50 @@ export function App() {
       return
     }
     setNotes((current) => [
-      {
-        id: `n${Date.now()}`,
-        text,
-        by: SIGNED_IN,
-        time: stamp(new Date()),
-      },
+      { id: `n${Date.now()}`, text, by: SIGNED_IN, at: NOW },
       ...current,
     ])
     setDraft("")
     setNoteError(false)
   }
 
+  const currentStep = delivered ? -1 : CURRENT_STEP
+
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-[1280px] items-center px-3 py-3 md:px-5">
+      <header className="border-b bg-card" onKeyDown={onHeaderKeyDown}>
+        <div className="mx-auto flex max-w-[1280px] items-center gap-8 px-3 py-3 md:px-5">
           <a
             href="/"
             className={cn(
-              "font-heading text-h2 text-foreground transition-colors duration-150",
-              FOCUS
+              "font-heading text-h2 transition-colors duration-150",
+              focusRing
             )}
           >
             Northgate
           </a>
-          <nav aria-label="Main" className="ml-8 hidden gap-5 md:flex">
-            {NAV.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                aria-current={link.current ? "true" : undefined}
-                className={cn(
-                  NAV_LINK,
-                  link.current
-                    ? "text-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {link.label}
-              </a>
-            ))}
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex gap-5">
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    aria-current={item.current ? "true" : undefined}
+                    className={cn(navLink, item.current && "text-foreground")}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
-          <p className={cn(FIGURE, "ml-auto hidden md:block")}>{SIGNED_IN}</p>
+          <p className={cn(smallFigure, "ml-auto hidden md:block")}>
+            {SIGNED_IN}
+          </p>
           <Button
+            ref={menuButtonRef}
             variant="outline"
-            className={cn(BUTTON, "ml-auto md:hidden")}
+            className={cn(buttonText, "ml-auto md:hidden")}
             aria-expanded={menuOpen}
             aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
@@ -312,20 +295,18 @@ export function App() {
           className="border-t md:hidden"
         >
           <ul className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
-            {NAV.map((link) => (
-              <li key={link.href}>
+            {navItems.map((item) => (
+              <li key={item.href}>
                 <a
-                  href={link.href}
-                  aria-current={link.current ? "true" : undefined}
+                  href={item.href}
+                  aria-current={item.current ? "true" : undefined}
                   className={cn(
-                    NAV_LINK,
+                    navLink,
                     "block py-2",
-                    link.current
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                    item.current && "text-foreground"
                   )}
                 >
-                  {link.label}
+                  {item.label}
                 </a>
               </li>
             ))}
@@ -337,13 +318,7 @@ export function App() {
         {/* Page header */}
         <div className="md:col-span-12">
           <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-            <a
-              href="/shipments"
-              className={cn(
-                NAV_LINK,
-                "text-muted-foreground hover:text-foreground"
-              )}
-            >
+            <a href="/shipments" className={navLink}>
               Shipments
             </a>
             <span
@@ -365,97 +340,114 @@ export function App() {
                 Shipment <span className="font-mono">{SHIPMENT_ID}</span>
               </h1>
               {delivered ? (
-                <State tone="success">Delivered</State>
+                <State dot="bg-success" word="Delivered" />
               ) : (
-                <>
-                  <State tone="neutral">Out for delivery</State>
-                  <Badge
-                    variant="outline"
-                    className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
-                  >
-                    Delayed
-                  </Badge>
-                </>
+                <State dot="bg-muted-foreground" word="Out for delivery" />
+              )}
+              {!delivered && (
+                <Badge
+                  variant="outline"
+                  className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
+                >
+                  Delayed
+                </Badge>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className={BUTTON}>
+              <Button variant="outline" className={buttonText}>
                 Print label
               </Button>
-              <Button variant="secondary" className={BUTTON}>
+              <Button variant="secondary" className={buttonText}>
                 Reroute
               </Button>
               <Button
-                className={BUTTON}
-                onClick={markDelivered}
-                disabled={delivered !== null}
+                className={buttonText}
+                disabled={delivered}
                 focusableWhenDisabled
+                onClick={markDelivered}
               >
                 Mark as delivered
               </Button>
             </div>
           </div>
-          <p role="status" className="sr-only">
-            {delivered ? `Shipment ${SHIPMENT_ID} marked as delivered.` : ""}
-          </p>
+          <div role="status" className="sr-only">
+            {status}
+          </div>
         </div>
 
         {/* Main column */}
         <div className="flex flex-col gap-5 md:col-span-12 lg:col-span-8">
-          <section aria-labelledby="progress-heading" className={PANEL}>
-            <PanelHeading id="progress-heading">Progress</PanelHeading>
+          <section className="rounded-xl border bg-card p-5">
+            <PanelHeading>Progress</PanelHeading>
             <ol className="mt-3 grid gap-3 md:grid-cols-5">
-              {STEPS.map((step, index) => {
-                const last = index === STEPS.length - 1
-                const status: "done" | "current" | "next" = delivered
-                  ? "done"
-                  : index < CURRENT_STEP
-                    ? "done"
-                    : index === CURRENT_STEP
-                      ? "current"
-                      : "next"
-                const time = delivered && last ? delivered : step.time
+              {steps.map((step, index) => {
+                const isLast = index === steps.length - 1
+                const done = delivered || index < CURRENT_STEP
+                const current = index === currentStep
+                const reached = delivered && isLast ? NOW : step.reached
                 return (
                   <li
                     key={step.name}
-                    aria-current={status === "current" ? "step" : undefined}
+                    aria-current={current ? "step" : undefined}
                     className="flex gap-3 md:flex-col md:gap-2"
                   >
                     <span
                       aria-hidden="true"
                       className={cn(
                         "flex size-5 shrink-0 items-center justify-center rounded-sm border",
-                        status === "done" &&
+                        done &&
                           "border-secondary bg-secondary text-secondary-foreground",
-                        status === "current" && "border-primary bg-primary"
+                        current && "border-primary bg-primary",
+                        !done && !current && "border-muted-foreground"
                       )}
                     >
-                      {status === "done" && (
-                        <Check className="size-4" strokeWidth={1.5} />
+                      {done && (
+                        <Check
+                          className="size-4"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
                       )}
                     </span>
-                    <div className="min-w-0">
+                    <div>
                       <p className="font-sans text-body font-medium">
                         {step.name}
+                        <span className="sr-only">
+                          {done
+                            ? ", Done"
+                            : current
+                              ? ", Current"
+                              : ", To come"}
+                        </span>
                       </p>
-                      <span className="sr-only">
-                        {status === "done"
-                          ? "Done"
-                          : status === "current"
-                            ? "Current"
-                            : "To come"}
-                      </span>
-                      {status === "next" && (
-                        <p className={cn(LABEL, "text-muted-foreground")}>
-                          Expected
-                        </p>
+                      {done || current ? (
+                        reached && (
+                          <time
+                            dateTime={reached.iso}
+                            className={cn(
+                              smallFigure,
+                              "block whitespace-nowrap"
+                            )}
+                          >
+                            {reached.text}
+                          </time>
+                        )
+                      ) : (
+                        <>
+                          <p className={label}>Expected</p>
+                          {step.expected && (
+                            <time
+                              dateTime={step.expected.iso}
+                              className={cn(
+                                smallFigure,
+                                "block whitespace-nowrap"
+                              )}
+                            >
+                              {step.expected.text}
+                            </time>
+                          )}
+                        </>
                       )}
-                      <time
-                        dateTime={time.iso}
-                        className={cn(FIGURE, "block whitespace-nowrap")}
-                      >
-                        {time.text}
-                      </time>
                     </div>
                   </li>
                 )
@@ -463,48 +455,45 @@ export function App() {
             </ol>
           </section>
 
-          <section aria-labelledby="timeline-heading" className={ROWS_PANEL}>
-            <div className={ROWS_HEAD}>
-              <PanelHeading id="timeline-heading">Timeline</PanelHeading>
+          <section className="overflow-hidden rounded-xl border bg-card">
+            <div className="border-b px-5 pt-5 pb-3">
+              <PanelHeading>Timeline</PanelHeading>
             </div>
             <ol>
-              {events.map((event) => (
+              {events.map((event, index) => (
                 <li
                   key={event.id}
-                  className="flex flex-col border-t px-5 py-3 first:border-t-0 md:flex-row md:items-baseline md:gap-5"
+                  className={cn(
+                    "flex flex-col px-5 py-3 md:flex-row md:items-baseline md:gap-5",
+                    index > 0 && "border-t"
+                  )}
                 >
                   <time
-                    dateTime={event.time.iso}
-                    className={cn(FIGURE, "md:w-32 md:shrink-0")}
+                    dateTime={event.at.iso}
+                    className={cn(smallFigure, "block md:w-32 md:shrink-0")}
                   >
-                    {event.time.text}
+                    {event.at.text}
                   </time>
                   <div className="mt-1 min-w-0 md:mt-0">
                     {event.state && (
                       <div className="mb-1">
-                        <State tone={event.state.tone}>
-                          {event.state.word}
-                        </State>
+                        <State dot={event.state.dot} word={event.state.word} />
                       </div>
                     )}
                     <p className="text-body">{event.text}</p>
-                    <p className={cn(FIGURE, "mt-1")}>{event.by}</p>
+                    <p className={cn(smallFigure, "mt-1")}>{event.by}</p>
                   </div>
                 </li>
               ))}
             </ol>
           </section>
 
-          <section
-            aria-labelledby="items-heading"
-            className={cn(ROWS_PANEL, "flex-1")}
-          >
-            <div className={ROWS_HEAD}>
+          <section className="flex-1 overflow-hidden rounded-xl border bg-card">
+            <div className="border-b px-5 pt-5 pb-3">
               <PanelHeading
-                id="items-heading"
                 aside={
-                  <p className={FIGURE}>
-                    {plural(ITEMS.length, "item", "items")}
+                  <p className={smallFigure}>
+                    {items.length} {items.length === 1 ? "item" : "items"}
                   </p>
                 }
               >
@@ -514,36 +503,20 @@ export function App() {
             <Table label="Items" className="text-body">
               <TableHeader>
                 <TableRow>
-                  <TableHead
-                    className={cn(LABEL, "px-5 text-muted-foreground")}
-                  >
-                    SKU
-                  </TableHead>
-                  <TableHead
-                    className={cn(LABEL, "px-5 text-muted-foreground")}
-                  >
+                  <TableHead className={cn(label, "px-5")}>SKU</TableHead>
+                  <TableHead className={cn(label, "px-5")}>
                     Description
                   </TableHead>
-                  <TableHead
-                    className={cn(
-                      LABEL,
-                      "px-5 text-right text-muted-foreground"
-                    )}
-                  >
+                  <TableHead className={cn(label, "px-5 text-right")}>
                     Quantity
                   </TableHead>
-                  <TableHead
-                    className={cn(
-                      LABEL,
-                      "px-5 text-right text-muted-foreground"
-                    )}
-                  >
+                  <TableHead className={cn(label, "px-5 text-right")}>
                     Weight <span className="normal-case">(kg)</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {ITEMS.map((item) => (
+                {items.map((item) => (
                   <TableRow key={item.sku}>
                     <TableCell className="px-5 py-2 font-mono tabular-nums">
                       {item.sku}
@@ -555,7 +528,7 @@ export function App() {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                      {item.weight.toFixed(1)}
+                      {kg(item.quantity * item.unitKg)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -565,10 +538,10 @@ export function App() {
                   <TableCell className="px-5 py-2">Total</TableCell>
                   <TableCell className="px-5 py-2" />
                   <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                    {TOTAL_QUANTITY}
+                    {totalQuantity}
                   </TableCell>
                   <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                    {TOTAL_WEIGHT.toFixed(1)}
+                    {kg(totalKg)}
                   </TableCell>
                 </TableRow>
               </TableFooter>
@@ -578,87 +551,92 @@ export function App() {
 
         {/* Side column */}
         <div className="flex flex-col gap-5 md:col-span-12 lg:col-span-4">
-          <section aria-labelledby="details-heading" className={PANEL}>
-            <PanelHeading id="details-heading">Details</PanelHeading>
+          <section className="rounded-xl border bg-card p-5">
+            <PanelHeading>Details</PanelHeading>
             <dl className="mt-3">
               {[
-                { term: "Customer", value: "Halden & Brook Outfitters" },
+                { term: "Customer", value: "Hollowmere Home Goods" },
                 { term: "Service", value: "Next day, before 12:00" },
-                { term: "Depot", value: "Easton Vale" },
+                { term: "Depot", value: "Ashby Cross" },
                 {
                   term: "Weight",
-                  value: `${TOTAL_WEIGHT.toFixed(1)} kg`,
-                  mono: true,
+                  value: (
+                    <span className="font-mono tabular-nums">
+                      {kg(totalKg)} kg
+                    </span>
+                  ),
                 },
-                { term: "Booked", time: at("2026-11-10T15:22") },
-                { term: "Due", time: at("2026-11-11T12:00") },
-              ].map((row) => (
+                {
+                  term: "Booked",
+                  value: (
+                    <time
+                      dateTime="2026-11-10T15:22"
+                      className="font-mono tabular-nums"
+                    >
+                      10 Nov, 15:22
+                    </time>
+                  ),
+                },
+                {
+                  term: "Due",
+                  value: (
+                    <time
+                      dateTime="2026-11-11T12:00"
+                      className="font-mono tabular-nums"
+                    >
+                      11 Nov, 12:00
+                    </time>
+                  ),
+                },
+              ].map((row, index) => (
                 <div
                   key={row.term}
-                  className="flex items-baseline justify-between gap-3 border-t py-2 first:border-t-0"
+                  className={cn(
+                    "flex items-baseline justify-between gap-3 py-2",
+                    index > 0 && "border-t"
+                  )}
                 >
-                  <dt className={cn(LABEL, "text-muted-foreground")}>
-                    {row.term}
-                  </dt>
-                  <dd
-                    className={cn(
-                      "text-right text-body",
-                      (row.mono || row.time) && "font-mono tabular-nums"
-                    )}
-                  >
-                    {row.time ? (
-                      <time dateTime={row.time.iso}>{row.time.text}</time>
-                    ) : (
-                      row.value
-                    )}
-                  </dd>
+                  <dt className={label}>{row.term}</dt>
+                  <dd className="text-right text-body">{row.value}</dd>
                 </div>
               ))}
             </dl>
           </section>
 
-          <section aria-labelledby="addresses-heading" className={PANEL}>
-            <PanelHeading id="addresses-heading">Addresses</PanelHeading>
+          <section className="rounded-xl border bg-card p-5">
+            <PanelHeading>Addresses</PanelHeading>
             <div className="mt-3">
               <div>
-                <h3 className={cn(LABEL, "text-muted-foreground")}>From</h3>
+                <h3 className={label}>From</h3>
                 <address className="mt-1 text-body not-italic">
-                  Halden &amp; Brook Outfitters
-                  <br />
-                  Unit 7, Millbeck Trade Park
-                  <br />
-                  MB4 2QL Millbeck
+                  <span className="block">Hollowmere Home Goods</span>
+                  <span className="block">
+                    Unit 6, Brackenfield Trading Estate
+                  </span>
+                  <span className="block">DE55 7RT Alfreton</span>
                 </address>
               </div>
               <div className="mt-5 border-t pt-5">
-                <h3 className={cn(LABEL, "text-muted-foreground")}>To</h3>
+                <h3 className={label}>To</h3>
                 <address className="mt-1 text-body not-italic">
-                  Ruth Ainsley
-                  <br />
-                  14 Orchard Row
-                  <br />
-                  FB2 7HN Ferrow Bridge
+                  <span className="block">Joanna Whitlock</span>
+                  <span className="block">12 Rowan Close</span>
+                  <span className="block">NG22 8QH Kelham</span>
                 </address>
               </div>
             </div>
           </section>
 
-          <section
-            aria-labelledby="notes-heading"
-            className={cn(PANEL, "flex-1")}
-          >
-            <PanelHeading id="notes-heading">Notes</PanelHeading>
+          <section className="flex-1 rounded-xl border bg-card p-5">
+            <PanelHeading>Notes</PanelHeading>
             <form noValidate onSubmit={addNote} className="mt-3">
               <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="note"
-                  className={cn(LABEL, "text-muted-foreground")}
-                >
+                <label htmlFor="note" className={label}>
                   Add a note
                 </label>
                 <Textarea
-                  id="note"
                   ref={noteRef}
+                  id="note"
                   value={draft}
                   onChange={(event) => {
                     setDraft(event.target.value)
@@ -682,21 +660,21 @@ export function App() {
                   Write a note first.
                 </p>
               )}
-              <div className="mt-3">
-                <Button type="submit" variant="secondary" className={BUTTON}>
-                  Add note
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                variant="secondary"
+                className={cn(buttonText, "mt-3")}
+              >
+                Add note
+              </Button>
             </form>
             <ul className="mt-5">
               {notes.map((note) => (
                 <li key={note.id} className="border-t py-3 last:pb-0">
-                  <p className="text-body break-words whitespace-pre-line">
-                    {note.text}
-                  </p>
-                  <p className={cn(FIGURE, "mt-1")}>
+                  <p className="text-body wrap-break-word">{note.text}</p>
+                  <p className={cn(smallFigure, "mt-1")}>
                     {note.by} ·{" "}
-                    <time dateTime={note.time.iso}>{note.time.text}</time>
+                    <time dateTime={note.at.iso}>{note.at.text}</time>
                   </p>
                 </li>
               ))}

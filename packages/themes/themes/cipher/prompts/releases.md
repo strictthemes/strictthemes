@@ -36,7 +36,7 @@ Inside the container, at most `max-w-lg` wide: the `<h1>` "Changelog", and with 
 With `mt-6`, a row with `flex flex-wrap items-center gap-x-6 gap-y-3`:
 
 - A button group with the `aria-label` "Filter by kind": All, Added, Changed, Fixed, Removed. Their text is in sentence case, as button text is; the group headings below print the kind lowercase, as the tool does. All is chosen at the start.
-- A small figure with `aria-live="polite"`: `9 releases` while All is chosen, and `4 of 9 releases` when a kind leaves four.
+- A `<p>`, a small figure with `aria-live="polite"`: `9 releases` while All is chosen, and `4 of 9 releases` when a kind leaves four (the noun follows the total: `1 of 9 releases`).
 
 ### 4. Releases
 
@@ -55,7 +55,7 @@ The footer from the layout notes, with the links Docs (`/docs`), Status (`#`) an
 
 ### Behavior
 
-- The releases come from one array in the code, each with its version, date and changes; each change has a kind.
+- The releases come from one array in the code, each with its version, date and changes; each change has a kind. Write a change's text as a string with backticks around its code, and render each backticked part as inline code.
 - Choosing a kind shows, in every release, only that kind's group, and hides the releases that have none of it. All shows everything. The chosen button carries `aria-pressed="true"`.
 - The count updates with the filter. Every kind leaves at least one release, so the list is never empty.
 - The filter keeps the order newest first, and a hidden release is removed from the page, not only from view, so its heading does not stay in the headings list.

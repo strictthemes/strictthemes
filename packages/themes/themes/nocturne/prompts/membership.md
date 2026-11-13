@@ -22,7 +22,7 @@ The header from the layout notes. "Membership" is the current page.
 
 ### 2. Introduction
 
-The first `<section>`: a label "Membership"; with `mt-2`, the `<h1>` "Become a member of the Vesper" in `text-h1 md:text-display`, inside a `<div>` with `max-w-4xl`, so that it breaks onto three short lines from `md` up; with `mt-6`, one paragraph within `max-w-xl` on what membership pays for (the late shows, the 35mm projector, the seasons).
+The first `<section>`: a label "Membership"; with `mt-2`, the `<h1>` "Become a member of the Vesper" in `text-h1 md:text-display`, inside a `<div>` with `max-w-4xl`, so that it breaks onto three short lines from `md` up; with `mt-6` (one step more than the rhythm's `mt-4`, under the large title, on purpose), one paragraph within `max-w-xl` on what membership pays for (the late shows, the 35mm projector, the seasons).
 
 ### 3. Plans
 
@@ -32,7 +32,7 @@ With `mt-6`, a row `flex flex-wrap items-center gap-4`: a button group with the 
 
 With `mt-6`, the three plans as cards from the layout notes, in a grid `grid grid-cols-1 gap-6 md:grid-cols-3`. Each card is an `<article>` holding, in order:
 
-1. The plan's name as an `<h3>` in `text-h2`. On Regular, the badge "Recommended" (add the component with `npx shadcn@latest add badge`) stands on the same line, after the name: the `<h3>` and the badge sit in a row `flex flex-wrap items-center gap-2`, so the three names stay level and no card needs a spacer.
+1. The plan's name as an `<h3>` in `text-h2`. On Regular, the badge "Recommended" (add the component with `npx shadcn@latest add badge`) stands on the same line, after the name: the `<h3>` and the badge sit in a row `flex flex-wrap items-center gap-2`, so the three names stay level and no card needs a spacer. On Friend and Patron the `<h3>` stands alone, with no row.
 2. With `mt-4`, the price as a `<p>` in `font-heading text-h1 tabular-nums`, e.g. `£12`, followed in the same `<p>` by a `<span>` label in `text-muted-foreground`, `/ month` or `/ year`, with `ml-2`.
 3. With `mt-2`, the billing note, a label in `text-muted-foreground`: `Billed monthly · cancel any time`, or for yearly `Billed yearly · £10 a month`, with the plan's own per-month figure to the penny (`£5 a month`, `£10 a month`, `£20.83 a month`).
 4. With `mt-4`, one sentence on who the plan is for.
@@ -48,7 +48,7 @@ Below `md` the cards stack in the order Friend, Regular, Patron.
 The third `<section>`, with `mt-24` and the `id` "join". A grid (`md:grid-cols-12`):
 
 - Columns 1–5: an `<h2>` "Join" in `text-h2 md:text-h1`, then with `mt-4` two sentences: "Your membership starts today, Wednesday 11 November 2026. You can cancel it at any time from your account page." With `mt-4`, a `<p>` in `text-body text-muted-foreground`: "This is a demo. No card details are asked for and nothing is charged."
-- Columns 7–12, with `mt-12 md:mt-0`: a wrapper holding the form and the status element from the layout notes.
+- Columns 7–12, with `mt-12 md:mt-0`: this grid item is itself the wrapper holding the form and the status element from the layout notes.
 
 The form, with `noValidate`:
 
@@ -66,6 +66,6 @@ The footer from the layout notes.
 
 - The billing period and the chosen plan are component state. The prices, the billing notes, the `/ month` or `/ year` labels and the summary line all read from them, and the `Select` and the "Choose" buttons both set the plan.
 - A "Choose" button sets the plan and moves focus to the "Full name" field, which scrolls the form into view. It does not submit anything. Once the confirmation is shown, the form does not come back: a "Choose" button then only moves focus to the confirmation's `<h3>`, and the confirmation keeps the plan, period and price that were sent, whatever is switched after.
-- When the form is sent, check it in code: the name must not be empty ("Enter your full name."), and the email must not be empty and must look like an address, with one `@` and a dot after it ("Enter an email address such as name@example.com."). Show every error at once, and move focus to the first field with an error.
-- A good form is replaced by the confirmation. Its `<h3>`: "Welcome to the Vesper, Mara", with the first word of the name the person typed and no full stop. Under it, with `mt-4`, these sentences: "Your Regular membership, billed monthly at £12 a month, starts on Wednesday 11 November 2026." (yearly: "billed yearly at £120") "Your card will reach you by email. This was a demo: no payment was taken." After the status element, in the shared wrapper as the layout notes say, a text link "See what's on" to `/`.
+- When the form is sent, check it in code: the name must not be empty ("Enter your full name."), and the email must not be empty and must look like an address: no spaces, one `@` with text before it, and after it a dot with text on both sides ("Enter an email address such as name@example.com."). Show every error at once, and move focus to the first field with an error.
+- A good form is replaced by the confirmation. Its `<h3>`: "Welcome to the Vesper, Mara", with the first word of the name the person typed and no full stop. Under it, with `mt-4`, one `<p>` with these sentences: "Your Regular membership, billed monthly at £12 a month, starts on Wednesday 11 November 2026. Your card will reach you by email. This was a demo: no payment was taken." Yearly, the first sentence reads "Your Regular membership, billed yearly at £120 a year, starts on Wednesday 11 November 2026." After the status element, in the shared wrapper as the layout notes say, a text link "See what's on" to `/`.
 - No payment form, no card field, no price is charged anywhere on the page.

@@ -36,7 +36,7 @@ One panel across the full width, with `gap-5`, holding the shadcn `Table` (add i
 
 The header cells are `TableHead` with `scope="col"`. The day in each row is a `<th scope="row">` with the body cells' padding (`px-3 py-2 first:pl-0`), `whitespace-nowrap align-middle`, as the stock `TableCell` has, plus `text-left text-body font-bold`, and its date in a `<time dateTime="2026-12-04">`. Every time is a `<time>` with a full `dateTime` and the offset, in `font-mono tabular-nums`; a set that ends after midnight ends on the next date (`2026-12-05T00:30+01:00`, `2026-12-06T01:00+01:00`). The stock cells do not wrap, so on a phone the table is wider than its panel and scrolls inside its box.
 
-Under the table, in the panel's stack, small print: "Weekend wristbands can leave and come back until 22:00."
+Under the table, in the panel's stack, small print: "Weekend wristbands can leave and come back until 22:00." It is a sentence, so 22:00 is plain text, not a `<time>`.
 
 ### 4. What to bring
 
@@ -49,8 +49,8 @@ A section. Its heading row holds the `<h2>` "What to bring". Then the grid with 
 
 A section. Its heading row holds the `<h2>` "Access". One panel across the full width, with `gap-5`:
 
-- Two paragraphs in `text-body` in a stack with `gap-3`, each at most `max-w-xl`: the site is step-free on hard ground, and a free ticket for a companion comes with any ticket on request.
-- A list in running text, `list-disc pl-5` with `flex flex-col gap-3` in `text-body`, six items: a raised viewing platform at both music stages, a quiet room in the Drawing Office open all day, accessible toilets at every bar, sign language interpreters at every talk, assistance dogs welcome, and last, which sets use strobe lighting: Ossa Bloom and Sister Antenna.
+- Two paragraphs in `text-body` in a stack with `gap-3`, each at most `max-w-xl`, one sentence each and no more: "The whole site is step-free, on hard ground." and "Any ticket comes with a free ticket for a companion on request."
+- A list in running text, `list-disc pl-5` with `flex flex-col gap-3` in `text-body`, six items: a raised viewing platform at both music stages, a quiet room in the Drawing Office open all day, accessible toilets at every bar, sign language interpreters at every talk, assistance dogs welcome, and last "Strobe lighting in two sets: Ossa Bloom and Sister Antenna". The items are plain text, the act names too.
 - A sentence with a text link to the email address: "Write to info@tremordays.example and we answer within two working days." The address is the link, `mailto:` the same address.
 
 ### 6. Questions
@@ -62,7 +62,7 @@ A section. Its heading row holds the `<h2>` "Questions". One panel across the fu
 - Items keep the stock line between them, a 1px `border-border` line.
 - Each trigger sits in the stock `<h3>`. A question is not a headline: the Headings note's five-word limit does not apply to it.
 
-The questions: Can I leave and come back? What happens if it rains? Is there a cloakroom? Can I bring a camera? Can I change the name on my ticket? Do children need a ticket? Write plain, direct answers that agree with the rest of this page: re-entry until 22:00, most stages indoors, a cloakroom for €3, phone and compact cameras are fine, names can be changed until 1 December, under-13s go free with an adult.
+The questions: Can I leave and come back? What happens if it rains? Is there a cloakroom? Can I bring a camera? Can I change the name on my ticket? Do children need a ticket? Write plain, direct answers that agree with the rest of this page: re-entry until 22:00, most stages indoors, a cloakroom for €3, phone and compact cameras are fine, names can be changed until 1 December by writing to the address under Access (say so in words; the address and its link stay in Access), under-13s go free with an adult.
 
 ### 7. Footer
 

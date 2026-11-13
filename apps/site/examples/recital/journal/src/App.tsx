@@ -6,8 +6,22 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const codeFocusRing =
+  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+const plainLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+const textLink = cn(
+  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const buttonClass = "h-auto rounded-md px-6 py-2 font-mono text-label"
+
 type Topic = "Letters" | "Craft" | "Reading" | "Notes"
-type Filter = "All" | Topic
+const topics: Array<"All" | Topic> = ["All", "Letters", "Craft", "Reading", "Notes"]
 
 type Entry = {
   date: string
@@ -17,111 +31,114 @@ type Entry = {
   summary: string
 }
 
-const FILTERS: Filter[] = ["All", "Letters", "Craft", "Reading", "Notes"]
-
-// Newest first.
-const ENTRIES: Entry[] = [
+const entries: Entry[] = [
   {
     date: "2026-10-29",
     topic: "Craft",
     minutes: 7,
-    title: "Eleven years with the same chisel",
+    title: "Sharpening the same chisel for eleven years",
     summary:
-      "Odile Varga on why she has never replaced the bench chisel she bought in her first week as an apprentice.",
+      "Ruth Okafor has ground her paring chisel down by a third, and she can tell you which year took off which millimetre.",
   },
   {
     date: "2026-08-14",
     topic: "Letters",
-    minutes: 5,
-    title: "A letter from the bindery in August",
-    summary:
-      "The heat slowed the glue, the order book filled up, and we finally finished the atlas we started in spring.",
-  },
-  {
-    date: "2026-05-21",
-    topic: "Reading",
-    minutes: 8,
-    title: "What a forty-year diary teaches about patience",
-    summary:
-      "Reading the notebooks of a lighthouse keeper who wrote three lines a day and missed only nine of them.",
-  },
-  {
-    date: "2026-03-12",
-    topic: "Craft",
-    minutes: 6,
-    title: "The slow part of a stone wall is the looking",
-    summary:
-      "A waller in the hills explains why she spends more time choosing each stone than setting it.",
-  },
-  {
-    date: "2026-01-22",
-    topic: "Letters",
     minutes: 4,
-    title: "Notes from the first cold week",
+    title: "A reply to the reader who asked when the book will be done",
     summary:
-      "What changed in the workshop when we stopped working past four and let the light set the hours.",
+      "We do not know, and we explain why that is the honest answer for a history that is in its sixth year.",
   },
   {
-    date: "2025-11-06",
+    date: "2026-06-02",
     topic: "Reading",
     minutes: 9,
-    title: "Three books that took longer to write than to read twice",
+    title: "What a 900-page biography teaches about patience",
     summary:
-      "A history of a canal, a field guide to lichens and a dictionary of one valley's weather words.",
+      "Reading one life over a whole winter, twenty pages a night, changed how we plan the long pieces in each issue.",
   },
   {
-    date: "2025-09-18",
+    date: "2026-03-19",
+    topic: "Craft",
+    minutes: 6,
+    title: "The second draft is where the work starts",
+    summary:
+      "Three of our writers show the same paragraph in its first and its fourth version and say what each pass took out.",
+  },
+  {
+    date: "2026-01-08",
+    topic: "Letters",
+    minutes: 3,
+    title: "Notes from a cold workshop in January",
+    summary:
+      "The glue will not set below ten degrees, so the editors wrote letters to readers instead and kept the stove going.",
+  },
+  {
+    date: "2025-11-20",
+    topic: "Reading",
+    minutes: 8,
+    title: "Rereading a novel I first read at nineteen",
+    summary:
+      "Tomas Brandl returns to a book he loved as a student and finds that the slow chapters were the point all along.",
+  },
+  {
+    date: "2025-09-03",
+    topic: "Craft",
+    minutes: 6,
+    title: "Why the joinery takes longer than the cutting",
+    summary:
+      "A cabinetmaker in Hexley times every step of one drawer and finds that fitting it took four times as long as making it.",
+  },
+  {
+    date: "2025-05-11",
     topic: "Letters",
     minutes: 5,
-    title: "On finishing a thing nobody asked for",
+    title: "To the bookbinder who answered every letter",
     summary:
-      "Our editor on the quilt her grandmother left half done, and the eight winters it took to complete it.",
+      "A thank-you to Agnes Wilmot, who wrote back to each of our questions by hand over two years of research.",
   },
   {
-    date: "2025-06-05",
-    topic: "Craft",
-    minutes: 7,
-    title: "How a violin maker knows when to stop scraping",
-    summary:
-      "Tapping, listening and weighing the top plate until the last tenth of a millimetre stops mattering.",
-  },
-  {
-    date: "2025-02-27",
+    date: "2025-02-24",
     topic: "Reading",
-    minutes: 6,
-    title: "Rereading a novel every ten years",
+    minutes: 5,
+    title: "Slow books for a fast spring",
     summary:
-      "Four readings of the same book, at twenty, thirty, forty and fifty, and what moved each time.",
+      "Six books that each took their authors more than a decade, chosen by the people who edit this magazine.",
   },
   {
-    date: "2024-12-12",
+    date: "2024-10-15",
+    topic: "Craft",
+    minutes: 10,
+    title: "Keeping a log of every hour spent on one chair",
+    summary:
+      "One maker kept a notebook for the 212 hours a Windsor chair took her, and the log turned out more useful than the chair.",
+  },
+  {
+    date: "2024-06-06",
     topic: "Letters",
     minutes: 4,
-    title: "The year in one long letter",
+    title: "Why we print twice a year and not every month",
     summary:
-      "Twelve months of the magazine, the people who wrote for it and the one issue we printed twice.",
+      "The editors explain what a six-month gap between issues lets them do, and what it costs the magazine to keep it.",
   },
   {
-    date: "2024-09-19",
-    topic: "Craft",
-    minutes: 8,
-    title: "Why the first table takes a year",
-    summary:
-      "A furniture maker counts the hours behind his first dining table and finds most of them were spent waiting.",
-  },
-  {
-    date: "2024-04-25",
+    date: "2024-02-12",
     topic: "Reading",
-    minutes: 5,
-    title: "A reading list for the long middle of a project",
+    minutes: 7,
+    title: "The essays we keep returning to",
     summary:
-      "Seven books for the months after the excitement fades and before the end is anywhere in sight.",
+      "Five essays on slow work that the editors hand to every new writer, with a line on why each one stays on the list.",
   },
 ]
 
-const NEWEST = ENTRIES[0]
+const newestDate = entries.reduce(
+  (latest, entry) => (entry.date > latest ? entry.date : latest),
+  entries[0].date
+)
+const startHere = entries.find(
+  (entry) => entry.title === "Keeping a log of every hour spent on one chair"
+)!
 
-const MONTHS = [
+const months = [
   "January",
   "February",
   "March",
@@ -138,140 +155,164 @@ const MONTHS = [
 
 function dayAndMonth(iso: string) {
   const [, month, day] = iso.split("-").map(Number)
-  return `${day} ${MONTHS[month - 1]}`
+  return `${day} ${months[month - 1]}`
 }
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const HEADER_LINK = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
-)
-const TEXT_LINK = cn(
-  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  FOCUS
-)
-const BUTTON = "h-auto rounded-md px-6 py-2 font-mono text-label"
-const LABEL = "font-mono text-label text-muted-foreground"
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+function EntryItem({ entry }: { entry: Entry }) {
+  const isNewest = entry.date === newestDate
+  const details = (
+    <>
+      <time dateTime={entry.date}>{dayAndMonth(entry.date)}</time>
+      {` · ${entry.topic} · ${entry.minutes} min read`}
+    </>
+  )
+
+  return (
+    <li>
+      <article className="border-t py-6">
+        {isNewest ? (
+          <p className="flex flex-wrap items-center gap-2 font-mono text-label text-muted-foreground">
+            <span>{details}</span>
+            <Badge className="h-auto rounded-sm bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground">
+              New
+            </Badge>
+          </p>
+        ) : (
+          <p className="font-mono text-label text-muted-foreground">
+            {details}
+          </p>
+        )}
+        <h3 className="mt-2 text-h2">
+          <a href="#" className={plainLink}>
+            {entry.title}
+          </a>
+        </h3>
+        <p className="mt-2">{entry.summary}</p>
+      </article>
+    </li>
+  )
+}
 
 function SignUp() {
   const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
-  const [sent, setSent] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [done, setDone] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
-  const thanksRef = useRef<HTMLParagraphElement>(null)
+  const messageRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
-    if (sent) thanksRef.current?.focus()
-  }, [sent])
+    if (done) messageRef.current?.focus()
+  }, [done])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = email.trim()
-    let message = ""
+    setEmail(value)
     if (value === "") {
-      message = "Enter your email address."
-    } else if (!EMAIL_PATTERN.test(value)) {
-      message = "Enter an email address in the form name@example.com."
-    }
-    setError(message)
-    if (message) {
+      setError("Enter your email address to get the journal.")
       inputRef.current?.focus()
       return
     }
-    setSent(true)
+    if (!emailPattern.test(value)) {
+      setError("Enter an email address in the form name@example.com.")
+      inputRef.current?.focus()
+      return
+    }
+    setError(null)
+    setDone(true)
   }
 
   return (
-    <div className="mt-6">
-      {!sent && (
-        <form noValidate onSubmit={handleSubmit}>
-          <label
-            htmlFor="email"
-            className="block font-mono text-label text-foreground"
-          >
-            Email address
-          </label>
-          <Input
-            ref={inputRef}
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            onInput={() => setError("")}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? "email-error" : undefined}
-            className="mt-2 h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
-          />
-          {error && (
-            <p
-              id="email-error"
-              className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
-            >
-              <CircleAlert
-                className="size-4 shrink-0"
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-              <span>{error}</span>
+    <div className="mx-auto mt-24 max-w-lg border-t pt-12">
+      <h2 className="text-h2">Get the journal by email</h2>
+      <p className="mt-4">
+        Each new entry arrives in your inbox the day it goes up, and nothing
+        else does.
+      </p>
+      <div className="mt-6">
+        {!done && (
+          <form noValidate onSubmit={handleSubmit}>
+            <label htmlFor="email" className="block text-foreground">
+              Email address
+            </label>
+            <Input
+              ref={inputRef}
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value)
+                if (error) setError(null)
+              }}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? "email-error" : undefined}
+              className="mt-2 h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
+            />
+            {error && (
+              <p
+                id="email-error"
+                className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
+              >
+                <CircleAlert
+                  className="size-4 shrink-0"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+                <span>{error}</span>
+              </p>
+            )}
+            <div className="mt-4">
+              <Button type="submit" variant="secondary" className={buttonClass}>
+                Subscribe
+              </Button>
+            </div>
+            <p className="mt-4 font-mono text-label text-muted-foreground">
+              Once a month · Leave with one click
+            </p>
+          </form>
+        )}
+        <div role="status">
+          {done && (
+            <p ref={messageRef} tabIndex={-1} className={codeFocusRing}>
+              Thank you. The next entry will reach you by email.
             </p>
           )}
-          <div className="mt-4">
-            <Button type="submit" variant="secondary" className={BUTTON}>
-              Subscribe
-            </Button>
-          </div>
-          <p className={cn("mt-4", LABEL)}>
-            Every other Thursday · Leave with one click
-          </p>
-        </form>
-      )}
-      <div role="status">
-        {sent && (
-          <p
-            ref={thanksRef}
-            tabIndex={-1}
-            className="focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-          >
-            Thank you. The next entry will reach you by email.
-          </p>
-        )}
+        </div>
       </div>
     </div>
   )
 }
 
 export function App() {
-  const [filter, setFilter] = useState<Filter>("All")
+  const [topic, setTopic] = useState<"All" | Topic>("All")
 
-  const shown = ENTRIES.filter(
-    (entry) => filter === "All" || entry.topic === filter
-  )
+  const shown = entries
+    .filter((entry) => topic === "All" || entry.topic === topic)
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
   const years = Array.from(new Set(shown.map((entry) => entry.date.slice(0, 4))))
-  const count = `${shown.length} ${shown.length === 1 ? "entry" : "entries"}`
 
   return (
     <div className="mx-auto max-w-3xl px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-y-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", HEADER_LINK)}>
+        <a href="/" className={cn("font-heading text-h2", plainLink)}>
           The Long Margin
         </a>
         <nav aria-label="Main" className="flex gap-6">
-          <a href="/essays" className={HEADER_LINK}>
+          <a href="/essays" className={plainLink}>
             Essays
           </a>
           <a
             href="/journal"
             aria-current="page"
-            className={cn(HEADER_LINK, "underline")}
+            className={cn(plainLink, "underline")}
           >
             Journal
           </a>
-          <a href="/about" className={HEADER_LINK}>
+          <a href="/about" className={plainLink}>
             About
           </a>
         </nav>
@@ -282,27 +323,26 @@ export function App() {
           <h1 className="text-h1">Journal</h1>
           <p className="mt-4">
             The journal is where the editors of The Long Margin write between
-            issues: letters from the workshop, notes on craft and the books we
-            are reading slowly. A new entry comes out every other Thursday, and
-            some months there is only one.
+            issues: letters to readers, notes from the workshops we visit and
+            the books we are reading slowly. A new entry goes up about once a
+            month, a little less often when an issue is going to print.
           </p>
         </div>
 
         <div className="mx-auto mt-12 max-w-lg">
           <aside className="mb-12 rounded-xl border bg-card p-6">
-            <p className={LABEL}>Start here</p>
-            <h2 className="mt-2 text-h2">Why the first table takes a year</h2>
+            <p className="font-mono text-label text-muted-foreground">
+              Start here
+            </p>
+            <h2 className="mt-2 text-h2">{startHere.title}</h2>
             <p className="mt-4">
-              A furniture maker counts the hours behind his first dining table
-              and finds most of them were spent waiting for wood to settle. It
-              is the entry readers send to friends most often, and the best
-              short account of what this magazine is about.
+              One maker counted every hour a Windsor chair took her, from
+              splitting the green oak to the last coat of oil. It is the
+              entry that explains best what this magazine means by work that
+              takes a long time.
             </p>
             <p className="mt-6">
-              <a
-                href="#"
-                className={cn(buttonVariants({ variant: "default" }), BUTTON)}
-              >
+              <a href="#" className={cn(buttonVariants(), buttonClass)}>
                 Read the entry
               </a>
             </p>
@@ -315,23 +355,26 @@ export function App() {
             aria-label="Filter by topic"
             className="flex flex-wrap gap-2"
           >
-            {FILTERS.map((topic) => {
-              const chosen = topic === filter
+            {topics.map((name) => {
+              const chosen = name === topic
               return (
                 <Button
-                  key={topic}
+                  key={name}
                   variant={chosen ? "secondary" : "outline"}
-                  aria-pressed={chosen ? "true" : "false"}
-                  onClick={() => setFilter(topic)}
-                  className={BUTTON}
+                  aria-pressed={chosen}
+                  onClick={() => setTopic(name)}
+                  className={buttonClass}
                 >
-                  {topic}
+                  {name}
                 </Button>
               )
             })}
           </div>
-          <p aria-live="polite" className={cn("mt-4", LABEL)}>
-            {count}
+          <p
+            aria-live="polite"
+            className="mt-4 font-mono text-label text-muted-foreground"
+          >
+            {shown.length === 1 ? "1 entry" : `${shown.length} entries`}
           </p>
         </div>
 
@@ -342,54 +385,20 @@ export function App() {
             <>
               {years.map((year) => (
                 <section key={year} className="mt-12">
-                  <h2 className={LABEL}>
+                  <h2 className="font-mono text-label text-muted-foreground">
                     <time dateTime={year}>{year}</time>
                   </h2>
                   <ul className="mt-4">
                     {shown
                       .filter((entry) => entry.date.startsWith(year))
                       .map((entry) => (
-                        <li key={entry.date}>
-                          <article className="border-t py-6">
-                            {entry === NEWEST ? (
-                              <p
-                                className={cn(
-                                  "flex flex-wrap items-center gap-2",
-                                  LABEL
-                                )}
-                              >
-                                <span>
-                                  <time dateTime={entry.date}>
-                                    {dayAndMonth(entry.date)}
-                                  </time>
-                                  {` · ${entry.topic} · ${entry.minutes} min read`}
-                                </span>
-                                <Badge className="h-auto rounded-sm bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground">
-                                  New
-                                </Badge>
-                              </p>
-                            ) : (
-                              <p className={LABEL}>
-                                <time dateTime={entry.date}>
-                                  {dayAndMonth(entry.date)}
-                                </time>
-                                {` · ${entry.topic} · ${entry.minutes} min read`}
-                              </p>
-                            )}
-                            <h3 className="mt-2 text-h2">
-                              <a href="#" className={HEADER_LINK}>
-                                {entry.title}
-                              </a>
-                            </h3>
-                            <p className="mt-2">{entry.summary}</p>
-                          </article>
-                        </li>
+                        <EntryItem key={entry.date} entry={entry} />
                       ))}
                   </ul>
                 </section>
               ))}
               <p className="mt-12">
-                <a href="#" className={TEXT_LINK}>
+                <a href="/journal/older" className={textLink}>
                   Older entries
                 </a>
               </p>
@@ -397,24 +406,19 @@ export function App() {
           )}
         </div>
 
-        <div className="mx-auto mt-24 max-w-lg border-t pt-12">
-          <h2 className="text-h2">Get the journal by email</h2>
-          <p className="mt-4">
-            Each new entry arrives in your inbox on the morning it is published,
-            with nothing else attached.
-          </p>
-          <SignUp />
-        </div>
+        <SignUp />
       </main>
 
       <footer className="mt-24">
         <div className="border-t py-12">
           <p className="font-heading text-h2">The Long Margin</p>
           <p className="mt-2">
-            A small magazine about work that takes a long time, published from a
-            converted bindery since 2019.
+            A small magazine about work that takes a long time, printed twice a
+            year.
           </p>
-          <p className={cn("mt-6", LABEL)}>© 2026 The Long Margin</p>
+          <p className="mt-6 font-mono text-label text-muted-foreground">
+            © 2026 The Long Margin · All rights reserved
+          </p>
         </div>
       </footer>
     </div>

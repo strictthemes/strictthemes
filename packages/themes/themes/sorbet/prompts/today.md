@@ -24,7 +24,7 @@ The header from the layout notes, with Today as the current page.
 
 ### 2. Page header
 
-The page header from the layout notes: the date as a small figure, a `<time dateTime="2026-11-11">` reading `Wednesday, 11 November` (the fixed sample date) that carries the small figure's classes itself, then the `<h1>` "Good morning, Ines". The greeting is set once, when the page loads, from the clock: "Good morning" before 12:00, "Good afternoon" before 18:00, "Good evening" after. It does not update while the page is open.
+The page header from the layout notes: the date as a small figure, a `<time dateTime="2026-11-11">` reading `Wednesday, 11 November` (the fixed sample date) that carries the small figure's classes itself, then the `<h1>` "Good morning, Ines". The greeting is set once, when the page loads, from the clock: "Good morning" from 00:00 to 11:59, "Good afternoon" from 12:00 to 17:59, "Good evening" from 18:00. It does not update while the page is open.
 
 Under the `<h1>`, in the page header's `gap-2`, a row `flex items-center` with no gap of its own, so the empty status element adds none, and no wrap, so the badge's `ml-3` never indents a second line:
 
@@ -54,7 +54,7 @@ From `md` up the card stays in view while the list scrolls: `md:sticky md:top-6 
 
 ### 4. A note for the day
 
-A section with an `aria-label` "Tip for today" and no visible heading: one card, `md:max-w-lg`. In place of the card's `gap-4`, it is `flex flex-col gap-2`, since a label and the text it labels are `gap-2` apart: a label in `text-muted-foreground` ("Tip for today") and one or two sentences in `text-body`, e.g. "Put your book where your phone usually goes. Reading the first page is the hard part." No icon.
+A card that is a section, with the `aria-label` "Tip for today", no visible heading and `md:max-w-lg`: one element, the `<section>` with the card's classes. In place of the card's `gap-4`, it is `flex flex-col gap-2`, since a label and the text it labels are `gap-2` apart: a label in `text-muted-foreground` ("Tip for today") and one or two sentences in `text-body`, e.g. "Put your book where your phone usually goes. Reading the first page is the hard part." No icon.
 
 ### 5. Footer
 

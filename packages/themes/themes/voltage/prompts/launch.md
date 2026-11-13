@@ -31,7 +31,7 @@ A section on the page, not on a panel: large numbers are part of the look. Its h
 - The four units, in a row with `grid grid-cols-2 gap-5 md:flex md:items-center md:gap-8`: two by two on a phone, one line from `md` up. Each unit is a stack with `gap-1`: the number, two digits with a leading zero (`04`), in `font-heading text-h1 tabular-nums` below `md` and `md:text-display` from `md` up; under it its label, `Days`, `Hours`, `Minutes` or `Seconds`. These four numbers are the one other `text-display` text on the page. The days count may have three digits; it does not need a leading zero then.
 - Between the units, from `md` up only, a separator: `hidden md:flex flex-col gap-2` holding two countdown dots, each `size-3 rounded-full bg-foreground`. Below `md` they are not shown, so the grid holds only the four units.
 - The whole row of units and dots has `aria-hidden="true"`, which hides the separators too; they need no `aria-hidden` of their own. Beside it, a `<p>` with `sr-only` gives the same time in words: "12 days, 4 hours and 31 minutes until the gates open." It is not a live region: it changes once a minute and is read when someone reaches it.
-- Under the row, a label line with the start as a `<time dateTime="2026-12-04T16:00+01:00">`: `Fri 4 Dec · 16:00`.
+- Under the row, a label line with the start as one `<time dateTime="2026-12-04T16:00+01:00">` that wraps the whole `Fri 4 Dec · 16:00`, since it is one moment.
 
 ### 3. First names
 
@@ -63,7 +63,7 @@ The footer from the layout notes.
 
 ### Behavior
 
-- The start time is one constant: `new Date("2026-12-04T16:00:00+01:00")`. Work out the time left from it and `Date.now()` in the state's first value, so the first render already shows the right numbers, then update it once a second with a `setInterval` that is cleared when the component unmounts.
+- The start time is one constant: `new Date("2026-12-04T16:00:00+01:00")`. Work out the time left from it and `Date.now()` in the state's first value, so the first render already shows the right numbers, then update it once a second with a `setInterval` that is cleared when the component unmounts. Count whole seconds left rounded up (`Math.ceil`), so every unit reaches `00` only at the start itself.
 - The digits change and nothing else happens: no flip, no fade, no slide, no pulse, and no transition on the numbers. This holds with reduced motion as well, since there is no motion to reduce. The stock button's nudge while pressed stays, from the Motion note.
 - The words in the `sr-only` sentence are derived from the same state, rounded down to the minute, so they change at most once a minute. Use "1 day", "1 hour" and "1 minute" in the singular. Leave out a unit that is 0 ("4 hours and 31 minutes until the gates open."), join two parts with "and" and three with a comma and "and". With less than a minute left, the sentence is "Less than a minute until the gates open."
 - Once the start time has passed, stop the interval, show `00` in every unit, change the `<h2>` to "Gates are open" and the sentence to "The gates are open."

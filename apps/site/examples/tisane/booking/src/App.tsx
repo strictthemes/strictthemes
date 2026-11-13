@@ -25,22 +25,10 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const CODE_FOCUS =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const TEXT_LINK = cn(
-  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  FOCUS
-)
-const NAV_LINK = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
-)
-const BUTTON = "h-auto rounded-md px-6 py-2 font-mono text-label"
-const FIELD = "mt-2 h-auto rounded-md px-4 py-2 text-body md:text-body"
-const LABEL = "block font-mono text-label text-foreground"
-const HELP = "mt-2 font-mono text-label text-muted-foreground"
+const MIN_PEOPLE = 1
+const MAX_PEOPLE = 8
+const DAYS_AHEAD = 60
+const NOTE_MAX = 300
 
 const MONTHS = [
   "January",
@@ -66,23 +54,41 @@ const WEEKDAYS = [
   "Saturday",
 ]
 
-const MAX_DAYS = 60
-const NOTE_MAX = 300
-const MIN_PEOPLE = 1
-const MAX_PEOPLE = 8
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const codeFocusOutline =
+  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+const textLink = cn(
+  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusOutline
+)
+const chromeLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusOutline
+)
+const labelClass = "block font-mono text-label text-foreground"
+const fieldClass = "mt-2 h-auto rounded-md px-4 py-2 text-body md:text-body"
+const helpClass = "mt-2 font-mono text-label text-muted-foreground"
 
-const TIMES = (() => {
-  const list: { value: string; label: string }[] = []
+const timeItems = (() => {
+  const items: { value: string; label: string }[] = []
   for (let minutes = 9 * 60 + 30; minutes <= 16 * 60; minutes += 30) {
     const h = Math.floor(minutes / 60)
     const m = String(minutes % 60).padStart(2, "0")
-    list.push({
+    items.push({
       value: `${String(h).padStart(2, "0")}:${m}`,
       label: `${h}:${m}`,
     })
   }
-  return list
+  return items
 })()
+
+const navLinks = [
+  { label: "Menu", href: "/menu" },
+  { label: "Book a table", href: "/booking", current: true },
+  { label: "Journal", href: "/journal" },
+  { label: "Visit", href: "/visit" },
+]
 
 function startOfToday() {
   const now = new Date()
@@ -99,41 +105,34 @@ function isoDate(date: Date) {
   return `${date.getFullYear()}-${m}-${d}`
 }
 
-function longDate(date: Date) {
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
+function formatDate(date: Date, withWeekday = false) {
+  const text = `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
+  return withWeekday ? `${WEEKDAYS[date.getDay()]} ${text}` : text
 }
 
-function fullDate(date: Date) {
-  return `${WEEKDAYS[date.getDay()]} ${longDate(date)}`
+function peopleText(count: number) {
+  return count === 1 ? "1 person" : `${count} people`
 }
 
 function timeLabel(value: string) {
-  return TIMES.find((t) => t.value === value)?.label ?? value
+  return timeItems.find((item) => item.value === value)?.label ?? value
 }
 
-function peopleLabel(count: number) {
-  return `${count} ${count === 1 ? "person" : "people"}`
-}
-
-type Field = "date" | "time" | "name" | "email"
-type Errors = Partial<Record<Field, string>>
-
-type Booking = {
+function DateText({
+  date,
+  withWeekday,
+}: {
   date: Date
-  time: string
-  people: number
-  name: string
-  email: string
+  withWeekday?: boolean
+}) {
+  return <time dateTime={isoDate(date)}>{formatDate(date, withWeekday)}</time>
 }
 
-const NAV = [
-  { label: "Menu", href: "/menu" },
-  { label: "Book a table", href: "/booking", current: true },
-  { label: "Journal", href: "/journal" },
-  { label: "Visit", href: "/visit" },
-]
+function TimeText({ value }: { value: string }) {
+  return <time dateTime={value}>{timeLabel(value)}</time>
+}
 
-function ErrorLine({ id, message }: { id: string; message: string }) {
+function FieldError({ id, children }: { id: string; children: ReactNode }) {
   return (
     <p
       id={id}
@@ -144,14 +143,101 @@ function ErrorLine({ id, message }: { id: string; message: string }) {
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      <span>{message}</span>
+      <span>{children}</span>
     </p>
   )
 }
 
+type Errors = Partial<Record<"date" | "time" | "name" | "email", string>>
+
+type Booking = {
+  date: Date
+  time: string
+  people: number
+  name: string
+  email: string
+}
+
+function Header() {
+  return (
+    <header className="flex flex-col items-start gap-2 py-6 md:flex-row md:items-baseline md:justify-between">
+      <a href="/" className={cn("font-heading text-h2", chromeLink)}>
+        The Linden Room
+      </a>
+      <nav aria-label="Main">
+        <ul className="flex flex-wrap gap-x-6 gap-y-2">
+          {navLinks.map((link) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                aria-current={link.current ? "page" : undefined}
+                className={cn(
+                  "text-body",
+                  chromeLink,
+                  link.current && "underline"
+                )}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="mt-18">
+      <div className="border-t py-10">
+        <div className="grid gap-6 md:grid-cols-12 md:items-start">
+          <div className="md:col-span-6">
+            <p className="font-heading text-h2">The Linden Room</p>
+            <p className="mt-2 max-w-xl">
+              A tea room and shop by the mill race, pouring loose-leaf tea and
+              baking every morning.
+            </p>
+          </div>
+          <div className="md:col-span-5 md:col-start-8">
+            <address className="not-italic">
+              <span className="block">14 Mill Lane</span>
+              <span className="block">Ashby Wold</span>
+              <span className="block">AW3 7LN</span>
+            </address>
+            <p className="mt-4 font-mono text-label text-muted-foreground">
+              Tuesday to Sunday · Closed Mondays
+            </p>
+          </div>
+        </div>
+        <p className="mt-6 font-mono text-label text-muted-foreground">
+          © 2026 The Linden Room
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+function SummaryRow({ term, children }: { term: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-4 py-2 first:pt-0">
+      <dt className="shrink-0 font-mono text-label text-muted-foreground">
+        {term}
+      </dt>
+      <dd className="min-w-0 text-right text-body text-foreground">
+        {children}
+      </dd>
+    </div>
+  )
+}
+
+function Missing({ children }: { children: ReactNode }) {
+  return <span className="text-muted-foreground">{children}</span>
+}
+
 export function App() {
   const today = startOfToday()
-  const lastDay = addDays(today, MAX_DAYS)
+  const lastDay = addDays(today, DAYS_AHEAD)
 
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [dateOpen, setDateOpen] = useState(false)
@@ -161,32 +247,20 @@ export function App() {
   const [email, setEmail] = useState("")
   const [note, setNote] = useState("")
   const [errors, setErrors] = useState<Errors>({})
-  const [focusTarget, setFocusTarget] = useState<{ field: Field } | null>(null)
   const [booking, setBooking] = useState<Booking | null>(null)
 
-  const dateRef = useRef<HTMLButtonElement>(null)
-  const timeRef = useRef<HTMLButtonElement>(null)
+  const dateTriggerRef = useRef<HTMLButtonElement>(null)
+  const timeTriggerRef = useRef<HTMLButtonElement>(null)
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const calendarRef = useRef<HTMLDivElement>(null)
-  const confirmRef = useRef<HTMLHeadingElement>(null)
+  const confirmationRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (!focusTarget) return
-    const refs = {
-      date: dateRef,
-      time: timeRef,
-      name: nameRef,
-      email: emailRef,
-    }
-    refs[focusTarget.field].current?.focus()
-  }, [focusTarget])
-
-  useEffect(() => {
-    if (booking) confirmRef.current?.focus()
+    if (booking) confirmationRef.current?.focus()
   }, [booking])
 
-  function clearError(field: Field) {
+  function clearError(field: keyof Errors) {
     setErrors((current) => {
       if (!current[field]) return current
       const next = { ...current }
@@ -198,7 +272,9 @@ export function App() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const now = startOfToday()
-    const max = addDays(now, MAX_DAYS)
+    const max = addDays(now, DAYS_AHEAD)
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
     const next: Errors = {}
 
     if (!date) next.date = "Choose a date."
@@ -209,54 +285,30 @@ export function App() {
 
     if (!time) next.time = "Choose a time."
 
-    if (!name.trim()) next.name = "Write the name for the booking."
+    if (!trimmedName) next.name = "Write the name for the booking."
 
-    const mail = email.trim()
-    if (!mail) next.email = "Write your email address."
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail))
+    if (!trimmedEmail) next.email = "Write your email address."
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
       next.email = "Check the email address: it needs an @ and a domain."
 
     setErrors(next)
-    const order: Field[] = ["date", "time", "name", "email"]
-    const first = order.find((field) => next[field])
-    if (first) {
-      setFocusTarget({ field: first })
-      return
-    }
+
+    if (next.date) return dateTriggerRef.current?.focus()
+    if (next.time) return timeTriggerRef.current?.focus()
+    if (next.name) return nameRef.current?.focus()
+    if (next.email) return emailRef.current?.focus()
+
     if (date && time) {
-      setBooking({ date, time, people, name: name.trim(), email: mail })
+      setBooking({ date, time, people, name: trimmedName, email: trimmedEmail })
     }
   }
 
+  const trimmedName = name.trim()
   const noteLeft = NOTE_MAX - note.length
 
   return (
     <div className="mx-auto max-w-[1120px] px-4 text-body md:px-6">
-      <header className="flex flex-col items-start gap-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn(NAV_LINK, "font-heading text-h2")}>
-          The Linden Room
-        </a>
-        <nav aria-label="Main">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <a
-                  href={item.href}
-                  aria-current={item.current ? "page" : undefined}
-                  className={cn(
-                    NAV_LINK,
-                    "text-body",
-                    item.current && "underline"
-                  )}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
-
+      <Header />
       <main>
         <section className="grid gap-6 pt-10 md:grid-cols-12">
           <div className="md:col-span-8">
@@ -266,8 +318,8 @@ export function App() {
             <h1 className="mt-2 text-h1">Book a table</h1>
             <p className="mt-4 max-w-xl">
               We keep half our tables for people who walk in, so there is often
-              room without a booking. If you do book, we hold your table for
-              fifteen minutes after the time you choose.
+              room without a booking. A booked table is held for fifteen minutes
+              after its time.
             </p>
           </div>
         </section>
@@ -281,30 +333,26 @@ export function App() {
                 onSubmit={handleSubmit}
               >
                 <div>
-                  <label id="date-label" htmlFor="date" className={LABEL}>
+                  <label id="date-label" htmlFor="date" className={labelClass}>
                     Date
                   </label>
                   <Popover open={dateOpen} onOpenChange={setDateOpen}>
                     <PopoverTrigger
+                      ref={dateTriggerRef}
                       id="date"
-                      ref={dateRef}
                       aria-labelledby="date-label date-value"
                       aria-invalid={errors.date ? true : undefined}
                       aria-describedby={errors.date ? "date-error" : undefined}
                       className={cn(
                         "mt-2 flex w-full items-center justify-between gap-2 rounded-md border border-input bg-card px-4 py-2 text-left text-body text-foreground transition-colors outline-none focus-visible:border-ring aria-invalid:border-destructive",
-                        FOCUS
+                        focusOutline
                       )}
                     >
                       <span
                         id="date-value"
                         className={date ? undefined : "text-muted-foreground"}
                       >
-                        {date ? (
-                          <time dateTime={isoDate(date)}>{longDate(date)}</time>
-                        ) : (
-                          "Choose a date"
-                        )}
+                        {date ? <DateText date={date} /> : "Choose a date"}
                       </span>
                       <CalendarDays
                         className="size-4 shrink-0 text-muted-foreground"
@@ -316,7 +364,7 @@ export function App() {
                       align="start"
                       className="w-auto p-2 md:p-4"
                       initialFocus={() =>
-                        calendarRef.current?.querySelector<HTMLButtonElement>(
+                        calendarRef.current?.querySelector<HTMLElement>(
                           'td button[tabindex="0"]'
                         ) ?? true
                       }
@@ -341,16 +389,16 @@ export function App() {
                     </PopoverContent>
                   </Popover>
                   {errors.date && (
-                    <ErrorLine id="date-error" message={errors.date} />
+                    <FieldError id="date-error">{errors.date}</FieldError>
                   )}
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="time" className={LABEL}>
+                  <label id="time-label" htmlFor="time" className={labelClass}>
                     Time
                   </label>
                   <Select
-                    items={TIMES}
+                    items={timeItems}
                     value={time}
                     onValueChange={(value) => {
                       if (value === null) return
@@ -359,24 +407,25 @@ export function App() {
                     }}
                   >
                     <SelectTrigger
+                      ref={timeTriggerRef}
                       id="time"
-                      ref={timeRef}
-                      className="mt-2"
+                      aria-labelledby="time-label"
                       aria-invalid={errors.time ? true : undefined}
                       aria-describedby={errors.time ? "time-error" : undefined}
+                      className="mt-2"
                     >
                       <SelectValue placeholder="Choose a time" />
                     </SelectTrigger>
                     <SelectContent>
-                      {TIMES.map((t) => (
-                        <SelectItem key={t.value} value={t.value}>
-                          {t.label}
+                      {timeItems.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {errors.time && (
-                    <ErrorLine id="time-error" message={errors.time} />
+                    <FieldError id="time-error">{errors.time}</FieldError>
                   )}
                 </div>
 
@@ -390,6 +439,7 @@ export function App() {
                   <div
                     role="group"
                     aria-labelledby="people-label"
+                    aria-describedby="people-help"
                     className="mt-2 flex items-center gap-2"
                   >
                     <Button
@@ -400,7 +450,7 @@ export function App() {
                       disabled={people <= MIN_PEOPLE}
                       focusableWhenDisabled
                       onClick={() =>
-                        setPeople((p) => Math.max(MIN_PEOPLE, p - 1))
+                        setPeople((n) => Math.max(MIN_PEOPLE, n - 1))
                       }
                     >
                       <Minus
@@ -413,7 +463,7 @@ export function App() {
                       aria-live="polite"
                       className="inline-flex min-w-24 justify-center font-mono text-label text-foreground tabular-nums"
                     >
-                      {peopleLabel(people)}
+                      {peopleText(people)}
                     </span>
                     <Button
                       variant="outline"
@@ -423,7 +473,7 @@ export function App() {
                       disabled={people >= MAX_PEOPLE}
                       focusableWhenDisabled
                       onClick={() =>
-                        setPeople((p) => Math.min(MAX_PEOPLE, p + 1))
+                        setPeople((n) => Math.min(MAX_PEOPLE, n + 1))
                       }
                     >
                       <Plus
@@ -433,11 +483,11 @@ export function App() {
                       />
                     </Button>
                   </div>
-                  <p className={HELP}>
+                  <p id="people-help" className={helpClass}>
                     For nine or more, write to{" "}
                     <a
                       href="mailto:hello@lindenroom.example"
-                      className={TEXT_LINK}
+                      className={textLink}
                     >
                       hello@lindenroom.example
                     </a>
@@ -445,75 +495,79 @@ export function App() {
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="name" className={LABEL}>
+                  <label htmlFor="name" className={labelClass}>
                     Name
                   </label>
                   <Input
-                    id="name"
                     ref={nameRef}
+                    id="name"
                     autoComplete="name"
-                    className={FIELD}
                     value={name}
-                    aria-invalid={errors.name ? true : undefined}
-                    aria-describedby={errors.name ? "name-error" : undefined}
                     onChange={(event) => {
                       setName(event.target.value)
                       clearError("name")
                     }}
+                    aria-invalid={errors.name ? true : undefined}
+                    aria-describedby={errors.name ? "name-error" : undefined}
+                    className={fieldClass}
                   />
                   {errors.name && (
-                    <ErrorLine id="name-error" message={errors.name} />
+                    <FieldError id="name-error">{errors.name}</FieldError>
                   )}
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="email" className={LABEL}>
+                  <label htmlFor="email" className={labelClass}>
                     Email address
                   </label>
                   <Input
-                    id="email"
                     ref={emailRef}
+                    id="email"
                     type="email"
                     autoComplete="email"
-                    className={FIELD}
                     value={email}
-                    aria-invalid={errors.email ? true : undefined}
-                    aria-describedby={
-                      errors.email ? "email-help email-error" : "email-help"
-                    }
                     onChange={(event) => {
                       setEmail(event.target.value)
                       clearError("email")
                     }}
+                    aria-invalid={errors.email ? true : undefined}
+                    aria-describedby={
+                      errors.email ? "email-help email-error" : "email-help"
+                    }
+                    className={fieldClass}
                   />
-                  <p id="email-help" className={HELP}>
+                  <p id="email-help" className={helpClass}>
                     We send the booking here, and nothing else.
                   </p>
                   {errors.email && (
-                    <ErrorLine id="email-error" message={errors.email} />
+                    <FieldError id="email-error">{errors.email}</FieldError>
                   )}
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="note" className={LABEL}>
+                  <label htmlFor="note" className={labelClass}>
                     Note (optional)
                   </label>
                   <Textarea
                     id="note"
                     maxLength={NOTE_MAX}
-                    className={cn(FIELD, "min-h-24 resize-none")}
                     value={note}
-                    aria-describedby="note-count"
                     onChange={(event) => setNote(event.target.value)}
+                    aria-describedby="note-help"
+                    className={cn(fieldClass, "min-h-24 resize-none")}
                   />
-                  <p id="note-count" className={HELP}>
-                    {noteLeft} {noteLeft === 1 ? "character" : "characters"}{" "}
-                    left
+                  <p id="note-help" className={helpClass}>
+                    {noteLeft === 1
+                      ? "1 character left"
+                      : `${noteLeft} characters left`}
                   </p>
                 </div>
 
                 <div className="mt-6">
-                  <Button type="submit" className={BUTTON}>
+                  <Button
+                    type="submit"
+                    className="h-auto rounded-md px-6 py-2 font-mono text-label"
+                  >
                     Book the table
                   </Button>
                 </div>
@@ -523,24 +577,19 @@ export function App() {
               {booking && (
                 <div>
                   <h2
-                    ref={confirmRef}
+                    ref={confirmationRef}
                     tabIndex={-1}
-                    className={cn("text-h2", CODE_FOCUS)}
+                    className={cn("text-h2", codeFocusOutline)}
                   >
                     Your table is booked
                   </h2>
-                  <p className="mt-4 max-w-xl">
-                    A table for {peopleLabel(booking.people)} on{" "}
-                    <time dateTime={isoDate(booking.date)}>
-                      {fullDate(booking.date)}
-                    </time>{" "}
-                    at{" "}
-                    <time dateTime={booking.time}>
-                      {timeLabel(booking.time)}
-                    </time>
-                    , under the name {booking.name}.
+                  <p className="mt-4 wrap-break-word">
+                    A table for {peopleText(booking.people)} on{" "}
+                    <DateText date={booking.date} withWeekday /> at{" "}
+                    <TimeText value={booking.time} />, under the name{" "}
+                    {booking.name}.
                   </p>
-                  <p className="mt-4 max-w-xl">
+                  <p className="mt-4 wrap-break-word">
                     We have sent the details to {booking.email}.
                   </p>
                 </div>
@@ -561,18 +610,30 @@ export function App() {
             <dl className="mt-6 divide-y">
               <SummaryRow term="Date">
                 {date ? (
-                  <time dateTime={isoDate(date)}>{fullDate(date)}</time>
-                ) : null}
+                  <DateText date={date} withWeekday />
+                ) : (
+                  <Missing>Not chosen yet</Missing>
+                )}
               </SummaryRow>
               <SummaryRow term="Time">
-                {time ? <time dateTime={time}>{timeLabel(time)}</time> : null}
+                {time ? (
+                  <TimeText value={time} />
+                ) : (
+                  <Missing>Not chosen yet</Missing>
+                )}
               </SummaryRow>
-              <SummaryRow term="People">{peopleLabel(people)}</SummaryRow>
-              <SummaryRow term="Name">{name.trim() || null}</SummaryRow>
+              <SummaryRow term="People">{peopleText(people)}</SummaryRow>
+              <SummaryRow term="Name">
+                {trimmedName ? (
+                  <span className="wrap-break-word">{trimmedName}</span>
+                ) : (
+                  <Missing>Not given yet</Missing>
+                )}
+              </SummaryRow>
             </dl>
             <p className="mt-6 text-body">
               We hold the table for fifteen minutes, and you can change a
-              booking by answering the email we send.
+              booking by answering our email.
             </p>
           </aside>
         </section>
@@ -582,58 +643,18 @@ export function App() {
             <h2 className="text-h2">Before you come</h2>
             <p className="mt-4 max-w-xl">
               The kitchen serves plates from <time dateTime="11:30">11:30</time>{" "}
-              to <time dateTime="14:30">14:30</time>, with tea and cake all day.
-              The shop counter stays open while the room is full, so you can buy
-              a pot to take home while you wait.
+              to <time dateTime="14:30">14:30</time>, and the shop counter stays
+              open while the room is full.
             </p>
             <p className="mt-4">
-              <a href="/menu" className={TEXT_LINK}>
+              <a href="/menu" className={textLink}>
                 See the menu
               </a>
             </p>
           </div>
         </section>
       </main>
-
-      <footer className="mt-18">
-        <div className="border-t py-10">
-          <div className="grid gap-6 md:grid-cols-12 md:items-start">
-            <div className="md:col-span-6">
-              <p className="font-heading text-h2">The Linden Room</p>
-              <p className="mt-2 max-w-xl">
-                A tea room and shop on Mill Lane, with loose-leaf tea, plates at
-                lunch and cake from the oven.
-              </p>
-            </div>
-            <div className="md:col-span-5 md:col-start-8">
-              <address className="not-italic">
-                <span className="block">14 Mill Lane</span>
-                <span className="block">Ashby Wold</span>
-                <span className="block">AW3 7LN</span>
-              </address>
-              <p className="mt-4 font-mono text-label text-muted-foreground">
-                Tuesday to Sunday · Closed Mondays
-              </p>
-            </div>
-          </div>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
-            © 2026 The Linden Room
-          </p>
-        </div>
-      </footer>
-    </div>
-  )
-}
-
-function SummaryRow({ term, children }: { term: string; children: ReactNode }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 py-2 first:pt-0">
-      <dt className="font-mono text-label text-muted-foreground">{term}</dt>
-      <dd className="text-right text-body text-foreground">
-        {children ?? (
-          <span className="text-muted-foreground">Not chosen yet</span>
-        )}
-      </dd>
+      <Footer />
     </div>
   )
 }

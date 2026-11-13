@@ -59,12 +59,12 @@ Plus is marked only by its badge and its default button. Do not enlarge it, lift
 
 ### 4. Compare the plans
 
-A section with the `<h2>` "Compare the plans". Under it, a card with `overflow-hidden p-0` in place of the card's padding and no stack classes, holding the shadcn `Table`.
+A section with the `<h2>` "Compare the plans". Under it, a card whose classes are `overflow-hidden rounded-xl border border-border bg-card`: the card's without `p-5` and without stack classes, holding the shadcn `Table`.
 
 The stock `Table` is off the type scale and its scroll box cannot take focus. Give the `Table` `className="text-body"`. In `components/ui/table.tsx`, give the scroll box, the `<div>` around the `<table>`, `tabIndex={0}`, `role="region"`, an `aria-label` from a required `label` prop, here "Comparison of the three plans", and the focus outline from the rules drawn inside it: `focus-visible:-outline-offset-2` in place of `focus-visible:outline-offset-2`, because the card around it clips. No `<caption>`: the heading above names the table.
 
 - **The header row:** four header cells, each a `<th scope="col">` (the stock `TableHead`) that is a label in `text-muted-foreground` with `px-5`, its stock height and `whitespace-nowrap` kept: "What you get", "Free", "Plus", "Team".
-- **The body rows:** each starts with a `<th scope="row">`, not the stock `TableHead`, with `px-5 py-3 text-left font-normal whitespace-nowrap text-body text-foreground`. The three cells after it are `TableCell`s with `px-5 py-3`. A cell that is a figure (a price, a number) is `font-mono tabular-nums` at the body size; a cell that is a phrase is body text. A "Yes" or a "No" is an `inline-flex items-center gap-2` with the `Check` or the `Minus` icon (`aria-hidden="true"`) before the word.
+- **The body rows:** each starts with a `<th scope="row">`, not the stock `TableHead`, with `px-5 py-3 text-left align-middle font-normal whitespace-nowrap text-body text-foreground` (`align-middle` as the stock `TableCell` has). The three cells after it are `TableCell`s with `px-5 py-3`. A cell that is a figure (a price, a number) is `font-mono tabular-nums` at the body size, all of it, the words of a price (`$18 a month`) included; a cell that is a phrase is body text. A "Yes" or a "No" is an `inline-flex items-center gap-2` with the `Check` or the `Minus` icon (`aria-hidden="true"`) before the word.
 - Rows keep the stock 1px rules and the stock hover fill. No zebra stripes, no colored cells, no ticks without a word.
 
 The nine rows, with the cells for Free, Plus and Team:

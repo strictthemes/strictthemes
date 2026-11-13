@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { CalendarIcon } from "lucide-react"
 
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -7,7 +7,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { formatShortDate, isoDate } from "@/format"
+import { formatShortDate, isoDate } from "@/lib/format"
+
+const FOCUS =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 type DatePickerProps = {
   id: string
@@ -16,7 +19,8 @@ type DatePickerProps = {
   value: Date
   onChange: (date: Date) => void
   today: Date
-  last: Date
+  latest: Date
+  ref?: React.Ref<HTMLButtonElement>
 }
 
 export function DatePicker({
@@ -26,22 +30,24 @@ export function DatePicker({
   value,
   onChange,
   today,
-  last,
+  latest,
+  ref,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
-  const timeId = `${id}-time`
+  const valueId = `${id}-value`
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
+        ref={ref}
         id={id}
-        aria-labelledby={`${labelId} ${timeId}`}
+        aria-labelledby={`${labelId} ${valueId}`}
         aria-describedby={describedBy}
-        className="flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-2 text-body whitespace-nowrap transition-colors outline-none focus-visible:border-ring focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        className={`flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-2 text-body whitespace-nowrap transition-colors outline-none focus-visible:border-ring ${FOCUS}`}
       >
         <time
-          id={timeId}
+          id={valueId}
           dateTime={isoDate(value)}
           className="font-mono tabular-nums"
         >
@@ -71,10 +77,9 @@ export function DatePicker({
             selected={value}
             defaultMonth={value}
             startMonth={today}
-            endMonth={last}
-            disabled={{ before: today, after: last }}
+            endMonth={latest}
+            disabled={{ before: today, after: latest }}
             onSelect={(date) => {
-              if (!date) return
               onChange(date)
               setOpen(false)
             }}

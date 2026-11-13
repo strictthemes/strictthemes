@@ -1,22 +1,24 @@
 import { Fragment, useEffect, useRef, useState } from "react"
+import type { KeyboardEvent } from "react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 const GATES_OPEN = new Date("2026-12-04T16:00:00+01:00")
-const GATES_OPEN_MS = GATES_OPEN.getTime()
 
-const container = "mx-auto max-w-[1200px] px-3 md:px-5"
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const label = "font-mono text-label font-bold uppercase text-foreground"
-const navLink = cn(label, "underline-offset-4 hover:underline", focusOutline)
+const label = "font-mono text-label font-bold uppercase"
+const navLink = cn(
+  label,
+  "text-foreground hover:underline underline-offset-4",
+  focusRing
+)
 const textLink = cn(
   "text-foreground underline underline-offset-4 hover:decoration-2",
-  focusOutline
+  focusRing
 )
-const buttonClasses =
-  "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
+const buttonText = "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
 
 const navItems = [
   { label: "Line-up", href: "/line-up" },
@@ -25,94 +27,94 @@ const navItems = [
 ]
 
 const acts = [
-  { name: "Ossa Bloom", slug: "ossa-bloom", headliner: true },
-  { name: "The Night Ferries", slug: "the-night-ferries", headliner: true },
-  { name: "Kettle Drum Union", slug: "kettle-drum-union", headliner: true },
-  { name: "Lumen Varga", slug: "lumen-varga", headliner: false },
-  { name: "Sister Antenna", slug: "sister-antenna", headliner: false },
-  { name: "Pia Strand", slug: "pia-strand", headliner: false },
-  { name: "Odd Weather", slug: "odd-weather", headliner: false },
-  { name: "Gravel & Gold", slug: "gravel-and-gold", headliner: false },
-  { name: "Juno Halde", slug: "juno-halde", headliner: false },
-  { name: "Neon Allotment", slug: "neon-allotment", headliner: false },
+  { name: "Ossa Bloom", slug: "ossa-bloom" },
+  { name: "The Night Ferries", slug: "the-night-ferries" },
+  { name: "Kettle Drum Union", slug: "kettle-drum-union" },
+  { name: "Lumen Varga", slug: "lumen-varga" },
+  { name: "Sister Antenna", slug: "sister-antenna" },
+  { name: "Pia Strand", slug: "pia-strand" },
+  { name: "Odd Weather", slug: "odd-weather" },
+  { name: "Gravel & Gold", slug: "gravel-and-gold" },
+  { name: "Juno Halde", slug: "juno-halde" },
+  { name: "Neon Allotment", slug: "neon-allotment" },
 ]
 
-const facts = [
-  {
-    label: "Acts",
-    value: <>19</>,
-    text: "Bands, live sets and design talks across two days.",
-  },
-  {
-    label: "Stages",
-    value: <>3</>,
-    text: "Two for music and one, the Drawing Office, for talks and workshops.",
-  },
-  {
-    label: "Last train",
-    value: <time dateTime="01:40">01:40</time>,
-    text: "Extra trains run back to Varsby Central after both nights.",
-  },
-]
-
-function timeLeft() {
-  return Math.max(0, GATES_OPEN_MS - Date.now())
+function secondsUntilGates() {
+  return Math.max(0, Math.ceil((GATES_OPEN.getTime() - Date.now()) / 1000))
 }
 
 function pad(value: number) {
   return String(value).padStart(2, "0")
 }
 
-function count(value: number, noun: string) {
-  return `${value} ${noun}${value === 1 ? "" : "s"}`
+function plural(count: number, noun: string) {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`
 }
 
-function sentenceFor(ms: number) {
-  if (ms <= 0) return "The gates are open."
-  const totalMinutes = Math.floor(ms / 60000)
+function timeLeftInWords(secondsLeft: number) {
+  if (secondsLeft <= 0) return "The gates are open."
+  const totalMinutes = Math.floor(secondsLeft / 60)
   if (totalMinutes === 0) return "Less than a minute until the gates open."
+
   const days = Math.floor(totalMinutes / 1440)
   const hours = Math.floor((totalMinutes % 1440) / 60)
   const minutes = totalMinutes % 60
-  const parts: string[] = []
-  if (days > 0) parts.push(count(days, "day"))
-  if (hours > 0) parts.push(count(hours, "hour"))
-  if (minutes > 0) parts.push(count(minutes, "minute"))
-  let words = parts[0]
-  if (parts.length === 2) words = `${parts[0]} and ${parts[1]}`
-  if (parts.length === 3) words = `${parts[0]}, ${parts[1]} and ${parts[2]}`
-  return `${words} until the gates open.`
+  const parts = [
+    days > 0 ? plural(days, "day") : null,
+    hours > 0 ? plural(hours, "hour") : null,
+    minutes > 0 ? plural(minutes, "minute") : null,
+  ].filter((part): part is string => part !== null)
+
+  const joined =
+    parts.length === 1
+      ? parts[0]
+      : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`
+  return `${joined} until the gates open.`
+}
+
+function useCountdown() {
+  const [secondsLeft, setSecondsLeft] = useState(secondsUntilGates)
+
+  useEffect(() => {
+    if (secondsUntilGates() <= 0) return
+    const id = window.setInterval(() => {
+      const next = secondsUntilGates()
+      setSecondsLeft(next)
+      if (next <= 0) window.clearInterval(id)
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  return secondsLeft
+}
+
+function FestivalDates() {
+  return (
+    <>
+      <time dateTime="2026-12-04">4</time>–
+      <time dateTime="2026-12-05">5 Dec 2026</time>
+    </>
+  )
 }
 
 function SiteHeader() {
-  const [open, setOpen] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!open) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false)
-        buttonRef.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [open])
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButton.current?.focus()
+  }
 
   return (
-    <header className="border-b border-border">
-      <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center gap-x-8 gap-y-3 py-3"
-        )}
-      >
+    <header className="border-b border-border" onKeyDown={handleKeyDown}>
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-3 px-3 py-3 md:px-5">
         <a
           href="/"
           className={cn(
             "font-heading text-h2 text-foreground underline-offset-4 hover:underline",
-            focusOutline
+            focusRing
           )}
         >
           Tremor Days
@@ -124,28 +126,27 @@ function SiteHeader() {
             </a>
           ))}
         </nav>
-        <p className={cn(label, "ml-auto hidden md:block")}>
-          <time dateTime="2026-12-04">4</time>–
-          <time dateTime="2026-12-05">5 Dec 2026</time>
+        <p className={cn(label, "ml-auto hidden tabular-nums md:block")}>
+          <FestivalDates />
         </p>
         <Button
-          ref={buttonRef}
+          ref={menuButton}
           variant="outline"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((value) => !value)}
-          className={cn(buttonClasses, "ml-auto md:hidden")}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-menu"
+          onClick={() => setMenuOpen((open) => !open)}
+          className={cn(buttonText, "ml-auto md:hidden")}
         >
           Menu
         </Button>
       </div>
       <nav
-        id="mobile-nav"
+        id="mobile-menu"
         aria-label="Main"
-        hidden={!open}
+        hidden={!menuOpen}
         className="border-t border-border md:hidden"
       >
-        <div className={cn(container, "py-2")}>
+        <div className="mx-auto max-w-[1200px] px-3 py-2 md:px-5">
           {navItems.map((item) => (
             <a
               key={item.href}
@@ -161,35 +162,53 @@ function SiteHeader() {
   )
 }
 
+function Hero() {
+  return (
+    <section className="flex flex-col gap-5">
+      <div className="flex flex-col gap-2">
+        <p className={label}>Music and design · Varsby Docks</p>
+        <h1 className="text-h1 md:text-display">Tremor Days</h1>
+      </div>
+      <p className="font-heading text-h2">
+        <time dateTime="2026-12-04">4</time>–
+        <time dateTime="2026-12-05">5 December 2026</time> · Varsby Docks
+      </p>
+      <p className="max-w-xl">
+        Two days of bands, live sets and design talks in the old harbour of
+        Varsby, with three stages between the cranes and the pump house.
+      </p>
+      <div className="flex flex-wrap gap-3">
+        <a
+          href="/tickets"
+          className={cn(buttonVariants({ variant: "default" }), buttonText)}
+        >
+          Buy tickets
+        </a>
+        <a
+          href="/line-up"
+          className={cn(buttonVariants({ variant: "secondary" }), buttonText)}
+        >
+          See the line-up
+        </a>
+      </div>
+    </section>
+  )
+}
+
 function Countdown() {
-  const [remaining, setRemaining] = useState(timeLeft)
-
-  useEffect(() => {
-    if (timeLeft() <= 0) return
-    const id = window.setInterval(() => {
-      const left = timeLeft()
-      setRemaining(left)
-      if (left <= 0) window.clearInterval(id)
-    }, 1000)
-    return () => window.clearInterval(id)
-  }, [])
-
-  const totalSeconds = Math.floor(remaining / 1000)
+  const secondsLeft = useCountdown()
+  const isOpen = secondsLeft <= 0
   const units = [
-    { label: "Days", value: Math.floor(totalSeconds / 86400) },
-    { label: "Hours", value: Math.floor((totalSeconds % 86400) / 3600) },
-    { label: "Minutes", value: Math.floor((totalSeconds % 3600) / 60) },
-    { label: "Seconds", value: totalSeconds % 60 },
+    { label: "Days", value: Math.floor(secondsLeft / 86400) },
+    { label: "Hours", value: Math.floor((secondsLeft % 86400) / 3600) },
+    { label: "Minutes", value: Math.floor((secondsLeft % 3600) / 60) },
+    { label: "Seconds", value: secondsLeft % 60 },
   ]
-  const isOpen = remaining <= 0
 
   return (
-    <section
-      aria-labelledby="countdown-heading"
-      className="flex flex-col gap-8"
-    >
+    <section className="flex flex-col gap-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h2 id="countdown-heading" className="text-h2 md:text-h1">
+        <h2 className="text-h2 md:text-h1">
           {isOpen ? "Gates are open" : "Gates open in"}
         </h2>
       </div>
@@ -215,8 +234,8 @@ function Countdown() {
             </Fragment>
           ))}
         </div>
-        <p className="sr-only">{sentenceFor(remaining)}</p>
-        <p className={label}>
+        <p className="sr-only">{timeLeftInWords(secondsLeft)}</p>
+        <p className={cn(label, "tabular-nums")}>
           <time dateTime="2026-12-04T16:00+01:00">Fri 4 Dec · 16:00</time>
         </p>
       </div>
@@ -224,149 +243,130 @@ function Countdown() {
   )
 }
 
+function FirstNames() {
+  return (
+    <section className="flex flex-col gap-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <h2 className="text-h2 md:text-h1">First names</h2>
+        <a href="/line-up" className={textLink}>
+          Full line-up
+        </a>
+      </div>
+      <div className="flex flex-col gap-3">
+        <ul className="flex list-none flex-wrap items-baseline gap-x-5 gap-y-2 p-0">
+          {acts.map((act, index) => (
+            <li key={act.slug}>
+              <a
+                href={`/artists/${act.slug}`}
+                className={cn(
+                  "font-heading text-h2 text-foreground underline-offset-4 hover:underline",
+                  index < 3 && "md:text-h1",
+                  focusRing
+                )}
+              >
+                {act.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p className="font-mono text-label text-muted-foreground">
+          Nine more acts on the full line-up.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+const facts = [
+  {
+    label: "Acts",
+    value: "19",
+    text: "Bands, live sets and design talks across two days.",
+  },
+  {
+    label: "Stages",
+    value: "3",
+    text: "Two for music and one, the Drawing Office, for talks and workshops.",
+  },
+  {
+    label: "Last train",
+    value: <time dateTime="01:40">01:40</time>,
+    text: "Extra trains run back to Varsby Central after both nights.",
+  },
+]
+
+function Facts() {
+  return (
+    <section className="flex flex-col gap-8">
+      <h2 className="sr-only">The festival in numbers</h2>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
+        {facts.map((fact) => (
+          <div
+            key={fact.label}
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 md:col-span-4"
+          >
+            <p className={label}>{fact.label}</p>
+            <p className="font-heading text-h1 tabular-nums">{fact.value}</p>
+            <p>{fact.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function Tickets() {
+  return (
+    <section className="flex flex-col gap-8">
+      <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-3">
+          <h2 className="text-h2 md:text-h1">Tickets on sale</h2>
+          <p className="max-w-xl">
+            Weekend €118, day tickets from €64. Saturday day tickets are sold
+            out.
+          </p>
+        </div>
+        <a
+          href="/tickets"
+          className={cn(
+            buttonVariants({ variant: "secondary" }),
+            buttonText,
+            "self-start md:shrink-0 md:self-auto"
+          )}
+        >
+          Buy tickets
+        </a>
+      </div>
+    </section>
+  )
+}
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-border">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-3 py-8 md:px-5">
+        <p className="font-heading text-h2">Tremor Days</p>
+        <p>A two-day music and design festival at Varsby Docks.</p>
+        <p className={cn(label, "tabular-nums")}>
+          Varsby Docks · <FestivalDates /> · © 2026 Tremor Days
+        </p>
+      </div>
+    </footer>
+  )
+}
+
 export function App() {
   return (
     <div className="min-h-screen bg-background font-sans text-body text-foreground">
       <SiteHeader />
-      <main className={cn(container, "flex flex-col gap-16 py-8 md:py-16")}>
-        <section aria-labelledby="hero-heading" className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <p className={label}>Music and design · Varsby Docks</p>
-            <h1 id="hero-heading" className="text-h1 md:text-display">
-              Tremor Days
-            </h1>
-          </div>
-          <p className="font-heading text-h2">
-            <time dateTime="2026-12-04">4</time>–
-            <time dateTime="2026-12-05">5 December 2026</time> · Varsby Docks
-          </p>
-          <p className="max-w-xl text-body">
-            Two days of live music, design talks and workshops in the old
-            harbour at Varsby Docks. Nineteen acts play across three stages,
-            from the cranes by the water to the old Drawing Office.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href="/tickets"
-              className={cn(
-                buttonVariants({ variant: "default" }),
-                buttonClasses
-              )}
-            >
-              Buy tickets
-            </a>
-            <a
-              href="/line-up"
-              className={cn(
-                buttonVariants({ variant: "secondary" }),
-                buttonClasses
-              )}
-            >
-              See the line-up
-            </a>
-          </div>
-        </section>
-
+      <main className="mx-auto flex max-w-[1200px] flex-col gap-16 px-3 py-8 md:px-5 md:py-16">
+        <Hero />
         <Countdown />
-
-        <section
-          aria-labelledby="names-heading"
-          className="flex flex-col gap-8"
-        >
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <h2 id="names-heading" className="text-h2 md:text-h1">
-              First names
-            </h2>
-            <a href="/line-up" className={textLink}>
-              Full line-up
-            </a>
-          </div>
-          <div className="flex flex-col gap-3">
-            <ul className="flex flex-wrap items-baseline gap-x-5 gap-y-2">
-              {acts.map((act) => (
-                <li key={act.slug}>
-                  <a
-                    href={`/artists/${act.slug}`}
-                    className={cn(
-                      "font-heading text-foreground underline-offset-4 hover:underline",
-                      act.headliner ? "text-h2 md:text-h1" : "text-h2",
-                      focusOutline
-                    )}
-                  >
-                    {act.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <p className="font-mono text-label text-muted-foreground">
-              Nine more acts on the full line-up.
-            </p>
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="facts-heading"
-          className="flex flex-col gap-8"
-        >
-          <h2 id="facts-heading" className="sr-only">
-            The festival in numbers
-          </h2>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-            {facts.map((fact) => (
-              <div
-                key={fact.label}
-                className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 md:col-span-4"
-              >
-                <p className={label}>{fact.label}</p>
-                <p className="font-heading text-h1 tabular-nums">
-                  {fact.value}
-                </p>
-                <p className="text-body">{fact.text}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section
-          aria-labelledby="tickets-heading"
-          className="flex flex-col gap-8"
-        >
-          <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 md:flex-row md:items-center md:justify-between">
-            <div className="flex flex-col gap-3">
-              <h2 id="tickets-heading" className="text-h2 md:text-h1">
-                Tickets on sale
-              </h2>
-              <p className="text-body">
-                Weekend €118, day tickets from €64. Saturday day tickets are
-                sold out.
-              </p>
-            </div>
-            <a
-              href="/tickets"
-              className={cn(
-                buttonVariants({ variant: "secondary" }),
-                buttonClasses,
-                "self-start md:shrink-0 md:self-auto"
-              )}
-            >
-              Buy tickets
-            </a>
-          </div>
-        </section>
+        <FirstNames />
+        <Facts />
+        <Tickets />
       </main>
-      <footer className="border-t border-border">
-        <div className={cn(container, "flex flex-col gap-3 py-8")}>
-          <p className="font-heading text-h2">Tremor Days</p>
-          <p className="text-body">
-            A two-day music and design festival in the old harbour at Varsby
-            Docks.
-          </p>
-          <p className={label}>
-            Varsby Docks · <time dateTime="2026-12-04">4</time>–
-            <time dateTime="2026-12-05">5 Dec 2026</time> · © 2026 Tremor Days
-          </p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }

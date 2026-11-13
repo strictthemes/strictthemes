@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react"
 import {
   Check,
   GitBranch,
@@ -12,9 +18,25 @@ import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const INSTALL_COMMAND = "curl -fsSL https://plinth.example/install.sh | sh"
+const container = "mx-auto max-w-[1200px] px-4 md:px-6"
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const focusRingInside =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+const textLink = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const headerLink = cn(
+  "font-mono text-label text-muted-foreground transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const buttonClass = "px-4 font-mono text-label"
 
-const CONFIG_FILE = `# plinth.toml
+const INSTALL_COMMAND = "curl -fsSL https://plinth.example/install.sh | sh"
+const GET_STARTED = "/docs/get-started/quick-start"
+
+const CONFIG = `# plinth.toml
 name = "orrin-web"
 build = "npm run build"
 output = "dist"
@@ -26,99 +48,88 @@ domain = "orrin.example"
 [env.preview]
 branch = "*"`
 
-const GET_STARTED = "/docs/get-started/quick-start"
-
-const focusOutline =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const focusOutlineInside =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-
-const container = "mx-auto max-w-[1200px] px-4 md:px-6"
-
-const label = "font-mono text-label text-muted-foreground"
-
-const headerLink = cn(
-  "font-mono text-label text-muted-foreground transition-colors duration-150 hover:text-foreground",
-  focusOutline
-)
-
-const textLink = cn(
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
-)
-
-const buttonText = "px-4 font-mono text-label"
-
 const navLinks = [
-  { name: "Docs", href: "/docs" },
-  { name: "Changelog", href: "/changelog" },
-  { name: "Pricing", href: "#" },
+  { label: "Docs", href: "/docs" },
+  { label: "Changelog", href: "/changelog" },
+  { label: "Pricing", href: "#" },
 ]
 
 const footerLinks = [
-  { name: "Docs", href: "/docs" },
-  { name: "Changelog", href: "/changelog" },
-  { name: "Status", href: "#" },
+  { label: "Docs", href: "/docs" },
+  { label: "Changelog", href: "/changelog" },
+  { label: "Status", href: "#" },
 ]
 
-function InlineCode({ children }: { children: ReactNode }) {
-  return (
-    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
-      {children}
-    </code>
-  )
-}
-
-const features: {
+type Feature = {
   icon: LucideIcon
   title: string
-  body: ReactNode
-}[] = [
+  command: string
+  before: string
+  after: ReactNode
+}
+
+const features: Feature[] = [
   {
     icon: GitBranch,
     title: "A preview for every branch",
-    body: (
+    before: "Run ",
+    command: "plinth deploy",
+    after: (
       <>
-        Run <InlineCode>plinth deploy</InlineCode> on any branch and it gets its
-        own address, named after the branch. Only{" "}
-        <span className="font-mono">main</span> goes to production.
+        {" "}
+        on any branch and it gets its own address. Pushes to{" "}
+        <span className="font-mono">main</span> go to production.
       </>
     ),
   },
   {
     icon: Undo2,
     title: "Roll back in one command",
-    body: (
-      <>
-        <InlineCode>plinth rollback</InlineCode> points production at the deploy
-        before the current one. Nothing is rebuilt, so it takes a few seconds.
-      </>
-    ),
+    before: "",
+    command: "plinth rollback",
+    after:
+      " points production at the deploy before this one. Nothing is rebuilt, so it takes seconds.",
   },
   {
     icon: KeyRound,
     title: "Secrets outside the repo",
-    body: (
-      <>
-        <InlineCode>plinth env set</InlineCode> stores a value encrypted, for
-        one environment. It reaches the build and never the repository.
-      </>
-    ),
+    before: "Store API keys with ",
+    command: "plinth env set",
+    after:
+      ". They are encrypted at rest and handed to the build for the environment that needs them.",
   },
   {
     icon: ScrollText,
     title: "Logs as they happen",
-    body: (
-      <>
-        <InlineCode>plinth logs --follow</InlineCode> streams build and request
-        logs to your terminal until you stop it.
-      </>
-    ),
+    before: "",
+    command: "plinth logs --follow",
+    after:
+      " streams build and request logs to your terminal until you press Ctrl+C.",
   },
 ]
 
 type CopyState = "idle" | "copied" | "failed"
+
+function useCopy(text: string) {
+  const [state, setState] = useState<CopyState>("idle")
+  const timer = useRef<number | undefined>(undefined)
+
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  async function copy() {
+    let next: CopyState = "copied"
+    try {
+      await navigator.clipboard.writeText(text)
+    } catch {
+      next = "failed"
+    }
+    setState(next)
+    window.clearTimeout(timer.current)
+    timer.current = window.setTimeout(() => setState("idle"), 2000)
+  }
+
+  return { state, copy }
+}
 
 function CodeBlock({
   name,
@@ -129,27 +140,9 @@ function CodeBlock({
   name: string
   code: string
   className?: string
-  children?: ReactNode
+  children: ReactNode
 }) {
-  const [state, setState] = useState<CopyState>("idle")
-  const timer = useRef<number | undefined>(undefined)
-
-  useEffect(() => () => window.clearTimeout(timer.current), [])
-
-  async function copy() {
-    let next: CopyState = "copied"
-    try {
-      await navigator.clipboard.writeText(code)
-    } catch {
-      next = "failed"
-    }
-    setState(next)
-    window.clearTimeout(timer.current)
-    timer.current = window.setTimeout(() => setState("idle"), 2000)
-  }
-
-  const message =
-    state === "copied" ? "Copied" : state === "failed" ? "Copy failed" : ""
+  const { state, copy } = useCopy(code)
 
   return (
     <figure
@@ -159,20 +152,30 @@ function CodeBlock({
       )}
     >
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
-        <figcaption className={label}>{name}</figcaption>
+        <figcaption className="font-mono text-label text-muted-foreground">
+          {name}
+        </figcaption>
         <Button
           variant="outline"
           size="sm"
-          className={buttonText}
+          className={buttonClass}
           onClick={copy}
         >
           {state === "copied" && (
             <Check className="size-4" strokeWidth={1.5} aria-hidden="true" />
           )}
-          {message || "Copy"}
+          {state === "copied"
+            ? "Copied"
+            : state === "failed"
+              ? "Copy failed"
+              : "Copy"}
         </Button>
         <span role="status" className="sr-only">
-          {message}
+          {state === "copied"
+            ? "Copied"
+            : state === "failed"
+              ? "Copy failed"
+              : ""}
         </span>
       </div>
       <pre
@@ -180,51 +183,114 @@ function CodeBlock({
         role="region"
         aria-label={`Code: ${name}`}
         className={cn(
-          "overflow-x-auto p-4 font-mono text-body text-foreground",
-          focusOutlineInside
+          "overflow-x-auto p-4 font-mono text-body",
+          focusRingInside
         )}
       >
-        <code>{children ?? code}</code>
+        {children}
       </pre>
     </figure>
   )
 }
 
-function ConfigLine({ line }: { line: string }) {
-  if (line.startsWith("#")) {
-    return <span className="text-muted-foreground">{line}</span>
+function Header() {
+  const [open, setOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+
+  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (open && event.key === "Escape") {
+      setOpen(false)
+      menuButton.current?.focus()
+    }
   }
-  const equals = line.indexOf(" = ")
-  if (equals === -1) {
-    return <>{line}</>
-  }
+
   return (
-    <>
-      <span className="text-primary">{line.slice(0, equals)}</span>
-      {line.slice(equals)}
-    </>
+    <header className="border-b border-border" onKeyDown={onKeyDown}>
+      <div
+        className={cn(
+          container,
+          "flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
+        )}
+      >
+        <a
+          href="/"
+          className={cn("font-heading text-h2 text-foreground", focusRing)}
+        >
+          plinth
+        </a>
+        <nav aria-label="Main" className="hidden gap-6 md:flex">
+          {navLinks.map((link) => (
+            <a key={link.label} href={link.href} className={headerLink}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+        <div className="ml-auto hidden items-center gap-3 md:flex">
+          <a href="#" className={headerLink}>
+            Sign in
+          </a>
+          <a
+            href="/deploys"
+            className={cn(buttonVariants({ variant: "outline" }), buttonClass)}
+          >
+            Open console
+          </a>
+        </div>
+        <Button
+          ref={menuButton}
+          variant="outline"
+          className={cn("ml-auto md:hidden", buttonClass)}
+          aria-expanded={open}
+          aria-controls="site-menu"
+          onClick={() => setOpen((value) => !value)}
+        >
+          Menu
+        </Button>
+      </div>
+      <nav
+        id="site-menu"
+        aria-label="Main"
+        hidden={!open}
+        className="border-t border-border md:hidden"
+      >
+        <div className={cn(container, "py-2")}>
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className={cn("block py-2", headerLink)}
+            >
+              {link.label}
+            </a>
+          ))}
+          <a href="#" className={cn("block py-2", headerLink)}>
+            Sign in
+          </a>
+          <a href="/deploys" className={cn("block py-2", headerLink)}>
+            Open console
+          </a>
+        </div>
+      </nav>
+    </header>
   )
 }
 
-function Terminal({ className }: { className?: string }) {
+function Terminal() {
   return (
-    <figure
-      className={cn(
-        "overflow-hidden rounded-xl border border-border bg-card",
-        className
-      )}
-    >
+    <figure className="min-w-0 self-start overflow-hidden rounded-xl border border-border bg-card lg:col-span-5">
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
-        <figcaption className={label}>~/orrin-web</figcaption>
-        <p className={label}>zsh</p>
+        <figcaption className="font-mono text-label text-muted-foreground">
+          ~/orrin-web
+        </figcaption>
+        <p className="font-mono text-label text-muted-foreground">zsh</p>
       </div>
       <pre
         tabIndex={0}
         role="region"
         aria-label="Terminal session"
         className={cn(
-          "overflow-x-auto p-4 font-mono text-label text-muted-foreground",
-          focusOutlineInside
+          "overflow-x-auto p-4 font-mono text-label",
+          focusRingInside
         )}
       >
         <span className="text-muted-foreground">$</span>{" "}
@@ -254,97 +320,42 @@ function Terminal({ className }: { className?: string }) {
   )
 }
 
-function SiteHeader() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false)
-        menuButton.current?.focus()
-      }
+function ConfigCode() {
+  const lines = CONFIG.split("\n")
+  return lines.map((line, index) => {
+    const end = index < lines.length - 1 ? "\n" : ""
+    if (line.startsWith("#")) {
+      return (
+        <span key={index} className="text-muted-foreground">
+          {line}
+          {end}
+        </span>
+      )
     }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [open])
-
-  return (
-    <header className="border-b border-border">
-      <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
-        )}
-      >
-        <a
-          href="/"
-          className={cn("font-heading text-h2 text-foreground", focusOutline)}
-        >
-          plinth
-        </a>
-        <nav aria-label="Main" className="hidden gap-6 md:flex">
-          {navLinks.map((link) => (
-            <a key={link.name} href={link.href} className={headerLink}>
-              {link.name}
-            </a>
-          ))}
-        </nav>
-        <div className="ml-auto hidden items-center gap-3 md:flex">
-          <a href="#" className={headerLink}>
-            Sign in
-          </a>
-          <a
-            href="/deploys"
-            className={cn(buttonVariants({ variant: "outline" }), buttonText)}
-          >
-            Open console
-          </a>
-        </div>
-        <Button
-          ref={menuButton}
-          variant="outline"
-          className={cn(buttonText, "ml-auto md:hidden")}
-          aria-expanded={open}
-          aria-controls="site-menu"
-          onClick={() => setOpen((value) => !value)}
-        >
-          Menu
-        </Button>
-      </div>
-      <nav
-        id="site-menu"
-        aria-label="Main"
-        hidden={!open}
-        className="border-t border-border md:hidden"
-      >
-        <div className={cn(container, "py-2")}>
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className={cn(headerLink, "block py-2")}
-            >
-              {link.name}
-            </a>
-          ))}
-          <a href="#" className={cn(headerLink, "block py-2")}>
-            Sign in
-          </a>
-          <a href="/deploys" className={cn(headerLink, "block py-2")}>
-            Open console
-          </a>
-        </div>
-      </nav>
-    </header>
-  )
+    const match = line.match(/^(\w+)( = )(.*)$/)
+    if (match) {
+      return (
+        <span key={index}>
+          <span className="text-primary">{match[1]}</span>
+          {match[2]}
+          {match[3]}
+          {end}
+        </span>
+      )
+    }
+    return (
+      <span key={index}>
+        {line}
+        {end}
+      </span>
+    )
+  })
 }
 
 export function App() {
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <SiteHeader />
+      <Header />
 
       <main className="pt-12">
         <div className={container}>
@@ -366,20 +377,21 @@ export function App() {
                 Deploy from the terminal you already have open
               </h1>
               <p className="mt-3 max-w-lg">
-                <InlineCode>plinth deploy</InlineCode> builds the current
-                commit, uploads it and prints the address. Every branch gets a
-                preview address, and <span className="font-mono">main</span>{" "}
-                goes to production.
+                Plinth builds the commit you are on, uploads it and prints the
+                address, all from one command. Every branch gets a preview
+                address, and <span className="font-mono">main</span> goes to
+                production.
               </p>
-              <CodeBlock
-                name="install"
-                code={INSTALL_COMMAND}
-                className="mt-6"
-              />
+              <CodeBlock name="install" code={INSTALL_COMMAND} className="mt-6">
+                {INSTALL_COMMAND}
+              </CodeBlock>
               <div className="mt-6 flex flex-wrap items-center gap-3">
                 <a
                   href={GET_STARTED}
-                  className={cn(buttonVariants(), buttonText)}
+                  className={cn(
+                    buttonVariants({ variant: "default" }),
+                    buttonClass
+                  )}
                 >
                   Get started
                 </a>
@@ -388,11 +400,13 @@ export function App() {
                 </a>
               </div>
             </div>
-            <Terminal className="min-w-0 self-start lg:col-span-5" />
+            <Terminal />
           </section>
 
           <section className="mt-12 border-t border-border pt-12">
-            <p className={label}>features</p>
+            <p className="font-mono text-label text-muted-foreground">
+              features
+            </p>
             <h2 className="mt-2 text-h2">
               What it does between commit and address
             </h2>
@@ -403,12 +417,18 @@ export function App() {
                   className="border-t border-border pt-4 md:col-span-6 lg:col-span-3"
                 >
                   <feature.icon
-                    className="size-4"
+                    className="block size-4"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
                   <h3 className="mt-3 text-body font-bold">{feature.title}</h3>
-                  <p className="mt-3 max-w-lg">{feature.body}</p>
+                  <p className="mt-3 max-w-lg">
+                    {feature.before}
+                    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                      {feature.command}
+                    </code>
+                    {feature.after}
+                  </p>
                 </div>
               ))}
             </div>
@@ -416,28 +436,30 @@ export function App() {
 
           <section className="mt-12 grid grid-cols-1 gap-6 border-t border-border pt-12 lg:grid-cols-12">
             <div className="lg:col-span-5">
-              <p className={label}>configuration</p>
+              <p className="font-mono text-label text-muted-foreground">
+                configuration
+              </p>
               <h2 className="mt-2 text-h2">
                 One file, checked in next to your code
               </h2>
               <p className="mt-3 max-w-lg">
-                <InlineCode>plinth.toml</InlineCode> names the build command,
-                the output folder and which branch goes where.{" "}
-                <InlineCode>plinth init</InlineCode> writes it for you, and you
-                change it like any other file in the project.
+                <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                  plinth.toml
+                </code>{" "}
+                names the build command, the output folder and which branch goes
+                to which environment. Run{" "}
+                <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                  plinth init
+                </code>{" "}
+                in your project and it writes the file for you.
               </p>
             </div>
             <CodeBlock
               name="plinth.toml"
-              code={CONFIG_FILE}
+              code={CONFIG}
               className="min-w-0 self-start lg:col-span-7"
             >
-              {CONFIG_FILE.split("\n").map((line, index) => (
-                <span key={index}>
-                  {index > 0 && "\n"}
-                  <ConfigLine line={line} />
-                </span>
-              ))}
+              <ConfigCode />
             </CodeBlock>
           </section>
 
@@ -446,13 +468,19 @@ export function App() {
               Your next commit can be live in a minute
             </h2>
             <p className="mt-3 max-w-lg">
-              Install Plinth, run <InlineCode>plinth init</InlineCode> in your
-              project and deploy the branch you are on.
+              Install the CLI, run{" "}
+              <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                plinth deploy
+              </code>{" "}
+              in your project and open the address it prints.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <a
                 href={GET_STARTED}
-                className={cn(buttonVariants(), buttonText)}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  buttonClass
+                )}
               >
                 Get started
               </a>
@@ -460,7 +488,7 @@ export function App() {
                 href="/deploys"
                 className={cn(
                   buttonVariants({ variant: "secondary" }),
-                  buttonText
+                  buttonClass
                 )}
               >
                 Open console
@@ -477,14 +505,16 @@ export function App() {
             "flex flex-wrap items-center gap-x-6 gap-y-2 py-6"
           )}
         >
-          <p className={label}>© 2026 Plinth Labs</p>
+          <p className="font-mono text-label text-muted-foreground">
+            © 2026 Plinth Labs
+          </p>
           <nav
             aria-label="Footer"
             className="ml-auto flex flex-wrap gap-x-6 gap-y-2"
           >
             {footerLinks.map((link) => (
-              <a key={link.name} href={link.href} className={headerLink}>
-                {link.name}
+              <a key={link.label} href={link.href} className={headerLink}>
+                {link.label}
               </a>
             ))}
           </nav>

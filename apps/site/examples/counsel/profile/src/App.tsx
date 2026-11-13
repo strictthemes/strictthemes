@@ -2,35 +2,38 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusOutline =
+const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+// A link in the header or the footer, and a name or a title that is a link.
+const plainLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focus
+)
 
 // A link in running text.
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focusOutline
-)
-
-// A link in the header or the footer, and a title that is a link.
-const plainLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusOutline
+  focus
 )
 
 const label = "font-mono text-label uppercase"
-const labelHeading = "font-mono text-label text-foreground uppercase"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-const dividedSection = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
+const labelHeading = "font-mono text-label uppercase text-foreground"
+
+const sectionGrid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+const sectionDivided =
+  "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
+
 const dlRow =
   "grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
-const entry =
-  "border-t border-border py-8 md:grid md:grid-cols-12 md:items-baseline md:gap-x-8"
+const dtClass = "font-mono text-label uppercase text-muted-foreground"
+const ddClass = "col-span-2 text-body"
 
 const navLinks = [
-  { name: "Practice", href: "/practice/commercial-disputes", current: false },
-  { name: "People", href: "/people/ruth-calloway", current: true },
-  { name: "Insights", href: "/insights/notice-clauses", current: false },
-  { name: "Contact", href: "/contact", current: false },
+  { label: "Practice", href: "/practice/commercial-disputes" },
+  { label: "People", href: "/people/ruth-calloway", current: true },
+  { label: "Insights", href: "/insights/notice-clauses" },
+  { label: "Contact", href: "/contact" },
 ]
 
 const admissions = [
@@ -46,40 +49,43 @@ const matters = [
     year: "2026",
     kind: "Warranty claim",
     name: "The sellers of Halden Print",
-    text: "Ruth led the defence of a buyer's warranty claim, which was struck out because its notice arrived one day after the contract's deadline.",
+    summary:
+      "Led the defence of a buyer's warranty claim, struck out because its notice arrived one day after the contract's deadline.",
     value: "£3.4m",
   },
   {
     year: "2026",
     kind: "Trial",
     name: "Estley Mills v Brandreth Engineering",
-    text: "With David Achterberg, she won a claim for a textile mill after a nine-day trial.",
+    summary:
+      "With David Achterberg, won a claim for a textile mill after a nine-day trial.",
     value: "£6.2m",
   },
   {
     year: "2025",
     kind: "Arbitration",
     name: "Pellam Foods",
-    text: "She recovered the cost of a failed packaging contract for a food producer in an arbitration seated in Wexcombe.",
+    summary:
+      "Recovered the cost of a failed packaging contract for a food producer in an arbitration seated in Wexcombe.",
     value: "£1.8m",
   },
 ]
 
 const briefings = [
   {
+    date: "2026-11-10",
+    dateText: "10 November 2026",
+    readingTime: "8 min read",
     title:
       "Notice clauses after a sale: when a late letter ends a warranty claim",
     href: "/insights/notice-clauses",
-    date: "10 November 2026",
-    dateTime: "2026-11-10",
-    reading: "8 min read",
   },
   {
+    date: "2026-09-17",
+    dateText: "17 September 2026",
+    readingTime: "6 min read",
     title: "Earn-outs that end in dispute",
     href: "#",
-    date: "17 September 2026",
-    dateTime: "2026-09-17",
-    reading: "6 min read",
   },
 ]
 
@@ -93,13 +99,13 @@ export function App() {
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 md:gap-x-8">
             {navLinks.map((link) => (
-              <li key={link.name}>
+              <li key={link.href}>
                 <a
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
                   className={cn(label, plainLink, link.current && "underline")}
                 >
-                  {link.name}
+                  {link.label}
                 </a>
               </li>
             ))}
@@ -108,7 +114,7 @@ export function App() {
       </header>
 
       <main>
-        <section className={cn(grid, "mt-14 md:mt-28")}>
+        <section className={cn("mt-14 md:mt-28", sectionGrid)}>
           <div className="md:col-span-5">
             <div
               role="img"
@@ -136,26 +142,24 @@ export function App() {
             <h1 className="mt-4 text-h1 md:text-display">Ruth Calloway</h1>
             <p className="mt-4 max-w-xl text-body">
               Ruth acts in disputes that follow the sale of a company: warranty
-              claims, earn-outs and the accounts drawn up at completion. She was
-              made a partner in May 2026, fifteen years after she joined the
-              firm as a trainee.
+              claims, earn-outs and the accounts drawn up at completion. She
+              was made a partner in May 2026, fifteen years after she joined
+              the firm as a trainee.
             </p>
 
-            <h2 className={cn(labelHeading, "mt-8")}>Contact</h2>
+            <h2 className={cn("mt-8", labelHeading)}>Contact</h2>
             <dl className="mt-4 border-b border-border">
               <div className={dlRow}>
-                <dt className={cn(label, "text-muted-foreground")}>
-                  Direct line
-                </dt>
-                <dd className="col-span-2 text-body">
+                <dt className={dtClass}>Direct line</dt>
+                <dd className={ddClass}>
                   <a href="tel:01632960237" className={textLink}>
                     01632 960 237
                   </a>
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={cn(label, "text-muted-foreground")}>Email</dt>
-                <dd className="col-span-2 text-body wrap-anywhere">
+                <dt className={dtClass}>Email</dt>
+                <dd className={cn(ddClass, "wrap-anywhere")}>
                   <a
                     href="mailto:r.calloway@harrowvane.example"
                     className={textLink}
@@ -165,10 +169,8 @@ export function App() {
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={cn(label, "text-muted-foreground")}>
-                  Assistant
-                </dt>
-                <dd className="col-span-2 text-body">
+                <dt className={dtClass}>Assistant</dt>
+                <dd className={ddClass}>
                   Owen Pryce ·{" "}
                   <a href="tel:01632960238" className={textLink}>
                     01632 960 238
@@ -176,10 +178,8 @@ export function App() {
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={cn(label, "text-muted-foreground")}>Office</dt>
-                <dd className="col-span-2 text-body">
-                  4 Chancery Row, Wexcombe
-                </dd>
+                <dt className={dtClass}>Office</dt>
+                <dd className={ddClass}>4 Chancery Row, Wexcombe</dd>
               </div>
             </dl>
 
@@ -197,82 +197,82 @@ export function App() {
           </div>
         </section>
 
-        <section className={cn(grid, dividedSection)}>
+        <section className={cn(sectionDivided, sectionGrid)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">Experience</h2>
             <p className="mt-4 max-w-xl text-body">
               Ruth acts for the buyers and sellers of owner-managed companies,
-              and for the private equity houses that stand behind some of them.
-              Most of her clients have sold or bought one business in their
-              lives and meet their first dispute a year or two after
-              completion, when a warranty is questioned, an earn-out falls
-              short or the completion accounts are challenged.
+              most of them family businesses sold after one or two generations,
+              and for the private equity houses that have bought some of them.
+              Her clients are usually founders, finance directors and the
+              investment managers who sat at the table when the deal was done.
             </p>
             <p className="mt-4 max-w-xl text-body">
-              In the first weeks of a claim she reads the contract&apos;s
-              notice and limitation clauses before anything else, because a
-              claim that was notified late or in the wrong form can end there.
-              Within two weeks the client has her written view of what the
-              claim is worth, what it will cost to pursue or defend, and where
-              it is weakest.
+              In the first weeks of a claim she reads the sale contract's notice
+              and limitation clauses before anything else, because a claim
+              served late or in the wrong form can end there. Within two weeks
+              the client has her written view of what the claim is worth, what
+              it will cost to bring or defend, and how long it is likely to
+              take.
             </p>
             <p className="mt-4 max-w-xl text-body">
-              Since she gained higher rights of audience in 2019, Ruth has
-              presented her own cases at hearings in the civil courts. She has
-              acted in arbitrations over earn-outs and supply contracts, and
-              has settled warranty claims at mediation before any proceedings
-              were issued. She works with the other three partners of{" "}
+              Many sale contracts send disputes over completion accounts to an
+              expert or to arbitration, and Ruth has acted in both, as well as
+              at mediations that settled claims before a hearing. She works
+              with the rest of{" "}
               <a href="/practice/commercial-disputes" className={textLink}>
                 the Commercial disputes team
-              </a>
-              , which David Achterberg leads.
+              </a>{" "}
+              on claims that go to trial.
             </p>
           </div>
 
           <div className="mt-14 md:col-span-4 md:col-start-9 md:mt-0">
             <h3 className={labelHeading}>Languages</h3>
             <p className="mt-4 text-body">English and German</p>
-            <h3 className={cn(labelHeading, "mt-8")}>Practice areas</h3>
+            <h3 className={cn("mt-8", labelHeading)}>Practice areas</h3>
             <p className="mt-4 text-body">
               Commercial disputes; Corporate (on the sale side of disputes)
             </p>
           </div>
         </section>
 
-        <section className={cn(grid, dividedSection)}>
+        <section className={cn(sectionDivided, sectionGrid)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">Admissions and education</h2>
             <dl className="mt-8 border-b border-border">
-              {admissions.map((row) => (
-                <div key={row.year} className={dlRow}>
-                  <dt className={cn(label, "text-muted-foreground")}>
-                    <time dateTime={row.year} className="tabular-nums">
-                      {row.year}
-                    </time>
+              {admissions.map((item) => (
+                <div key={item.year} className={dlRow}>
+                  <dt className={cn(dtClass, "tabular-nums")}>
+                    <time dateTime={item.year}>{item.year}</time>
                   </dt>
-                  <dd className="col-span-2 text-body">{row.text}</dd>
+                  <dd className={ddClass}>{item.text}</dd>
                 </div>
               ))}
             </dl>
           </div>
         </section>
 
-        <section className={dividedSection}>
+        <section className={sectionDivided}>
           <h2 className="text-h2">Recent matters</h2>
-          <ul className="mt-8 list-none border-b border-border">
+          <ul className="mt-8 list-none border-b border-border p-0">
             {matters.map((matter) => (
-              <li key={matter.name} className={entry}>
+              <li
+                key={matter.name}
+                className="border-t border-border py-8 md:grid md:grid-cols-12 md:items-baseline md:gap-x-8"
+              >
                 <p
-                  className={cn(label, "text-muted-foreground md:col-span-3")}
+                  className={cn(
+                    label,
+                    "text-muted-foreground tabular-nums md:col-span-3"
+                  )}
                 >
-                  <time dateTime={matter.year} className="tabular-nums">
-                    {matter.year}
-                  </time>{" "}
-                  · {matter.kind}
+                  <time dateTime={matter.year}>{matter.year}</time> ·{" "}
+                  {matter.kind}
                 </p>
                 <div className="mt-2 md:col-span-7 md:mt-0">
                   <h3 className="text-h2">{matter.name}</h3>
-                  <p className="mt-2 max-w-xl text-body">{matter.text}</p>
+                  <p className="mt-2 max-w-xl text-body">{matter.summary}</p>
                 </div>
                 <p className="mt-2 font-mono text-label text-foreground uppercase tabular-nums md:col-span-2 md:mt-0 md:text-right">
                   {matter.value}
@@ -282,18 +282,22 @@ export function App() {
           </ul>
         </section>
 
-        <section className={dividedSection}>
+        <section className={sectionDivided}>
           <h2 className="text-h2">Briefings by Ruth</h2>
-          <ul className="mt-8 list-none border-b border-border">
+          <ul className="mt-8 list-none border-b border-border p-0">
             {briefings.map((briefing) => (
-              <li key={briefing.title} className={entry}>
+              <li
+                key={briefing.title}
+                className="border-t border-border py-8 md:grid md:grid-cols-12 md:items-baseline md:gap-x-8"
+              >
                 <p
-                  className={cn(label, "text-muted-foreground md:col-span-3")}
+                  className={cn(
+                    label,
+                    "text-muted-foreground tabular-nums md:col-span-3"
+                  )}
                 >
-                  <time dateTime={briefing.dateTime} className="tabular-nums">
-                    {briefing.date}
-                  </time>{" "}
-                  · {briefing.reading}
+                  <time dateTime={briefing.date}>{briefing.dateText}</time> ·{" "}
+                  {briefing.readingTime}
                 </p>
                 <h3 className="mt-2 text-h2 md:col-span-9 md:mt-0">
                   <a href={briefing.href} className={plainLink}>
@@ -307,7 +311,7 @@ export function App() {
       </main>
 
       <footer className="mt-14 border-t border-border py-8 md:mt-28">
-        <div className={grid}>
+        <div className={sectionGrid}>
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Harrow &amp; Vane LLP</p>
             <address className="mt-2 font-mono text-label text-muted-foreground uppercase not-italic">
@@ -321,7 +325,7 @@ export function App() {
                 01632 960 214
               </a>
             </p>
-            <p className={cn(label, "mt-2")}>
+            <p className={cn("mt-2 wrap-anywhere", label)}>
               <a
                 href="mailto:enquiries@harrowvane.example"
                 className={cn(plainLink, "normal-case")}
@@ -336,7 +340,7 @@ export function App() {
           >
             <ul>
               {navLinks.map((link, index) => (
-                <li key={link.name} className={index > 0 ? "mt-2" : undefined}>
+                <li key={link.href} className={cn(index > 0 && "mt-2")}>
                   <a
                     href={link.href}
                     aria-current={link.current ? "page" : undefined}
@@ -346,14 +350,14 @@ export function App() {
                       link.current && "underline"
                     )}
                   >
-                    {link.name}
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
         </div>
-        <p className={cn(label, "mt-8 text-muted-foreground")}>
+        <p className={cn("mt-8 text-muted-foreground", label)}>
           © 2026 Harrow &amp; Vane LLP · Registered in England and Wales
         </p>
       </footer>

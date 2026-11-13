@@ -8,7 +8,7 @@ checks:
   - The number of people is set with minus and plus buttons that each have an `aria-label`.
   - Sending the empty form gives the date, the time, the name and the email each their own error line with an icon, and focus moves to the date field.
   - A Monday gets an error line that says why in words, and the calendar does not let a day before today or more than 60 days ahead be chosen.
-  - The summary card shows each value as soon as it is chosen or typed, and "Not chosen yet" for what is still missing.
+  - The summary card shows each value as soon as it is chosen or typed, and "Not chosen yet" ("Not given yet" for the name) for what is still missing.
   - After a good booking the form is replaced, inside the same card, by a confirmation that repeats the date, time, number of people and name, and focus moves to its heading.
 ---
 
@@ -45,14 +45,14 @@ The form's fields, in this order, each in its own `<div>`, `mt-6` apart, as the 
      - `today`: replace all of its classes with `text-foreground`. A grey fill is color alone, and the day's button covers it. `disabled`: delete `opacity-50`; the day's button already fades when disabled.
      - `button_previous` and `button_next`: add `dark:hover:bg-accent` after `aria-disabled:opacity-50`. The stock hover fill cannot be seen on the popup in dark mode.
      - Give the `ChevronLeftIcon` and the `ChevronRightIcon` `strokeWidth={1.5}`.
-     - `CalendarDayButton`: add `ref={ref}` to its `<Button>`. The stock file makes the ref and never attaches it, so the arrow keys move nothing. In the button's classes, delete `border-0` and the three classes that draw the stock ring on a focused day (`group-data-[focused=true]/day:border-ring` and the two `group-data-[focused=true]/day:ring-*` after it), replace the small text size in `[&>span]:` with `[&>span]:text-label`, and add `text-body tabular-nums group-data-[today=true]/day:border-foreground dark:hover:bg-accent`. Today then has a 1px line around it in the text color, which stays when the day is hovered or chosen; the chosen day keeps its olive fill (`bg-primary text-primary-foreground`), days of the next month stay in `text-muted-foreground`, and a focused day shows the outline that `button.tsx` has.
+     - `CalendarDayButton`: in the button's classes, delete `border-0` and the three classes that draw the stock ring on a focused day (`group-data-[focused=true]/day:border-ring` and the two `group-data-[focused=true]/day:ring-*` after it), replace the small text size in `[&>span]:` with `[&>span]:text-label`, and add `text-body tabular-nums group-data-[today=true]/day:border-foreground dark:hover:bg-accent` before the classes the rules end it with. Today then has a 1px line around it in the text color, which stays when the day is hovered or chosen; the chosen day keeps its olive fill (`bg-primary text-primary-foreground`), days of the next month stay in `text-muted-foreground`, and a focused day shows the outline that `button.tsx` has.
 2. **Time**: the label "Time", then a `Select` as the layout notes describe. Its placeholder is "Choose a time"; its items are every half hour from `9:30` to `16:00`, written as `9:30`, `10:00` and so on. An item holds plain text, not a `<time>`, and its value has two-digit hours: `{ value: "09:30", label: "9:30" }`.
 3. **Number of people**: a label in `font-mono text-label text-foreground` as a `<p>` with an `id`, "Number of people" (a `<label>` needs a field to point at; this one names the stepper), then with `mt-2` a stepper as the layout notes describe, from one to eight, starting at two. The value reads `1 person`, `2 people` and so on. The buttons' `aria-label`s are "Fewer people" and "More people". Under the stepper, with `mt-2`, a label in `text-muted-foreground`: `For nine or more, write to hello@lindenroom.example`, with the address as a link in running text to `mailto:hello@lindenroom.example`.
 4. **Name**: the label "Name", then an `Input` with `autoComplete="name"`.
 5. **Email**: the label "Email address", then an `Input` of type `email` with `autoComplete="email"`. Under it, with `mt-2`, a label in `text-muted-foreground`: `We send the booking here, and nothing else.` Where an error line shows, it comes after this label, also with `mt-2`, and the field's `aria-describedby` names both.
 6. **Note**: the label "Note (optional)", then a `Textarea` with `min-h-24` and `maxLength={300}`. Under it, with `mt-2`, a label in `text-muted-foreground` that counts down: `300 characters left`, down to `1 character left` and `0 characters left`.
 
-Then, in the notes' `<div>` with `mt-6`, the page's one default button, `type="submit"`: "Book the table".
+Then, in the `<div>` with `mt-6` that the Forms note gives it, the page's one default button, `type="submit"`: "Book the table".
 
 ### 4. Summary
 
@@ -60,7 +60,7 @@ The summary card is an `<aside>` with `aria-labelledby` pointing at its heading.
 
 - A label: `Your booking`.
 - With `mt-2`, an `<h2>` "Summary".
-- With `mt-6`, a `<dl>` with four rows: Date, Time, People, Name. Each row is a `<div>` with `flex items-baseline justify-between gap-4 py-2 first:pt-0` and the `<dl>` has `divide-y`: the Rows note, with a `<dl>` in place of the `<ul>`, and `first:pt-0` so the first row starts at the `mt-6`. The term, a `<dt>`, is a label in `text-muted-foreground`; the value, a `<dd>`, is `text-body text-foreground`, right-aligned with `text-right`. The date reads like `Saturday 14 November 2026`, inside a `<time>` with `dateTime="2026-11-14"`; the time is a `<time>` too, `<time dateTime="11:30">11:30</time>`. People reads `2 people`. A value that is still missing reads "Not chosen yet" in `text-muted-foreground`.
+- With `mt-6`, a `<dl>` with four rows: Date, Time, People, Name. Each row is a `<div>` with `flex items-baseline justify-between gap-4 py-2 first:pt-0` and the `<dl>` has `divide-y`: the Rows note, with a `<dl>` in place of the `<ul>`, and `first:pt-0` so the first row starts at the `mt-6`. The term, a `<dt>`, is a label in `text-muted-foreground`; the value, a `<dd>`, is `text-body text-foreground`, right-aligned with `text-right`. The date reads like `Saturday 14 November 2026`, inside a `<time>` with `dateTime="2026-11-14"`; the time is a `<time>` too, `<time dateTime="11:30">11:30</time>`. People reads `2 people`. A value that is still missing reads "Not chosen yet" in `text-muted-foreground`; the name, which is typed, not chosen, reads "Not given yet".
 - With `mt-6`, one sentence in `text-body`: we hold the table for fifteen minutes, and a booking can be changed by answering the email.
 
 The summary is not a live region: it changes with every keystroke, and announcing each one would be noise.

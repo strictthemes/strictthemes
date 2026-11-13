@@ -4,7 +4,7 @@ title: Check answers
 description: the last step of a public-service form, listing the answers so far with a link to change each one, the price, a declaration to tick and the button that sends the application.
 order: 3
 checks:
-  - The answers are description lists (`<dl>`), one `<dt>` and `<dd>` pair per answer, and on a phone each answer stacks under its question.
+  - The answers are description lists (`<dl>`), one `<dt>` per answer, followed by a `<dd>` for the answer and a `<dd>` for its "Change" link, and on a phone each answer stacks under its question.
   - Every "Change" link says to a screen reader what it changes ("Change vehicle registration number"), not just "Change".
   - Sending without ticking the declaration shows the error summary with a link that moves focus to the checkbox, and an error line with an icon beside the checkbox; the button is never disabled.
   - The checkbox and its label make a target at least 44px tall, and the checkbox has 3px corners.
@@ -40,8 +40,8 @@ An `<h2>` "Your details", then with `mt-6` a summary list: a `<dl>` with `border
 Each row is a `<div>` with `border-b border-border py-4`, holding:
 
 - The question as the `<dt>`, in `text-body font-bold`.
-- The answer as a `<dd>` with `mt-1` and `break-words`.
-- A `<dd>` with `mt-2` holding the "Change" link: a text link, `inline-flex min-h-11 items-center`, whose text is "Change" with the rest in a visually hidden span: `Change<span className="sr-only"> email address</span>`. The hidden words, row by row: name, address, permit zone, email address, phone number, proof of address; then vehicle registration number, make and model, what the vehicle runs on, permit start date. It goes to `#`.
+- The answer as a `<dd>` with `mt-1` and `wrap-break-word`.
+- A `<dd>` with `mt-2` holding the "Change" link: a text link, `inline-flex min-h-11 items-center md:items-start` (from `md` up its word then lines up with the question's first line), whose text is "Change" with the rest in a visually hidden span: `Change<span className="sr-only"> email address</span>`. The hidden words, row by row: name, address, permit zone, email address, phone number, proof of address; then vehicle registration number, make and model, what the vehicle runs on, permit start date. It goes to `#`.
 
 From `md` up the row is a grid: `md:grid md:grid-cols-12 md:items-start md:gap-x-4`, where `md:items-start` keeps a long answer from stretching the link. The `<dt>` has `md:col-span-4`, the answer `md:col-span-6 md:mt-0`, and the link's `<dd>` `md:col-span-2 md:mt-0 md:text-right`. The row's `py-4` is the only space between rows.
 
@@ -64,7 +64,7 @@ A wrapper with `mt-10` holding the form and the status element. The form has `no
 
 - An `<h2>` "Declaration", with no top margin.
 - With `mt-4`, one paragraph: giving false information to get a permit can mean it is cancelled with no refund.
-- With `mt-6`, the checkbox field, which here departs from the Fields note's order, since its label sits beside the box: a wrapper that gets the red line while it has an error, holding the error line while there is one, with no top margin as the wrapper's first element, and the checkbox row from the layout notes, which has `mt-2` while the error line is above it. Add the checkbox with `npx shadcn@latest add checkbox` and change it as the layout notes say. The `<label>`: "I confirm that I live at 14 Wharf Row, that the vehicle is registered to me at this address, and that my answers are correct." Give the `Checkbox` an `id` and the `<label>` `htmlFor` with it, so a click on the words ticks the box. Give the `<label>` an `id` too, and the `Checkbox` `aria-labelledby` naming it: in a Base UI project the `Checkbox`'s `id` lands on a hidden input, and the visible box would otherwise have no name. The checkbox names the error line in its `aria-describedby` and gets `aria-invalid` while there is an error.
+- With `mt-6`, the checkbox field, which here departs from the Fields note's order, since its label sits beside the box: a wrapper that gets the red line while it has an error, holding the error line while there is one, with no top margin as the wrapper's first element, and the checkbox row from the layout notes, which has `mt-2` while the error line is above it. Add the checkbox with `npx shadcn@latest add checkbox` and change it as the layout notes say. The `<label>`: "I confirm that I live at 14 Wharf Row, that the vehicle is registered to me at this address, and that my answers are correct." Give the `Checkbox` an `id` and the `<label>` `htmlFor` with it, so a click on the words ticks the box. Give the `<label>` an `id` too, and the `Checkbox` `aria-labelledby` naming it: in a Base UI project the `Checkbox`'s `id` lands on a hidden input, and the visible box would otherwise have no name. The checkbox names the error line in its `aria-describedby` and gets `aria-invalid` while there is an error. Give the `Checkbox` a `ref` too, which lands on the visible box: the error summary's link focuses that box with `focus({ preventScroll: true })`, because focusing the hidden input passes focus on without `preventScroll`.
 - The row of buttons with `mt-10`: the default `Button` "Submit application" with `type="submit"`, the only button on the page.
 
 After the form, in the same wrapper, the status element from the layout notes; its message is a `<p>` with `mt-6`.

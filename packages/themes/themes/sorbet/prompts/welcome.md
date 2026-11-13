@@ -24,7 +24,7 @@ The header from the layout notes, without the app's nav: this page is for people
 
 ### 2. Opening
 
-A grid from the layout notes, `md:items-center`. Its first item, `md:col-span-6`, is a `flex flex-col gap-6`:
+A grid from the layout notes, `md:items-center`, as a plain `<div>` in the `<main>`: not a section, since its heading is the `<h1>`. Its first item, `md:col-span-6`, is a `flex flex-col gap-6`:
 
 - A `flex flex-col gap-4` with the `<h1>` in `text-h1 md:text-display` ("Small steps, every day") and one paragraph under it: "Mossy helps you keep a few small habits. Tick each one off when it is done. It takes about ten seconds a day."
 - A row (`flex flex-wrap items-center gap-3`) with the page's one main button: an `<a>` to `#signup` styled as a default button, "Start for free". Beside it, a small figure: `Free for 5 habits · No card needed`.
@@ -37,7 +37,7 @@ A `<figure>` with `flex w-full flex-col gap-2 md:mx-auto md:max-w-sm`: full widt
 
 - A small figure, `Wednesday, 11 November`, then the greeting "Good morning, Ines" in `font-heading text-h2`, in a `flex flex-col gap-2`. Both are fixed text, not read from the clock.
 - A row with a good-news badge (add it with `npx shadcn@latest add badge`), "12-day streak", with the `Flame` icon.
-- Five habit rows, each a `flex items-center gap-3` with a 1px `border-t border-border pt-4` (`gap-4` from the card's stack holds them apart): a box `size-6 shrink-0 rounded-sm border border-border` that, for the three done habits (the first three in the sample's order), is `bg-secondary` with a `Check` icon (`text-secondary-foreground`) inside; then the habit's name in `text-body`; then at the right end (`ml-auto`) a small figure, "Done" or "To do". The rows are not cards and have no fill.
+- Five habit rows, each a `flex items-center gap-3` with a 1px `border-t border-border pt-4` (`gap-4` from the card's stack holds them apart): a box `flex size-6 shrink-0 items-center justify-center rounded-sm border border-border` that, for the three done habits (the first three in the sample's order), is `bg-secondary` with a `Check` icon (`text-secondary-foreground`) inside; then the habit's name in `text-body`; then at the right end (`ml-auto`) a label in `text-muted-foreground`, "Done" or "To do" (words, not a small figure). The rows are not cards and have no fill.
 
 The `<figcaption>` under the card is a label in `text-muted-foreground`, `md:text-center`, so it is centered under the card from `md` up and left-aligned below: "What your mornings look like in Mossy".
 

@@ -34,7 +34,7 @@ A section with the hairline from the layout notes. Its heading is an `<h2>` with
 **The control.** A `<div>` with `flex flex-wrap items-center justify-between gap-x-6 gap-y-4` and no top margin (it is the first thing seen under the hairline), holding:
 
 - A button group from the layout notes with the `aria-label` "Show rooms for" and four buttons: "All rooms", "One guest", "Two guests", "Three or more". "All rooms" is chosen when the page opens.
-- A `<p>` with `role="status"`, a label in `text-foreground`, saying how many rooms are shown: `Showing all 6 rooms`, `Showing 1 room for one guest`, `Showing 3 rooms for two guests` or `Showing 2 rooms for three or more guests`. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
+- A `<p>` with `role="status"`, a label in `text-foreground`, uppercased as every label is, saying how many rooms are shown: `Showing all 6 rooms`, `Showing 1 room for one guest`, `Showing 3 rooms for two guests` or `Showing 2 rooms for three or more guests`. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
 
 Under that row, with `mt-4`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "A guest travelling alone is welcome in any room for two, at the room's price."
 

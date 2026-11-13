@@ -24,8 +24,8 @@ The header from the layout notes, with "Book" as the current page; its link keep
 
 The first section, with `pt-8`, as a grid (`grid gap-5 md:grid-cols-12 md:items-start`):
 
-- In columns 1–5: a label, `Ferries to the islands · Since 1987`, then with `mt-2` the `<h1>` in `text-h1 lg:text-display` (here `lg:` in place of the Headings note's `md:`, since five columns at `md` are too narrow for the display size): "Over the water by lunchtime". With `mt-3` one or two sentences in `text-body`: five islands' worth of crossings from Harrowmouth, with a car, a bike or a dog. With `mt-5` a label line in `text-muted-foreground`: `Harrowmouth · Port Ellery · Brindle Ness · Wrenholm · Tollan Quay`.
-- In columns 7–12: the search card, a card that is the wrapper for the form and the confirmation. It holds the `<form>` (with `noValidate` and the `aria-label` "Search sailings") and, after it, the empty `role="status"` element. Add the fields with `npx shadcn@latest add input select popover calendar` if the project has none, and give the new files the edits the Added components note lists.
+- In columns 1–5: a label, `Ferries to the islands · Since 1987`, then with `mt-2` the `<h1>` in `text-h1 lg:text-display` (here `lg:` in place of the Headings note's `md:`, since five columns at `md` are too narrow for the display size): "Over the water by lunchtime". With `mt-3` one or two sentences in `text-body`: crossings from Harrowmouth to four islands, with a car, a bike or a dog. With `mt-5` a label line in `text-muted-foreground`: `Harrowmouth · Port Ellery · Brindle Ness · Wrenholm · Tollan Quay`.
+- In columns 7–12: the search card, a card that is the wrapper for the form and the confirmation. It holds the `<form>` (with `noValidate` and the `aria-label` "Search sailings") and, after it, the empty `role="status"` element. Add the fields with `npx shadcn@latest add select popover calendar` if the project has none, and give the new files the edits the Added components note lists.
 
 On a phone the card comes under the label line, with the grid's `gap-5` between them.
 
@@ -65,7 +65,7 @@ Each card is an `<article>` with the card classes, holding:
 - With `mt-2`, an `<h3>` in `text-h2`, the route: "Harrowmouth to Port Ellery".
 - With `mt-3`, one sentence in `text-body` about the crossing.
 - With `mt-5`, a row `<div>` with `flex items-end justify-between gap-5`: on the left a `<p>`, a label in `text-muted-foreground`, with the duration and the way, `1 h 45 min · Direct`; on the right a `<div>` with `shrink-0 text-right` holding a label in `text-muted-foreground`, `From, one adult`, and under it with `mt-1` the price as a `<p>` in `font-mono text-h2 text-foreground tabular-nums`, `£29.00`.
-- With `mt-5`, a `<p>` holding a link in running text, "See sailings".
+- With `mt-5`, a `<p>` holding a link in running text that names its port, "See sailings to Port Ellery", so the three links differ.
 
 The three routes: Harrowmouth to Port Ellery (`5 sailings a day`, `1 h 45 min · Direct`, `£29.00`, the link to `/results`); Harrowmouth to Brindle Ness (`3 sailings a day`, `55 min · Direct`, `£18.00`, the link to `#`); Harrowmouth to Wrenholm (`2 sailings a day`, `2 h 30 min · Direct`, `£36.00`, the link to `#`). No badge on this page.
 

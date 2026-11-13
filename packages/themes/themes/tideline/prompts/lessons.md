@@ -47,7 +47,7 @@ The three lessons, word for word:
 
 A section of parts side by side, from the layout notes, with its `aria-labelledby` pointing at the `<h2>` "Kit hire". Here the parts stand side by side only from `lg`: write `lg:` in place of `md:` in the grid's classes and in the spans (`grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-x-6 lg:items-start`).
 
-**First part,** `lg:col-span-8`: a `flex flex-col gap-6` holding a `flex flex-col gap-4` with the `<h2>` "Kit hire" and one paragraph in `text-body` with `max-w-xl`: "Surfed before? Hire what you need from the Boat Shed, with no need to book. Prices are for one item.", and then the table in its card, as the Tables note describes it, with `label="Kit hire"`. Four columns: Item, 2 hours, Half day, Full day. Six rows, the item in `text-body` and the three prices with `tabular-nums`:
+**First part,** `lg:col-span-8`: a `flex flex-col gap-6` holding a `flex flex-col gap-4` with the `<h2>` "Kit hire" and one paragraph in `text-body` with `max-w-xl`: "Surfed before? Hire what you need from the Boat Shed, with no need to book. Prices are for one item.", and then the table in its card, as the Tables note describes it, with `label="Kit hire"`. Four columns: Item, 2 hours, Half day, Full day. Six rows, the three prices with `tabular-nums` (the item takes its size from the table's `text-body`):
 
 | Item | 2 hours | Half day | Full day |
 |---|---|---|---|

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react"
-import type { FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
+import { flushSync } from "react-dom"
 import { CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -7,195 +7,146 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 type Message = {
-  id: number
+  id: string
   name: string
   initials: string
   relation: string | null
-  date: string | null
+  date: { iso: string; text: string } | null
   text: string
 }
 
-type Errors = {
-  name?: string
-  message?: string
-}
-
-const MESSAGE_LIMIT = 500
-
-const MONTHS = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-]
-
-const FIRST_MESSAGES: Message[] = [
+const SAMPLE_MESSAGES: Message[] = [
   {
-    id: 6,
+    id: "m6",
     name: "Juno Pell",
     initials: "JP",
     relation: "Margot's daughter, aged 9",
-    date: "2027-04-09",
-    text: "I am going to dance every single dance. Rafe, you promised me the one with the arches, and I have not forgotten.",
+    date: { iso: "2027-04-09", text: "9 April 2027" },
+    text: "I am going to dance every dance, even the slow ones. Rafe, you promised me the one with the arches, and I have not forgotten.",
   },
   {
-    id: 5,
+    id: "m5",
     name: "Tobias Wren",
     initials: "TW",
     relation: "Your neighbour on Saltry Lane",
-    date: "2027-04-01",
-    text: "The croquet set is yours to borrow for the day, hoops and all. I wish you both a garden that grows faster than mine.",
+    date: { iso: "2027-04-01", text: "1 April 2027" },
+    text: "The croquet set is yours to borrow for the day, hoops and all. I hope your garden grows faster than mine ever has.",
   },
   {
-    id: 4,
+    id: "m4",
     name: "Hester Quayle",
     initials: "HQ",
     relation: "Clem's friend from the library",
-    date: "2027-03-24",
-    text: "I still remember you reading recipes aloud at the issue desk, Clem, when you thought nobody was listening. I hope the new kitchen hears plenty of them.",
+    date: { iso: "2027-03-24", text: "24 March 2027" },
+    text: "I still think of you reading recipes aloud at the issue desk on quiet afternoons. May the new kitchen hear plenty of them.",
   },
   {
-    id: 3,
+    id: "m3",
     name: "Dev Raman",
     initials: "DR",
     relation: "Rafe's flatmate at university",
-    date: "2027-03-15",
-    text: "I have known for years that Rafe would marry someone who could out-walk him. I am very glad it is Clem.",
+    date: { iso: "2027-03-15", text: "15 March 2027" },
+    text: "I knew years ago that Rafe would marry someone who could out-walk him. I am very glad it is Clem.",
   },
   {
-    id: 2,
+    id: "m2",
     name: "Ade Fairbrother",
     initials: "AF",
     relation: "Clem's cousin",
-    date: "2027-03-09",
-    text: "This family has waited a long time for a ceilidh. I have been practising in the kitchen, and the dog is not impressed.",
+    date: { iso: "2027-03-09", text: "9 March 2027" },
+    text: "The family has waited a long time for a ceilidh. I have been practising in the kitchen, so stand well back.",
   },
   {
-    id: 1,
+    id: "m1",
     name: "Margot Pell",
     initials: "MP",
     relation: "Clem's godmother",
-    date: "2027-03-02",
-    text: "I held you at your christening, Clem, and you slept through all of it. I will try very hard not to cry at the barn.",
+    date: { iso: "2027-03-02", text: "2 March 2027" },
+    text: "I held you at your christening, Clem, and now I get to see you married. I will try very hard not to cry at the barn.",
   },
 ]
 
-const FOCUS =
+const MESSAGE_MAX = 500
+
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const NAV_LINK = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline ${FOCUS}`
+const navLinkClass = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 hover:underline transition-colors duration-150 ${focusOutline}`
 
-const TEXT_LINK = `text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${FOCUS}`
+const runningLinkClass = `text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 ${focusOutline}`
 
-const NAV = [
+const NAV_LINKS = [
   { label: "Reply", href: "/rsvp" },
   { label: "Gifts", href: "/gifts" },
   { label: "The day", href: "/day" },
-  { label: "Guestbook", href: "/guestbook" },
+  { label: "Guestbook", href: "/guestbook", current: true },
 ]
 
-function writtenDate(iso: string) {
-  const [year, month, day] = iso.split("-").map(Number)
-  return `${day} ${MONTHS[month - 1]} ${year}`
-}
+type Errors = { name?: string; message?: string }
 
-function initialsOf(name: string) {
+function initialsFrom(name: string) {
   return name
     .split(/\s+/)
+    .filter(Boolean)
     .slice(0, 2)
     .map((word) => Array.from(word)[0].toUpperCase())
     .join("")
 }
 
-function ErrorLine({ id, text }: { id: string; text: string }) {
-  return (
-    <p
-      id={id}
-      className="flex items-start gap-2 font-mono text-label text-destructive"
-    >
-      <CircleAlert
-        className="size-4 shrink-0"
-        strokeWidth={1.5}
-        aria-hidden="true"
-      />
-      <span>{text}</span>
-    </p>
-  )
+function plural(n: number, one: string, many: string) {
+  return `${n} ${n === 1 ? one : many}`
 }
 
 export function App() {
-  const [messages, setMessages] = useState<Message[]>(FIRST_MESSAGES)
+  const [messages, setMessages] = useState<Message[]>(SAMPLE_MESSAGES)
   const [name, setName] = useState("")
   const [relation, setRelation] = useState("")
   const [text, setText] = useState("")
   const [errors, setErrors] = useState<Errors>({})
-  const [sends, setSends] = useState(0)
-  const [thanked, setThanked] = useState<string | null>(null)
+  const [thanksName, setThanksName] = useState<string | null>(null)
+  const nextId = useRef(1)
 
   const nameRef = useRef<HTMLInputElement>(null)
-  const textRef = useRef<HTMLTextAreaElement>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
   const thanksRef = useRef<HTMLHeadingElement>(null)
-  const focusNext = useRef<"name" | "message" | null>(null)
-
-  // Runs after the render that added the error lines, so they are in the
-  // page when focus lands on the field.
-  useEffect(() => {
-    if (focusNext.current === "name") nameRef.current?.focus()
-    if (focusNext.current === "message") textRef.current?.focus()
-    focusNext.current = null
-  }, [sends])
 
   useEffect(() => {
-    if (thanked !== null) thanksRef.current?.focus()
-  }, [thanked])
+    if (thanksName !== null) thanksRef.current?.focus()
+  }, [thanksName])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const trimmedName = name.trim()
+    const trimmedRelation = relation.trim()
+    const trimmedText = text.trim()
 
-    const cleanName = name.trim()
-    const cleanRelation = relation.trim()
-    const cleanText = text.trim()
+    const next: Errors = {}
+    if (!trimmedName) next.name = "Write your name, so they know who it is from."
+    if (!trimmedText) next.message = "Write a message. A line or two is plenty."
 
-    const found: Errors = {}
-    if (cleanName === "") {
-      found.name = "Write your name, so they know who it is from."
-    }
-    if (cleanText === "") {
-      found.message = "Write a message. A line or two is plenty."
-    }
-
-    if (found.name || found.message) {
-      focusNext.current = found.name ? "name" : "message"
-      setErrors(found)
-      setSends((count) => count + 1)
+    if (next.name || next.message) {
+      flushSync(() => setErrors(next))
+      if (next.name) nameRef.current?.focus()
+      else messageRef.current?.focus()
       return
     }
 
     setErrors({})
     setMessages((list) => [
       {
-        id: list.length + 1,
-        name: cleanName,
-        initials: initialsOf(cleanName),
-        relation: cleanRelation === "" ? null : cleanRelation,
+        id: `new-${nextId.current++}`,
+        name: trimmedName,
+        initials: initialsFrom(trimmedName),
+        relation: trimmedRelation || null,
         date: null,
-        text: cleanText,
+        text: trimmedText,
       },
       ...list,
     ])
-    setThanked(cleanName)
+    setThanksName(trimmedName)
   }
 
-  const left = MESSAGE_LIMIT - text.length
-  const count = messages.length
+  const charsLeft = MESSAGE_MAX - text.length
 
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
@@ -203,27 +154,23 @@ export function App() {
         <div className="mx-auto flex max-w-[1088px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
           <a
             href="/"
-            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${FOCUS}`}
+            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
           >
             Clem &amp; Rafe
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
             <ul className="flex flex-wrap gap-x-6">
-              {NAV.map((item) => (
-                <li key={item.href}>
-                  {item.href === "/guestbook" ? (
-                    <a
-                      href={item.href}
-                      aria-current="page"
-                      className={`${NAV_LINK} underline`}
-                    >
-                      {item.label}
-                    </a>
-                  ) : (
-                    <a href={item.href} className={NAV_LINK}>
-                      {item.label}
-                    </a>
-                  )}
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "page" : undefined}
+                    className={
+                      link.current ? `${navLinkClass} underline` : navLinkClass
+                    }
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -260,10 +207,10 @@ export function App() {
                 Messages
               </h2>
               <p className="font-mono text-label text-muted-foreground tabular-nums">
-                {count === 1 ? "1 message" : `${count} messages`}
+                {plural(messages.length, "message", "messages")}
               </p>
             </div>
-            <ul className="flex flex-col gap-6">
+            <ul className="flex list-none flex-col gap-6 p-0">
               {messages.map((message) => (
                 <li
                   key={message.id}
@@ -277,22 +224,22 @@ export function App() {
                       {message.initials}
                     </span>
                     <div className="flex min-w-0 flex-col gap-2">
-                      <h3 className="text-body text-foreground">
+                      <h3 className="text-body wrap-break-word">
                         {message.name}
                       </h3>
-                      <p className="font-mono text-label text-muted-foreground tabular-nums">
-                        {message.relation !== null && `${message.relation} · `}
-                        {message.date === null ? (
-                          "Just now"
-                        ) : (
-                          <time dateTime={message.date}>
-                            {writtenDate(message.date)}
+                      <p className="font-mono text-label text-muted-foreground tabular-nums wrap-break-word">
+                        {message.relation && <>{message.relation} · </>}
+                        {message.date ? (
+                          <time dateTime={message.date.iso}>
+                            {message.date.text}
                           </time>
+                        ) : (
+                          "Just now"
                         )}
                       </p>
                     </div>
                   </div>
-                  <p className="text-body text-foreground">{message.text}</p>
+                  <p className="text-body wrap-break-word">{message.text}</p>
                 </li>
               ))}
             </ul>
@@ -310,9 +257,8 @@ export function App() {
                 Your message goes at the top of the list straight away.
               </p>
             </div>
-
             <div className="rounded-xl border border-border bg-card p-6">
-              {thanked === null && (
+              {thanksName === null && (
                 <form
                   noValidate
                   aria-label="Write in the guestbook"
@@ -335,7 +281,8 @@ export function App() {
                       value={name}
                       onChange={(event) => {
                         setName(event.target.value)
-                        setErrors((now) => ({ ...now, name: undefined }))
+                        if (errors.name)
+                          setErrors((e) => ({ ...e, name: undefined }))
                       }}
                       aria-invalid={errors.name ? true : undefined}
                       aria-describedby={
@@ -344,7 +291,17 @@ export function App() {
                       className="h-11 rounded-md px-3 text-body md:text-body"
                     />
                     {errors.name && (
-                      <ErrorLine id="guest-name-error" text={errors.name} />
+                      <p
+                        id="guest-name-error"
+                        className="flex items-start gap-2 font-mono text-label text-destructive"
+                      >
+                        <CircleAlert
+                          className="size-4 shrink-0"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                        <span>{errors.name}</span>
+                      </p>
                     )}
                   </div>
 
@@ -369,7 +326,7 @@ export function App() {
                       id="guest-relation-help"
                       className="font-mono text-label text-muted-foreground"
                     >
-                      {'Like "Rafe\'s cousin" or "the neighbours at number 4"'}
+                      Like "Rafe's cousin" or "the neighbours at number 4"
                     </p>
                   </div>
 
@@ -381,14 +338,15 @@ export function App() {
                       Your message
                     </label>
                     <Textarea
-                      ref={textRef}
+                      ref={messageRef}
                       id="guest-message"
                       name="message"
-                      maxLength={MESSAGE_LIMIT}
+                      maxLength={MESSAGE_MAX}
                       value={text}
                       onChange={(event) => {
                         setText(event.target.value)
-                        setErrors((now) => ({ ...now, message: undefined }))
+                        if (errors.message)
+                          setErrors((e) => ({ ...e, message: undefined }))
                       }}
                       aria-invalid={errors.message ? true : undefined}
                       aria-describedby={
@@ -402,15 +360,20 @@ export function App() {
                       id="guest-message-count"
                       className="font-mono text-label text-muted-foreground tabular-nums"
                     >
-                      {left === 1
-                        ? "1 character left"
-                        : `${left} characters left`}
+                      {plural(charsLeft, "character left", "characters left")}
                     </p>
                     {errors.message && (
-                      <ErrorLine
+                      <p
                         id="guest-message-error"
-                        text={errors.message}
-                      />
+                        className="flex items-start gap-2 font-mono text-label text-destructive"
+                      >
+                        <CircleAlert
+                          className="size-4 shrink-0"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                        <span>{errors.message}</span>
+                      </p>
                     )}
                   </div>
 
@@ -423,16 +386,16 @@ export function App() {
                 </form>
               )}
               <div role="status">
-                {thanked !== null && (
-                  <div className="flex flex-col gap-3">
+                {thanksName !== null && (
+                  <div className="flex flex-col gap-3 text-foreground">
                     <h3
                       ref={thanksRef}
                       tabIndex={-1}
-                      className="text-h2 text-foreground focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+                      className="text-h2 wrap-break-word focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
                     >
-                      Thank you, {thanked}
+                      Thank you, {thanksName}
                     </h3>
-                    <p className="text-body text-foreground">
+                    <p className="text-body">
                       Your message is at the top of the guestbook.
                     </p>
                   </div>
@@ -466,9 +429,12 @@ export function App() {
               <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
               Quillbrook Barn, Little Saltry
             </p>
-            <p className="font-mono text-label text-muted-foreground">
+            <p className="font-mono text-label text-muted-foreground wrap-break-word">
               Questions:{" "}
-              <a href="mailto:hello@clemandrafe.example" className={TEXT_LINK}>
+              <a
+                href="mailto:hello@clemandrafe.example"
+                className={runningLinkClass}
+              >
                 hello@clemandrafe.example
               </a>
             </p>

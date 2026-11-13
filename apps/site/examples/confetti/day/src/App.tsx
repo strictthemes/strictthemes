@@ -8,24 +8,26 @@ import {
 } from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
+const textLink = `text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 ${focusRing}`
+
+const navLink = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 hover:underline transition-colors duration-150 ${focusRing}`
+
 const container = "mx-auto max-w-[1088px] px-6"
-
-const textLink = `text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${focusOutline}`
-
-const navLink = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline ${focusOutline}`
 
 const navItems = [
   { label: "Reply", href: "/rsvp" },
   { label: "Gifts", href: "/gifts" },
-  { label: "The day", href: "/day", current: true },
+  { label: "The day", href: "/day" },
   { label: "Guestbook", href: "/guestbook" },
 ]
 
-function Clock({ time }: { time: string }) {
-  return <time dateTime={time}>{time}</time>
+const currentHref = "/day"
+
+function T({ at, children }: { at: string; children: ReactNode }) {
+  return <time dateTime={at}>{children}</time>
 }
 
 type TimelineRow = {
@@ -33,7 +35,7 @@ type TimelineRow = {
   dateTime: string
   title: string
   badge?: string
-  text: ReactNode
+  body: ReactNode
 }
 
 const timeline: TimelineRow[] = [
@@ -41,11 +43,11 @@ const timeline: TimelineRow[] = [
     time: "13:30",
     dateTime: "2027-07-17T13:30",
     title: "Arrive and find a drink",
-    text: (
+    body: (
       <>
-        Lemonade and elderflower fizz are waiting in the orchard. The
-        minibuses from Market Fenley station leave at <Clock time="13:00" />{" "}
-        and <Clock time="13:15" />.
+        Lemonade and elderflower fizz are waiting in the orchard. The minibuses
+        from Market Fenley station leave at <T at="13:00">13:00</T> and{" "}
+        <T at="13:15">13:15</T>.
       </>
     ),
   },
@@ -53,7 +55,7 @@ const timeline: TimelineRow[] = [
     time: "14:00",
     dateTime: "2027-07-17T14:00",
     title: "The ceremony",
-    text: (
+    body: (
       <>
         In the barn, for about half an hour. Phones away until it is over,
         please; the photographer has it covered.
@@ -64,28 +66,33 @@ const timeline: TimelineRow[] = [
     time: "15:00",
     dateTime: "2027-07-17T15:00",
     title: "Photos and lawn games",
-    text: <>On the lawn behind the barn, with tea, cake and a croquet set.</>,
+    body: (
+      <>
+        On the lawn behind the barn, with tea, cake and a croquet set while we
+        have our photos taken.
+      </>
+    ),
   },
   {
     time: "17:00",
     dateTime: "2027-07-17T17:00",
     title: "Dinner at long tables",
-    text: <>In the barn. Your place is on the board by the door.</>,
+    body: <>In the barn. Your place is on the board by the door.</>,
   },
   {
     time: "19:00",
     dateTime: "2027-07-17T19:00",
     title: "Speeches and cake",
-    text: <>Three speeches, each under five minutes. Then we cut the cake.</>,
+    body: <>Three speeches, each under five minutes. Then we cut the cake.</>,
   },
   {
     time: "20:00",
     dateTime: "2027-07-17T20:00",
     title: "Dancing with The Saltry Reelers",
-    text: (
+    body: (
       <>
-        A ceilidh band whose caller teaches every dance before it starts, so
-        you need no practice.
+        A ceilidh band whose caller teaches every dance before it starts. No
+        one needs to know the steps.
       </>
     ),
   },
@@ -93,10 +100,10 @@ const timeline: TimelineRow[] = [
     time: "23:30",
     dateTime: "2027-07-17T23:30",
     title: "The last minibus",
-    text: (
+    body: (
       <>
         To Market Fenley station and The Old Granary. An earlier one leaves at{" "}
-        <Clock time="22:30" />.
+        <T at="22:30">22:30</T>.
       </>
     ),
   },
@@ -105,39 +112,38 @@ const timeline: TimelineRow[] = [
     dateTime: "2027-07-18T11:00",
     title: "Brunch on the lawn",
     badge: "Day two",
-    text: (
+    body: (
       <>
-        The next morning, <time dateTime="2027-07-18">Sunday 18 July</time>,
-        for anyone still in Little Saltry. We keep it going until{" "}
-        <Clock time="13:00" />.
+        The next morning, <T at="2027-07-18">Sunday 18 July</T>, for anyone
+        still in Little Saltry, until <T at="13:00">13:00</T>. Come as you are.
       </>
     ),
   },
 ]
 
-const ways: { title: string; text: ReactNode }[] = [
+const waysThere: { title: string; body: ReactNode }[] = [
   {
     title: "By train",
-    text: (
+    body: (
       <>
         Take the train to Market Fenley station. A minibus waits on the
-        forecourt at <Clock time="13:00" /> and <Clock time="13:15" />, and
-        brings you back at <Clock time="22:30" /> and <Clock time="23:30" />.
+        forecourt at <T at="13:00">13:00</T> and <T at="13:15">13:15</T>, and
+        brings you back at <T at="22:30">22:30</T> and <T at="23:30">23:30</T>.
       </>
     ),
   },
   {
     title: "By car",
-    text: (
+    body: (
       <>
-        The postcode takes you to the gate on Saltry Lane. Park in the
-        paddock, signposted from the lane; it is free.
+        The postcode takes you to the gate on Saltry Lane. Park in the paddock,
+        signposted from the lane; it is free.
       </>
     ),
   },
   {
     title: "By taxi",
-    text: (
+    body: (
       <>
         Call Fenley Cars on{" "}
         <a href="tel:+441632960881" className={textLink}>
@@ -149,7 +155,7 @@ const ways: { title: string; text: ReactNode }[] = [
   },
   {
     title: "On foot",
-    text: (
+    body: (
       <>
         From The Wren and Wheel it is five minutes along Saltry Lane, with a
         pavement all the way.
@@ -166,70 +172,73 @@ const glance: { term: string; value: ReactNode }[] = [
     term: "Minibus from the station",
     value: (
       <>
-        <Clock time="13:00" /> and <Clock time="13:15" />
+        <T at="13:00">13:00</T> and <T at="13:15">13:15</T>
       </>
     ),
   },
-  { term: "Last minibus back", value: <Clock time="23:30" /> },
+  { term: "Last minibus back", value: <T at="23:30">23:30</T> },
 ]
 
-const places: {
+type Stay = {
+  id: string
   label: string
   name: string
-  text: ReactNode
+  body: ReactNode
   price: string
-  link: string
-  href: string
-}[] = [
+  link: { label: string; href: string }
+}
+
+const stays: Stay[] = [
   {
+    id: "stay-wren",
     label: "Inn · 6 rooms · A 5-minute walk",
     name: "The Wren and Wheel",
-    text: (
+    body: (
       <>
         The pub on the green. All six rooms are held for guests until{" "}
-        <time dateTime="2027-05-01">1 May 2027</time>; say you are coming to
-        the wedding when you book.
+        <T at="2027-05-01">1 May 2027</T>; say you are coming to the wedding
+        when you book.
       </>
     ),
     price: "From £95 a night",
-    link: "Book a room",
-    href: "#",
+    link: { label: "Book a room", href: "#" },
   },
   {
+    id: "stay-granary",
     label: "Bed and breakfast · 4 rooms · Market Fenley",
     name: "The Old Granary",
-    text: (
+    body: (
       <>
-        In town, 15 minutes by car, and on the minibus route both ways.
-        Breakfast is at a big table in the kitchen.
+        In town, 15 minutes by car, and on the minibus route both ways, so no
+        one has to drive home.
       </>
     ),
     price: "From £80 a night",
-    link: "Book a room",
-    href: "#",
+    link: { label: "Book a room", href: "#" },
   },
   {
+    id: "stay-field",
     label: "Camping · Behind the barn",
     name: "The top field",
-    text: (
+    body: (
       <>
-        Bring a tent and stay from{" "}
-        <time dateTime="2027-07-16">Friday 16 July</time> to{" "}
-        <time dateTime="2027-07-18">Sunday 18 July</time>, with showers in the
-        stable block.
+        Bring a tent and stay from <T at="2027-07-16">Friday 16 July</T> to{" "}
+        <T at="2027-07-18">Sunday 18 July</T>, with showers in the stable
+        block.
       </>
     ),
     price: "Free",
-    link: "Tell us you are camping",
-    href: "mailto:hello@clemandrafe.example",
+    link: {
+      label: "Tell us you are camping",
+      href: "mailto:hello@clemandrafe.example",
+    },
   },
 ]
 
-const questions: { id: string; question: string; answer: ReactNode }[] = [
+const questions: { q: string; a: ReactNode }[] = [
   {
-    id: "children",
-    question: "Can we bring our children?",
-    answer: (
+    q: "Can we bring our children?",
+    a: (
       <>
         Yes, if they are named on your invitation. There is a children&apos;s
         plate at dinner and a quiet room off the barn with blankets and books.
@@ -237,9 +246,8 @@ const questions: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
-    id: "step-free",
-    question: "Is the barn step-free?",
-    answer: (
+    q: "Is the barn step-free?",
+    a: (
       <>
         The barn, the toilets and the lawn are. The orchard is on a gentle
         slope with a mown path.
@@ -247,9 +255,8 @@ const questions: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
-    id: "rain",
-    question: "What if it rains?",
-    answer: (
+    q: "What if it rains?",
+    a: (
       <>
         Everything but the lawn games moves into the barn, which holds
         everyone. Bring a coat for the walk from the paddock.
@@ -257,9 +264,8 @@ const questions: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
-    id: "photos",
-    question: "Can I take photos?",
-    answer: (
+    q: "Can I take photos?",
+    a: (
       <>
         Not during the ceremony, please. From the drinks on, take as many as
         you like.
@@ -267,9 +273,8 @@ const questions: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
-    id: "allergy",
-    question: "Can the kitchen cook around an allergy?",
-    answer: (
+    q: "Can the kitchen cook around an allergy?",
+    a: (
       <>
         Yes. Tell us in the note{" "}
         <a href="/rsvp" className={textLink}>
@@ -280,12 +285,11 @@ const questions: { id: string; question: string; answer: ReactNode }[] = [
     ),
   },
   {
-    id: "end",
-    question: "When does it end?",
-    answer: (
+    q: "When does it end?",
+    a: (
       <>
-        The band stops at <Clock time="23:15" /> and the last minibus leaves
-        at <Clock time="23:30" />. Brunch on Sunday is for anyone still
+        The band stops at <T at="23:15">23:15</T> and the last minibus leaves
+        at <T at="23:30">23:30</T>. Brunch on Sunday is for anyone still
         around.
       </>
     ),
@@ -301,25 +305,26 @@ export function App() {
         >
           <a
             href="/"
-            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
+            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusRing}`}
           >
             Clem &amp; Rafe
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
             <ul className="flex flex-wrap gap-x-6">
-              {navItems.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    aria-current={item.current ? "page" : undefined}
-                    className={
-                      item.current ? `${navLink} underline` : navLink
-                    }
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const current = item.href === currentHref
+                return (
+                  <li key={item.href}>
+                    <a
+                      href={item.href}
+                      aria-current={current ? "page" : undefined}
+                      className={current ? `${navLink} underline` : navLink}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                )
+              })}
             </ul>
           </nav>
         </div>
@@ -327,16 +332,15 @@ export function App() {
 
       <main className={`${container} flex flex-col gap-22 pt-10 pb-22`}>
         <section
-          aria-labelledby="opening-heading"
+          aria-labelledby="opening-title"
           className="flex flex-col gap-6 rounded-xl bg-candy p-6 text-candy-foreground md:p-10"
         >
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
               <p className="font-mono text-label">
-                <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
-                Little Saltry
+                <T at="2027-07-17">Saturday 17 July 2027</T> · Little Saltry
               </p>
-              <h1 id="opening-heading" className="text-h1 md:text-display">
+              <h1 id="opening-title" className="text-h1 md:text-display">
                 The plan for the day
               </h1>
             </div>
@@ -348,14 +352,14 @@ export function App() {
         </section>
 
         <section
-          aria-labelledby="timeline-heading"
+          aria-labelledby="day-title"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col gap-6 md:col-span-8 md:col-start-3">
-            <h2 id="timeline-heading" className="text-h2">
+            <h2 id="day-title" className="text-h2">
               How the day goes
             </h2>
-            <ol className="divide-y divide-border">
+            <ol className="list-none divide-y divide-border p-0">
               {timeline.map((row) => (
                 <li
                   key={row.dateTime}
@@ -378,7 +382,7 @@ export function App() {
                     ) : (
                       <h3 className="text-body">{row.title}</h3>
                     )}
-                    <p className="max-w-xl text-body">{row.text}</p>
+                    <p className="text-body">{row.body}</p>
                   </div>
                 </li>
               ))}
@@ -387,12 +391,12 @@ export function App() {
         </section>
 
         <section
-          aria-labelledby="getting-heading"
+          aria-labelledby="getting-title"
           className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-start md:gap-x-6"
         >
           <div className="flex flex-col gap-6 md:col-span-6">
             <div className="flex flex-col gap-3">
-              <h2 id="getting-heading" className="text-h2">
+              <h2 id="getting-title" className="text-h2">
                 Getting to Quillbrook Barn
               </h2>
               <address className="flex flex-col text-body not-italic">
@@ -408,11 +412,11 @@ export function App() {
                 </p>
               </address>
             </div>
-            <ul className="flex flex-col gap-6">
-              {ways.map((way) => (
+            <ul className="flex list-none flex-col gap-6 p-0">
+              {waysThere.map((way) => (
                 <li key={way.title} className="flex flex-col gap-2">
                   <h3 className="text-body">{way.title}</h3>
-                  <p className="max-w-xl text-body">{way.text}</p>
+                  <p className="text-body">{way.body}</p>
                 </li>
               ))}
             </ul>
@@ -424,66 +428,69 @@ export function App() {
               {glance.map((row) => (
                 <div
                   key={row.term}
-                  className="flex items-baseline justify-between gap-6"
+                  className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2"
                 >
-                  <dt className="shrink-0 font-mono text-label">{row.term}</dt>
-                  <dd className="min-w-0 text-right text-body">{row.value}</dd>
+                  <dt className="font-mono text-label">{row.term}</dt>
+                  <dd className="ml-auto text-right text-body">{row.value}</dd>
                 </div>
               ))}
             </dl>
           </div>
         </section>
 
-        <section aria-labelledby="stay-heading" className="flex flex-col gap-6">
+        <section aria-labelledby="stay-title" className="flex flex-col gap-6">
           <div className="flex flex-col gap-3">
-            <h2 id="stay-heading" className="text-h2">
+            <h2 id="stay-title" className="text-h2">
               Where to stay
             </h2>
             <p className="max-w-xl text-body">
               Little Saltry is small, so book early. We have held the rooms at
-              the inn until <time dateTime="2027-05-01">1 May 2027</time>.
+              the inn until <T at="2027-05-01">1 May 2027</T>.
             </p>
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-            {places.map((place) => (
-              <div
-                key={place.name}
+            {stays.map((stay) => (
+              <article
+                key={stay.id}
+                aria-labelledby={stay.id}
                 className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4"
               >
                 <div className="flex flex-col gap-2">
                   <p className="font-mono text-label text-muted-foreground">
-                    {place.label}
+                    {stay.label}
                   </p>
-                  <h3 className="text-h2">{place.name}</h3>
+                  <h3 id={stay.id} className="text-h2">
+                    {stay.name}
+                  </h3>
                 </div>
-                <p className="text-body">{place.text}</p>
+                <p className="text-body">{stay.body}</p>
                 <p className="font-mono text-label text-foreground tabular-nums">
-                  {place.price}
+                  {stay.price}
                 </p>
                 <p className="mt-auto">
-                  <a href={place.href} className={textLink}>
-                    {place.link}
+                  <a href={stay.link.href} className={textLink}>
+                    {stay.link.label}
                   </a>
                 </p>
-              </div>
+              </article>
             ))}
           </div>
         </section>
 
         <section
-          aria-labelledby="questions-heading"
+          aria-labelledby="questions-title"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col gap-6 md:col-span-8 md:col-start-3">
-            <h2 id="questions-heading" className="text-h2">
+            <h2 id="questions-title" className="text-h2">
               Questions and answers
             </h2>
             <Accordion multiple>
               {questions.map((item) => (
-                <AccordionItem key={item.id} value={item.id}>
-                  <AccordionTrigger>{item.question}</AccordionTrigger>
+                <AccordionItem key={item.q} value={item.q}>
+                  <AccordionTrigger>{item.q}</AccordionTrigger>
                   <AccordionContent>
-                    <p className="max-w-xl text-body">{item.answer}</p>
+                    <p className="max-w-xl">{item.a}</p>
                   </AccordionContent>
                 </AccordionItem>
               ))}
@@ -499,14 +506,14 @@ export function App() {
           <p className="font-heading text-h2">Clem &amp; Rafe</p>
           <div className="flex flex-col gap-2 md:items-end">
             <p className="font-mono text-label text-muted-foreground">
-              <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
-              Quillbrook Barn, Little Saltry
+              <T at="2027-07-17">Saturday 17 July 2027</T> · Quillbrook Barn,
+              Little Saltry
             </p>
             <p className="font-mono text-label text-muted-foreground">
               Questions:{" "}
               <a
                 href="mailto:hello@clemandrafe.example"
-                className={textLink}
+                className={`${textLink} wrap-break-word`}
               >
                 hello@clemandrafe.example
               </a>

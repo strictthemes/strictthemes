@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react"
-import type { FormEvent } from "react"
+import { useRef, useState, type FormEvent, type KeyboardEvent } from "react"
 import { CircleAlert, CircleCheck, ShoppingBag } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -15,23 +14,23 @@ import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 const STUDIO = "Whitlow Pottery"
-const BASKET_COUNT = 3
+const BASKET_COUNT: number = 3
 
 const container = "mx-auto max-w-[1120px] px-4 md:px-6"
-
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const quietLink = cn(
+const navLink = cn(
   "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  focusOutline
+  focusRing
 )
-
-const label = "font-mono text-label"
-const mutedLabel = "font-mono text-label text-muted-foreground"
-const buttonClasses = "h-auto px-4 py-2 font-mono text-label"
-const fieldClasses = "mt-2 h-auto px-4 py-2 text-body md:text-body"
+const textLink = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const buttonText = "h-auto px-4 py-2 font-mono text-label"
 const fieldLabel = "block font-mono text-label text-foreground"
+const fieldClass = "h-auto px-4 py-2 text-body md:text-body"
+const label = "font-mono text-label text-muted-foreground"
 
 const mainLinks = [
   { label: "Shop", href: "/" },
@@ -52,19 +51,22 @@ const people = [
     initials: "NV",
     name: "Nell Varga",
     role: "Potter, co-founder",
-    text: "Nell throws the tableware, about forty pieces on a good day at the wheel. She also keeps the glaze notebooks, one line for every test tile since 2019.",
+    about:
+      "Nell throws all of the tableware, one batch at a time. She also keeps the glaze notebooks, with every recipe and every firing written down since the first one.",
   },
   {
     initials: "TR",
     name: "Tomas Reid",
     role: "Glazes and kiln, co-founder",
-    text: "Tomas mixes the glazes from raw materials, a bucket at a time. He packs and fires the kiln, and sits up with it on the night of a glaze firing.",
+    about:
+      "Tomas mixes the glazes from raw materials in the shed behind the kiln. He loads and fires the gas kiln, and sits up with it through the night of every firing.",
   },
   {
     initials: "IO",
     name: "Ines Okafor",
     role: "Orders and the Saturday class",
-    text: "Ines packs every order in paper and wood wool, and has not lost a plate in the post yet. She runs the Saturday class, six people at six wheels.",
+    about:
+      "Ines packs every order in paper and card and takes it to the post office on her way home. On Saturday mornings she teaches the class at the studio's second wheel.",
   },
 ]
 
@@ -72,43 +74,39 @@ const steps = [
   {
     time: "1 hour",
     name: "Wedging the clay",
-    text: "A 12.5 kg bag of stoneware clay is cut, slammed and kneaded on a plaster slab until no air is left in it. Then it is weighed into balls, 450 g for a mug and 900 g for a dinner plate.",
+    text: "Each block of clay is kneaded on the bench to push out the air and even out the water in it. Air left in the clay can crack a piece in the kiln.",
   },
   {
     time: "20 minutes a piece",
     name: "Throwing on the wheel",
-    text: "Nell centres each ball and pulls it up against a gauge, so that six mugs come out as one set. The pieces are cut from the wheel with a wire and left on boards overnight.",
+    text: "Nell centres a weighed ball of clay and pulls up the walls by hand. Every mug in a batch starts from the same weight, so a set matches.",
   },
   {
     time: "7 days",
     name: "Trimming and drying",
-    text: "The next day, when the clay is as firm as cheese, each piece goes back on the wheel upside down and its foot is cut. Then it dries on the racks for a week, turned once, away from the door.",
+    text: "When a piece is leather-hard it goes back on the wheel to have its foot trimmed, and mugs and jugs get their handles. Then it dries slowly on the racks under a cloth.",
   },
   {
     time: "1 day",
     name: "The bisque firing, to 1,000°C",
-    text: "The dry pieces are stacked in the electric kiln and fired slowly to 1,000°C. They come out hard but still thirsty, which is what makes a glaze hold on to them.",
+    text: "The dry pieces are fired once in the electric kiln, to 1,000°C. This makes them hard enough to handle and still open enough to soak up a glaze.",
   },
   {
     time: "2 days",
     name: "Glazing and the glaze firing, to 1,260°C",
-    text: "Each piece is dipped in one of four glazes, and its foot is wiped clean so it does not stick to the shelf. The gas kiln takes fourteen hours to reach 1,260°C and a day and a half to cool before it can be opened.",
+    text: "Each piece is dipped in glaze and its foot wiped clean. The gas kiln fires a full load to 1,260°C, then cools for a day before Tomas opens the door.",
   },
 ]
 
-const OPEN = { from: "10:00", to: "16:00" }
+type Hours = { day: string; open?: boolean; classTime?: boolean }
 
-const hours: {
-  day: string
-  open?: { from: string; to: string }
-  lesson?: { from: string; to: string }
-}[] = [
+const hours: Hours[] = [
   { day: "Monday" },
   { day: "Tuesday" },
   { day: "Wednesday" },
-  { day: "Thursday", open: OPEN },
-  { day: "Friday", open: OPEN },
-  { day: "Saturday", open: OPEN, lesson: { from: "10:00", to: "12:00" } },
+  { day: "Thursday", open: true },
+  { day: "Friday", open: true },
+  { day: "Saturday", open: true, classTime: true },
   { day: "Sunday" },
 ]
 
@@ -122,14 +120,9 @@ const topics = [
 type Field = "name" | "email" | "topic" | "message"
 type Errors = Partial<Record<Field, string>>
 
-const fieldOrder: Field[] = ["name", "email", "topic", "message"]
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function basketLabel(count: number) {
-  if (count === 0) return "Basket, empty"
-  return `Basket, ${count} ${count === 1 ? "piece" : "pieces"}`
-}
-
-function Clock({ value }: { value: string }) {
+function Time({ value }: { value: string }) {
   return (
     <time dateTime={value} className="font-mono tabular-nums">
       {value}
@@ -153,6 +146,91 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
   )
 }
 
+function NavLinks({ itemClass }: { itemClass?: string }) {
+  return mainLinks.map((link) => (
+    <li key={link.href}>
+      <a
+        href={link.href}
+        aria-current={link.current ? "page" : undefined}
+        className={cn(navLink, link.current && "underline", itemClass)}
+      >
+        {link.label}
+      </a>
+    </li>
+  ))
+}
+
+function Header() {
+  const [open, setOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+
+  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (open && event.key === "Escape") {
+      setOpen(false)
+      menuButton.current?.focus()
+    }
+  }
+
+  return (
+    <header className="border-b" onKeyDown={onKeyDown}>
+      <div
+        className={cn(
+          container,
+          "flex flex-wrap items-center gap-x-4 gap-y-2 py-4 md:gap-x-6"
+        )}
+      >
+        <a href="/" className={cn(navLink, "font-heading text-h2")}>
+          {STUDIO}
+        </a>
+        <nav aria-label="Main" className="hidden md:block">
+          <ul className="flex gap-6">
+            <NavLinks />
+          </ul>
+        </nav>
+        <div className="ml-auto flex items-center gap-4">
+          <Button
+            ref={menuButton}
+            variant="outline"
+            className={cn(buttonText, "md:hidden")}
+            aria-expanded={open}
+            aria-controls="site-menu"
+            onClick={() => setOpen((value) => !value)}
+          >
+            Menu
+          </Button>
+          <a
+            href="/basket"
+            aria-label={
+              BASKET_COUNT === 0
+                ? "Basket, empty"
+                : `Basket, ${BASKET_COUNT} ${BASKET_COUNT === 1 ? "piece" : "pieces"}`
+            }
+            className={cn(navLink, "inline-flex items-center gap-2")}
+          >
+            <ShoppingBag
+              className="size-4"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+            <span className="hidden md:inline">Basket</span>
+            <span className="font-mono tabular-nums">({BASKET_COUNT})</span>
+          </a>
+        </div>
+      </div>
+      <nav
+        id="site-menu"
+        aria-label="Main"
+        className="border-t md:hidden"
+        hidden={!open}
+      >
+        <ul className={cn(container, "py-2")}>
+          <NavLinks itemClass="block py-2" />
+        </ul>
+      </nav>
+    </header>
+  )
+}
+
 function ContactForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -165,11 +243,7 @@ function ContactForm() {
   const emailRef = useRef<HTMLInputElement>(null)
   const topicRef = useRef<HTMLButtonElement>(null)
   const messageRef = useRef<HTMLTextAreaElement>(null)
-  const confirmationRef = useRef<HTMLParagraphElement>(null)
-
-  useEffect(() => {
-    if (sent) confirmationRef.current?.focus()
-  }, [sent])
+  const thanksRef = useRef<HTMLDivElement>(null)
 
   function clearError(field: Field) {
     setErrors((current) => {
@@ -180,42 +254,37 @@ function ContactForm() {
     })
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
+    const trimmedMessage = message.trim()
+    setName(trimmedName)
+    setEmail(trimmedEmail)
+    setMessage(trimmedMessage)
 
     const found: Errors = {}
-    if (name.trim() === "") {
-      found.name = "Enter your name."
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+    if (!trimmedName) found.name = "Enter your name."
+    if (!EMAIL.test(trimmedEmail))
       found.email = "Enter an email address, like name@example.com."
-    }
-    if (topic === null) {
-      found.topic = "Choose what your message is about."
-    }
-    if (message.trim().length < 20) {
+    if (!topic) found.topic = "Choose what your message is about."
+    if (trimmedMessage.length < 20)
       found.message = "Write a little more: at least 20 characters."
-    }
     setErrors(found)
 
-    const first = fieldOrder.find((field) => found[field])
-    if (first) {
-      const refs = {
-        name: nameRef,
-        email: emailRef,
-        topic: topicRef,
-        message: messageRef,
-      }
-      refs[first].current?.focus()
-      return
-    }
+    if (found.name) return nameRef.current?.focus()
+    if (found.email) return emailRef.current?.focus()
+    if (found.topic) return topicRef.current?.focus()
+    if (found.message) return messageRef.current?.focus()
+
     setSent(true)
+    requestAnimationFrame(() => thanksRef.current?.focus())
   }
 
   return (
     <div className="mt-6">
       {!sent && (
-        <form noValidate onSubmit={handleSubmit}>
+        <form noValidate onSubmit={onSubmit}>
           <div>
             <label htmlFor="contact-name" className={fieldLabel}>
               Your name
@@ -232,7 +301,7 @@ function ContactForm() {
               }}
               aria-invalid={errors.name ? true : undefined}
               aria-describedby={errors.name ? "contact-name-error" : undefined}
-              className={fieldClasses}
+              className={cn(fieldClass, "mt-2")}
             />
             {errors.name && (
               <ErrorLine id="contact-name-error">{errors.name}</ErrorLine>
@@ -258,7 +327,7 @@ function ContactForm() {
               aria-describedby={
                 errors.email ? "contact-email-error" : undefined
               }
-              className={fieldClasses}
+              className={cn(fieldClass, "mt-2")}
             />
             {errors.email && (
               <ErrorLine id="contact-email-error">{errors.email}</ErrorLine>
@@ -266,7 +335,11 @@ function ContactForm() {
           </div>
 
           <div className="mt-6">
-            <label htmlFor="contact-topic" className={fieldLabel}>
+            <label
+              id="contact-topic-label"
+              htmlFor="contact-topic"
+              className={fieldLabel}
+            >
               What it is about
             </label>
             <Select
@@ -281,6 +354,7 @@ function ContactForm() {
               <SelectTrigger
                 ref={topicRef}
                 id="contact-topic"
+                aria-labelledby="contact-topic-label"
                 aria-invalid={errors.topic ? true : undefined}
                 aria-describedby={
                   errors.topic ? "contact-topic-error" : undefined
@@ -319,22 +393,22 @@ function ContactForm() {
               aria-describedby={
                 errors.message ? "contact-message-error" : undefined
               }
-              className={cn(fieldClasses, "min-h-40 resize-none")}
+              className={cn(fieldClass, "mt-2 min-h-40 resize-none")}
             />
             {errors.message && (
               <ErrorLine id="contact-message-error">{errors.message}</ErrorLine>
             )}
           </div>
 
-          <Button type="submit" className={cn(buttonClasses, "mt-6")}>
+          <Button type="submit" className={cn(buttonText, "mt-6")}>
             Send message
           </Button>
         </form>
       )}
       <div role="status">
         {sent && (
-          <p
-            ref={confirmationRef}
+          <div
+            ref={thanksRef}
             tabIndex={-1}
             className="flex items-start gap-2 text-body focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
           >
@@ -343,10 +417,10 @@ function ContactForm() {
               strokeWidth={1.5}
               aria-hidden="true"
             />
-            <span className="text-foreground">
+            <p className="text-foreground">
               Thank you. Nell will answer within two working days.
-            </span>
-          </p>
+            </p>
+          </div>
         )}
       </div>
     </div>
@@ -354,133 +428,35 @@ function ContactForm() {
 }
 
 export function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setMenuOpen(false)
-        menuButtonRef.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [menuOpen])
-
   return (
-    <div className="bg-background text-body text-foreground">
-      <header className="border-b">
-        <div
-          className={cn(
-            container,
-            "flex flex-wrap items-center gap-x-4 gap-y-2 py-4 md:gap-x-6"
-          )}
-        >
-          <a href="/" className={cn(quietLink, "font-heading text-h2")}>
-            {STUDIO}
-          </a>
-          <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-6">
-              {mainLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={link.current ? "page" : undefined}
-                    className={cn(quietLink, link.current && "underline")}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <div className="ml-auto flex items-center gap-4">
-            <Button
-              ref={menuButtonRef}
-              variant="outline"
-              aria-expanded={menuOpen}
-              aria-controls="small-screen-menu"
-              onClick={() => setMenuOpen((open) => !open)}
-              className={cn(buttonClasses, "md:hidden")}
-            >
-              Menu
-            </Button>
-            <a
-              href="/basket"
-              aria-label={basketLabel(BASKET_COUNT)}
-              className={cn(quietLink, "inline-flex items-center gap-2")}
-            >
-              <ShoppingBag
-                className="size-4"
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-              <span className="hidden md:inline">Basket</span>
-              <span className="font-mono tabular-nums">({BASKET_COUNT})</span>
-            </a>
-          </div>
-        </div>
-        <nav
-          id="small-screen-menu"
-          aria-label="Main"
-          hidden={!menuOpen}
-          className="border-t md:hidden"
-        >
-          <ul className={cn(container, "py-2")}>
-            {mainLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={cn(
-                    quietLink,
-                    "block py-2",
-                    link.current && "underline"
-                  )}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </header>
+    <div className="min-h-svh bg-background text-body text-foreground">
+      <Header />
 
       <main className={cn(container, "flex flex-col gap-20 pt-10 pb-20")}>
         <section className="grid gap-x-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-7">
-            <p className={mutedLabel}>The studio</p>
+            <p className={label}>The studio</p>
             <h1 className="mt-2 text-h1">
               Two potters, one gas kiln and an old dairy in Bramwick
             </h1>
             <p className="mt-6 max-w-lg">
-              Nell Varga and Tomas Reid started {STUDIO} in 2019, in a dairy at
+              Nell Varga and Tomas Reid started {STUDIO} in 2019, in a dairy on
               Coldharbour Yard that had stood empty since it closed in 1994.
-              They had one wheel and an electric kiln borrowed from Nell’s old
-              college, and for the first winter they sold from a table in the
-              yard.
+              They had one wheel, a borrowed electric kiln and the cold room
+              for a workshop.
             </p>
             <p className="mt-4 max-w-lg">
-              They make stoneware for the table: mugs, bowls, plates, jugs and a
-              few vases, in four glazes. A firing holds about 120 pieces, and
-              each one passes through the same two pairs of hands, so a batch is
-              as many as the two of them can throw, trim and glaze well in three
-              weeks.
+              They make stoneware for the table, and a few vases: mugs, bowls,
+              plates and jugs. Each piece is thrown by hand in batches of
+              twenty or thirty, small enough that every one is looked over
+              before it goes on the shelf, and large enough to fill a kiln.
             </p>
             <p className="mt-4 max-w-lg">
-              In 2021 they built a gas kiln in the yard, brick by brick, over
-              one summer. It fires hotter and with less air than the electric
-              one, which turned the Iron glaze from flat brown to a deep,
-              speckled rust and gave the Ash glaze its grey edge.{" "}
-              <a
-                href="/"
-                className={cn(
-                  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                  focusOutline
-                )}
-              >
+              In 2021 they built a gas kiln in the yard. It holds four times as
+              much as the electric one and fires hotter, which gave the Iron
+              and Slate glazes their depth, and the shop now restocks after
+              each firing.{" "}
+              <a href="/" className={textLink}>
                 See what came out of the last firing
               </a>
               .
@@ -494,14 +470,16 @@ export function App() {
             >
               <div className="h-3/5 w-1/2 border border-foreground/40 bg-glaze-dark" />
             </div>
-            <figcaption className={cn(mutedLabel, "mt-2")}>
+            <figcaption className={cn(label, "mt-2")}>
               The gas kiln, built in 2021
             </figcaption>
           </figure>
         </section>
 
-        <section>
-          <h2 className="text-h2">The people</h2>
+        <section aria-labelledby="people-heading">
+          <h2 id="people-heading" className="text-h2">
+            The people
+          </h2>
           <ul className="mt-6 grid gap-y-10 md:grid-cols-3 md:gap-x-6">
             {people.map((person) => (
               <li key={person.initials}>
@@ -516,20 +494,26 @@ export function App() {
                     <h3 className="font-sans text-body font-medium">
                       {person.name}
                     </h3>
-                    <p className={cn(mutedLabel, "mt-1")}>{person.role}</p>
+                    <p className={cn(label, "mt-1")}>{person.role}</p>
                   </div>
                 </div>
-                <p className="mt-4 max-w-lg">{person.text}</p>
+                <p className="mt-4 max-w-lg">{person.about}</p>
               </li>
             ))}
           </ul>
         </section>
 
-        <section id="process" className="scroll-mt-10">
-          <h2 className="text-h2">From clay to kiln</h2>
+        <section
+          id="process"
+          aria-labelledby="process-heading"
+          className="scroll-mt-10"
+        >
+          <h2 id="process-heading" className="text-h2">
+            From clay to kiln
+          </h2>
           <p className="mt-4 max-w-lg">
-            A piece takes about three weeks to get from a bag of clay to the
-            shop.
+            A piece takes about three weeks from a bag of clay to the shop, and
+            most of that is drying time and waiting for a full kiln.
           </p>
           <ol className="mt-6">
             {steps.map((step, index) => (
@@ -538,8 +522,8 @@ export function App() {
                 className="border-t py-6 last:border-b md:grid md:grid-cols-12 md:gap-x-6"
               >
                 <div className="md:col-span-3">
-                  <p className={mutedLabel}>Step {index + 1}</p>
-                  <p className={cn(label, "mt-1 text-foreground tabular-nums")}>
+                  <p className={label}>Step {index + 1}</p>
+                  <p className="mt-1 font-mono text-label text-foreground tabular-nums">
                     {step.time}
                   </p>
                 </div>
@@ -554,8 +538,10 @@ export function App() {
           </ol>
         </section>
 
-        <section>
-          <h2 className="text-h2">Visit the studio</h2>
+        <section aria-labelledby="visit-heading">
+          <h2 id="visit-heading" className="text-h2">
+            Visit the studio
+          </h2>
           <div className="mt-6 grid gap-x-6 md:grid-cols-12">
             <div className="md:col-span-5">
               <address className="not-italic">
@@ -566,40 +552,39 @@ export function App() {
                 Bramwick BW4 2LT
               </address>
               <p className="mt-4 max-w-lg">
-                The yard has three parking spaces, straight ahead as you come
-                through the gate. The door is step-free, and the shop shelf is
-                by the kiln, at the back of the room.
+                The yard has three parking spaces by the gate. The door is
+                step-free, and the shop shelf is in the kiln room, so you can
+                see the work beside the kiln that fired it.
               </p>
             </div>
             <div className="mt-10 md:col-span-6 md:col-start-7 md:mt-0">
-              <p className={mutedLabel}>Opening hours</p>
+              <p className={label}>Opening hours</p>
               <dl className="mt-2">
                 {hours.map((row) => (
                   <div
                     key={row.day}
                     className="grid grid-cols-3 items-baseline gap-x-4 border-t py-2 last:border-b"
                   >
-                    <dt className={mutedLabel}>{row.day}</dt>
+                    <dt className={label}>{row.day}</dt>
                     <dd className="col-span-2 text-body">
                       {row.open ? (
                         <>
-                          <Clock value={row.open.from} /> to{" "}
-                          <Clock value={row.open.to} />
+                          <Time value="10:00" /> to <Time value="16:00" />
                         </>
                       ) : (
                         "Closed"
                       )}
-                      {row.lesson && (
-                        <span className={cn(mutedLabel, "block")}>
-                          class <Clock value={row.lesson.from} /> to{" "}
-                          <Clock value={row.lesson.to} />
+                      {row.classTime && (
+                        <span className={cn(label, "block tabular-nums")}>
+                          class <time dateTime="10:00">10:00</time> to{" "}
+                          <time dateTime="12:00">12:00</time>
                         </span>
                       )}
                     </dd>
                   </div>
                 ))}
               </dl>
-              <p className={cn(mutedLabel, "mt-4")}>
+              <p className={cn(label, "mt-4")}>
                 Closed from <time dateTime="2026-12-24">24 December</time> to{" "}
                 <time dateTime="2027-01-02">2 January</time>, both days
                 included.
@@ -608,12 +593,18 @@ export function App() {
           </div>
         </section>
 
-        <section id="contact" className="grid gap-x-6 md:grid-cols-12">
+        <section
+          id="contact"
+          aria-labelledby="contact-heading"
+          className="grid gap-x-6 md:grid-cols-12"
+        >
           <div className="md:col-span-7">
-            <h2 className="text-h2">Write to us</h2>
+            <h2 id="contact-heading" className="text-h2">
+              Write to us
+            </h2>
             <p className="mt-4 max-w-lg">
-              Nell reads every message and answers within two working days, and
-              commissions are booked from February.
+              Nell reads every message and answers within two working days,
+              and commissions are booked from February.
             </p>
             <ContactForm />
           </div>
@@ -635,7 +626,7 @@ export function App() {
               <ul className="flex flex-col gap-2">
                 {footerLinks.map((link) => (
                   <li key={link.href}>
-                    <a href={link.href} className={quietLink}>
+                    <a href={link.href} className={navLink}>
                       {link.label}
                     </a>
                   </li>
@@ -643,7 +634,7 @@ export function App() {
               </ul>
             </nav>
           </div>
-          <p className={cn(mutedLabel, "mt-6")}>© 2026 {STUDIO}</p>
+          <p className={cn(label, "mt-6")}>© 2026 {STUDIO}</p>
         </div>
       </footer>
     </div>

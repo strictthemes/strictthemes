@@ -55,8 +55,10 @@ const startingHabits: Habit[] = [
   { id: 5, name: "No phone after 22:00", frequency: "every-day", doneAt: null },
 ]
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const container = "mx-auto max-w-[1168px] px-4 md:px-6"
 
 const navLinks = [
   { label: "Today", href: "/today" },
@@ -72,74 +74,71 @@ function greetingFor(date: Date) {
   return "Good evening"
 }
 
-function clockTime(date: Date) {
-  const hh = String(date.getHours()).padStart(2, "0")
-  const mm = String(date.getMinutes()).padStart(2, "0")
+function currentTime() {
+  const now = new Date()
+  const hh = String(now.getHours()).padStart(2, "0")
+  const mm = String(now.getMinutes()).padStart(2, "0")
   return `${hh}:${mm}`
 }
 
-const container = "mx-auto max-w-[1168px] px-4 md:px-6"
+const nameError = 'Give your habit a name, like "Stretch for 5 minutes".'
+const duplicateError = "You already have this habit."
 
 export function App() {
   const [greeting] = useState(() => greetingFor(new Date()))
   const [habits, setHabits] = useState<Habit[]>(startingHabits)
   const [name, setName] = useState("")
   const [frequency, setFrequency] = useState<Frequency>("every-day")
-  const [nameError, setNameError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const [added, setAdded] = useState<string | null>(null)
-
   const nameRef = useRef<HTMLInputElement>(null)
+  const timerRef = useRef<number | null>(null)
   const nextId = useRef(startingHabits.length + 1)
-  const addedTimer = useRef<number | undefined>(undefined)
 
-  useEffect(() => () => window.clearTimeout(addedTimer.current), [])
+  useEffect(() => {
+    return () => {
+      if (timerRef.current !== null) window.clearTimeout(timerRef.current)
+    }
+  }, [])
 
-  const doneCount = habits.filter((h) => h.doneAt).length
+  const doneCount = habits.filter((h) => h.doneAt !== null).length
   const allDone = habits.length > 0 && doneCount === habits.length
 
   function toggle(id: number) {
     setHabits((list) =>
       list.map((h) =>
-        h.id === id
-          ? { ...h, doneAt: h.doneAt ? null : clockTime(new Date()) }
-          : h
+        h.id === id ? { ...h, doneAt: h.doneAt ? null : currentTime() } : h
       )
     )
   }
 
-  function addHabit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const trimmed = name.trim()
-
-    if (!trimmed) {
-      setNameError('Give your habit a name, like "Stretch for 5 minutes".')
+    if (trimmed === "") {
+      setError(nameError)
       nameRef.current?.focus()
       return
     }
-    if (
-      habits.some((h) => h.name.trim().toLowerCase() === trimmed.toLowerCase())
-    ) {
-      setNameError("You already have this habit.")
+    const exists = habits.some(
+      (h) => h.name.trim().toLowerCase() === trimmed.toLowerCase()
+    )
+    if (exists) {
+      setError(duplicateError)
       nameRef.current?.focus()
       return
     }
-
     setHabits((list) => [
       ...list,
       { id: nextId.current++, name: trimmed, frequency, doneAt: null },
     ])
-    setNameError(null)
+    setError(null)
     setName("")
-    nameRef.current?.focus()
-
     setAdded(trimmed)
-    window.clearTimeout(addedTimer.current)
-    addedTimer.current = window.setTimeout(() => setAdded(null), 4000)
+    if (timerRef.current !== null) window.clearTimeout(timerRef.current)
+    timerRef.current = window.setTimeout(() => setAdded(null), 4000)
+    nameRef.current?.focus()
   }
-
-  const nameDescribedBy = nameError
-    ? "habit-name-help habit-name-error"
-    : "habit-name-help"
 
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
@@ -149,7 +148,7 @@ export function App() {
         >
           <a
             href="/today"
-            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
+            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusRing}`}
           >
             Mossy
           </a>
@@ -162,7 +161,7 @@ export function App() {
                     <a
                       href={link.href}
                       aria-current={current ? "page" : undefined}
-                      className={`inline-flex h-11 items-center rounded-lg px-3 font-mono text-label ${focusOutline} ${
+                      className={`inline-flex h-11 items-center rounded-lg px-3 font-mono text-label ${focusRing} ${
                         current
                           ? "bg-secondary text-secondary-foreground"
                           : "text-foreground underline-offset-4 hover:underline"
@@ -194,7 +193,7 @@ export function App() {
             <div role="status">
               {allDone && (
                 <Badge className="ml-3 h-auto gap-1 rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground">
-                  <PartyPopper strokeWidth={1.5} aria-hidden="true" />
+                  <PartyPopper aria-hidden="true" strokeWidth={1.5} />
                   All done for today
                 </Badge>
               )}
@@ -244,17 +243,9 @@ export function App() {
                       className="h-11 shrink-0 px-6 font-mono text-label"
                     >
                       {done ? (
-                        <CircleCheck
-                          className="size-4"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        />
+                        <CircleCheck aria-hidden="true" strokeWidth={1.5} />
                       ) : (
-                        <Circle
-                          className="size-4"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        />
+                        <Circle aria-hidden="true" strokeWidth={1.5} />
                       )}
                       Done
                     </Button>
@@ -278,7 +269,7 @@ export function App() {
             <div>
               <form
                 noValidate
-                onSubmit={addHabit}
+                onSubmit={handleSubmit}
                 className="flex flex-col gap-6"
               >
                 <div className="flex flex-col gap-2">
@@ -291,16 +282,20 @@ export function App() {
                   <Input
                     ref={nameRef}
                     id="habit-name"
-                    name="habit-name"
-                    autoComplete="off"
+                    name="name"
                     maxLength={40}
+                    autoComplete="off"
                     value={name}
                     onChange={(e) => {
                       setName(e.target.value)
-                      if (nameError) setNameError(null)
+                      if (error) setError(null)
                     }}
-                    aria-invalid={nameError ? true : undefined}
-                    aria-describedby={nameDescribedBy}
+                    aria-invalid={error ? true : undefined}
+                    aria-describedby={
+                      error
+                        ? "habit-name-help habit-name-error"
+                        : "habit-name-help"
+                    }
                     className="h-11 px-4 text-body md:text-body"
                   />
                   <p
@@ -309,23 +304,24 @@ export function App() {
                   >
                     Up to 40 characters, like "Drink a glass of water"
                   </p>
-                  {nameError && (
+                  {error && (
                     <p
                       id="habit-name-error"
                       className="flex items-start gap-2 font-mono text-label text-destructive"
                     >
                       <CircleAlert
-                        className="size-4 shrink-0"
-                        strokeWidth={1.5}
                         aria-hidden="true"
+                        strokeWidth={1.5}
+                        className="size-4 shrink-0"
                       />
-                      {nameError}
+                      {error}
                     </p>
                   )}
                 </div>
 
                 <div className="flex flex-col gap-2">
                   <label
+                    id="habit-frequency-label"
                     htmlFor="habit-frequency"
                     className="block font-mono text-label text-muted-foreground"
                   >
@@ -338,7 +334,10 @@ export function App() {
                       if (value !== null) setFrequency(value as Frequency)
                     }}
                   >
-                    <SelectTrigger id="habit-frequency">
+                    <SelectTrigger
+                      id="habit-frequency"
+                      aria-labelledby="habit-frequency-label"
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -355,21 +354,17 @@ export function App() {
                   type="submit"
                   className="h-11 w-full px-6 font-mono text-label md:w-auto md:self-start"
                 >
-                  <Plus
-                    className="size-4"
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                  />
+                  <Plus aria-hidden="true" strokeWidth={1.5} />
                   Add habit
                 </Button>
               </form>
               <div role="status">
                 {added && (
-                  <p className="mt-4 flex w-fit items-center gap-2 font-mono text-label text-success">
+                  <p className="mt-4 flex w-fit items-center gap-2 font-mono text-label wrap-break-word text-success">
                     <CircleCheck
-                      className="size-4"
-                      strokeWidth={1.5}
                       aria-hidden="true"
+                      strokeWidth={1.5}
+                      className="size-4 shrink-0"
                     />
                     Added "{added}"
                   </p>
@@ -386,7 +381,7 @@ export function App() {
           <p className="font-mono text-label text-muted-foreground">
             Tip for today
           </p>
-          <p className="text-body text-foreground">
+          <p className="max-w-lg text-body text-foreground">
             Put your book where your phone usually goes. Reading the first page
             is the hard part.
           </p>

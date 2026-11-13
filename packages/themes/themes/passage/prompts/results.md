@@ -50,7 +50,7 @@ Then with `mt-5` the sailings as an `<ol>` with no markers and no padding, `grid
    - A `<div>` with `flex items-center justify-end gap-5 md:shrink-0`: the fare in a `<div>` with `text-right`, a `<p>` in `font-mono text-h2 text-foreground tabular-nums` (`£78.00`) and under it with `mt-1` a label in `text-muted-foreground`, `2 adults`; then the "Choose" button. The sold-out sailing has neither: it shows no `<div>` here at all, and its state says why.
 3. On the 12:40 only, with `mt-3`, a label in `text-muted-foreground`: `Calls at Brindle Ness · 10 min stop`.
 
-The "Choose" button is `variant="outline"` with the notes' button classes, and on the chosen sailing `variant="secondary"`. Its text is always "Choose"; it has `aria-pressed` (`true` on the chosen sailing, `false` on the others) and an `aria-label` that names the sailing: "Choose the 09:15 sailing". The chosen card adds `border-primary`, which replaces the card's border color through `cn`; the other cards keep theirs.
+The "Choose" button is `variant="outline"` with the notes' button classes, and on the chosen sailing `variant="secondary"`. Its text is always "Choose"; it has `aria-pressed` (`true` on the chosen sailing, `false` on the others) and an `aria-label` that names the sailing: "Choose the 09:15 sailing". The chosen card adds `border-primary`, which wins over the stock border color; the other cards keep the stock one.
 
 At 375px a card's inside is about 295px wide: the journey fills it, and the fare and the button sit on their own line under it, at the right end.
 

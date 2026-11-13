@@ -46,7 +46,7 @@ Still in the opening section, after the grid, with `mt-6`: a `<form>` that is a 
   3. The label "Guests", then with `mt-2` a `Select` with `name="guests"` and four choices, `1 guest`, `2 guests`, `3 guests` and `4 guests`, with the values `1` to `4`. It starts on `2 guests` and has no placeholder.
   4. The page's one default button, `type="submit"`: "Check dates", with `h-11 w-full` in place of the Buttons note's `h-auto`, so it is as tall as the fields beside it. This item has no label.
 - Under the row, the error lines, one for each date field that has an error, in the order of the fields, each with `mt-2` as the Errors note says for a row.
-- With `mt-4`, a `<p>` with `role="status"`, a label in `text-foreground`. While a date is missing, or the day of leaving is not after the day of arriving, it reads `Choose the days you arrive and leave`. With two good dates it says the nights in words: `3 nights · Friday 14 May 2027 to Monday 17 May 2027`, each date a `<time>`. Unlike the confirmations in the layout notes, this element holds its first text from the start: it is a line that changes, not a message that replaces a form.
+- With `mt-4`, a `<p>` with `role="status"`, a label in `text-foreground`, uppercased as every label is. While a date is missing, or the day of leaving is not after the day of arriving, it reads `Choose the days you arrive and leave`. With two good dates it says the nights in words: `3 nights · Friday 14 May 2027 to Monday 17 May 2027`, each date a `<time>`. Unlike the confirmations in the layout notes, this element holds its first text from the start: it is a line that changes, not a message that replaces a form.
 - With `mt-2`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "Rooms from £78 a night, breakfast included. Nothing is paid until we confirm your stay."
 
 On a phone the four items stack, 24px apart, the button last and at the full width.
@@ -92,7 +92,7 @@ A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-sta
 - In columns 1–4 (`md:col-span-4`):
   - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Every morning` in `text-muted-foreground`, then the badge "Breakfast included".
   - With `mt-2`, an `<h2>`: "Breakfast on the veranda".
-  - With `mt-4`, one or two sentences in `text-body`: cooked to order, with eggs from the farm on the hill and kippers from the smokehouse on the quay, and served for as long as the hours below say.
+  - With `mt-4`, one or two sentences in `text-body`: cooked to order, with eggs from the farm on the hill and kippers from the smokehouse on the quay, and served at the hours listed here. Do not write "below" or "beside": the hours sit under the text on a phone and beside it from `md` up.
   - With `mt-6`, an onward link: "See the menu", to `/menu`.
 - In columns 6–12 (`md:col-span-7 md:col-start-6`):
   - Rows of times from the layout notes, four rows, each span of hours two `<time>` elements:
@@ -132,8 +132,8 @@ The footer from the layout notes.
 - Keep the two dates and the guests in component state. "Today" and "tomorrow" come from the visitor's clock. Work with the calendar dates as written: read the year, the month and the day from a field's value and count with `Date.UTC`, so that no time zone moves a day. The number of nights is the number of days from the day of arriving to the day of leaving.
 - The status line follows the fields as they change. It is the only thing on the page that announces itself.
 - When the form is sent, check the two dates in code, in this order, one message per field:
-  - Arrive: empty gives "Choose the day you arrive."; a day before today gives "Choose today or a later day."
-  - Leave: empty gives "Choose the day you leave."; a day that is not after the day of arriving gives "Choose a day after the day you arrive."
+  - Arrive: empty gives "Choose the day you arrive."; a day before today gives "Choose today or a later day." The calendar cannot pick such a day, but a page left open past midnight can hold one, so keep the check.
+  - Leave: empty gives "Choose the day you leave."; a day that is not after the day of arriving gives "Choose a day after the day you arrive." While Arrive is empty, Leave gets only its empty check.
   - The guests are always valid.
 - With an error, stop the form from being sent, show the lines under the row and move focus to the first field with an error, as the Errors note says.
 - With two good dates, let the form go: do not stop it. The browser then opens `/reserve?arrive=2027-05-14&leave=2027-05-17&guests=2`, with the values of the three fields, which their hidden inputs carry. Nothing is checked against real bookings: the reservation page takes it from there.

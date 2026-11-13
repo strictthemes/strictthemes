@@ -38,7 +38,7 @@ The header from the layout notes, with Courses as the current page.
 
 A `<div>` with `flex flex-col gap-8`, not a section. First a `flex flex-col gap-3`: the `<h1>` in `text-h1 md:text-display` with `md:max-w-3xl`, "Data skills you will use on Monday", and one paragraph: "Nine courses in spreadsheets, SQL and charts. Every lesson is short, ends with one question, and starts where the last one stopped."
 
-Then four figures, a `<ul>` with `grid grid-cols-2 gap-5 md:max-w-2xl md:grid-cols-4`: two rows of two below `md`, one row of four from `md` up. Each `<li>` is `flex flex-col gap-1 border-l-2 pl-3`, with a rule in a chart color on its left, in the order of the Chart colors note: `border-azure`, `border-tertiary`, `border-sun`, `border-berry`. It holds the smaller key figure of the layout notes and, under it, a small figure:
+Then four figures, a `<ul>` with `grid grid-cols-2 gap-5 md:max-w-2xl md:grid-cols-4`: two rows of two below `md`, one row of four from `md` up. Each `<li>` is `flex flex-col gap-1 border-l-2 pl-3`, with a rule in a chart color on its left, in the order of the Chart colors note: `border-azure`, `border-tertiary`, `border-sun`, `border-berry`. It holds two `<span>`s: the smaller key figure of the layout notes and, under it, a small figure:
 
 - `9`, then `courses`
 - `102`, then `lessons`
@@ -54,7 +54,7 @@ A section with the `<h2>` "All courses". Its content, in the section's `gap-5`, 
 **The controls.** A `<div>` with `flex flex-col gap-5 md:flex-row md:items-end md:justify-between`:
 
 - The search field, in a wrapper with `w-full md:max-w-sm`: a field from the layout notes with the label "Search courses", an `Input` with `type="search"` and `autoComplete="off"`, and the helper text `By title, topic or teacher`. No placeholder and no search button: the grid follows as you type. A browser draws a clear button of its own inside a search field that holds text: add `[&::-webkit-search-cancel-button]:appearance-none` to the `Input`'s `className`, beside the classes of the Inputs note, so the field keeps the theme's look. Escape still empties the field where the browser does that.
-- The level filter, a `flex flex-col gap-2`: a `<p>` with an `id`, styled as a field's label, "Level"; then a button group from the layout notes, named by that `<p>` with `aria-labelledby` (in place of the `aria-label`), with four buttons: "All levels", chosen at the start, "Beginner", "Intermediate" and "Advanced".
+- The level filter, a `flex flex-col gap-2`: a `<p>` with an `id` in `font-mono text-label text-muted-foreground`, the look of a field's label (a `<p>` needs no `block`), "Level"; then a button group from the layout notes, named by that `<p>` with `aria-labelledby` (in place of the `aria-label`), with four buttons: "All levels", chosen at the start, "Beginner", "Intermediate" and "Advanced".
 
 **The count.** A `<p>` with `role="status"`, a small figure in `text-foreground`. It always holds a sentence, so it is an item of the section's stack:
 

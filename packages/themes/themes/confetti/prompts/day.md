@@ -22,7 +22,7 @@ The header from the layout notes, with "The day" as the current page; its link k
 
 ### 2. Opening
 
-A full-width section that is a pastel block in candy, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The block element itself carries `bg-candy text-candy-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `Saturday 17 July 2027 · Little Saltry` (the date a `<time dateTime="2027-07-17">`), and the `<h1>` "The plan for the day" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "When things happen, how to reach the barn, where to sleep, and the answers to what people have asked us so far."
+A full-width section that is a pastel block in candy, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The `<section>` is the block element, and it carries `bg-candy text-candy-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `Saturday 17 July 2027 · Little Saltry` (the date a `<time dateTime="2027-07-17">`), and the `<h1>` "The plan for the day" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "When things happen, how to reach the barn, where to sleep, and the answers to what people have asked us so far."
 
 ### 3. How the day goes
 
@@ -50,14 +50,14 @@ A section of parts side by side, from the layout notes, with its `aria-labelledb
 
 **First part,** `md:col-span-6`: a `flex flex-col gap-6` holding two groups.
 
-- A `flex flex-col gap-3` with the `<h2>` "Getting to Quillbrook Barn" and an `<address className="not-italic">` in `text-body`, a `flex flex-col` of four `<span>`s, `Quillbrook Barn`, `Saltry Lane`, `Little Saltry`, `ZQ4 7HB`, and a fifth line, a `<p>` in the `<address>`: "On the day: 01632 960 214", the number a link in running text to `tel:+441632960214`.
+- A `flex flex-col gap-3` with the `<h2>` "Getting to Quillbrook Barn" and an `<address className="not-italic">` in `text-body`, a `flex flex-col` with no gap, so it reads as one block of lines, of four `<span>`s, `Quillbrook Barn`, `Saltry Lane`, `Little Saltry`, `ZQ4 7HB`, and a fifth line, a `<p>` in the `<address>`: "On the day: 01632 960 214", the number a link in running text to `tel:+441632960214`.
 - The ways there, as a `<ul>` with no markers and no padding and `flex flex-col gap-6`. Each `<li>` is a `flex flex-col gap-2` with an `<h3>` in `text-body` and one or two sentences in `text-body`:
   - "By train": to Market Fenley station. A minibus waits on the forecourt at 13:00 and 13:15, and brings you back at 22:30 and 23:30.
   - "By car": the postcode takes you to the gate on Saltry Lane. Park in the paddock, signposted from the lane; it is free.
   - "By taxi": Fenley Cars, 01632 960 881, the number a link in running text to `tel:+441632960881`. They have three cars, so book ahead for the evening.
   - "On foot": from The Wren and Wheel, five minutes along Saltry Lane, with a pavement all the way.
 
-**Second part,** `md:col-span-5 md:col-start-8`: a pastel block in mist, as the layout notes describe it, a `<div>` in this section. The block element itself carries `bg-mist text-mist-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. In the block's `gap-6`: an `<h3>` in `text-h2`, "At a glance", then a `<dl>` of rows on a pastel block (`flex flex-col gap-3`, no rules). Each row is a `<div>` with `flex items-baseline justify-between gap-6`: the term, a `<dt>`, a label with `shrink-0`; the value, a `<dd>`, in `text-body` with `min-w-0 text-right`. The rows: Postcode / `ZQ4 7HB`; Nearest station / `Market Fenley`; Parking / `Free, in the paddock`; Minibus from the station / `13:00 and 13:15`; Last minibus back / `23:30`. Each time is a `<time>`. The block holds no link: the numbers to call are in the first part.
+**Second part,** `md:col-span-5 md:col-start-8`: a pastel block in mist, as the layout notes describe it, a `<div>` in this section. The block element itself carries `bg-mist text-mist-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. In the block's `gap-6`: an `<h3>` in `text-h2`, "At a glance", then a `<dl>` of rows on a pastel block (`flex flex-col gap-3`, no rules). Each row is a `<div>` with `flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2`: the term, a `<dt>`, a label; the value, a `<dd>`, in `text-body` with `ml-auto text-right`. Where the two do not fit on one line (`Minibus from the station` in the narrow column), the value moves whole to a line of its own at the right, instead of being squeezed to a word per line. The rows: Postcode / `ZQ4 7HB`; Nearest station / `Market Fenley`; Parking / `Free, in the paddock`; Minibus from the station / `13:00 and 13:15`; Last minibus back / `23:30`. Each time is a `<time>`. The block holds no link: the numbers to call are in the first part.
 
 ### 5. Where to stay
 
@@ -76,7 +76,7 @@ The three places:
 
 ### 6. Questions and answers
 
-A section in the centered column from the layout notes, with an `<h2>` "Questions and answers", then in the column's `gap-6` an `Accordion` (add it with `npx shadcn@latest add accordion`) with six items, any number open at once, all closed when the page opens. Questions word for word, answers in one to three short sentences:
+A section in the centered column from the layout notes, with an `<h2>` "Questions and answers", then in the column's `gap-6` an `<Accordion multiple>` (add it with `npx shadcn@latest add accordion`) with six items, any number open at once (without `multiple`, Base UI opens one at a time), all closed when the page opens. Questions word for word, answers in one to three short sentences:
 
 1. "Can we bring our children?": yes, if they are named on your invitation. There is a children's plate at dinner and a quiet room off the barn with blankets and books.
 2. "Is the barn step-free?": the barn, the toilets and the lawn are; the orchard is on a gentle slope with a mown path.
@@ -85,7 +85,7 @@ A section in the centered column from the layout notes, with an `<h2>` "Question
 5. "Can the kitchen cook around an allergy?": yes. Tell us in the note when you reply, and the kitchen plans a plate for you. "When you reply" is a link in running text to `/rsvp`.
 6. "When does it end?": the band stops at 23:15 and the last minibus leaves at 23:30. Brunch on Sunday is for anyone still around.
 
-The stock `Accordion` is off the type scale and its trigger is under 44px. In `components/ui/accordion.tsx`: on the trigger, replace `items-start` with `items-center`, its stock vertical padding with `py-3` and its small text size with `font-sans text-body`, and add `min-h-11 gap-3` (its `font-medium` stays); on the content, replace the small text size with `text-body`, and on its inner element the stock bottom padding with `pb-3` (its `pt-0` stays). Every item has its 1px line under it, the last one too: on the item, replace the stock `not-last:border-b` with `border-b border-border`. Both chevron icons get `strokeWidth={1.5}`. The trigger keeps its stock corner, which only shows in its focus outline, and its ring classes are replaced as the rules say.
+The stock `Accordion` is off the type scale and its trigger is under 44px. In `components/ui/accordion.tsx`: on the trigger, replace `items-start` with `items-center`, its stock vertical padding with `py-3` and its small text size with `font-sans text-body` (the questions read as body text, unlike the timeline's `<h3>` titles in the heading font), and add `min-h-11 gap-3` (its `font-medium` stays); on the content, replace the small text size with `text-body`, and on its inner element the stock bottom padding with `pb-3` (its `pt-0` stays) and `[&_a]:underline-offset-3` with `[&_a]:underline-offset-4`, the offset of a link in running text. Every item has its 1px line under it, the last one too: on the item, replace the stock `not-last:border-b` with `border-b border-border`. Both chevron icons get `strokeWidth={1.5}`. The trigger keeps its stock corner, which only shows in its focus outline, and its ring classes are replaced as the rules say.
 
 ### 7. Footer
 

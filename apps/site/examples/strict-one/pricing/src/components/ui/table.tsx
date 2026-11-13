@@ -12,7 +12,7 @@ function Table({
       tabIndex={0}
       role="region"
       aria-label={label}
-      className="relative w-full overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid"
+      className="relative w-full overflow-x-auto focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <table
         data-slot="table"
@@ -34,7 +34,13 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return <tbody data-slot="table-body" className={cn(className)} {...props} />
+  return (
+    <tbody
+      data-slot="table-body"
+      className={cn(className)}
+      {...props}
+    />
+  )
 }
 
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {

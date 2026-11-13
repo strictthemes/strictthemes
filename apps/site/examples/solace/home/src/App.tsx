@@ -5,21 +5,20 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLink = cn(
-  "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
   focusRing
 )
 
+const navLink = cn(
+  "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+
 const card = "rounded-xl border border-border bg-card p-7"
-
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
 const label = "font-mono text-label"
-
-const badge =
+const badgeClass =
   "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground"
 
 const navItems = [
@@ -59,7 +58,7 @@ const concerns = [
 const steps = [
   {
     title: "You write to me",
-    text: "Use the form, and say as much or as little as you like. A name and a way to reach you is enough.",
+    text: "Fill in a short form, and say as much or as little as you like. A name and a way to reach you is enough.",
     note: "I reply within 2 working days",
   },
   {
@@ -75,23 +74,14 @@ const steps = [
 ]
 
 const inShort = [
-  {
-    term: "In person",
-    value: "The Garden Room, 14 Orchard Row, Larkmere",
-  },
-  {
-    term: "Online",
-    value: "By video, with a link I send the day before",
-  },
-  {
-    term: "Evenings",
-    value: "On Wednesdays, until 20:00",
-  },
+  { badge: "In person", text: "The Garden Room, 14 Orchard Row, Larkmere" },
+  { badge: "Online", text: "By video, with a link I send the day before" },
+  { badge: "Evenings", text: "On Wednesdays, until 20:00" },
 ]
 
-function NavList({ vertical = false }: { vertical?: boolean }) {
+function NavList({ className }: { className?: string }) {
   return (
-    <ul className={vertical ? undefined : "flex flex-wrap gap-x-4 md:gap-x-7"}>
+    <ul className={className}>
       {navItems.map((item) => (
         <li key={item.href}>
           <a href={item.href} className={navLink}>
@@ -117,15 +107,12 @@ export function App() {
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <NavList />
+          <NavList className="flex flex-wrap gap-x-4 md:gap-x-7" />
         </nav>
       </header>
 
       <main>
-        <section
-          aria-labelledby="opening-heading"
-          className="mt-12 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="opening-heading" className={cn(grid, "mt-12 md:mt-28")}>
           <p className={cn(label, "text-muted-foreground md:col-span-12")}>
             Psychotherapy · Larkmere and online
           </p>
@@ -147,10 +134,7 @@ export function App() {
           </p>
         </section>
 
-        <section
-          aria-labelledby="bring-heading"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="bring-heading" className={cn(grid, "mt-28")}>
           <div className="md:col-span-4">
             <h2 id="bring-heading" className="text-h2">
               What people bring
@@ -178,16 +162,16 @@ export function App() {
 
         <section
           id="how-it-starts"
-          aria-labelledby="how-heading"
+          aria-labelledby="steps-heading"
           className="mt-28 scroll-mt-7"
         >
-          <h2 id="how-heading" className="text-h2">
+          <h2 id="steps-heading" className="text-h2">
             How it starts
           </h2>
           <p className="mt-4 max-w-xl">
             Three steps, at your own pace. You can stop after any of them.
           </p>
-          <ol className="mt-7 grid list-none grid-cols-1 p-0 md:grid-cols-12 md:gap-x-7">
+          <ol className={cn(grid, "mt-7 list-none p-0")}>
             {steps.map((step, index) => (
               <li
                 key={step.title}
@@ -201,7 +185,7 @@ export function App() {
                   Step {index + 1}
                 </p>
                 <h3 className="mt-4 text-h2">{step.title}</h3>
-                <p className="mt-4 max-w-xl">{step.text}</p>
+                <p className="mt-4">{step.text}</p>
                 <p className={cn(label, "mt-auto pt-7 text-foreground")}>
                   {step.note}
                 </p>
@@ -210,12 +194,9 @@ export function App() {
           </ol>
         </section>
 
-        <section
-          aria-labelledby="who-heading"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="therapist-heading" className={cn(grid, "mt-28")}>
           <div className="md:col-span-7">
-            <h2 id="who-heading" className="text-h2">
+            <h2 id="therapist-heading" className="text-h2">
               Who you would be talking to
             </h2>
             <div className="mt-7 flex items-center gap-4">
@@ -247,33 +228,25 @@ export function App() {
               </a>
             </p>
           </div>
-          <div
-            className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0")}
-          >
+          <div className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0")}>
             <h3 className="text-h2">In short</h3>
             <dl className="mt-4">
               {inShort.map((row, index) => (
-                <div key={row.term} className={index > 0 ? "mt-4" : undefined}>
+                <div key={row.badge} className={cn(index > 0 && "mt-4")}>
                   <dt>
-                    <Badge className={badge}>{row.term}</Badge>
+                    <Badge className={badgeClass}>{row.badge}</Badge>
                   </dt>
-                  <dd className="mt-2">{row.value}</dd>
+                  <dd className="mt-2">{row.text}</dd>
                 </div>
               ))}
             </dl>
           </div>
         </section>
 
-        <section
-          aria-labelledby="fee-heading"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="fee-heading" className={cn(grid, "mt-28")}>
           <div className="md:col-span-8">
-            <p className={cn(label, "text-muted-foreground")}>
-              Fees from{" "}
-              <time dateTime="2027-01-01" className="tabular-nums">
-                1 January 2027
-              </time>
+            <p className={cn(label, "text-muted-foreground tabular-nums")}>
+              Fees from <time dateTime="2027-01-01">1 January 2027</time>
             </p>
             <h2 id="fee-heading" className="mt-4 text-h1">
               A session is 50 minutes and costs £68
@@ -290,17 +263,14 @@ export function App() {
           </div>
         </section>
 
-        <section
-          aria-labelledby="ready-heading"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="action-heading" className={cn(grid, "mt-28")}>
           <div className={cn(card, "md:col-span-8")}>
-            <h2 id="ready-heading" className="text-h2">
+            <h2 id="action-heading" className="text-h2">
               When you are ready
             </h2>
             <p className="mt-4 max-w-xl">
-              Write to me with the form. I reply within two working days, and
-              nothing is booked until we have spoken.
+              The button leads to a short form. I reply within two working days,
+              and nothing is booked until we have spoken.
             </p>
             <div className="mt-7">
               <a
@@ -318,16 +288,16 @@ export function App() {
       </main>
 
       <footer className="mt-28 border-t border-border py-12">
-        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
+        <div className={grid}>
           <div className="md:col-span-7">
             <p className="font-heading text-h2">Nora Ellingham</p>
             <p className={cn(label, "mt-2 text-muted-foreground")}>
               Registered psychotherapist · Larkmere and online
             </p>
-            <address className="mt-7 text-body not-italic">
+            <address className="mt-7 not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
-            <p className="mt-2">
+            <p className="mt-2 wrap-break-word">
               <a href="mailto:hello@ellingham.example" className={textLink}>
                 hello@ellingham.example
               </a>
@@ -337,7 +307,7 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <NavList vertical />
+            <NavList />
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

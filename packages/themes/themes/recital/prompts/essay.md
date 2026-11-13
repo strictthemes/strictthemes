@@ -10,7 +10,7 @@ checks:
   - The essay is inside an `<article>` element with one `<h1>`, and the footnotes are an ordered list.
 ---
 
-Sample essay, if the user gave none: "The case for the slow reply", a 900 to 1,100 word essay by a writer who answers letters for a small magazine, about why a considered answer a week later is worth more than a quick one today. Write the full text yourself, in the first person, plain and specific, with three `<h2>` sections. The publication is called "The Long Margin".
+Sample essay, if the user gave none: "The case for the slow reply", a 900 to 1,100 word essay (counting the body's paragraphs only) by a writer who answers letters for a small magazine, about why a considered answer a week later is worth more than a quick one today. Write the full text yourself, in the first person, plain and specific, with three `<h2>` sections. The publication is called "The Long Margin".
 
 Build these parts in order. An `<article>` wraps the essay header, the body, the footnotes and the author note.
 
@@ -48,7 +48,7 @@ In the reading column, with `mt-12`, a 1px top border and `pt-6`: a label headin
 
 ### 5. Author note
 
-In the reading column, with `mt-12`: a card (`mb-12`, as the notes give a card that opens a part). Inside it a label `<p>` ("About the author"), then with `mt-2` the author's name as an `<h2>` in `text-h2`, then with `mt-4` two sentences about them and a link in running text to more of their essays.
+In the reading column, with `mt-12`: a card (`mb-12`, as the notes give a card that opens a part). Inside it a label `<p>` ("About the author"), then with `mt-2` the author's name as an `<h2>` in `text-h2`, then with `mt-4` two sentences about them, the second ending in a link in running text to more of their essays.
 
 ### 6. Keep reading
 

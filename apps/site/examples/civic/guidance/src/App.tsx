@@ -21,14 +21,7 @@ const textLink = cn(
   focusOutline
 )
 
-const listLink = cn("inline-block py-2", textLink)
-
-const sectionHeading = "mt-10 scroll-mt-6 text-h2"
-
-const headCell =
-  "h-auto px-4 py-2 font-bold whitespace-normal text-foreground first:pl-0 last:pr-0"
-const bodyCell = "px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0"
-const amount = "text-right tabular-nums"
+const listLink = cn(textLink, "inline-block py-2")
 
 const sections = [
   { id: "who-can-get-a-permit", title: "Who can get a permit" },
@@ -38,35 +31,15 @@ const sections = [
   { id: "if-something-changes", title: "If something changes" },
 ]
 
-const conditions = [
-  "you live in zone A, B, C or D",
-  "the vehicle is registered to you at your address, or is a company car you are the main driver of",
-  "your address has fewer than two permits",
-]
-
 const prices = [
   { fuel: "Petrol or diesel", first: "£96", second: "£144" },
   { fuel: "Hybrid", first: "£72", second: "£108" },
   { fuel: "Fully electric", first: "£30", second: "£45" },
 ]
 
-const needed = [
-  "the vehicle's registration number",
-  "the date you want the permit to start",
-  "proof of address from the last 3 months, such as a council tax bill, a tenancy agreement or a utility bill",
-]
-
-const changes = [
-  "You change vehicle. Update the registration number online, which is free.",
-  "You move house. Cancel the permit, and you get back the full months left, less a £10 fee.",
-  "You sell the vehicle and do not replace it. Cancel the permit in the same way.",
-]
-
-const related = [
-  "Apply for a resident's parking permit",
-  "Visitor parking permits",
-  "Pay or challenge a parking fine",
-]
+const headCell =
+  "h-auto px-4 py-2 font-bold whitespace-normal text-foreground first:pl-0 last:pr-0"
+const bodyCell = "px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0"
 
 const footerLinks = [
   "Accessibility",
@@ -75,15 +48,18 @@ const footerLinks = [
   "Contact the council",
 ]
 
-function BulletList({ items }: { items: string[] }) {
+const relatedLinks = [
+  "Apply for a resident's parking permit",
+  "Visitor parking permits",
+  "Pay or challenge a parking fine",
+]
+
+function SectionHeading({ index }: { index: number }) {
+  const section = sections[index]
   return (
-    <ul className="mt-4 list-disc pl-6">
-      {items.map((item, index) => (
-        <li key={item} className={index > 0 ? "mt-2" : undefined}>
-          {item}
-        </li>
-      ))}
-    </ul>
+    <h2 id={section.id} className="mt-10 scroll-mt-6 text-h2">
+      {section.title}
+    </h2>
   )
 }
 
@@ -123,7 +99,7 @@ export function App() {
               focusOutline
             )}
           >
-            Apply for a resident&apos;s parking permit
+            Apply for a resident's parking permit
           </a>
         </div>
       </header>
@@ -134,10 +110,9 @@ export function App() {
           Resident parking permits: who can get one and what it costs
         </h1>
         <p className="mt-6">
-          A resident parking permit lets you park one vehicle in the
-          permit-holder bays of the zone you live in. This page is for people
-          who live in Callowmere and want to know if they can get a permit and
-          what they will pay.
+          A resident parking permit lets you park on the streets near your home
+          in a permit zone. This page is for people who live in Callowmere and
+          want to know if they can get one and what it will cost.
         </p>
         <p className="mt-4 font-mono text-label text-muted-foreground">
           Updated <time dateTime="2026-11-04">4 November 2026</time>
@@ -153,7 +128,7 @@ export function App() {
           >
             Contents
           </h2>
-          <ul className="mt-2">
+          <ul className="mt-2 list-none p-0">
             {sections.map((section) => (
               <li key={section.id}>
                 <a href={`#${section.id}`} className={listLink}>
@@ -164,15 +139,20 @@ export function App() {
           </ul>
         </nav>
 
-        <h2 id={sections[0].id} className={sectionHeading}>
-          {sections[0].title}
-        </h2>
+        <SectionHeading index={0} />
         <p className="mt-4">
           Whether you can get a permit depends on where you live, on the vehicle
           and on how many permits your address already has.
         </p>
         <p className="mt-4">You can get a permit if:</p>
-        <BulletList items={conditions} />
+        <ul className="mt-4 list-disc pl-6">
+          <li>you live in zone A, B, C or D</li>
+          <li className="mt-2">
+            the vehicle is registered to you at your address, or is a company
+            car you are the main driver of
+          </li>
+          <li className="mt-2">your address has fewer than two permits</li>
+        </ul>
         <p className="mt-4">
           Homes at Linden Yard cannot get a permit, because they were built
           without parking.
@@ -185,12 +165,10 @@ export function App() {
           .
         </p>
 
-        <h2 id={sections[1].id} className={sectionHeading}>
-          {sections[1].title}
-        </h2>
+        <SectionHeading index={1} />
         <p className="mt-4">
-          The price depends on what the vehicle runs on and on whether it is the
-          first or the second permit at your address.
+          The price depends on what the vehicle runs on, and on whether it is
+          the first or the second permit at your address.
         </p>
         <h3 className="mt-6 text-body font-bold">
           Prices for a 12-month permit
@@ -202,26 +180,28 @@ export function App() {
           >
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead scope="col" className={headCell}>
-                  Vehicle runs on
-                </TableHead>
-                <TableHead scope="col" className={cn(headCell, amount)}>
+                <TableHead className={headCell}>Vehicle runs on</TableHead>
+                <TableHead className={cn(headCell, "text-right tabular-nums")}>
                   First permit
                 </TableHead>
-                <TableHead scope="col" className={cn(headCell, amount)}>
+                <TableHead className={cn(headCell, "text-right tabular-nums")}>
                   Second permit
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {prices.map((price) => (
-                <TableRow key={price.fuel} className="hover:bg-transparent">
-                  <TableCell className={bodyCell}>{price.fuel}</TableCell>
-                  <TableCell className={cn(bodyCell, amount)}>
-                    {price.first}
+              {prices.map((row) => (
+                <TableRow key={row.fuel} className="hover:bg-transparent">
+                  <TableCell className={bodyCell}>{row.fuel}</TableCell>
+                  <TableCell
+                    className={cn(bodyCell, "text-right tabular-nums")}
+                  >
+                    {row.first}
                   </TableCell>
-                  <TableCell className={cn(bodyCell, amount)}>
-                    {price.second}
+                  <TableCell
+                    className={cn(bodyCell, "text-right tabular-nums")}
+                  >
+                    {row.second}
                   </TableCell>
                 </TableRow>
               ))}
@@ -255,14 +235,19 @@ export function App() {
           price.
         </p>
 
-        <h2 id={sections[2].id} className={sectionHeading}>
-          {sections[2].title}
-        </h2>
+        <SectionHeading index={2} />
         <p className="mt-4">You will need:</p>
-        <BulletList items={needed} />
+        <ul className="mt-4 list-disc pl-6">
+          <li>the vehicle's registration number</li>
+          <li className="mt-2">the date you want the permit to start</li>
+          <li className="mt-2">
+            proof of address from the last 3 months, such as a council tax bill,
+            a tenancy agreement or a utility bill
+          </li>
+        </ul>
         <p className="mt-4">
-          For a company car, you also need a letter from your employer that says
-          you are the main driver.
+          For a company car, you will also need a letter from your employer that
+          says you are the main driver.
         </p>
         <p className="mt-10">
           <a
@@ -277,22 +262,31 @@ export function App() {
           </a>
         </p>
 
-        <h2 id={sections[3].id} className={sectionHeading}>
-          {sections[3].title}
-        </h2>
+        <SectionHeading index={3} />
         <p className="mt-4">
           A permit lasts 12 months from the start date you choose.
         </p>
         <p className="mt-4">
-          We send you a reminder email 4 weeks before it ends. You renew online,
-          in the same way you applied.
+          We send you a reminder email 4 weeks before your permit ends. You
+          renew online in the same way you applied.
         </p>
 
-        <h2 id={sections[4].id} className={sectionHeading}>
-          {sections[4].title}
-        </h2>
-        <p className="mt-4">Tell us if any of these happen:</p>
-        <BulletList items={changes} />
+        <SectionHeading index={4} />
+        <p className="mt-4">Tell us if one of these happens:</p>
+        <ul className="mt-4 list-disc pl-6">
+          <li>
+            You change vehicle. Update the registration number online, which is
+            free.
+          </li>
+          <li className="mt-2">
+            You move house. Cancel your permit and you get back the full months
+            left, less a £10 fee.
+          </li>
+          <li className="mt-2">
+            You sell the vehicle and do not replace it. Cancel your permit in
+            the same way.
+          </li>
+        </ul>
 
         <section
           aria-labelledby="related-heading"
@@ -301,11 +295,11 @@ export function App() {
           <h2 id="related-heading" className="text-h2">
             Related
           </h2>
-          <ul className="mt-4">
-            {related.map((title) => (
-              <li key={title}>
+          <ul className="mt-4 list-none p-0">
+            {relatedLinks.map((label) => (
+              <li key={label}>
                 <a href="#" className={listLink}>
-                  {title}
+                  {label}
                 </a>
               </li>
             ))}
@@ -316,11 +310,11 @@ export function App() {
       <footer className="border-t border-border bg-card">
         <div className={cn(container, "py-10")}>
           <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-6">
-              {footerLinks.map((title) => (
-                <li key={title}>
+            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+              {footerLinks.map((label) => (
+                <li key={label}>
                   <a href="#" className={listLink}>
-                    {title}
+                    {label}
                   </a>
                 </li>
               ))}

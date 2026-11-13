@@ -19,32 +19,38 @@ type Tide = {
 }
 
 type Day = {
-  date: string
-  longDate: string
-  shortDate: string
+  iso: string
   button: string
+  short: string
+  long: string
   rating: string
   heading: string
-  swell: { height: number; period: number; from: string }
-  wind: { speed: number; direction: string; aspect: string }
-  water: { temp: number; note: string }
+  swell: { value: string; unit: string; note: string }
+  period: string
+  wind: { value: string; unit: string; note: string; table: string }
+  water: { value: string; unit: string; note: string }
   sentence: string
-  // In order through the day: low, high, low, high. The third is the
-  // daytime low shown on the conditions block, the fourth the high after it.
   tides: [Tide, Tide, Tide, Tide]
+  best?: boolean
 }
 
-const DAYS: Day[] = [
+const days: Day[] = [
   {
-    date: "2027-06-17",
-    longDate: "Thursday 17 June 2027",
-    shortDate: "Thu 17 Jun",
+    iso: "2027-06-17",
     button: "Today",
+    short: "Thu 17 Jun",
+    long: "Thursday 17 June 2027",
     rating: "Good",
     heading: "Good: clean and waist high",
-    swell: { height: 3, period: 9, from: "the west" },
-    wind: { speed: 8, direction: "East", aspect: "Offshore" },
-    water: { temp: 15, note: "Summer wetsuit" },
+    swell: { value: "3", unit: "ft", note: "9 s · From the west" },
+    period: "9 s",
+    wind: {
+      value: "8",
+      unit: "mph",
+      note: "East · Offshore",
+      table: "East, offshore",
+    },
+    water: { value: "15", unit: "°C", note: "Summer wetsuit" },
     sentence:
       "A light offshore wind holds the waves up all morning. Best for beginners in the two hours either side of low water.",
     tides: [
@@ -55,15 +61,21 @@ const DAYS: Day[] = [
     ],
   },
   {
-    date: "2027-06-18",
-    longDate: "Friday 18 June 2027",
-    shortDate: "Fri 18 Jun",
+    iso: "2027-06-18",
     button: "Fri 18 Jun",
+    short: "Fri 18 Jun",
+    long: "Friday 18 June 2027",
     rating: "Very good",
     heading: "Very good: clean and chest high",
-    swell: { height: 4, period: 11, from: "the west" },
-    wind: { speed: 6, direction: "South-east", aspect: "Offshore" },
-    water: { temp: 15, note: "Summer wetsuit" },
+    swell: { value: "4", unit: "ft", note: "11 s · From the west" },
+    period: "11 s",
+    wind: {
+      value: "6",
+      unit: "mph",
+      note: "South-east · Offshore",
+      table: "South-east, offshore",
+    },
+    water: { value: "15", unit: "°C", note: "Summer wetsuit" },
     sentence:
       "The best day of the five. A longer swell arrives overnight, and the wind stays light and offshore until the middle of the afternoon.",
     tides: [
@@ -72,17 +84,24 @@ const DAYS: Day[] = [
       { kind: "Low", time: "14:22", height: "1.3 m" },
       { kind: "High", time: "20:28", height: "5.0 m" },
     ],
+    best: true,
   },
   {
-    date: "2027-06-19",
-    longDate: "Saturday 19 June 2027",
-    shortDate: "Sat 19 Jun",
+    iso: "2027-06-19",
     button: "Sat 19 Jun",
+    short: "Sat 19 Jun",
+    long: "Saturday 19 June 2027",
     rating: "Fair",
     heading: "Fair: bigger, and bumpy by noon",
-    swell: { height: 5, period: 12, from: "the west" },
-    wind: { speed: 14, direction: "West", aspect: "Onshore" },
-    water: { temp: 15, note: "Summer wetsuit" },
+    swell: { value: "5", unit: "ft", note: "12 s · From the west" },
+    period: "12 s",
+    wind: {
+      value: "14",
+      unit: "mph",
+      note: "West · Onshore",
+      table: "West, onshore",
+    },
+    water: { value: "15", unit: "°C", note: "Summer wetsuit" },
     sentence:
       "The biggest waves of the five days, but the wind turns onshore by noon. Improvers should go early; beginners stay in the white water.",
     tides: [
@@ -93,15 +112,21 @@ const DAYS: Day[] = [
     ],
   },
   {
-    date: "2027-06-20",
-    longDate: "Sunday 20 June 2027",
-    shortDate: "Sun 20 Jun",
+    iso: "2027-06-20",
     button: "Sun 20 Jun",
+    short: "Sun 20 Jun",
+    long: "Sunday 20 June 2027",
     rating: "Fair",
     heading: "Fair: small and tidy",
-    swell: { height: 2, period: 8, from: "the north-west" },
-    wind: { speed: 10, direction: "North", aspect: "Cross-shore" },
-    water: { temp: 16, note: "Summer wetsuit" },
+    swell: { value: "2", unit: "ft", note: "8 s · From the north-west" },
+    period: "8 s",
+    wind: {
+      value: "10",
+      unit: "mph",
+      note: "North · Cross-shore",
+      table: "North, cross-shore",
+    },
+    water: { value: "16", unit: "°C", note: "Summer wetsuit" },
     sentence:
       "The swell drops away and the wind swings to the north. Small, tidy waves that suit a first lesson.",
     tides: [
@@ -112,15 +137,21 @@ const DAYS: Day[] = [
     ],
   },
   {
-    date: "2027-06-21",
-    longDate: "Monday 21 June 2027",
-    shortDate: "Mon 21 Jun",
+    iso: "2027-06-21",
     button: "Mon 21 Jun",
+    short: "Mon 21 Jun",
+    long: "Monday 21 June 2027",
     rating: "Poor",
     heading: "Poor: nearly flat, and windy",
-    swell: { height: 1, period: 7, from: "the west" },
-    wind: { speed: 18, direction: "South-west", aspect: "Onshore" },
-    water: { temp: 16, note: "Summer wetsuit" },
+    swell: { value: "1", unit: "ft", note: "7 s · From the west" },
+    period: "7 s",
+    wind: {
+      value: "18",
+      unit: "mph",
+      note: "South-west · Onshore",
+      table: "South-west, onshore",
+    },
+    water: { value: "16", unit: "°C", note: "Summer wetsuit" },
     sentence:
       "Hardly a wave, and a stiff onshore wind. A day for a swim, a walk to the north rocks or the café.",
     tides: [
@@ -132,10 +163,39 @@ const DAYS: Day[] = [
   },
 ]
 
-// Friday has the best conditions of the five days.
-const BEST_DAY_INDEX = 1
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const READING_NOTES = [
+const navLinkClass = cn(
+  "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
+  focusOutline
+)
+
+const textLinkClass = cn(
+  "text-foreground underline decoration-1 underline-offset-4 hover:decoration-2",
+  focusOutline
+)
+
+const buttonClass = "h-11 rounded-md px-6 font-mono text-label uppercase"
+
+const label = "font-mono text-label uppercase"
+
+const smallFigure =
+  "font-mono text-label text-muted-foreground uppercase tabular-nums"
+
+const tableHeadClass =
+  "h-auto px-6 py-4 font-mono text-label text-muted-foreground uppercase"
+
+const tableCellClass = "px-6 py-4 text-foreground"
+
+const navLinks = [
+  { label: "Lessons", href: "/lessons" },
+  { label: "Forecast", href: "/forecast", current: true },
+  { label: "Guide", href: "/guide" },
+  { label: "Book", href: "/booking" },
+]
+
+const readingNotes = [
   {
     term: "Swell",
     meaning:
@@ -158,31 +218,6 @@ const READING_NOTES = [
   },
 ]
 
-const NAV_LINKS = [
-  { label: "Lessons", href: "/lessons" },
-  { label: "Forecast", href: "/forecast" },
-  { label: "Guide", href: "/guide" },
-  { label: "Book", href: "/booking" },
-]
-
-const focusOutline =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const inlineLink = cn(
-  "text-foreground underline decoration-1 underline-offset-4 hover:decoration-2",
-  focusOutline
-)
-
-const buttonClasses = "h-11 rounded-md px-6 font-mono text-label uppercase"
-
-const label = "font-mono text-label uppercase"
-const smallFigure =
-  "font-mono text-label uppercase tabular-nums text-muted-foreground"
-
-const headCell =
-  "h-auto px-6 py-4 font-mono text-label uppercase text-muted-foreground"
-const bodyCell = "px-6 py-4 text-foreground"
-
 function Figure({ value, unit }: { value: ReactNode; unit: string }) {
   return (
     <dd className="flex flex-wrap items-baseline gap-x-2">
@@ -196,9 +231,9 @@ function Figure({ value, unit }: { value: ReactNode; unit: string }) {
 
 export function App() {
   const [chosen, setChosen] = useState(0)
-  const day = DAYS[chosen]
-  const low = day.tides[2]
-  const highAfter = day.tides[3]
+  const day = days[chosen]
+  const lowTide = day.tides[2]
+  const highTide = day.tides[3]
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
@@ -215,24 +250,17 @@ export function App() {
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
             <ul className="flex flex-wrap gap-x-6">
-              {NAV_LINKS.map((link) => {
-                const current = link.href === "/forecast"
-                return (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      aria-current={current ? "page" : undefined}
-                      className={cn(
-                        "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
-                        current && "underline",
-                        focusOutline
-                      )}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                )
-              })}
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "page" : undefined}
+                    className={cn(navLinkClass, link.current && "underline")}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -240,7 +268,7 @@ export function App() {
 
       <main className="mx-auto flex max-w-[1248px] flex-col gap-24 px-6 pt-10 pb-24">
         <section
-          aria-labelledby="forecast-title"
+          aria-labelledby="forecast-heading"
           className="flex flex-col gap-6 rounded-xl bg-coral p-6 text-coral-foreground md:p-10"
         >
           <div className="flex flex-col gap-4">
@@ -250,7 +278,7 @@ export function App() {
                 <time dateTime="2027-06-17">Thursday 17 June 2027</time> at{" "}
                 <time dateTime="06:40">06:40</time>
               </p>
-              <h1 id="forecast-title" className="text-h1 md:text-display">
+              <h1 id="forecast-heading" className="text-h1 md:text-display">
                 Surf forecast
               </h1>
             </div>
@@ -262,11 +290,8 @@ export function App() {
           </div>
         </section>
 
-        <section
-          aria-labelledby="day-by-day-title"
-          className="flex flex-col gap-6"
-        >
-          <h2 id="day-by-day-title" className="text-h2">
+        <section aria-labelledby="day-heading" className="flex flex-col gap-6">
+          <h2 id="day-heading" className="text-h2">
             Day by day
           </h2>
 
@@ -282,16 +307,16 @@ export function App() {
               aria-labelledby="day-choice-label"
               className="flex flex-wrap gap-2"
             >
-              {DAYS.map((d, index) => {
-                const pressed = index === chosen
+              {days.map((d, index) => {
+                const isChosen = index === chosen
                 return (
                   <Button
-                    key={d.date}
+                    key={d.iso}
                     type="button"
-                    variant={pressed ? "secondary" : "outline"}
-                    aria-pressed={pressed}
+                    variant={isChosen ? "secondary" : "outline"}
+                    aria-pressed={isChosen}
                     onClick={() => setChosen(index)}
-                    className={buttonClasses}
+                    className={buttonClass}
                   >
                     {d.button}
                   </Button>
@@ -299,14 +324,14 @@ export function App() {
               })}
             </div>
             <p role="status" className={smallFigure}>
-              Showing <time dateTime={day.date}>{day.longDate}</time>
+              Showing <time dateTime={day.iso}>{day.long}</time>
             </p>
           </div>
 
           <div className="flex flex-col gap-6 rounded-xl bg-lagoon p-6 text-lagoon-foreground md:p-10">
             <div className="flex flex-col gap-2">
               <p className={label}>
-                <time dateTime={day.date}>{day.longDate}</time>
+                <time dateTime={day.iso}>{day.long}</time>
               </p>
               <h3 className="text-h2">{day.heading}</h3>
             </div>
@@ -315,31 +340,27 @@ export function App() {
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Tide</dt>
                 <Figure
-                  value={<time dateTime={low.time}>{low.time}</time>}
+                  value={<time dateTime={lowTide.time}>{lowTide.time}</time>}
                   unit="low"
                 />
                 <dd className={cn(label, "tabular-nums")}>
-                  {low.height} · High at{" "}
-                  <time dateTime={highAfter.time}>{highAfter.time}</time>
+                  {lowTide.height} · High at{" "}
+                  <time dateTime={highTide.time}>{highTide.time}</time>
                 </dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Swell</dt>
-                <Figure value={day.swell.height} unit="ft" />
-                <dd className={cn(label, "tabular-nums")}>
-                  {day.swell.period} s · From {day.swell.from}
-                </dd>
+                <Figure value={day.swell.value} unit={day.swell.unit} />
+                <dd className={cn(label, "tabular-nums")}>{day.swell.note}</dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Wind</dt>
-                <Figure value={day.wind.speed} unit="mph" />
-                <dd className={label}>
-                  {day.wind.direction} · {day.wind.aspect}
-                </dd>
+                <Figure value={day.wind.value} unit={day.wind.unit} />
+                <dd className={label}>{day.wind.note}</dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Water</dt>
-                <Figure value={day.water.temp} unit="°C" />
+                <Figure value={day.water.value} unit={day.water.unit} />
                 <dd className={label}>{day.water.note}</dd>
               </div>
             </dl>
@@ -350,29 +371,28 @@ export function App() {
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-x-6">
           <section
-            aria-labelledby="tide-times-title"
+            aria-labelledby="tides-heading"
             className="flex flex-col gap-6 lg:col-span-5"
           >
             <div className="flex flex-col gap-2">
-              <h2 id="tide-times-title" className="text-h2">
+              <h2 id="tides-heading" className="text-h2">
                 Tide times
               </h2>
               <p className={smallFigure}>
-                <time dateTime={day.date}>{day.longDate}</time> · Pentarrow
-                Sands
+                <time dateTime={day.iso}>{day.long}</time> · Pentarrow Sands
               </p>
             </div>
             <div className="overflow-hidden rounded-xl border border-border bg-card">
               <Table label="Tide times" className="text-body">
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead scope="col" className={headCell}>
+                    <TableHead scope="col" className={tableHeadClass}>
                       Tide
                     </TableHead>
-                    <TableHead scope="col" className={headCell}>
+                    <TableHead scope="col" className={tableHeadClass}>
                       Time
                     </TableHead>
-                    <TableHead scope="col" className={headCell}>
+                    <TableHead scope="col" className={tableHeadClass}>
                       Height
                     </TableHead>
                   </TableRow>
@@ -380,11 +400,13 @@ export function App() {
                 <TableBody>
                   {day.tides.map((tide) => (
                     <TableRow key={tide.time} className="hover:bg-transparent">
-                      <TableCell className={bodyCell}>{tide.kind}</TableCell>
-                      <TableCell className={cn(bodyCell, "tabular-nums")}>
+                      <TableCell className={tableCellClass}>
+                        {tide.kind}
+                      </TableCell>
+                      <TableCell className={cn(tableCellClass, "tabular-nums")}>
                         <time dateTime={tide.time}>{tide.time}</time>
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "tabular-nums")}>
+                      <TableCell className={cn(tableCellClass, "tabular-nums")}>
                         {tide.height}
                       </TableCell>
                     </TableRow>
@@ -395,14 +417,14 @@ export function App() {
           </section>
 
           <section
-            aria-labelledby="how-to-read-title"
+            aria-labelledby="reading-heading"
             className="flex flex-col gap-6 lg:col-span-6 lg:col-start-7"
           >
-            <h2 id="how-to-read-title" className="text-h2">
+            <h2 id="reading-heading" className="text-h2">
               How to read it
             </h2>
             <dl className="flex flex-col gap-6">
-              {READING_NOTES.map((note) => (
+              {readingNotes.map((note) => (
                 <div key={note.term} className="flex flex-col gap-2">
                   <dt className="text-body font-bold text-foreground">
                     {note.term}
@@ -415,11 +437,11 @@ export function App() {
         </div>
 
         <section
-          aria-labelledby="five-days-title"
+          aria-labelledby="five-days-heading"
           className="flex flex-col gap-6"
         >
           <div className="flex flex-col gap-2">
-            <h2 id="five-days-title" className="text-h2">
+            <h2 id="five-days-heading" className="text-h2">
               Five days
             </h2>
             <p className={smallFigure}>
@@ -427,7 +449,6 @@ export function App() {
               in miles an hour
             </p>
           </div>
-
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <Table label="Five days" className="text-body">
               <TableHeader>
@@ -440,44 +461,48 @@ export function App() {
                     "Direction",
                     "Rating",
                   ].map((heading) => (
-                    <TableHead key={heading} scope="col" className={headCell}>
+                    <TableHead
+                      key={heading}
+                      scope="col"
+                      className={tableHeadClass}
+                    >
                       {heading}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {DAYS.map((d, index) => {
-                  const current = index === chosen
+                {days.map((d, index) => {
+                  const isChosen = index === chosen
                   return (
                     <TableRow
-                      key={d.date}
-                      aria-current={current ? "true" : undefined}
+                      key={d.iso}
+                      aria-current={isChosen ? "true" : undefined}
                       className={
-                        current
+                        isChosen
                           ? "bg-accent hover:bg-accent"
                           : "hover:bg-transparent"
                       }
                     >
                       <TableCell
-                        className={cn(bodyCell, current && "font-bold")}
+                        className={cn(tableCellClass, isChosen && "font-bold")}
                       >
-                        <time dateTime={d.date}>{d.shortDate}</time>
+                        <time dateTime={d.iso}>{d.short}</time>
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.swell.height} ft
+                      <TableCell className={cn(tableCellClass, "tabular-nums")}>
+                        {d.swell.value} {d.swell.unit}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.swell.period} s
+                      <TableCell className={cn(tableCellClass, "tabular-nums")}>
+                        {d.period}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.wind.speed} mph
+                      <TableCell className={cn(tableCellClass, "tabular-nums")}>
+                        {d.wind.value} {d.wind.unit}
                       </TableCell>
-                      <TableCell className={bodyCell}>
-                        {d.wind.direction}, {d.wind.aspect.toLowerCase()}
+                      <TableCell className={tableCellClass}>
+                        {d.wind.table}
                       </TableCell>
-                      <TableCell className={bodyCell}>
-                        {index === BEST_DAY_INDEX ? (
+                      <TableCell className={tableCellClass}>
+                        {d.best ? (
                           <span className="inline-flex items-center gap-2">
                             {d.rating}
                             <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase">
@@ -494,19 +519,18 @@ export function App() {
               </TableBody>
             </Table>
           </div>
-
           <div className="flex flex-wrap items-center gap-4">
             <a
               href="/booking"
               className={cn(
                 buttonVariants({ variant: "default" }),
-                buttonClasses,
+                buttonClass,
                 "w-full md:w-auto"
               )}
             >
               Book a lesson
             </a>
-            <p className="max-w-xl text-body">
+            <p className="text-body">
               Lessons run every day. We set the start time by the tide.
             </p>
           </div>
@@ -526,11 +550,14 @@ export function App() {
               The Boat Shed · Beach Road · Pentarrow Sands · ZP7 3SB
             </p>
             <p className="text-body">
-              <a href="tel:+441632960418" className={inlineLink}>
+              <a href="tel:+441632960418" className={textLinkClass}>
                 01632 960 418
               </a>{" "}
               ·{" "}
-              <a href="mailto:hello@sandhopper.example" className={inlineLink}>
+              <a
+                href="mailto:hello@sandhopper.example"
+                className={cn(textLinkClass, "wrap-break-word")}
+              >
                 hello@sandhopper.example
               </a>
             </p>

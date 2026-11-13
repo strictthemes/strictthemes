@@ -10,7 +10,7 @@ checks:
   - The cards on the page hold no poster or still, and no card sits inside another.
 ---
 
-Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. The season is "Ilse Varga: the night films", a retrospective of an invented Hungarian director, six of her films shot mostly after dark, shown on Friday 20 November, Friday 27 November, Tuesday 1 December, Friday 4 December, Friday 11 December and Friday 18 December 2026, all at 20:30 on Screen 2. The films: "Corridor Light" (1989, 94 min), "The Long Blue" (1998, 142 min), "Kestrel Street" (2003, 101 min), "Winter Switchboard" (2009, 117 min), "The Last Tram Home" (2014, 88 min) and "Small Fires" (2019, 109 min). The first four films are shown on 35mm prints; "The Last Tram Home" and "Small Fires" were shot on digital and are shown that way. The season is curated by Petra Lindqvist, the Vesper's programmer. A season pass costs £38 for all six films, £30 for members.
+Sample content, if the user gave none: **The Vesper**, an independent cinema with three screens and a late bar at 21 Tallow Row, Oldmere. The season is "Ilse Varga: the night films", a retrospective of an invented Hungarian director, six of her films, all made in Hungary and shot mostly after dark, shown on Friday 20 November, Friday 27 November, Tuesday 1 December, Friday 4 December, Friday 11 December and Friday 18 December 2026, all at 20:30 on Screen 2. The films: "Corridor Light" (1989, 94 min), "The Long Blue" (1998, 142 min), "Kestrel Street" (2003, 101 min), "Winter Switchboard" (2009, 117 min), "The Last Tram Home" (2014, 88 min) and "Small Fires" (2019, 109 min). The first four films are shown on 35mm prints; "The Last Tram Home" and "Small Fires" were shot on digital and are shown that way. The season is curated by Petra Lindqvist, the Vesper's programmer. A season pass costs £38 for all six films, £30 for members.
 
 Build these parts in order.
 
@@ -22,7 +22,7 @@ The header from the layout notes. "Seasons" is the current page.
 
 The first `<section>`, a grid (`md:grid-cols-12`):
 
-- A `<div>` in `md:col-span-7` (columns 1–7): a label "Season · 20 Nov – 18 Dec 2026", in `text-muted-foreground`, built from two `<time>` elements; with `mt-2`, the `<h1>` "Ilse Varga: the night films" in `text-h1 md:text-display`; with `mt-6`, three paragraphs of introduction to read, each within `max-w-xl`, the second and third with `mt-4`. They say who Varga is, why these six films belong together (night, small rooms, people waiting for something), and how the season is shown (in order, the first four on 35mm prints, the last two digital); then, still in this `<div>`, with `mt-4`, a credits line from the layout notes, a `<p>` in `text-body text-muted-foreground`: "Curated by Petra Lindqvist" (not a label, so the name is not uppercased).
+- A `<div>` in `md:col-span-7` (columns 1–7): a label "Season · 20 Nov – 18 Dec 2026", in `text-muted-foreground`, built from two `<time>` elements, the year inside the second (`<time dateTime="2026-12-18">18 Dec 2026</time>`); with `mt-2`, the `<h1>` "Ilse Varga: the night films" in `text-h1 md:text-display`; with `mt-6` (one step more than the rhythm's `mt-4`, under the large title, on purpose), three paragraphs of introduction to read, each within `max-w-xl`, the second and third with `mt-4`. They say who Varga is, why these six films belong together (night, small rooms, people waiting for something), and how the season is shown (in order, the first four on 35mm prints, the last two digital); then, still in this `<div>`, with `mt-4`, a credits line from the layout notes, a `<p>` in `text-body text-muted-foreground`: "Curated by Petra Lindqvist" (not a label, so the name is not uppercased).
 - The season pass card (part 4 below), with `mt-12 md:mt-0`, in `md:col-span-5` (columns 8–12) and from `lg` up in `lg:col-span-4 lg:col-start-9` (columns 9–12). From `md` up it stands beside the introduction, at the top of the row; below `md` it comes after the introduction. Give it `md:self-start`, so it keeps its own height.
 
 ### 3. The films
@@ -43,7 +43,7 @@ On a phone the row is the poster at `w-24` with the text beside it.
 
 A card from the layout notes, holding, in order:
 
-- A label "Season pass".
+- A label "Season pass" in `text-muted-foreground`.
 - With `mt-2`, the price as a `<p>` in `font-heading text-h1 tabular-nums`: `£38`. With `mt-2`, a label in `text-muted-foreground`: `Six films · £30 for members`.
 - With `mt-4`, a `<ul>` of what the pass includes, in words, `list-disc pl-4` in `text-body`, with `mt-2` on every item but the first: a seat at all six screenings, the same seat each night if you want it, a printed programme with an essay by Petra Lindqvist, and 10% off at the bar on season nights.
 - With `mt-6`, the default-variant link "Buy a season pass" (to `#`), full width, `w-full whitespace-normal text-center`: the sample label fits on one line at every width, and these classes let a longer label from the user's content wrap instead of overflowing, since the stock button does not wrap its text. It is the page's one gold action.

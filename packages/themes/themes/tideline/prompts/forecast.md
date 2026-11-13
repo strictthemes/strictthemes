@@ -46,7 +46,7 @@ A full-width section with its `aria-labelledby` pointing at the `<h2>`. In the s
 **The conditions,** a color block in lagoon, a `<div>`, as the layout notes describe it. The block element itself carries `bg-lagoon text-lagoon-foreground`; nothing inside it gets a text color class of its own. In the block's `gap-6`, for the chosen day:
 
 - A heading group: the day's date as a label, `Thursday 17 June 2027`, a `<time dateTime="2027-06-17">`, over an `<h3>` in `text-h2`, the day's heading: "Good: clean and waist high".
-- The conditions, as the Conditions note describes them, with the figures in `text-h1 lg:text-display`, larger than anywhere else on these pages. Four facts, `Tide`, `Swell`, `Wind` and `Water`, each with the day's figure, unit and note from the sample. The tide's figure is a `<time dateTime="13:34">`, and the time in its note is a `<time>` too.
+- The conditions, as the Conditions note describes them, with the figures in `text-h1 lg:text-display`, larger than anywhere else on these pages. Four facts, `Tide`, `Swell`, `Wind` and `Water`, each with the day's figure, unit and note from the sample. The tide's figure is a `<time dateTime="13:34">`, and the time in its note is a `<time>` too. In every day of the sample the tide figure is the day's third tide and the `High at` in its note the fourth, so both may be read from the day's tides.
 - The day's sentence, one paragraph in `text-body` with `max-w-xl`.
 
 At 375px the four facts stand two to a row, and a unit that does not fit beside its figure wraps under it.

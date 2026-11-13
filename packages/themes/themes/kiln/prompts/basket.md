@@ -26,7 +26,7 @@ The first section of `<main>`: the `<h1>` in `text-h1`, "Your basket", and with 
 
 In the same section as the title, with `mt-6`, a 12-column grid with `md:items-start`. Below `md` the summary comes under the lines and the note, with `mt-10 md:mt-0`.
 
-**Lines**, columns 1–7. A visually hidden `<h2>`, "Pieces in your basket", then a `<ul>` with no markers and no gap. Each line is an `<li>` with a 1px top border and `py-6`; the last also has a 1px bottom border. A line is a row, `flex gap-4`:
+**Lines**, columns 1–7. A visually hidden `<h2>`, "Pieces in your basket", then a `<ul>` with no markers and no gap. Each line is an `<li>` with `border-t py-6 last:border-b`: a 1px top border, and the last also a bottom one. A line is a row, `flex gap-4`:
 
 - A picture as the Pictures note says, `size-20 shrink-0 rounded-xl border` (square, in place of the note's aspect class), the piece in the shape for its kind and the fill for its glaze (Ash is pale, Iron dark), with an `aria-label` such as "Moor mug in ash glaze".
 - Beside it, a column with `min-w-0 flex-1`:
@@ -47,10 +47,10 @@ At 375px the picture keeps its size and the quantity row wraps.
 - With `mt-6` a link styled as the default button, "Go to checkout", `w-full`, to `/checkout`. It is the page's one terracotta button. There is no payment form on this page.
 - With `mt-4` helper text: "You pay on the next page."
 
-**Empty basket.** When the last line is removed, the lines, the note and the summary are not rendered, and in their place, across columns 1–7, stands:
+**Empty basket.** When the last line is removed, the lines, the note and the summary are not rendered, and in their place, across columns 1–7, stands the following. The status element stays where it is, above, so the removal message still shows.
 
 - An `<h2>` in `text-h2` with `tabIndex={-1}`: "Your basket is empty".
-- With `mt-4` one sentence: the next firing comes out in early December.
+- With `mt-4` one sentence: "The next firing comes out of the kiln in early December."
 - With `mt-6` a link styled as a `secondary` button, "Back to the shop", to `/`.
 
 ### 4. Footer

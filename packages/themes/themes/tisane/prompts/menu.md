@@ -34,7 +34,7 @@ The first section, with `pt-10`, in columns 1–8 of a grid (`grid gap-6 md:grid
 Still in the opening's `<div>` that spans columns 1–8, after its sentences, a `<div>` with `mt-6` that holds the filter and its status line:
 
 - A button group with the `aria-label` "Show", holding three buttons: "All", "Vegan", "Gluten-free". "All" is chosen when the page opens.
-- With `mt-4`, a `<p>` with `role="status"` in `font-mono text-label text-muted-foreground`, saying how many items are shown: `Showing all 13 items`, `Showing 9 vegan items` or `Showing 7 gluten-free items`, and at one item `Showing 1 vegan item`. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
+- With `mt-4`, a `<p>` with `role="status"` in `font-mono text-label text-muted-foreground`, saying how many items are shown: `Showing all 13 items`, `Showing 9 vegan items` or `Showing 7 gluten-free items`, and at one item `Showing 1 vegan item`: the filter's name in lowercase, and `item` at one, `items` otherwise. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
 
 No button on this page disables itself, so it needs no `focusableWhenDisabled` and no `data-disabled:` edit.
 
@@ -47,7 +47,7 @@ A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
 
 Each list is a list of rows as the layout notes describe, with `py-4` on each row. A row holds:
 
-- On the left, a `<div>` with `min-w-0`: the item's name as an `<h3>` in `text-body`; with `mt-2` the note as a `<p>` in `text-body`; with `mt-2` the dietary marks as a label in `text-muted-foreground`, joined with ` · `, for example `Vegan · Gluten-free`. An item with no mark has no label line.
+- On the left, a `<div>` with `min-w-0`: the item's name as an `<h3>` in `text-body`; with `mt-2` (not the notes' `mt-4`: name, note and marks read as one item) the note as a `<p>` in `text-body`; with `mt-2` the dietary marks as a label in `text-muted-foreground`, joined with ` · `, for example `Vegan · Gluten-free`. A mark shows only where the sample gives it: a vegan item does not also show `Vegetarian`. An item with no mark has no label line.
 - On the right, the price, a label in `text-foreground` with `tabular-nums` and `shrink-0`.
 
 The name and the price stay on one row at every width: the left `<div>` wraps its own text, the price never wraps.

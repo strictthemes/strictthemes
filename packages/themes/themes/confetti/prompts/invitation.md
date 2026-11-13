@@ -21,7 +21,7 @@ The header from the layout notes. No link is the current page here: the names ar
 
 ### 2. Opening
 
-A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. This one block is centered: add `items-center text-center`, and here, in place of the block's `md:p-10`, `md:px-10 md:py-22`, so it stands like the front of a card. The block element itself carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. In the block's `gap-6`, two groups:
+A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. This one block is centered: add `items-center text-center`, and here, in place of the block's `md:p-10`, `md:px-10 md:py-22`, so it stands like the front of a card. The `<section>` is the block element, and it carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. In the block's `gap-6`, two groups:
 
 - A `flex flex-col items-center gap-3` holding a `flex flex-col items-center gap-2` with a label, `Together with their families`, and under it the `<h1>` "Clem & Rafe" in `text-h1 md:text-display`; then one sentence in `text-body` with `max-w-xl`: "would love you to be there on the day they marry."
 - A `flex flex-col items-center gap-2` holding the date as a `<p>` in `font-heading text-h2 md:text-h1`, its words a `<time dateTime="2027-07-17">Saturday 17 July 2027</time>`, and under it a label: `14:00 · Quillbrook Barn, Little Saltry`, the time a `<time dateTime="14:00">`.

@@ -12,7 +12,7 @@ checks:
   - At 375px the hours table and the map fit the screen without the page scrolling sideways.
 ---
 
-Sample content, if the user gave none: "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold, AW3 7LN, on the corner of Mill Lane and Station Road, opposite Orchard Park. Phone 01632 960 418, email hello@lindenroom.example. Open Tuesday to Friday 9:00–17:00, Saturday 9:00–18:00, Sunday 10:00–16:00, closed on Mondays; the kitchen serves plates from 11:30 to 14:30. Ashby Wold station is a four-minute walk; the 12 and 31 buses stop outside the park.
+Sample content, if the user gave none: "The Linden Room", a tea room and shop at 14 Mill Lane, Ashby Wold, AW3 7LN, on the corner of Mill Lane and Station Road, opposite Orchard Park. Phone 01632 960 418, email hello@lindenroom.example. Open Tuesday to Friday 9:00–17:00, Saturday 9:00–18:00, Sunday 10:00–16:00, closed on Mondays; the kitchen serves plates from 11:30 to 14:30 on every open day, Sunday included. Ashby Wold station is a four-minute walk; the 12 and 31 buses stop outside the park.
 
 Build these parts in order.
 
@@ -35,7 +35,7 @@ A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
 
 Today's row gets `aria-current="date"`, and its day cell holds, under the day's name, the word `Today` as a `<span>` with `block font-mono text-label text-primary` and no margin. No fill, no bold. Take today from the visitor's clock.
 
-At 375px the table fits: `whitespace-nowrap` on every Room and Kitchen cell, Monday's `Closed` included; the day cell wraps.
+At 375px the table fits: `whitespace-nowrap` on every Room and Kitchen cell, Monday's `Closed` included, in place of the notes' `whitespace-normal`; the day cell wraps.
 
 ### 4. Getting here
 
@@ -46,7 +46,7 @@ A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
 
 **The map.** A `<div>` with `relative aspect-4/3 overflow-hidden rounded-xl border bg-muted`, `role="img"`, the `aria-label` "Map of the streets around The Linden Room", and `aria-describedby` pointing at the directions paragraph. Draw it with absolutely placed plain elements, using only the classes below: fractions of the box and `inset-*-0`, no translate and no arbitrary values. No shape is round:
 
-- Two streets, each a strip in `bg-background`: Station Road across the box (`absolute inset-x-0 top-1/2 h-4`) and Mill Lane down it (`absolute inset-y-0 left-1/4 w-4`).
+- Two streets, each a strip in `bg-background` edged with 1px `border-muted-foreground` lines along its length: Mill Lane down the box (`absolute inset-y-0 left-1/4 w-4 border-x`), then Station Road across it (`absolute inset-x-0 top-1/2 h-4 border-y`), written after Mill Lane so it runs unbroken through the corner. Here, in place of the Rules note's `border-border`: oat on the map's fill is about 1.1:1, and the edges make the streets read at over 3:1 in both modes.
 - The railway, a thin strip in `bg-secondary` along the top (`absolute inset-x-0 top-1/6 h-1`).
 - Orchard Park, a block in `bg-card` with a 1px border and square corners, in the lower right (`absolute right-1/12 bottom-1/12 flex h-1/5 w-2/5 items-center justify-center`), holding its name tag.
 - The tea room, just below the corner of the two streets: a `<div>` with `absolute top-7/12 left-1/4 flex items-center gap-1` holding the `MapPin` icon in `text-primary` with `size-6` (here, instead of the notes' `size-4`), `strokeWidth={1.5}` and `aria-hidden="true"`, and a tag reading `The Linden Room`.
@@ -69,7 +69,7 @@ A section with `mt-18` and the `id` `contact`, in columns 1–7 of a grid: an `<
 - "About": a `Select` as the layout notes describe, with the placeholder "Choose a subject" and the items "A booking", "Buying tea", "Access", "Something else".
 - "Message": a `Textarea` with `min-h-48`.
 
-Then, in the notes' `<div>` with `mt-6`, the page's one default button, `type="submit"`: "Send message".
+Then, in the `<div>` with `mt-6` that the Forms note gives it, the page's one default button, `type="submit"`: "Send message".
 
 ### 7. Footer
 

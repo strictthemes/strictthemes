@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils"
 
 type DocType = "Data sheet" | "CAD file" | "Certificate"
-type Filter = "All" | DocType
+type Filter = "all" | DocType
 
 type Doc = {
   title: string
@@ -22,11 +22,11 @@ type Doc = {
   revision: string
   date: string
   dateTime: string
-  size: string
+  sizeMb: string
 }
 
 // Newest first.
-const documents: Doc[] = [
+const DOCUMENTS: Doc[] = [
   {
     title: "TVL-2552-RS data sheet",
     type: "Data sheet",
@@ -34,7 +34,7 @@ const documents: Doc[] = [
     revision: "Rev A",
     date: "21 Oct 2026",
     dateTime: "2026-10-21",
-    size: "0.91",
+    sizeMb: "0.91",
   },
   {
     title: "TVL-2552-RS 3D model",
@@ -43,7 +43,7 @@ const documents: Doc[] = [
     revision: "Rev A",
     date: "21 Oct 2026",
     dateTime: "2026-10-21",
-    size: "1.75",
+    sizeMb: "1.75",
   },
   {
     title: "TVL range catalogue",
@@ -52,7 +52,7 @@ const documents: Doc[] = [
     revision: "Rev D",
     date: "2 Oct 2026",
     dateTime: "2026-10-02",
-    size: "2.40",
+    sizeMb: "2.40",
   },
   {
     title: "TVL range 2D outlines",
@@ -61,7 +61,7 @@ const documents: Doc[] = [
     revision: "Rev D",
     date: "2 Oct 2026",
     dateTime: "2026-10-02",
-    size: "0.36",
+    sizeMb: "0.36",
   },
   {
     title: "Material declaration, REACH and RoHS",
@@ -70,7 +70,7 @@ const documents: Doc[] = [
     revision: "Rev B",
     date: "28 Sep 2026",
     dateTime: "2026-09-28",
-    size: "0.29",
+    sizeMb: "0.29",
   },
   {
     title: "TVL-2047-RS data sheet",
@@ -79,7 +79,7 @@ const documents: Doc[] = [
     revision: "Rev C",
     date: "14 Sep 2026",
     dateTime: "2026-09-14",
-    size: "0.84",
+    sizeMb: "0.84",
   },
   {
     title: "TVL-2047-RS 3D model",
@@ -88,7 +88,7 @@ const documents: Doc[] = [
     revision: "Rev C",
     date: "14 Sep 2026",
     dateTime: "2026-09-14",
-    size: "1.62",
+    sizeMb: "1.62",
   },
   {
     title: "TVL-3572-ZZ data sheet",
@@ -97,7 +97,7 @@ const documents: Doc[] = [
     revision: "Rev B",
     date: "9 Sep 2026",
     dateTime: "2026-09-09",
-    size: "0.88",
+    sizeMb: "0.88",
   },
   {
     title: "Certificate of conformity, 2026",
@@ -106,7 +106,7 @@ const documents: Doc[] = [
     revision: "Rev A",
     date: "4 Sep 2026",
     dateTime: "2026-09-04",
-    size: "0.21",
+    sizeMb: "0.21",
   },
   {
     title: "ISO 9001 certificate, Brigholt works",
@@ -115,183 +115,160 @@ const documents: Doc[] = [
     revision: "Rev C",
     date: "1 Sep 2026",
     dateTime: "2026-09-01",
-    size: "0.47",
+    sizeMb: "0.47",
   },
 ]
 
-const countOf = (filter: Filter) =>
-  filter === "All"
-    ? documents.length
-    : documents.filter((doc) => doc.type === filter).length
-
-const filters: { value: Filter; name: string }[] = [
-  { value: "All", name: "All" },
-  { value: "Data sheet", name: "Data sheets" },
-  { value: "CAD file", name: "CAD files" },
-  { value: "Certificate", name: "Certificates" },
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "Data sheet", label: "Data sheets" },
+  { value: "CAD file", label: "CAD files" },
+  { value: "Certificate", label: "Certificates" },
 ]
 
-const formats = [
+const FORMATS: { format: string; text: string }[] = [
+  { format: "PDF", text: "Data sheets and certificates, for any PDF reader." },
+  { format: "STEP", text: "3D models for any CAD system, in millimetres." },
   {
-    name: "PDF",
-    text: "Data sheets and certificates, for any PDF reader.",
-  },
-  {
-    name: "STEP",
-    text: "3D models for any CAD system, in millimetres.",
-  },
-  {
-    name: "DXF",
+    format: "DXF",
     text: "2D outlines of every size in the range, for drawing packages.",
   },
 ]
 
-const navLinks = [
-  { name: "Catalogue", href: "/catalogue" },
-  { name: "Compare", href: "/compare" },
-  { name: "Downloads", href: "/downloads" },
-  { name: "Quote", href: "/quote" },
+const NAV_LINKS = [
+  { label: "Catalogue", href: "/catalogue" },
+  { label: "Compare", href: "/compare" },
+  { label: "Downloads", href: "/downloads" },
+  { label: "Quote", href: "/quote" },
 ]
+const CURRENT_HREF = "/downloads"
 
-const currentPage = "/downloads"
-
-const focusRing =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const TEXT_LINK = cn(
+  "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
+  FOCUS
+)
+const LABEL = "font-mono text-label text-muted-foreground"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const CONTAINER = "mx-auto w-full max-w-[1280px] px-4"
+const BUTTON_TEXT = "px-4 font-mono text-label"
 
-const container = "mx-auto w-full max-w-[1280px] px-4"
-
-const smallFigure =
-  "font-mono text-label tabular-nums text-muted-foreground"
-
-const textLink =
-  "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2"
-
-const headCell = "px-4 font-mono text-label text-muted-foreground"
-
-const bodyCell = "px-4 py-2"
-
-function documentCount(count: number) {
-  return `${count} ${count === 1 ? "document" : "documents"}`
+function documentsWord(n: number) {
+  return n === 1 ? "document" : "documents"
 }
 
-function navLinkClass(href: string) {
-  return cn(
-    "font-mono text-label transition-colors duration-150",
-    href === currentPage
-      ? "text-foreground underline underline-offset-4"
-      : "text-muted-foreground hover:text-foreground",
-    focusRing
+function countOf(type: Filter) {
+  return type === "all"
+    ? DOCUMENTS.length
+    : DOCUMENTS.filter((d) => d.type === type).length
+}
+
+function NavLinks({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <ul className={mobile ? "py-2" : "flex gap-6"}>
+      {NAV_LINKS.map((link) => {
+        const current = link.href === CURRENT_HREF
+        return (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              aria-current={current ? "page" : undefined}
+              className={cn(
+                "font-mono text-label transition-colors duration-150",
+                mobile && "block py-2",
+                current
+                  ? "text-foreground underline underline-offset-4"
+                  : "text-muted-foreground hover:text-foreground",
+                FOCUS
+              )}
+            >
+              {link.label}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [filter, setFilter] = useState<Filter>("All")
-  const menuButton = useRef<HTMLButtonElement>(null)
+  const [filter, setFilter] = useState<Filter>("all")
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   const shown =
-    filter === "All"
-      ? documents
-      : documents.filter((doc) => doc.type === filter)
+    filter === "all" ? DOCUMENTS : DOCUMENTS.filter((d) => d.type === filter)
+  const countText =
+    filter === "all"
+      ? `${DOCUMENTS.length} ${documentsWord(DOCUMENTS.length)}`
+      : `${shown.length} of ${DOCUMENTS.length} ${documentsWord(DOCUMENTS.length)}`
 
-  // Escape closes the menu while focus is in it or on its button.
-  function closeOnEscape(event: KeyboardEvent<HTMLElement>) {
-    if (event.key === "Escape" && menuOpen) {
-      setMenuOpen(false)
-      menuButton.current?.focus()
-    }
+  function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButtonRef.current?.focus()
   }
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <header className="border-b border-border bg-card">
-        <div className={cn(container, "flex items-center gap-6 py-3")}>
+      <header
+        className="border-b border-border bg-card"
+        onKeyDown={onHeaderKeyDown}
+      >
+        <div className={cn(CONTAINER, "flex items-center gap-6 py-3")}>
           <a
             href="/catalogue"
-            className={cn("font-heading text-h2 text-foreground", focusRing)}
+            className={cn(
+              "font-heading text-h2 text-foreground transition-colors duration-150",
+              FOCUS
+            )}
           >
             Torvale
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-6">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={
-                      link.href === currentPage ? "page" : undefined
-                    }
-                    className={navLinkClass(link.href)}
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <NavLinks />
           </nav>
-          <p className={cn(smallFigure, "ml-auto hidden md:block")}>
+          <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
             Sales 01632 960 418
           </p>
           <Button
-            ref={menuButton}
+            ref={menuButtonRef}
             variant="secondary"
-            className="ml-auto px-4 font-mono text-label md:hidden"
             aria-expanded={menuOpen}
-            aria-controls="main-menu"
+            aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
-            onKeyDown={closeOnEscape}
+            className={cn(BUTTON_TEXT, "ml-auto md:hidden")}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="main-menu"
+          id="mobile-nav"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
-          onKeyDown={closeOnEscape}
         >
-          <div className={container}>
-            <ul className="py-2">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={
-                      link.href === currentPage ? "page" : undefined
-                    }
-                    className={cn(navLinkClass(link.href), "block py-2")}
-                  >
-                    {link.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
+          <div className={CONTAINER}>
+            <NavLinks mobile />
           </div>
         </nav>
       </header>
 
       <main className="flex-1 py-6">
-        <div className={cn(container, "flex flex-col gap-6")}>
+        <div className={cn(CONTAINER, "flex flex-col gap-6")}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className="font-mono text-label text-muted-foreground">
-                Downloads
-              </p>
+              <p className={LABEL}>Downloads</p>
               <h1 className="text-h1">TVL range documents</h1>
-              <p className={smallFigure}>
-                Deep groove ball bearings · {documentCount(documents.length)} ·
-                updated <time dateTime="2026-10-21">21 Oct 2026</time>
+              <p className={SMALL_FIGURE}>
+                Deep groove ball bearings · {DOCUMENTS.length}{" "}
+                {documentsWord(DOCUMENTS.length)} · updated{" "}
+                <time dateTime="2026-10-21">21 Oct 2026</time>
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <a
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "px-4 font-mono text-label"
-                )}
-              >
+              <a href="#" className={cn(buttonVariants(), BUTTON_TEXT)}>
                 <Download
                   className="size-4"
                   strokeWidth={1.5}
@@ -303,31 +280,37 @@ export function App() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
+            <section
+              aria-labelledby="documents-heading"
+              className="flex flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-9"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 className="text-h2">Documents</h2>
+                <h2 id="documents-heading" className="text-h2">
+                  Documents
+                </h2>
                 <div className="flex flex-wrap items-center gap-3">
                   <div
                     role="group"
                     aria-label="Document type"
                     className="flex flex-wrap gap-1"
                   >
-                    {filters.map((item) => (
+                    {FILTERS.map((f) => (
                       <Button
-                        key={item.value}
+                        key={f.value}
                         variant="secondary"
-                        aria-pressed={filter === item.value}
-                        className="px-4 font-mono text-label aria-pressed:border-foreground aria-pressed:font-bold"
-                        onClick={() => setFilter(item.value)}
+                        aria-pressed={filter === f.value}
+                        onClick={() => setFilter(f.value)}
+                        className={cn(
+                          BUTTON_TEXT,
+                          "aria-pressed:border-foreground aria-pressed:font-bold"
+                        )}
                       >
-                        {item.name} ({countOf(item.value)})
+                        {f.label} ({countOf(f.value)})
                       </Button>
                     ))}
                   </div>
-                  <p aria-live="polite" className={smallFigure}>
-                    {filter === "All"
-                      ? documentCount(documents.length)
-                      : `${shown.length} of ${documentCount(documents.length)}`}
+                  <p aria-live="polite" className={SMALL_FIGURE}>
+                    {countText}
                   </p>
                 </div>
               </div>
@@ -335,17 +318,19 @@ export function App() {
               <Table label="Documents" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn(headCell, "min-w-48")}>
+                    <TableHead className={cn(LABEL, "min-w-48 px-4")}>
                       Document
                     </TableHead>
-                    <TableHead className={headCell}>Type</TableHead>
-                    <TableHead className={headCell}>Format</TableHead>
-                    <TableHead className={headCell}>Revision</TableHead>
-                    <TableHead className={headCell}>Date</TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead className={cn(LABEL, "px-4")}>Type</TableHead>
+                    <TableHead className={cn(LABEL, "px-4")}>Format</TableHead>
+                    <TableHead className={cn(LABEL, "px-4")}>
+                      Revision
+                    </TableHead>
+                    <TableHead className={cn(LABEL, "px-4")}>Date</TableHead>
+                    <TableHead className={cn(LABEL, "px-4 text-right")}>
                       Size (MB)
                     </TableHead>
-                    <TableHead className={headCell}>
+                    <TableHead className={cn(LABEL, "px-4")}>
                       <span className="sr-only">File</span>
                     </TableHead>
                   </TableRow>
@@ -353,45 +338,32 @@ export function App() {
                 <TableBody>
                   {shown.map((doc) => (
                     <TableRow key={doc.title}>
-                      <TableCell
-                        className={cn(bodyCell, "text-body whitespace-normal")}
-                      >
+                      <TableCell className="px-4 py-2 text-body whitespace-normal">
                         {doc.title}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "text-body")}>
+                      <TableCell className="px-4 py-2 text-body">
                         {doc.type}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "font-mono")}>
+                      <TableCell className="px-4 py-2 font-mono">
                         {doc.format}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "font-mono")}>
+                      <TableCell className="px-4 py-2 font-mono">
                         {doc.revision}
                       </TableCell>
-                      <TableCell className={bodyCell}>
-                        <time
-                          dateTime={doc.dateTime}
-                          className="font-mono tabular-nums"
-                        >
-                          {doc.date}
-                        </time>
+                      <TableCell className="px-4 py-2 font-mono tabular-nums">
+                        <time dateTime={doc.dateTime}>{doc.date}</time>
                       </TableCell>
-                      <TableCell
-                        className={cn(
-                          bodyCell,
-                          "text-right font-mono tabular-nums"
-                        )}
-                      >
-                        {doc.size}
+                      <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                        {doc.sizeMb}
                       </TableCell>
-                      <TableCell className={bodyCell}>
+                      <TableCell className="px-4 py-2 text-left">
                         <a
                           href="#"
                           download
-                          aria-label={`Download ${doc.title}, ${doc.format}, ${doc.size} MB`}
+                          aria-label={`Download ${doc.title}, ${doc.format}, ${doc.sizeMb} MB`}
                           className={cn(
-                            "inline-flex items-center gap-2 font-mono text-label",
-                            textLink,
-                            focusRing
+                            TEXT_LINK,
+                            "inline-flex items-center gap-2 font-mono text-label"
                           )}
                         >
                           <Download
@@ -407,44 +379,51 @@ export function App() {
                 </TableBody>
               </Table>
 
-              <div className="border-t border-border px-4 py-3">
-                <p className={smallFigure}>
-                  Each file shows its revision on its first page. Older
-                  revisions are sent on request.
-                </p>
-              </div>
-            </div>
+              <p
+                className={cn(SMALL_FIGURE, "border-t border-border px-4 py-3")}
+              >
+                Each file shows its revision on its first page. Older revisions
+                are sent on request.
+              </p>
+            </section>
 
-            <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-3">
+            <section
+              aria-labelledby="formats-heading"
+              className="flex flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-3"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 className="text-h2">File formats</h2>
+                <h2 id="formats-heading" className="text-h2">
+                  File formats
+                </h2>
               </div>
               <dl>
-                {formats.map((format, index) => (
+                {FORMATS.map((f, i) => (
                   <div
-                    key={format.name}
+                    key={f.format}
                     className={cn(
                       "flex flex-col gap-1 px-4 py-3",
-                      index > 0 && "border-t border-border"
+                      i > 0 && "border-t border-border"
                     )}
                   >
                     <dt className="font-mono text-label text-foreground">
-                      {format.name}
+                      {f.format}
                     </dt>
-                    <dd className="text-body">{format.text}</dd>
+                    <dd className="max-w-lg text-body text-foreground">
+                      {f.text}
+                    </dd>
                   </div>
                 ))}
               </dl>
-            </div>
+            </section>
           </div>
         </div>
       </main>
 
       <footer className="border-t border-border">
-        <div className={cn(container, "py-6")}>
-          <p className={smallFigure}>
-            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A
-            demo: nothing is sold or sent.
+        <div className={cn(CONTAINER, "py-6")}>
+          <p className={SMALL_FIGURE}>
+            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
+            nothing is sold or sent.
           </p>
         </div>
       </footer>

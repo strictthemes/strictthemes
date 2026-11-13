@@ -55,7 +55,7 @@ A section in the grid, with two parts:
 A section in the grid, with its content in columns 1–7 (`md:col-span-7`):
 
 - An `<h2>` in `text-h2`: "Admissions and education".
-- With `mt-8`, a `<dl>` as the layout notes describe it, with five rows, oldest last. Each `<dt>` holds the year in a `<time>` (`<time dateTime="2026">2026</time>`) with `tabular-nums`, and each `<dd>` one line in `text-body`:
+- With `mt-8`, a `<dl>` as the layout notes describe it, with five rows, oldest last. Each `<dt>` has `tabular-nums` and holds the year in a `<time>` (`<time dateTime="2026">2026</time>`), and each `<dd>` one line in `text-body`:
   - `2026`: Partner, Harrow & Vane LLP
   - `2019`: Higher rights of audience, civil proceedings
   - `2013`: Admitted as a solicitor in England and Wales

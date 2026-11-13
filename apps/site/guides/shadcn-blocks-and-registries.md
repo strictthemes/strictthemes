@@ -63,7 +63,7 @@ The three words get mixed up, so here is the difference in what you receive:
 
 | File in the item | Type | Lines | Where it landed |
 |---|---|---|---|
-| `components/kiln-shop/page.tsx` | `registry:component` | 558 | `src/components/kiln-shop/page.tsx` (new) |
+| `components/kiln-shop/page.tsx` | `registry:component` | 567 | `src/components/kiln-shop/page.tsx` (new) |
 | `components/ui/badge.tsx` | `registry:ui` | 52 | `src/components/ui/badge.tsx` (new) |
 | `components/ui/input.tsx` | `registry:ui` | 20 | `src/components/ui/input.tsx` (new) |
 | `components/ui/button.tsx` | `registry:ui` | 58 | `src/components/ui/button.tsx` (overwritten) |
@@ -155,7 +155,7 @@ Rendered pages: / in light and dark mode at 1280px and 375px, also on hover and 
   layout           4 checked  all on theme
   states          90 checked  all on theme
 
-Passed: 100% of 4143 measured values follow the theme. 0 errors, 0 warnings.
+Passed: 100% of 4422 measured values follow the theme. 0 errors, 0 warnings.
 ```
 
 That is the block untouched, with its made-up sample content. It says nothing about the page after you put your own content in: run it again then.

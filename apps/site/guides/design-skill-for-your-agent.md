@@ -38,11 +38,11 @@ Where the folder goes depends on the tool. The commands below write to `.claude/
 
 | Way | When it fits | Length |
 |---|---|---|
-| A theme's ready skill | You build in one of the [themes](/themes/) | 3,868 to 7,952 words |
+| A theme's ready skill | You build in one of the [themes](/themes/) | 4,630 to 8,669 words |
 | Generate one from your site | You have a site that already looks right | About 700 words |
 | Write one by hand | You have a spec and know your project's habits | Yours to decide |
 
-The first range is a word count of the 23 files `skills/strict-theme-*/SKILL.md` in the repo; the middle one, Cipher's, has 5,212 words.
+The first range is a word count of the 23 files `skills/strict-theme-*/SKILL.md` in the repo; the middle one, Sorbet's, has 5,977 words.
 
 ### A. Take a theme's ready skill
 
@@ -52,7 +52,7 @@ Each theme has a skill at `https://strictthemes.com/themes/<slug>/SKILL.md`, and
 curl -s --create-dirs -o .claude/skills/strict-theme-kiln/SKILL.md https://strictthemes.com/themes/kiln/SKILL.md
 ```
 
-That writes one file of 32,846 bytes.
+That writes one file of 38,115 bytes.
 
 A theme's skill is long because it carries more than tokens. Kiln's opens like this:
 

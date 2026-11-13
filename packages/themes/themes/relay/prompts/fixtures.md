@@ -67,7 +67,7 @@ A row is `flex items-center justify-between gap-5` with the row padding of the C
   - A match to come: the figure is the kick-off time, `15:00`, in a `<time>` with `dateTime="2027-06-12T15:00"`, and the label is `KICK-OFF`.
   - The match being played: the figure is the score so far, `1–0`, the badge says "Live", and the label is the minute, `35'`.
 
-Three rows differ from the rest:
+Three rows differ from the rest. Find them in code: a team's latest result is its last match with a final score, and its next match is its first match with no score that is not being played.
 
 - **The latest result** of the first team and of the under 18s has the badge "Final" before its score. The reserves' view has no "Final": its one badge is "Live". So each view has exactly one badge.
 - **The first team's latest result,** on 5 June, also ends its first line with a label link, "Match report", to `/report`. No other row has a link.

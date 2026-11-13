@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type FormEvent,
-  type ReactNode,
-} from "react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
 import { CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -15,7 +9,7 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const headerLink = cn(
+const navLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
@@ -25,100 +19,77 @@ const textLink = cn(
   focusRing
 )
 
-const label = "font-mono text-label text-muted-foreground"
-
 const fieldClass =
-  "h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
+  "mt-2 h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
+
+const labelClass = "block font-mono text-label"
 
 const numbers = [
-  { term: "Letters sent to readers", value: "214" },
-  { term: "Readers who pay for it", value: "1,260" },
+  { term: "Letters answered", value: "1,140" },
+  { term: "Paying readers", value: "3,862" },
   { term: "Years in print", value: "7" },
 ]
 
 const people = [
   {
-    initials: "MA",
-    name: "Marit Aalto",
-    role: "Editor · writes the long essays",
-    about:
-      "Marit spent eleven years restoring church organs before she started the magazine. She writes one long essay an issue, usually about a single job followed from start to finish, and edits everything else.",
+    initials: "MO",
+    name: "Maren Oduya",
+    role: "Editor",
+    bio: "Maren started the magazine after ten years editing trade journals about bridges and drainage. She chooses what we cover, edits every essay twice and answers the letters herself.",
   },
   {
-    initials: "JO",
-    name: "Jonah Okafor",
-    role: "Writer · keeps the journal",
-    about:
-      "Jonah is a former surveyor who now writes the journal, a short dispatch every fortnight from a workshop, a farm or a lab where something slow is under way. He answers most of the letters.",
+    initials: "TR",
+    name: "Tomas Reyle",
+    role: "Writer",
+    bio: "Tomas writes the long pieces, the ones that need a season of visits. He has followed a clockmaker, a hedge layer and a team relining a canal, and he still keeps the notebooks.",
   },
   {
-    initials: "PL",
-    name: "Paloma Lund",
-    role: "Designer · sets every page",
-    about:
-      "Paloma sets the type, draws the diagrams and looks after the printing. She also checks every number we publish, which is why corrections are rare.",
+    initials: "IF",
+    name: "Ines Fairlie",
+    role: "Designer and subeditor",
+    bio: "Ines sets each issue, checks every fact and date, and looks after the readers' accounts. She is the reason the printed copies arrive on time.",
   },
 ]
 
-const details: { term: string; value: ReactNode }[] = [
-  { term: "Typefaces", value: "Fraunces, Source Sans 3 and Source Code Pro" },
+const details = [
   {
-    term: "Published",
-    value: "Four printed issues a year, and an essay online each month",
+    term: "Typefaces",
+    value: <>Fraunces for headings, Source Sans 3 for text</>,
   },
-  {
-    term: "Paid for by",
-    value: "Its readers, at £36 a year, with no advertising",
-  },
+  { term: "Published", value: <>Four issues a year, in print and online</> },
+  { term: "Paid for by", value: <>Its readers, with no advertising</> },
   { term: "Since", value: <time dateTime="2019">2019</time> },
 ]
 
 const history = [
   {
     year: "2019",
-    text: "The first issue went out to 140 people, folded and posted by hand from a kitchen table.",
+    text: "Maren posted the first issue, twelve stapled pages, to 140 friends and former colleagues.",
   },
   {
     year: "2020",
-    text: "Jonah joined and the journal began, one short dispatch every two weeks.",
+    text: "Tomas joined and wrote a year-long piece on a family rebuilding a dry stone wall.",
   },
   {
     year: "2022",
-    text: "We dropped the last advertiser and asked readers to pay for the whole magazine.",
+    text: "Readers voted to drop the free tier, and the magazine has been paid for by them alone ever since.",
   },
   {
     year: "2024",
-    text: "Paloma redesigned the print edition and moved it to a printer two streets from the office.",
+    text: "Ines redesigned the print edition so that each issue fits in a coat pocket.",
   },
   {
     year: "2026",
-    text: "The magazine passed a thousand paying readers and sent its two hundredth letter.",
+    text: "The magazine passed 3,800 paying readers and published its twenty-eighth issue.",
   },
 ]
 
 type Field = "name" | "email" | "message"
 type Errors = Partial<Record<Field, string>>
 
-const fields: Field[] = ["name", "email", "message"]
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function validate(values: Record<Field, string>): Errors {
-  const errors: Errors = {}
-  if (!values.name.trim()) {
-    errors.name = "Enter your name."
-  }
-  if (!values.email.trim()) {
-    errors.email = "Enter your email address."
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
-    errors.email = "Enter an email address like name@example.com."
-  }
-  if (!values.message.trim()) {
-    errors.message = "Write a message before you send it."
-  }
-  return errors
-}
-
-function FieldError({ id, message }: { id: string; message?: string }) {
-  if (!message) return null
+function ErrorLine({ id, text }: { id: string; text: string }) {
   return (
     <p
       id={id}
@@ -129,7 +100,7 @@ function FieldError({ id, message }: { id: string; message?: string }) {
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      <span>{message}</span>
+      <span>{text}</span>
     </p>
   )
 }
@@ -142,13 +113,17 @@ function ContactForm() {
   })
   const [errors, setErrors] = useState<Errors>({})
   const [sent, setSent] = useState(false)
+
+  const nameRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
   const thanksRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     if (sent) thanksRef.current?.focus()
   }, [sent])
 
-  function update(field: Field, value: string) {
+  function change(field: Field, value: string) {
     setValues((v) => ({ ...v, [field]: value }))
     if (errors[field]) {
       setErrors((e) => {
@@ -159,77 +134,85 @@ function ContactForm() {
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const found = validate(values)
-    setErrors(found)
-    const first = fields.find((f) => found[f])
-    if (first) {
-      document.getElementById(`contact-${first}`)?.focus()
-      return
+    const trimmed = {
+      name: values.name.trim(),
+      email: values.email.trim(),
+      message: values.message.trim(),
     }
-    setSent(true)
-  }
+    setValues(trimmed)
 
-  function fieldProps(field: Field) {
-    return {
-      id: `contact-${field}`,
-      name: field,
-      value: values[field],
-      "aria-invalid": errors[field] ? true : undefined,
-      "aria-describedby": errors[field] ? `contact-${field}-error` : undefined,
-    }
+    const next: Errors = {}
+    if (!trimmed.name) next.name = "Enter your name."
+    if (!trimmed.email) next.email = "Enter your email address."
+    else if (!emailPattern.test(trimmed.email))
+      next.email = "Enter an email address in the form name@example.com."
+    if (!trimmed.message) next.message = "Write a message before you send it."
+    setErrors(next)
+
+    if (next.name) nameRef.current?.focus()
+    else if (next.email) emailRef.current?.focus()
+    else if (next.message) messageRef.current?.focus()
+    else setSent(true)
   }
 
   return (
     <div className="mt-6">
       {!sent && (
-        <form noValidate onSubmit={handleSubmit}>
+        <form noValidate onSubmit={submit}>
           <div>
-            <label
-              htmlFor="contact-name"
-              className="block font-mono text-label text-foreground"
-            >
+            <label htmlFor="name" className={labelClass}>
               Your name
             </label>
             <Input
-              {...fieldProps("name")}
-              type="text"
+              ref={nameRef}
+              id="name"
+              name="name"
               autoComplete="name"
-              onChange={(e) => update("name", e.currentTarget.value)}
-              className={cn("mt-2", fieldClass)}
+              value={values.name}
+              onChange={(e) => change("name", e.target.value)}
+              aria-invalid={errors.name ? true : undefined}
+              aria-describedby={errors.name ? "name-error" : undefined}
+              className={fieldClass}
             />
-            <FieldError id="contact-name-error" message={errors.name} />
+            {errors.name && <ErrorLine id="name-error" text={errors.name} />}
           </div>
           <div className="mt-6">
-            <label
-              htmlFor="contact-email"
-              className="block font-mono text-label text-foreground"
-            >
+            <label htmlFor="email" className={labelClass}>
               Email address
             </label>
             <Input
-              {...fieldProps("email")}
+              ref={emailRef}
+              id="email"
+              name="email"
               type="email"
               autoComplete="email"
-              onChange={(e) => update("email", e.currentTarget.value)}
-              className={cn("mt-2", fieldClass)}
+              value={values.email}
+              onChange={(e) => change("email", e.target.value)}
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={errors.email ? "email-error" : undefined}
+              className={fieldClass}
             />
-            <FieldError id="contact-email-error" message={errors.email} />
+            {errors.email && <ErrorLine id="email-error" text={errors.email} />}
           </div>
           <div className="mt-6">
-            <label
-              htmlFor="contact-message"
-              className="block font-mono text-label text-foreground"
-            >
+            <label htmlFor="message" className={labelClass}>
               Message
             </label>
             <Textarea
-              {...fieldProps("message")}
-              onChange={(e) => update("message", e.currentTarget.value)}
-              className={cn("mt-2 min-h-48 resize-none", fieldClass)}
+              ref={messageRef}
+              id="message"
+              name="message"
+              value={values.message}
+              onChange={(e) => change("message", e.target.value)}
+              aria-invalid={errors.message ? true : undefined}
+              aria-describedby={errors.message ? "message-error" : undefined}
+              className={cn(fieldClass, "min-h-48 resize-none")}
             />
-            <FieldError id="contact-message-error" message={errors.message} />
+            {errors.message && (
+              <ErrorLine id="message-error" text={errors.message} />
+            )}
           </div>
           <div className="mt-6">
             <Button
@@ -252,8 +235,7 @@ function ContactForm() {
               Thank you
             </h3>
             <p className="mt-4">
-              Jonah will read your message and write back within three working
-              days.
+              Maren will write back within a week, usually on a Sunday evening.
             </p>
           </>
         )}
@@ -266,20 +248,20 @@ export function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-y-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", headerLink)}>
+        <a href="/" className={cn(navLink, "font-heading text-h2")}>
           The Long Margin
         </a>
-        <nav aria-label="Main" className="flex gap-6">
-          <a href="/essays" className={headerLink}>
+        <nav aria-label="Main" className="flex gap-6 text-body">
+          <a href="/essays" className={navLink}>
             Essays
           </a>
-          <a href="/journal" className={headerLink}>
+          <a href="/journal" className={navLink}>
             Journal
           </a>
           <a
             href="/about"
             aria-current="page"
-            className={cn(headerLink, "underline")}
+            className={cn(navLink, "underline")}
           >
             About
           </a>
@@ -287,35 +269,40 @@ export function App() {
       </header>
 
       <main>
+        {/* Opening */}
         <div className="mx-auto max-w-lg pt-12">
-          <p className={label}>About</p>
+          <p className="font-mono text-label text-muted-foreground">About</p>
           <h1 className="mt-4 text-h1">
-            The Long Margin is a small magazine about work that takes years to
-            finish
+            A small magazine about work that takes a long time
           </h1>
           <p className="mt-6">
-            Most of what we read is about things that happen this week. We
-            started the magazine in 2019 because we kept meeting people whose
-            work moves at the pace of seasons: a luthier drying spruce for a
-            decade, a team rebuilding a salt marsh, a translator on her third
-            year of one novel.
+            Most of what gets written about work is about speed: who shipped
+            first, who grew fastest. We started The Long Margin to write about
+            the other kind, the restorations, apprenticeships and building
+            projects that take years and only make sense when you stay with
+            them.
           </p>
           <p className="mt-6">
-            It is for readers who like to know how a thing was actually done,
-            step by step, and who are happy to wait three months for the next
-            issue. Three of us write it, and the people who read it pay for it.
+            It is for people who do slow work themselves, and for anyone who
+            would rather read one careful piece a season than a hundred quick
+            ones. There are no adverts and no tracking, and every issue can be
+            read in a single sitting.
           </p>
         </div>
 
-        <dl className="mt-12 mb-12 grid gap-6 md:grid-cols-3">
+        {/* In numbers */}
+        <dl className="my-12 grid gap-6 md:grid-cols-3">
           {numbers.map((n) => (
             <div key={n.term} className="flex flex-col-reverse border-t pt-4">
-              <dt className={cn("mt-2", label)}>{n.term}</dt>
+              <dt className="mt-2 font-mono text-label text-muted-foreground">
+                {n.term}
+              </dt>
               <dd className="font-heading text-h1">{n.value}</dd>
             </div>
           ))}
         </dl>
 
+        {/* Who makes it */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">Who makes it</h2>
           {people.map((p, i) => (
@@ -329,54 +316,62 @@ export function App() {
                 </div>
                 <div>
                   <h3 className="text-body font-semibold">{p.name}</h3>
-                  <p className={cn("mt-2", label)}>{p.role}</p>
+                  <p className="mt-2 font-mono text-label text-muted-foreground">
+                    {p.role}
+                  </p>
                 </div>
               </div>
-              <p className="mt-4">{p.about}</p>
+              <p className="mt-4">{p.bio}</p>
             </div>
           ))}
         </div>
 
+        {/* How it is made */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">How it is made</h2>
           <p className="mt-4">
-            Each essay starts with a visit, and most need several. We follow one
-            piece of work for as long as it takes, which is why a single essay
-            can be <em>two years</em> in the writing.
+            Each piece starts with a visit and ends months later, sometimes a
+            year. We go back to the same people until the work has changed in
+            front of us, and we write only about what we saw. That is why there
+            are just four issues a year, and why each one is <em>finished</em>{" "}
+            before it is sent, not updated after.
           </p>
           <p className="mt-6">
-            Nothing is sponsored and nobody pays to be written about. We print
-            on uncoated paper close to home, and you can read about the choices
-            behind it in our{" "}
+            Readers pay between £3 and £12 a month, whatever suits them, and
+            that money covers printing, postage and our three salaries. Once a
+            year we publish the{" "}
             <a href="#" className={textLink}>
-              notes on printing
-            </a>
-            .
+              full accounts
+            </a>{" "}
+            so you can see where it goes.
           </p>
-          <aside className="my-12 rounded-xl border bg-card p-6">
+          <div className="my-12 rounded-xl border bg-card p-6">
             <dl>
               {details.map((d, i) => (
                 <div
                   key={d.term}
                   className={cn(
-                    "md:grid md:grid-cols-4 md:items-baseline md:gap-x-6",
-                    i > 0 && "mt-4"
+                    i > 0 && "mt-4",
+                    "md:grid md:grid-cols-4 md:items-baseline md:gap-x-6"
                   )}
                 >
-                  <dt className={label}>{d.term}</dt>
+                  <dt className="font-mono text-label text-muted-foreground">
+                    {d.term}
+                  </dt>
                   <dd className="mt-2 md:col-span-3 md:mt-0">{d.value}</dd>
                 </div>
               ))}
             </dl>
-          </aside>
+          </div>
         </div>
 
+        {/* A short history */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">A short history</h2>
           <ol className="mt-6 list-none">
             {history.map((h) => (
               <li key={h.year} className="border-t py-4">
-                <p className={label}>
+                <p className="font-mono text-label text-muted-foreground">
                   <time dateTime={h.year}>{h.year}</time>
                 </p>
                 <p className="mt-2">{h.text}</p>
@@ -385,19 +380,20 @@ export function App() {
           </ol>
           <blockquote className="my-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              It is the only thing I read slowly on purpose
+              It is the only thing that arrives in my post that I save for a
+              quiet evening.
             </p>
             <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Ingrid, a reader in Leeds
+              Ingrid, Leeds
             </footer>
           </blockquote>
         </div>
 
+        {/* Write to us */}
         <div id="contact" className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">Write to us</h2>
           <p className="mt-4">
-            Jonah reads every message himself and answers within three working
-            days.
+            Maren reads every message herself and answers within a week.
           </p>
           <ContactForm />
         </div>
@@ -407,8 +403,8 @@ export function App() {
         <div className="border-t py-12">
           <p className="font-heading text-h2">The Long Margin</p>
           <p className="mt-2">
-            A small magazine about slow work, written by three people and paid
-            for by its readers.
+            A small magazine about work that takes a long time, written by three
+            people and paid for by its readers.
           </p>
           <p className="mt-6 font-mono text-label text-muted-foreground">
             © 2026 The Long Margin

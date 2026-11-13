@@ -37,7 +37,7 @@ A section in the grid, with its `aria-label` "How sessions work" (here, in place
 - An `<h2>` with an `id`: "On this page".
 - With `mt-4`, an `<ol>` with `list-none`, no padding and `mt-2` between items, holding five links in `text-body`, styled as links in running text, one for each `<h2>` of the text, with the same words.
 
-**The text**, in columns 1–7 (`md:col-span-7 md:row-start-1`), with `mt-12 md:mt-0`: one `<div>` in normal block flow. Every paragraph is a `<p>` in `text-body`, at most `max-w-xl`. Each of the five `<h2>` has an `id` and `scroll-mt-7`; the first has no top margin, the others `mt-12`. The text under a heading starts with `mt-4`, and paragraphs follow each other with `mt-4`. A list, the quotation, and a paragraph that follows a list or the quotation have `mt-7`. In this order, word for word:
+**The text**, in columns 1–7 (`md:col-span-7 md:row-start-1`), with `mt-12 md:mt-0`: one `<div>` in normal block flow. Every paragraph is a `<p>` in `text-body`, at most `max-w-xl`. Each of the five `<h2>` has an `id` and `scroll-mt-7`; the first has no top margin, the others `mt-12`. The text under a heading starts with `mt-4`, and paragraphs follow each other with `mt-4`. A list, the quotation, and a paragraph that follows a list or the quotation have `mt-7`, also where the list or the quotation comes straight under its heading. In this order, word for word:
 
 **"Before we meet"** (`id="before"`)
 
@@ -84,7 +84,7 @@ The text holds no card, no badge, no picture and no button.
 A section in the grid, with one card in columns 1–7 (`md:col-span-7`), built as the note The one action says. The section's `aria-labelledby` names the card's `<h2>`.
 
 - The `<h2>`: "If this sounds right for you".
-- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "Write to me with the form. I reply within two working days. The first call is free, and nothing is booked until we have spoken."
+- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The button leads to a short form. I reply within two working days. The first call is free, and nothing is booked until we have spoken."
 - With `mt-7`, a `<div>` holding the default button "Request a first session", an `<a>` to `/first-session`. The page's one default button.
 
 ### 5. Footer

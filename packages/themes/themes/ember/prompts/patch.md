@@ -60,7 +60,7 @@ Under the table, with `mt-3`, a `<p>` in `text-body text-muted-foreground`: "A s
 
 ### 5. Fixes
 
-The fourth `<section>`, with `mt-20` and the `id` "fixes". An `<h2>` "Fixes" in `text-h2 md:text-h1 uppercase`. Under it, three groups in a grid `grid grid-cols-1 gap-6 md:grid-cols-3`, with `mt-6`, each a `<div>`: an `<h3>` in `text-h2` (Gameplay, Interface, Audio), then with `mt-3` a `<ul>` with `list-disc pl-6` in `text-body`, with `mt-2` on every item but the first. Each item is one sentence that says what was wrong and that it is fixed. Gameplay has four (among them: Anchor Step could carry a Bulwark through the wall at the Glasswater Yard pump house), Interface three, Audio three: ten in all.
+The fourth `<section>`, with `mt-20` and the `id` "fixes". An `<h2>` "Fixes" in `text-h2 md:text-h1 uppercase`. Under it, three groups in a grid `grid grid-cols-1 md:grid-cols-3 md:gap-x-6`, with `mt-6`, each a `<div>`, the second and third with `mt-12 md:mt-0` (separate groups, as the rhythm note says): an `<h3>` in `text-h2` (Gameplay, Interface, Audio), then with `mt-3` a `<ul>` with `list-disc pl-6` in `text-body`, with `mt-2` on every item but the first. Each item is one sentence that says what was wrong and that it is fixed. Gameplay has four (among them: Anchor Step could carry a Bulwark through the wall at the Glasswater Yard pump house), Interface three, Audio three: ten in all.
 
 ### 6. Known issues
 
@@ -79,6 +79,6 @@ The footer from the layout notes.
 ### Behavior
 
 - Keep the eight balance changes as an array of rows. The chosen class is component state; the table rows and the count line read from it. With All chosen, all eight show.
-- Changing the class does not move focus and does not scroll the page. The count line announces the change; one change reads `1 change`.
+- Changing the class does not move focus and does not scroll the page. The count line announces the change. Write `1 change` for one, though with the sample every class has two.
 - The links of "On this page" jump to their sections by their `id`. No other link needs behavior.
 - The page has no red action: there is nothing to buy or start here.

@@ -1,5 +1,4 @@
-import { useRef, useState } from "react"
-import type { KeyboardEvent } from "react"
+import { useMemo, useRef, useState, type KeyboardEvent } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -31,167 +30,52 @@ type Part = {
   load: number
   stock: StockState
   price: number
-  href: string
   badge?: string
 }
 
 const PARTS: Part[] = [
-  {
-    number: "TVL-1026-ZZ",
-    bore: 10,
-    outside: 26,
-    width: 8,
-    load: 4.75,
-    stock: "In stock",
-    price: 1.42,
-    href: "#",
-  },
-  {
-    number: "TVL-1030-RS",
-    bore: 10,
-    outside: 30,
-    width: 9,
-    load: 5.5,
-    stock: "In stock",
-    price: 1.64,
-    href: "#",
-  },
-  {
-    number: "TVL-1232-RS",
-    bore: 12,
-    outside: 32,
-    width: 10,
-    load: 7.2,
-    stock: "In stock",
-    price: 1.78,
-    href: "#",
-  },
-  {
-    number: "TVL-1535-ZZ",
-    bore: 15,
-    outside: 35,
-    width: 11,
-    load: 8.1,
-    stock: "Low stock",
-    price: 1.96,
-    href: "#",
-  },
-  {
-    number: "TVL-1740-RS",
-    bore: 17,
-    outside: 40,
-    width: 12,
-    load: 9.9,
-    stock: "In stock",
-    price: 2.38,
-    href: "#",
-  },
-  {
-    number: "TVL-2047-RS",
-    bore: 20,
-    outside: 47,
-    width: 14,
-    load: 13.4,
-    stock: "In stock",
-    price: 2.94,
-    href: "/part",
-  },
-  {
-    number: "TVL-2047-ZZ",
-    bore: 20,
-    outside: 47,
-    width: 14,
-    load: 13.4,
-    stock: "Low stock",
-    price: 2.71,
-    href: "#",
-  },
-  {
-    number: "TVL-2552-RS",
-    bore: 25,
-    outside: 52,
-    width: 15,
-    load: 14.6,
-    stock: "In stock",
-    price: 3.46,
-    href: "#",
-    badge: "New",
-  },
-  {
-    number: "TVL-3062-RS",
-    bore: 30,
-    outside: 62,
-    width: 16,
-    load: 20.1,
-    stock: "Made to order",
-    price: 4.88,
-    href: "#",
-  },
-  {
-    number: "TVL-3572-ZZ",
-    bore: 35,
-    outside: 72,
-    width: 17,
-    load: 26.8,
-    stock: "In stock",
-    price: 6.52,
-    href: "#",
-  },
-  {
-    number: "TVL-4080-RS",
-    bore: 40,
-    outside: 80,
-    width: 18,
-    load: 32.2,
-    stock: "Made to order",
-    price: 8.15,
-    href: "#",
-  },
-  {
-    number: "TVL-4585-RS",
-    bore: 45,
-    outside: 85,
-    width: 19,
-    load: 34.9,
-    stock: "Discontinued",
-    price: 9.4,
-    href: "#",
-  },
-]
-
-const NAV_LINKS = [
-  { label: "Catalogue", href: "/catalogue", current: true },
-  { label: "Compare", href: "/compare", current: false },
-  { label: "Downloads", href: "/downloads", current: false },
-  { label: "Quote", href: "/quote", current: false },
+  { number: "TVL-1026-ZZ", bore: 10, outside: 26, width: 8, load: 4.75, stock: "In stock", price: 1.42 },
+  { number: "TVL-1030-RS", bore: 10, outside: 30, width: 9, load: 5.5, stock: "In stock", price: 1.64 },
+  { number: "TVL-1232-RS", bore: 12, outside: 32, width: 10, load: 7.2, stock: "In stock", price: 1.78 },
+  { number: "TVL-1535-ZZ", bore: 15, outside: 35, width: 11, load: 8.1, stock: "Low stock", price: 1.96 },
+  { number: "TVL-1740-RS", bore: 17, outside: 40, width: 12, load: 9.9, stock: "In stock", price: 2.38 },
+  { number: "TVL-2047-RS", bore: 20, outside: 47, width: 14, load: 13.4, stock: "In stock", price: 2.94 },
+  { number: "TVL-2047-ZZ", bore: 20, outside: 47, width: 14, load: 13.4, stock: "Low stock", price: 2.71 },
+  { number: "TVL-2552-RS", bore: 25, outside: 52, width: 15, load: 14.6, stock: "In stock", price: 3.46, badge: "New" },
+  { number: "TVL-3062-RS", bore: 30, outside: 62, width: 16, load: 20.1, stock: "Made to order", price: 4.88 },
+  { number: "TVL-3572-ZZ", bore: 35, outside: 72, width: 17, load: 26.8, stock: "In stock", price: 6.52 },
+  { number: "TVL-4080-RS", bore: 40, outside: 80, width: 18, load: 32.2, stock: "Made to order", price: 8.15 },
+  { number: "TVL-4585-RS", bore: 45, outside: 85, width: 19, load: 34.9, stock: "Discontinued", price: 9.4 },
 ]
 
 const BORE_OPTIONS = [
   { id: "bore-10-17", label: "10 to 17", min: 10, max: 17 },
   { id: "bore-20-30", label: "20 to 30", min: 20, max: 30 },
   { id: "bore-35-45", label: "35 to 45", min: 35, max: 45 },
-]
+] as const
 
 const SEAL_OPTIONS = [
-  { id: "seal-rs", label: "Rubber seals, RS", suffix: "RS" },
-  { id: "seal-zz", label: "Metal shields, ZZ", suffix: "ZZ" },
-]
+  { id: "seal-rs", label: "Rubber seals, RS", suffix: "-RS" },
+  { id: "seal-zz", label: "Metal shields, ZZ", suffix: "-ZZ" },
+] as const
 
-const STOCK_OPTION = { id: "stock-only", label: "In stock only" }
+type SortKey = "bore" | "number" | "load" | "price"
 
-const SORT_ITEMS = [
+const SORT_ITEMS: { value: SortKey; label: string }[] = [
   { value: "bore", label: "Bore, smallest first" },
   { value: "number", label: "Part number, A to Z" },
   { value: "load", label: "Load rating, highest first" },
   { value: "price", label: "Unit price, lowest first" },
 ]
 
-const STOCK_DOT: Record<StockState, string> = {
-  "In stock": "bg-success",
-  "Low stock": "bg-muted-foreground",
-  "Made to order": "bg-muted-foreground",
-  Discontinued: "bg-destructive",
-}
+const NAV_LINKS = [
+  { label: "Catalogue", href: "/catalogue" },
+  { label: "Compare", href: "/compare" },
+  { label: "Downloads", href: "/downloads" },
+  { label: "Quote", href: "/quote" },
+]
+
+const CURRENT_SECTION = "/catalogue"
 
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -200,113 +84,144 @@ const TEXT_LINK = cn(
   FOCUS
 )
 const LABEL = "font-mono text-label text-muted-foreground"
-const SMALL_FIGURE = "font-mono text-label text-muted-foreground tabular-nums"
-const BUTTON = "px-4 font-mono text-label"
-const HEAD = "px-4 font-mono text-label text-muted-foreground"
-const FIGURE_CELL = "px-4 py-2 text-right font-mono tabular-nums"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const BUTTON_TEXT = "px-4 font-mono text-label"
+
+const STOCK_DOT: Record<StockState, string> = {
+  "In stock": "bg-success",
+  "Low stock": "bg-muted-foreground",
+  "Made to order": "bg-muted-foreground",
+  Discontinued: "bg-destructive",
+}
+
+function formatPrice(value: number) {
+  return value.toLocaleString("en-GB", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
 
 function byNumber(a: Part, b: Part) {
   return a.number < b.number ? -1 : a.number > b.number ? 1 : 0
 }
 
-function sortParts(parts: Part[], sort: string) {
-  const sorted = [...parts]
-  sorted.sort((a, b) => {
-    let order = 0
-    if (sort === "bore") order = a.bore - b.bore
-    else if (sort === "load") order = b.load - a.load
-    else if (sort === "price") order = a.price - b.price
-    return order !== 0 ? order : byNumber(a, b)
-  })
-  return sorted
+const SORTERS: Record<SortKey, (a: Part, b: Part) => number> = {
+  bore: (a, b) => a.bore - b.bore || byNumber(a, b),
+  number: byNumber,
+  load: (a, b) => b.load - a.load || byNumber(a, b),
+  price: (a, b) => a.price - b.price || byNumber(a, b),
 }
 
-function navLinkClass(current: boolean) {
-  return cn(
-    "font-mono text-label transition-colors duration-150",
-    current
-      ? "text-foreground underline underline-offset-4"
-      : "text-muted-foreground hover:text-foreground",
-    FOCUS
+function NavLink({
+  label,
+  href,
+  className,
+}: {
+  label: string
+  href: string
+  className?: string
+}) {
+  const current = href === CURRENT_SECTION
+  return (
+    <a
+      href={href}
+      aria-current={current ? "true" : undefined}
+      className={cn(
+        "font-mono text-label transition-colors duration-150",
+        FOCUS,
+        current
+          ? "text-foreground underline underline-offset-4"
+          : "text-muted-foreground hover:text-foreground",
+        className
+      )}
+    >
+      {label}
+    </a>
+  )
+}
+
+function StockStatus({ state }: { state: StockState }) {
+  return (
+    <span className="inline-flex items-center gap-2 whitespace-nowrap">
+      <span
+        aria-hidden="true"
+        className={cn("size-2 shrink-0 rounded-full", STOCK_DOT[state])}
+      />
+      <span className="text-body text-foreground">{state}</span>
+    </span>
   )
 }
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [checked, setChecked] = useState<string[]>([])
-  const [sort, setSort] = useState("bore")
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+
+  const [bores, setBores] = useState<string[]>([])
+  const [seals, setSeals] = useState<string[]>([])
+  const [inStockOnly, setInStockOnly] = useState(false)
+  const [sort, setSort] = useState<SortKey>("bore")
   const firstCheckboxRef = useRef<HTMLElement>(null)
 
-  const filterSet = checked.length > 0
+  const filterSet = bores.length > 0 || seals.length > 0 || inStockOnly
 
-  const bores = BORE_OPTIONS.filter((option) => checked.includes(option.id))
-  const seals = SEAL_OPTIONS.filter((option) => checked.includes(option.id))
-  const stockOnly = checked.includes(STOCK_OPTION.id)
+  const rows = useMemo(() => {
+    const boreRanges = BORE_OPTIONS.filter((o) => bores.includes(o.id))
+    const sealSuffixes = SEAL_OPTIONS.filter((o) => seals.includes(o.id))
+    return PARTS.filter((part) => {
+      if (
+        boreRanges.length > 0 &&
+        !boreRanges.some((r) => part.bore >= r.min && part.bore <= r.max)
+      )
+        return false
+      if (
+        sealSuffixes.length > 0 &&
+        !sealSuffixes.some((s) => part.number.endsWith(s.suffix))
+      )
+        return false
+      if (
+        inStockOnly &&
+        part.stock !== "In stock" &&
+        part.stock !== "Low stock"
+      )
+        return false
+      return true
+    }).sort(SORTERS[sort])
+  }, [bores, seals, inStockOnly, sort])
 
-  const rows = sortParts(
-    PARTS.filter(
-      (part) =>
-        (bores.length === 0 ||
-          bores.some((b) => part.bore >= b.min && part.bore <= b.max)) &&
-        (seals.length === 0 ||
-          seals.some((s) => part.number.endsWith(`-${s.suffix}`))) &&
-        (!stockOnly || part.stock === "In stock" || part.stock === "Low stock")
-    ),
-    sort
-  )
-
-  const total = PARTS.length
-  const noun = total === 1 ? "part" : "parts"
   const count = filterSet
-    ? `${rows.length} of ${total} ${noun}`
-    : `${total} ${noun}`
+    ? `${rows.length} of ${PARTS.length} parts`
+    : `${PARTS.length} parts`
 
-  function toggle(id: string, on: boolean) {
-    setChecked((current) =>
-      on
-        ? [...current.filter((item) => item !== id), id]
-        : current.filter((item) => item !== id)
-    )
+  function toggle(list: string[], id: string, checked: boolean) {
+    return checked ? [...list, id] : list.filter((item) => item !== id)
   }
 
   function clearFilters() {
-    setChecked([])
+    setBores([])
+    setSeals([])
+    setInStockOnly(false)
     firstCheckboxRef.current?.focus()
   }
 
-  function closeMenuOnEscape(event: KeyboardEvent<HTMLElement>) {
-    if (event.key === "Escape" && menuOpen) {
-      setMenuOpen(false)
-      menuButtonRef.current?.focus()
-    }
-  }
-
-  function option(id: string, label: string, first = false) {
-    return (
-      <label
-        key={id}
-        className="flex items-center gap-2 text-body text-foreground"
-      >
-        <Checkbox
-          ref={first ? firstCheckboxRef : undefined}
-          className="rounded-sm"
-          checked={checked.includes(id)}
-          onCheckedChange={(on) => toggle(id, on)}
-          aria-labelledby={`${id}-text`}
-        />
-        <span id={`${id}-text`}>{label}</span>
-      </label>
-    )
+  function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButtonRef.current?.focus()
   }
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <header className="border-b border-border bg-card">
+      <header
+        className="border-b border-border bg-card"
+        onKeyDown={onHeaderKeyDown}
+      >
         <div className="mx-auto flex w-full max-w-[1280px] items-center gap-6 px-4 py-3">
           <a
             href="/catalogue"
-            className={cn("font-heading text-h2 text-foreground", FOCUS)}
+            className={cn(
+              "font-heading text-h2 text-foreground transition-colors duration-150",
+              FOCUS
+            )}
           >
             Torvale
           </a>
@@ -314,50 +229,36 @@ export function App() {
             <ul className="flex gap-6">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={link.current ? "true" : undefined}
-                    className={navLinkClass(link.current)}
-                  >
-                    {link.label}
-                  </a>
+                  <NavLink {...link} />
                 </li>
               ))}
             </ul>
           </nav>
-          <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
+          <p className={cn("ml-auto hidden md:block", SMALL_FIGURE)}>
             Sales 01632 960 418
           </p>
           <Button
             ref={menuButtonRef}
             variant="secondary"
-            className={cn(BUTTON, "ml-auto md:hidden")}
+            className={cn("ml-auto md:hidden", BUTTON_TEXT)}
             aria-expanded={menuOpen}
-            aria-controls="main-menu"
+            aria-controls="menu-nav"
             onClick={() => setMenuOpen((open) => !open)}
-            onKeyDown={closeMenuOnEscape}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="main-menu"
+          id="menu-nav"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
-          onKeyDown={closeMenuOnEscape}
         >
           <div className="mx-auto w-full max-w-[1280px] px-4">
             <ul className="py-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={link.current ? "true" : undefined}
-                    className={cn("block py-2", navLinkClass(link.current))}
-                  >
-                    {link.label}
-                  </a>
+                  <NavLink {...link} className="block py-2" />
                 </li>
               ))}
             </ul>
@@ -409,7 +310,10 @@ export function App() {
             <div className="flex flex-wrap gap-2">
               <a
                 href="/downloads"
-                className={cn(buttonVariants({ variant: "secondary" }), BUTTON)}
+                className={cn(
+                  buttonVariants({ variant: "secondary" }),
+                  BUTTON_TEXT
+                )}
               >
                 Range documents
               </a>
@@ -431,7 +335,7 @@ export function App() {
                 <h2 className="text-h2">Filters</h2>
                 <Button
                   variant="secondary"
-                  className={BUTTON}
+                  className={BUTTON_TEXT}
                   disabled={!filterSet}
                   onClick={clearFilters}
                 >
@@ -441,41 +345,82 @@ export function App() {
 
               <div
                 role="group"
-                aria-labelledby="bore-label"
+                aria-labelledby="group-bore"
                 className="flex flex-col gap-2"
               >
-                <p id="bore-label" className={LABEL}>
+                <p id="group-bore" className={LABEL}>
                   Bore (mm)
                 </p>
-                {BORE_OPTIONS.map((item, index) =>
-                  option(item.id, item.label, index === 0)
-                )}
+                {BORE_OPTIONS.map((option, index) => (
+                  <label
+                    key={option.id}
+                    className="flex items-center gap-2 text-body text-foreground"
+                  >
+                    <Checkbox
+                      ref={index === 0 ? firstCheckboxRef : undefined}
+                      className="rounded-sm"
+                      aria-labelledby={`${option.id}-text`}
+                      checked={bores.includes(option.id)}
+                      onCheckedChange={(checked) =>
+                        setBores((list) => toggle(list, option.id, checked))
+                      }
+                    />
+                    <span id={`${option.id}-text`}>{option.label}</span>
+                  </label>
+                ))}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="seals-label"
+                aria-labelledby="group-seals"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="seals-label" className={LABEL}>
+                <p id="group-seals" className={LABEL}>
                   Seals
                 </p>
-                {SEAL_OPTIONS.map((item) => option(item.id, item.label))}
+                {SEAL_OPTIONS.map((option) => (
+                  <label
+                    key={option.id}
+                    className="flex items-center gap-2 text-body text-foreground"
+                  >
+                    <Checkbox
+                      className="rounded-sm"
+                      aria-labelledby={`${option.id}-text`}
+                      checked={seals.includes(option.id)}
+                      onCheckedChange={(checked) =>
+                        setSeals((list) => toggle(list, option.id, checked))
+                      }
+                    />
+                    <span id={`${option.id}-text`}>{option.label}</span>
+                  </label>
+                ))}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="stock-label"
+                aria-labelledby="group-stock"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="stock-label" className={LABEL}>
+                <p id="group-stock" className={LABEL}>
                   Stock
                 </p>
-                {option(STOCK_OPTION.id, STOCK_OPTION.label)}
+                <label className="flex items-center gap-2 text-body text-foreground">
+                  <Checkbox
+                    className="rounded-sm"
+                    aria-labelledby="stock-only-text"
+                    checked={inStockOnly}
+                    onCheckedChange={(checked) => setInStockOnly(checked)}
+                  />
+                  <span id="stock-only-text">In stock only</span>
+                </label>
               </div>
 
               <div className="flex flex-col gap-3 border-t border-border pt-4">
-                <label htmlFor="sort-by" className={cn("block", LABEL)}>
+                <label
+                  id="sort-label"
+                  htmlFor="sort-trigger"
+                  className={cn("block", LABEL)}
+                >
                   Sort by
                 </label>
                 <div className="flex flex-col gap-2">
@@ -483,10 +428,13 @@ export function App() {
                     items={SORT_ITEMS}
                     value={sort}
                     onValueChange={(value) => {
-                      if (value !== null) setSort(value)
+                      if (value !== null) setSort(value as SortKey)
                     }}
                   >
-                    <SelectTrigger id="sort-by">
+                    <SelectTrigger
+                      id="sort-trigger"
+                      aria-labelledby="sort-label"
+                    >
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -501,85 +449,43 @@ export function App() {
               </div>
             </aside>
 
-            <div className="overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
+            <div
+              className="overflow-hidden rounded-xl border border-border bg-card lg:col-span-9"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 className="text-h2">Parts</h2>
+                <h2 className="text-h2">
+                  Parts
+                </h2>
                 <p aria-live="polite" className={SMALL_FIGURE}>
                   {count}
                 </p>
               </div>
+
               <Table label="Parts" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={HEAD}>Part number</TableHead>
-                    <TableHead className={cn(HEAD, "text-right")}>
+                    <TableHead className={cn("px-4", LABEL)}>
+                      Part number
+                    </TableHead>
+                    <TableHead className={cn("px-4 text-right", LABEL)}>
                       Bore (mm)
                     </TableHead>
-                    <TableHead className={cn(HEAD, "text-right")}>
+                    <TableHead className={cn("px-4 text-right", LABEL)}>
                       Outside (mm)
                     </TableHead>
-                    <TableHead className={cn(HEAD, "text-right")}>
+                    <TableHead className={cn("px-4 text-right", LABEL)}>
                       Width (mm)
                     </TableHead>
-                    <TableHead className={cn(HEAD, "text-right")}>
+                    <TableHead className={cn("px-4 text-right", LABEL)}>
                       Load C (kN)
                     </TableHead>
-                    <TableHead className={HEAD}>Stock</TableHead>
-                    <TableHead className={cn(HEAD, "text-right")}>
+                    <TableHead className={cn("px-4", LABEL)}>Stock</TableHead>
+                    <TableHead className={cn("px-4 text-right", LABEL)}>
                       Unit price (£)
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {rows.map((part) => (
-                    <TableRow key={part.number}>
-                      <TableCell className="px-4 py-2">
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={part.href}
-                            className={cn("font-mono text-body", TEXT_LINK)}
-                          >
-                            {part.number}
-                          </a>
-                          {part.badge ? (
-                            <Badge
-                              variant="outline"
-                              className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
-                            >
-                              {part.badge}
-                            </Badge>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                      <TableCell className={FIGURE_CELL}>{part.bore}</TableCell>
-                      <TableCell className={FIGURE_CELL}>
-                        {part.outside}
-                      </TableCell>
-                      <TableCell className={FIGURE_CELL}>
-                        {part.width}
-                      </TableCell>
-                      <TableCell className={FIGURE_CELL}>
-                        {part.load.toFixed(2)}
-                      </TableCell>
-                      <TableCell className="px-4 py-2">
-                        <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                          <span
-                            aria-hidden="true"
-                            className={cn(
-                              "size-2 shrink-0 rounded-full",
-                              STOCK_DOT[part.stock]
-                            )}
-                          />
-                          <span className="text-body text-foreground">
-                            {part.stock}
-                          </span>
-                        </span>
-                      </TableCell>
-                      <TableCell className={FIGURE_CELL}>
-                        {part.price.toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
                   {rows.length === 0 ? (
                     <TableRow>
                       <TableCell
@@ -592,7 +498,7 @@ export function App() {
                           </p>
                           <Button
                             variant="secondary"
-                            className={BUTTON}
+                            className={BUTTON_TEXT}
                             onClick={clearFilters}
                           >
                             Clear filters
@@ -600,15 +506,60 @@ export function App() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ) : null}
+                  ) : (
+                    rows.map((part) => (
+                      <TableRow key={part.number}>
+                        <TableCell className="px-4 py-2">
+                          <span className="flex items-center gap-2">
+                            <a
+                              href={part.number === "TVL-2047-RS" ? "/part" : "#"}
+                              className={cn(TEXT_LINK, "font-mono text-body")}
+                            >
+                              {part.number}
+                            </a>
+                            {part.badge ? (
+                              <Badge
+                                variant="outline"
+                                className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
+                              >
+                                {part.badge}
+                              </Badge>
+                            ) : null}
+                          </span>
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                          {part.bore}
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                          {part.outside}
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                          {part.width}
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                          {part.load.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="px-4 py-2">
+                          <StockStatus state={part.stock} />
+                        </TableCell>
+                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
+                          {formatPrice(part.price)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
-              <div className="border-t border-border px-4 py-3">
-                <p className={SMALL_FIGURE}>
-                  Unit prices are for 1 to 49 and exclude VAT. Price breaks for
-                  larger quantities are on each part&apos;s page.
-                </p>
-              </div>
+
+              <p
+                className={cn(
+                  "border-t border-border px-4 py-3",
+                  SMALL_FIGURE
+                )}
+              >
+                Unit prices are for 1 to 49 and exclude VAT. Price breaks for
+                larger quantities are on each part's page.
+              </p>
             </div>
           </div>
         </div>
@@ -617,8 +568,8 @@ export function App() {
       <footer className="border-t border-border">
         <div className="mx-auto w-full max-w-[1280px] px-4 py-6">
           <p className={SMALL_FIGURE}>
-            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
-            nothing is sold or sent.
+            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A
+            demo: nothing is sold or sent.
           </p>
         </div>
       </footer>

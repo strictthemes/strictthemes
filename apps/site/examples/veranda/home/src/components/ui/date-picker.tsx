@@ -1,5 +1,5 @@
 import * as React from "react"
-import { CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
@@ -9,14 +9,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-// "2027-05-14" -> a local Date, without going through UTC.
+// "2027-05-14" to a local Date, without going through UTC.
 function toDate(value: string): Date | undefined {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (!match) return undefined
   return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
 }
 
-// A local Date -> "2027-05-14", from its own year, month and day.
+// A local Date to "2027-05-14", from its own year, month and day.
 function toValue(date: Date): string {
   const y = String(date.getFullYear()).padStart(4, "0")
   const m = String(date.getMonth() + 1).padStart(2, "0")
@@ -32,6 +32,7 @@ type DatePickerProps = {
   onValueChange: (value: string) => void
   min?: string
   className?: string
+  ref?: React.Ref<HTMLButtonElement>
   "aria-invalid"?: boolean
   "aria-describedby"?: string
 }
@@ -44,11 +45,12 @@ function DatePicker({
   onValueChange,
   min,
   className,
+  ref,
   "aria-invalid": ariaInvalid,
   "aria-describedby": ariaDescribedBy,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
-  const ref = React.useRef<HTMLDivElement>(null)
+  const calendarRef = React.useRef<HTMLDivElement>(null)
 
   const selected = toDate(value)
   const first = min ? toDate(min) : undefined
@@ -58,6 +60,7 @@ function DatePicker({
     <>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
+          ref={ref}
           id={id}
           aria-labelledby={`${labelId} ${valueId}`}
           aria-invalid={ariaInvalid || undefined}
@@ -90,12 +93,12 @@ function DatePicker({
           align="start"
           className="w-auto"
           initialFocus={() =>
-            ref.current?.querySelector<HTMLElement>(
+            calendarRef.current?.querySelector<HTMLElement>(
               'td button[tabindex="0"]'
             ) ?? true
           }
         >
-          <div ref={ref}>
+          <div ref={calendarRef}>
             <Calendar
               mode="single"
               required
@@ -104,8 +107,8 @@ function DatePicker({
               defaultMonth={selected ?? first}
               startMonth={first}
               disabled={first ? { before: first } : undefined}
-              onSelect={(date) => {
-                if (date) onValueChange(toValue(date))
+              onSelect={(date: Date) => {
+                onValueChange(toValue(date))
                 setOpen(false)
               }}
             />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useMemo, useRef, useState, type KeyboardEvent } from "react"
 import { ShoppingBag } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -13,141 +13,27 @@ import {
 import { cn } from "@/lib/utils"
 
 const STUDIO = "Whitlow Pottery"
-
-const CONTAINER = "mx-auto max-w-[1120px] px-4 md:px-6"
+const BASKET_COUNT: number = 3
 
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const QUIET_LINK = cn(
+const NAV_LINK = cn(
   "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
   FOCUS
 )
+const TEXT_LINK = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  FOCUS
+)
+const BUTTON_CLASSES = "h-auto px-4 py-2 font-mono text-label"
 
-const BUTTON = "h-auto px-4 py-2 font-mono text-label"
-
-type Category = "Mugs and cups" | "Bowls" | "Plates" | "Jugs"
-type Filter = "All" | Category
-type Glaze = "Ash" | "Oat" | "Iron" | "Slate"
-type Shape = "tall" | "bowl" | "plate"
-type Sort = "featured" | "price-asc" | "price-desc" | "name"
-
-type Piece = {
-  name: string
-  category: Category
-  glaze: Glaze
-  pence: number
-  shape: Shape
-  badge?: string
-}
-
-// The studio's own order: "Featured" shows the pieces as listed here.
-const PIECES: Piece[] = [
-  {
-    name: "Moor mug",
-    category: "Mugs and cups",
-    glaze: "Ash",
-    pence: 2800,
-    shape: "tall",
-  },
-  {
-    name: "Fold bowl",
-    category: "Bowls",
-    glaze: "Iron",
-    pence: 3400,
-    shape: "bowl",
-    badge: "New",
-  },
-  {
-    name: "Side plate",
-    category: "Plates",
-    glaze: "Oat",
-    pence: 2200,
-    shape: "plate",
-  },
-  {
-    name: "Espresso cup",
-    category: "Mugs and cups",
-    glaze: "Iron",
-    pence: 1800,
-    shape: "tall",
-  },
-  {
-    name: "Serving bowl",
-    category: "Bowls",
-    glaze: "Ash",
-    pence: 7200,
-    shape: "bowl",
-    badge: "Last one",
-  },
-  {
-    name: "Platter",
-    category: "Plates",
-    glaze: "Iron",
-    pence: 8500,
-    shape: "plate",
-    badge: "New",
-  },
-  {
-    name: "Tumbler, set of two",
-    category: "Mugs and cups",
-    glaze: "Slate",
-    pence: 3600,
-    shape: "tall",
-  },
-  {
-    name: "Breakfast bowl",
-    category: "Bowls",
-    glaze: "Ash",
-    pence: 2600,
-    shape: "bowl",
-  },
-  {
-    name: "Dinner plate",
-    category: "Plates",
-    glaze: "Oat",
-    pence: 3200,
-    shape: "plate",
-  },
-  {
-    name: "Beaker",
-    category: "Mugs and cups",
-    glaze: "Oat",
-    pence: 2400,
-    shape: "tall",
-    badge: "Sold out",
-  },
-  {
-    name: "Nest of three bowls",
-    category: "Bowls",
-    glaze: "Slate",
-    pence: 5800,
-    shape: "bowl",
-  },
-  {
-    name: "Pasta plate",
-    category: "Plates",
-    glaze: "Slate",
-    pence: 3000,
-    shape: "plate",
-  },
-]
-
-const FILTERS: Filter[] = ["All", "Mugs and cups", "Bowls", "Plates", "Jugs"]
-
-const SORTS: { value: Sort; label: string }[] = [
-  { value: "featured", label: "Featured" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "name", label: "Name: A to Z" },
-]
-
-const NAV_LINKS = [
+const MAIN_LINKS = [
   { label: "Shop", href: "/" },
-  { label: "Tableware", href: "/tableware", current: true },
+  { label: "Tableware", href: "/tableware" },
   { label: "Vases", href: "/vases" },
   { label: "Studio", href: "/studio" },
 ]
+const CURRENT_HREF = "/tableware"
 
 const FOOTER_LINKS = [
   { label: "Shop", href: "/" },
@@ -156,97 +42,189 @@ const FOOTER_LINKS = [
   { label: "Care of stoneware", href: "/care" },
 ]
 
-const SHAPE_SIZE: Record<Shape, string> = {
-  tall: "h-1/2 w-2/5",
-  bowl: "h-1/4 w-3/5",
-  plate: "h-1/6 w-3/4",
+type CategoryId = "all" | "mugs" | "bowls" | "plates" | "jugs"
+type Glaze = "Ash" | "Oat" | "Iron" | "Slate"
+type Shape = "tall" | "bowl" | "flat"
+
+const CATEGORIES: { id: CategoryId; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "mugs", label: "Mugs and cups" },
+  { id: "bowls", label: "Bowls" },
+  { id: "plates", label: "Plates" },
+  { id: "jugs", label: "Jugs" },
+]
+
+type Piece = {
+  name: string
+  category: Exclude<CategoryId, "all">
+  glaze: Glaze
+  shape: Shape
+  pence: number
+  badge?: string
 }
 
-const BASKET_COUNT = 3
+// The studio's own order, which is also the "Featured" order.
+const PIECES: Piece[] = [
+  {
+    name: "Moor mug",
+    category: "mugs",
+    glaze: "Ash",
+    shape: "tall",
+    pence: 2800,
+  },
+  {
+    name: "Fold bowl",
+    category: "bowls",
+    glaze: "Iron",
+    shape: "bowl",
+    pence: 3400,
+    badge: "New",
+  },
+  {
+    name: "Side plate",
+    category: "plates",
+    glaze: "Oat",
+    shape: "flat",
+    pence: 2200,
+  },
+  {
+    name: "Espresso cup",
+    category: "mugs",
+    glaze: "Iron",
+    shape: "tall",
+    pence: 1800,
+  },
+  {
+    name: "Serving bowl",
+    category: "bowls",
+    glaze: "Ash",
+    shape: "bowl",
+    pence: 7200,
+    badge: "Last one",
+  },
+  {
+    name: "Platter",
+    category: "plates",
+    glaze: "Iron",
+    shape: "flat",
+    pence: 8500,
+    badge: "New",
+  },
+  {
+    name: "Tumbler, set of two",
+    category: "mugs",
+    glaze: "Slate",
+    shape: "tall",
+    pence: 3600,
+  },
+  {
+    name: "Breakfast bowl",
+    category: "bowls",
+    glaze: "Ash",
+    shape: "bowl",
+    pence: 2600,
+  },
+  {
+    name: "Dinner plate",
+    category: "plates",
+    glaze: "Oat",
+    shape: "flat",
+    pence: 3200,
+  },
+  {
+    name: "Beaker",
+    category: "mugs",
+    glaze: "Oat",
+    shape: "tall",
+    pence: 2400,
+    badge: "Sold out",
+  },
+  {
+    name: "Nest of three bowls",
+    category: "bowls",
+    glaze: "Slate",
+    shape: "bowl",
+    pence: 5800,
+  },
+  {
+    name: "Pasta plate",
+    category: "plates",
+    glaze: "Slate",
+    shape: "flat",
+    pence: 3000,
+  },
+]
 
-const gbp = new Intl.NumberFormat("en-GB", {
+type SortId = "featured" | "price-asc" | "price-desc" | "name"
+
+const SORTS: { value: SortId; label: string }[] = [
+  { value: "featured", label: "Featured" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+  { value: "name", label: "Name: A to Z" },
+]
+
+const money = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
 })
 
-function formatPrice(pence: number) {
-  return gbp.format(pence / 100)
+function formatPence(pence: number) {
+  return money.format(pence / 100)
 }
 
-function pieceHref(name: string) {
-  const slug = name
+function slugify(name: string) {
+  return name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-  return `/tableware/${slug}`
+    .replace(/^-+|-+$/g, "")
 }
 
-function isDark(glaze: Glaze) {
-  return glaze === "Iron" || glaze === "Slate"
+function pieceWord(n: number) {
+  if (n === 0) return "No pieces"
+  return n === 1 ? "1 piece" : `${n} pieces`
 }
 
-// Array.prototype.sort is stable, so ties keep the studio's order.
-function sortPieces(pieces: Piece[], sort: Sort) {
-  const sorted = [...pieces]
-  if (sort === "price-asc") {
-    sorted.sort((a, b) => a.pence - b.pence)
-  } else if (sort === "price-desc") {
-    sorted.sort((a, b) => b.pence - a.pence)
-  } else if (sort === "name") {
-    sorted.sort((a, b) =>
-      a.name.localeCompare(b.name, "en-GB", { sensitivity: "base" })
-    )
-  }
-  return sorted
+const SHAPE_SIZE: Record<Shape, string> = {
+  tall: "h-1/2 w-2/5",
+  bowl: "h-1/4 w-3/5",
+  flat: "h-1/6 w-3/4",
 }
 
-function countLabel(count: number) {
-  if (count === 0) return "No pieces"
-  if (count === 1) return "1 piece"
-  return `${count} pieces`
-}
-
-function basketLabel(count: number) {
-  if (count === 0) return "Basket, empty"
-  if (count === 1) return "Basket, 1 piece"
-  return `Basket, ${count} pieces`
-}
+const PALE_GLAZES: Glaze[] = ["Ash", "Oat"]
 
 function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!menuOpen) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setMenuOpen(false)
-        menuButtonRef.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [menuOpen])
+  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButtonRef.current?.focus()
+  }
+
+  const basketLabel =
+    BASKET_COUNT === 0
+      ? "Basket, empty"
+      : `Basket, ${BASKET_COUNT} ${BASKET_COUNT === 1 ? "piece" : "pieces"}`
 
   return (
-    <header className="border-b">
-      <div
-        className={cn(
-          CONTAINER,
-          "flex flex-wrap items-center gap-x-4 gap-y-2 py-4 md:gap-x-6"
-        )}
-      >
-        <a href="/" className={cn(QUIET_LINK, "font-heading text-h2")}>
+    <header className="border-b" onKeyDown={onKeyDown}>
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-4 md:gap-x-6 md:px-6">
+        <a href="/" className={cn("font-heading text-h2", NAV_LINK)}>
           {STUDIO}
         </a>
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex gap-6">
-            {NAV_LINKS.map((link) => (
+            {MAIN_LINKS.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={cn(QUIET_LINK, link.current && "underline")}
+                  aria-current={link.href === CURRENT_HREF ? "page" : undefined}
+                  className={cn(
+                    NAV_LINK,
+                    link.href === CURRENT_HREF && "underline"
+                  )}
                 >
                   {link.label}
                 </a>
@@ -258,17 +236,17 @@ function SiteHeader() {
           <Button
             ref={menuButtonRef}
             variant="outline"
-            className={cn(BUTTON, "md:hidden")}
+            className={cn(BUTTON_CLASSES, "md:hidden")}
             aria-expanded={menuOpen}
-            aria-controls="main-menu"
+            aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
           <a
             href="/basket"
-            aria-label={basketLabel(BASKET_COUNT)}
-            className={cn(QUIET_LINK, "inline-flex items-center gap-2")}
+            aria-label={basketLabel}
+            className={cn("inline-flex items-center gap-2", NAV_LINK)}
           >
             <ShoppingBag
               className="size-4"
@@ -281,21 +259,21 @@ function SiteHeader() {
         </div>
       </div>
       <nav
-        id="main-menu"
+        id="mobile-nav"
         aria-label="Main"
         className="border-t md:hidden"
         hidden={!menuOpen}
       >
-        <ul className={cn(CONTAINER, "py-2")}>
-          {NAV_LINKS.map((link) => (
+        <ul className="mx-auto max-w-[1120px] px-4 py-2 md:px-6">
+          {MAIN_LINKS.map((link) => (
             <li key={link.href}>
               <a
                 href={link.href}
-                aria-current={link.current ? "page" : undefined}
+                aria-current={link.href === CURRENT_HREF ? "page" : undefined}
                 className={cn(
-                  QUIET_LINK,
                   "block py-2",
-                  link.current && "underline"
+                  NAV_LINK,
+                  link.href === CURRENT_HREF && "underline"
                 )}
               >
                 {link.label}
@@ -308,12 +286,13 @@ function SiteHeader() {
   )
 }
 
-function Tile({ piece }: { piece: Piece }) {
+function PieceTile({ piece }: { piece: Piece }) {
+  const pale = PALE_GLAZES.includes(piece.glaze)
   return (
     <li>
       <a
-        href={pieceHref(piece.name)}
-        className="flex h-full flex-col overflow-hidden rounded-xl border bg-card focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+        href={`/tableware/${slugify(piece.name)}`}
+        className="group flex h-full flex-col overflow-hidden rounded-xl border bg-card transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid"
       >
         <div
           aria-hidden="true"
@@ -322,25 +301,27 @@ function Tile({ piece }: { piece: Piece }) {
           <div
             className={cn(
               "border border-foreground/40",
-              SHAPE_SIZE[piece.shape],
-              isDark(piece.glaze) ? "bg-glaze-dark" : "bg-glaze-pale"
+              pale ? "bg-glaze-pale" : "bg-glaze-dark",
+              SHAPE_SIZE[piece.shape]
             )}
           />
         </div>
-        <div className="p-4">
-          <h3 className="font-sans text-body font-medium">{piece.name}</h3>
-          <p className="mt-1 font-mono text-label text-muted-foreground">
-            {piece.glaze}
+        <div className="flex flex-1 flex-col p-4">
+          <h3 className="font-sans text-body font-medium underline-offset-4 group-hover:underline">
+            {piece.name}
+          </h3>
+          <p className="mt-1 flex-1 font-mono text-label text-muted-foreground">
+            {piece.glaze} glaze
           </p>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
-            <span className="font-mono text-body tabular-nums">
-              {formatPrice(piece.pence)}
+            <span className="font-mono text-body text-foreground tabular-nums">
+              {formatPence(piece.pence)}
             </span>
-            {piece.badge && (
+            {piece.badge ? (
               <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground">
                 {piece.badge}
               </Badge>
-            )}
+            ) : null}
           </div>
         </div>
       </a>
@@ -348,70 +329,48 @@ function Tile({ piece }: { piece: Piece }) {
   )
 }
 
-function SiteFooter() {
-  return (
-    <footer className="border-t">
-      <div className={cn(CONTAINER, "py-10")}>
-        <div className="flex flex-col gap-6 md:flex-row md:justify-between">
-          <div>
-            <p className="font-heading text-h2">{STUDIO}</p>
-            <address className="mt-2 not-italic">
-              Unit 3, Coldharbour Yard
-              <br />
-              Bramwick BW4 2LT
-            </address>
-          </div>
-          <nav aria-label="Footer">
-            <ul className="flex flex-col gap-2">
-              {FOOTER_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a href={link.href} className={QUIET_LINK}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-        <p className="mt-6 font-mono text-label text-muted-foreground">
-          © 2026 {STUDIO}
-        </p>
-      </div>
-    </footer>
-  )
-}
-
 export function App() {
-  const [filter, setFilter] = useState<Filter>("All")
-  const [sort, setSort] = useState<Sort>("featured")
+  const [category, setCategory] = useState<CategoryId>("all")
+  const [sort, setSort] = useState<SortId>("featured")
   const allButtonRef = useRef<HTMLButtonElement>(null)
 
-  const shown = sortPieces(
-    filter === "All"
-      ? PIECES
-      : PIECES.filter((piece) => piece.category === filter),
-    sort
-  )
+  const shown = useMemo(() => {
+    const filtered =
+      category === "all"
+        ? PIECES
+        : PIECES.filter((piece) => piece.category === category)
+    const list = [...filtered]
+    // Array.prototype.sort is stable, so ties keep the studio's order.
+    if (sort === "price-asc") list.sort((a, b) => a.pence - b.pence)
+    if (sort === "price-desc") list.sort((a, b) => b.pence - a.pence)
+    if (sort === "name")
+      list.sort((a, b) =>
+        a.name.localeCompare(b.name, "en-GB", { sensitivity: "base" })
+      )
+    return list
+  }, [category, sort])
 
-  const emptyName = filter.toLowerCase()
+  const categoryLabel =
+    CATEGORIES.find((c) => c.id === category)?.label ?? "pieces"
+  const categoryWord = categoryLabel.toLowerCase()
 
   function showAll() {
-    setFilter("All")
+    setCategory("all")
     allButtonRef.current?.focus()
   }
 
   return (
-    <div className="min-h-svh bg-background text-body text-foreground">
+    <div className="bg-background text-body text-foreground">
       <SiteHeader />
 
-      <main className={cn(CONTAINER, "flex flex-col gap-20 pt-10 pb-20")}>
+      <main className="mx-auto flex max-w-[1120px] flex-col gap-20 px-4 pt-10 pb-20 md:px-6">
         <section>
           <div className="grid gap-x-6 md:grid-cols-12">
             <div className="md:col-span-7">
               <nav aria-label="Breadcrumb">
                 <ol className="flex flex-wrap gap-2 font-mono text-label text-muted-foreground">
                   <li>
-                    <a href="/" className={QUIET_LINK}>
+                    <a href="/" className={NAV_LINK}>
                       Shop
                     </a>
                   </li>
@@ -421,9 +380,9 @@ export function App() {
               </nav>
               <h1 className="mt-2 text-h1">Tableware</h1>
               <p className="mt-4 max-w-lg">
-                Mugs, bowls and plates for the everyday table. Everything here
-                is food-safe and goes in the dishwasher, and no two pieces come
-                out of the kiln quite the same.
+                Everything here is food-safe and goes in the dishwasher. Each
+                piece is thrown and glazed by hand, so no two come out of the
+                kiln quite the same.
               </p>
             </div>
           </div>
@@ -443,18 +402,18 @@ export function App() {
                 aria-labelledby="category-label"
                 className="mt-2 flex flex-wrap gap-2"
               >
-                {FILTERS.map((name) => {
-                  const chosen = name === filter
+                {CATEGORIES.map((c) => {
+                  const chosen = c.id === category
                   return (
                     <Button
-                      key={name}
-                      ref={name === "All" ? allButtonRef : undefined}
+                      key={c.id}
+                      ref={c.id === "all" ? allButtonRef : undefined}
                       variant={chosen ? "secondary" : "outline"}
                       aria-pressed={chosen}
-                      className={BUTTON}
-                      onClick={() => setFilter(name)}
+                      className={BUTTON_CLASSES}
+                      onClick={() => setCategory(c.id)}
                     >
-                      {name}
+                      {c.label}
                     </Button>
                   )
                 })}
@@ -462,7 +421,8 @@ export function App() {
             </div>
             <div className="w-full md:w-56">
               <label
-                htmlFor="sort-order"
+                id="sort-label"
+                htmlFor="sort-trigger"
                 className="block font-mono text-label text-foreground"
               >
                 Sort by
@@ -471,10 +431,15 @@ export function App() {
                 items={SORTS}
                 value={sort}
                 onValueChange={(value) => {
-                  if (value !== null) setSort(value)
+                  if (value === null) return
+                  setSort(value as SortId)
                 }}
               >
-                <SelectTrigger id="sort-order" className="mt-2">
+                <SelectTrigger
+                  id="sort-trigger"
+                  aria-labelledby="sort-label"
+                  className="mt-2"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -492,26 +457,26 @@ export function App() {
             aria-live="polite"
             className="mt-6 font-mono text-label text-muted-foreground tabular-nums"
           >
-            {countLabel(shown.length)}
+            {pieceWord(shown.length)}
           </p>
 
           {shown.length > 0 ? (
             <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 md:gap-x-6 lg:grid-cols-4">
               {shown.map((piece) => (
-                <Tile key={piece.name} piece={piece} />
+                <PieceTile key={piece.name} piece={piece} />
               ))}
             </ul>
           ) : (
             <div className="mt-4 max-w-lg rounded-xl border bg-card p-6">
-              <h3 className="text-h2">No {emptyName} just now</h3>
+              <h3 className="text-h2">No {categoryWord} just now</h3>
               <p className="mt-4">
-                {filter === "Jugs"
+                {category === "jugs"
                   ? "The next jugs come out of the kiln in early December."
-                  : `The next ${emptyName} come out of the next firing.`}
+                  : `The next ${categoryWord} come out of the next firing.`}
               </p>
               <Button
                 variant="secondary"
-                className={cn(BUTTON, "mt-6")}
+                className={cn(BUTTON_CLASSES, "mt-6")}
                 onClick={showAll}
               >
                 Show all pieces
@@ -520,32 +485,57 @@ export function App() {
           )}
         </section>
 
-        <section className="grid gap-x-6 md:grid-cols-12">
+        <section
+          aria-labelledby="delivery-heading"
+          className="grid gap-x-6 md:grid-cols-12"
+        >
           <div className="rounded-xl border bg-card p-6 md:col-span-7">
-            <h2 className="text-h2">Delivery and returns</h2>
+            <h2 id="delivery-heading" className="text-h2">
+              Delivery and returns
+            </h2>
             <p className="mt-4 max-w-lg">
               Every piece is packed in recycled paper and posted within three
-              working days.
+              working days of your order.
             </p>
             <p className="mt-4 max-w-lg">
-              If a piece is not right, send it back unused within 30 days and
-              we refund it in full.{" "}
-              <a
-                href="/delivery"
-                className={cn(
-                  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                  FOCUS
-                )}
-              >
+              If a piece is not right for you, send it back unused within 30
+              days for a full refund.{" "}
+              <a href="/delivery" className={TEXT_LINK}>
                 Read the delivery terms
               </a>
-              .
             </p>
           </div>
         </section>
       </main>
 
-      <SiteFooter />
+      <footer className="border-t">
+        <div className="mx-auto max-w-[1120px] px-4 py-10 md:px-6">
+          <div className="flex flex-col gap-6 md:flex-row md:justify-between">
+            <div>
+              <p className="font-heading text-h2">{STUDIO}</p>
+              <address className="mt-2 not-italic">
+                Unit 3, Coldharbour Yard
+                <br />
+                Bramwick BW4 2LT
+              </address>
+            </div>
+            <nav aria-label="Footer">
+              <ul className="flex flex-col gap-2">
+                {FOOTER_LINKS.map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} className={NAV_LINK}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+          <p className="mt-6 font-mono text-label text-muted-foreground">
+            © 2026 {STUDIO}
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

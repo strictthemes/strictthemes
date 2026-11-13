@@ -5,7 +5,7 @@ description: one piece from a small ceramics studio's shop, with pictures, its p
 order: 3
 checks:
   - Choosing a glaze changes the pictures' text alternatives, the stock line and the glaze in the details, and the chosen button has `aria-pressed="true"`.
-  - The quantity cannot go below 1 or above what is in stock, and a minus or plus button disabled at its limit keeps keyboard focus.
+  - The quantity cannot go below 1 or above what is in stock (for Slate, the order limit of 4), and a minus or plus button disabled at its limit keeps keyboard focus.
   - The "Add to basket" button is the page's only terracotta button; pressing it raises the count on the header's basket link and shows a confirmation that a screen reader announces.
   - The details are a description list (`<dl>`), and the price, the quantity and every measurement are in mono figures.
 ---
@@ -24,7 +24,7 @@ The first section of `<main>`, with the `aria-label` "Fold bowl". It opens with 
 
 **Breadcrumb.** A `<nav>` with the `aria-label` "Breadcrumb" holding an `<ol>` in one row, `flex flex-wrap gap-2 font-mono text-label text-muted-foreground`: a link "Shop" to `/`, a `/`, a link "Tableware" to `/tableware`, a `/` and "Fold bowl" with `aria-current="page"`. The links are styled as header links and so are `text-foreground`; each `/` has `aria-hidden="true"`, and the slashes and "Fold bowl" stay muted.
 
-**Pictures**, columns 1–7. A large picture and, with `mt-4`, two smaller ones side by side, `grid grid-cols-2 gap-4`. Each is a `<figure>` as the Pictures note says; the picture element inside it carries `rounded-xl border bg-muted` and the aspect ratio, `aspect-square` for the large one and `aspect-4/5` for the small ones. They show the bowl from the side (`h-1/4 w-3/5`), from above (`size-3/5`, a square like every drawn piece: the theme allows no round shape this large) and its foot (`h-1/4 w-2/5`), in the chosen glaze as the Pictures note says: `bg-glaze-dark` for Iron and Slate, `bg-glaze-pale` for Ash. Each `aria-label` names the view and the glaze ("Fold bowl in iron glaze, seen from above"), and each caption says the view in words: "From the side", "From above", "The unglazed foot".
+**Pictures**, columns 1–7. A large picture and, with `mt-4`, two smaller ones side by side, `grid grid-cols-2 gap-4`. Each is a `<figure>` as the Pictures note says; the picture element inside it carries `rounded-xl border bg-muted` and the aspect ratio, `aspect-square` for the large one and `aspect-4/5` for the small ones. They show the bowl from the side (`h-1/4 w-3/5`), from above (`aspect-square w-3/5`, a square like every drawn piece: the theme allows no round shape this large) and its foot (`h-1/4 w-2/5`), in the chosen glaze as the Pictures note says: `bg-glaze-dark` for Iron and Slate, `bg-glaze-pale` for Ash. Each `aria-label` names the view and the glaze: "Fold bowl in iron glaze, seen from the side", "Fold bowl in iron glaze, seen from above", "The foot of the Fold bowl in iron glaze", and each caption says the view in words: "From the side", "From above", "The unglazed foot".
 
 **Buying**, columns 8–12 (`md:col-span-5 md:col-start-8`). Below `md` this column comes under the pictures with `mt-10 md:mt-0`. In order:
 
@@ -40,7 +40,7 @@ The first section of `<main>`, with the `aria-label` "Fold bowl". It opens with 
 
 ### 3. Details and care
 
-A `<section>` with the `aria-label` "Details and care", a 12-column grid.
+A `<section>` with the `aria-label` "Details and care", a 12-column grid with `md:items-start`, so the Care card is only as tall as its text.
 
 - Columns 1–7: the `<h2>` "Details", then with `mt-6` a `<dl>` as the Description lists note says, with seven rows: Size (`16 cm across, 6 cm high`), Holds (`550 ml`), Weight (`420 g`), Clay (Buff stoneware), Glaze (the chosen glaze), Fired (6 November 2026, a `<time>` with `dateTime="2026-11-06"`), Foot (Unglazed and sanded smooth). The `<dd>` of Size, Holds and Weight is `font-mono tabular-nums` as a whole, units included; the other four are body text, the date too, as the Dates note says.
 - Columns 9–12: a card, as the Cards note says, with the `<h2>` "Care", then with `mt-4` a `list-disc` list with `pl-6`, `mt-2` between its items, of four: safe in the dishwasher and the microwave; not for the oven or the hob; let it cool before it meets cold water; a fine crackle in Ash glaze is part of the glaze, not a crack. Below `md` the card comes under the list with `mt-10 md:mt-0`.
@@ -57,6 +57,6 @@ The footer from the layout notes.
 
 - Keep the glaze, the quantity and the basket count in component state. The glaze sets the pictures' fills and labels, the stock line, the quantity's limit and the Glaze row of the details.
 - The quantity starts at 1. Its limit is the stock for Iron (6) and Ash (2); Slate is made to order and has no stock, so its limit is the order limit, 4. "One fewer" is disabled at 1 and "One more" at the limit; both get `focusableWhenDisabled`. Choosing a glaze whose limit is below the quantity sets the quantity to that limit.
-- "Add to basket" adds the quantity to the header's count (`Basket (5)` after adding 2) and updates the link's `aria-label`. It writes the confirmation into the status element: clear it first and write the new sentence on the next frame, so that adding the same thing twice is read out twice. The sentence uses the singular for one ("Added 1 Fold bowl…"). The quantity goes back to 1.
+- "Add to basket" adds the quantity to the header's count (`Basket (5)` after adding 2) and updates the link's `aria-label`. It writes the confirmation into the status element: clear it first and write the new sentence on the next frame, so that adding the same thing twice is read out twice. The sentence uses the singular for one ("Added 1 Fold bowl…"). The quantity goes back to 1. Adding does not change the stock line or the limit: the page keeps no stock count.
 - The "Menu" button opens and closes the small-screen menu and sets `aria-expanded`; Escape closes it as the notes say.
 - The tiles and the other links need no behavior.

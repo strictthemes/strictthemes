@@ -59,14 +59,14 @@ The second `<section>`, with `mt-20`. An `<h2>` "Top players" in `text-h2 md:tex
 In the same section, with `mt-6`, the `Table` from the layout notes with the `label` "Ranking" and `min-w-2xl`, so it scrolls in its box on a phone. In this table every cell keeps `px-3` and none gets `first:pl-0 last:pr-0`, so the viewer's bar has room at the left edge. The column headers are `<th scope="col">`. Columns:
 
 1. `Rank`: the rank in the chosen list, `font-mono tabular-nums`, left-aligned with its header, so it sits next to the bar.
-2. `Player`: the name in `text-body`. Juno Vane's name is a text link to `/player`; every other name is a text link to `#`. On the row ranked 1 in the chosen list, the page's one badge, "Rank 1", follows the name with `ml-2`: the name and the badge sit in a row `flex items-center gap-2` in place of the margin. On the viewer's row, the label `You` in `text-muted-foreground` follows the name in the same way.
+2. `Player`: the name in `text-body`. Juno Vane's name is a text link to `/player`; every other name is a text link to `#`. On the row ranked 1 in the chosen list, the page's one badge, "Rank 1", follows the name: the name and the badge sit in a row `flex items-center gap-2`, and the badge has no margin. On the viewer's row, the label `You` in `text-muted-foreground` follows the name in the same way.
 3. `Tier`: a rank mark from the layout notes and the tier's name in `text-body`.
 4. `Region`: in `text-body`, left-aligned.
 5. `Rating`, 6. `Wins`, 7. `Win rate`: numbers, right-aligned with their headers, in `font-mono tabular-nums`. Win rate has one decimal and a `%`.
 
 The viewer's row is marked with a heat bar at its left edge: its first cell is `relative`, and holds before the rank a `<span>` with `absolute inset-y-0 left-0 w-1 bg-heat-mid` and `aria-hidden="true"`. The row gets `aria-current="true"`. The bar, the word `You` and the link to the profile all mark it, so the bar is never the only sign. The row has no fill of its own.
 
-When Americas or Asia-Pacific is chosen, the viewer is not in the list, and under the table, with `mt-3`, a `<p>` in `text-body` says so: "You play in Europe, so you are not in this list." With Global or Europe chosen it is not there.
+When Americas or Asia-Pacific is chosen, the viewer is not in the list, and under the table, with `mt-3`, a `<p>` in `text-body` says so: "You play in Europe, so you are not in this list." With Global or Europe chosen it is not there. It is not an announcement: the count line announces the change.
 
 ### 5. Tiers
 

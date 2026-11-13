@@ -82,7 +82,7 @@ A section in the grid, with two parts:
 A section in the grid, with one card in columns 1–7 (`md:col-span-7`), built as the note The one action says. The section's `aria-labelledby` names the card's `<h2>`.
 
 - The `<h2>`: "If you would like to meet".
-- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "Write to me with the form. I reply within two working days, and we start with a free call of 20 minutes."
+- With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The button leads to a short form. I reply within two working days, and we start with a free call of 20 minutes."
 - With `mt-7`, a `<div>` holding the default button "Request a first session", an `<a>` to `/first-session`. The page's one default button.
 
 ### 7. Footer

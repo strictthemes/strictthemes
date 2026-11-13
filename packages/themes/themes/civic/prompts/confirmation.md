@@ -23,9 +23,9 @@ The header from the layout notes: "Callowmere Council" and "Apply for a resident
 The first element of `<main>`: a box. Inside it:
 
 - A row `flex items-start gap-4`: the `CircleCheck` icon in `text-success`, `mt-1 size-8 shrink-0` (here `size-8` in place of the Icons note's `size-5`, to match the heading) and `aria-hidden="true"`, and the `<h1>` "Application sent". The word in the heading says it; the green icon only repeats it.
-- With `mt-6`, as the first text under the `<h1>`, one paragraph: a copy of the application has been sent to the email address, which is in `break-words` so it can wrap on a phone.
+- With `mt-6`, as the first text under the `<h1>`, one paragraph: a copy of the application has been sent to the email address, which is in `wrap-break-word` so it can wrap on a phone.
 - With `mt-6`, the label "Your reference number" as a `<p>` in `font-mono text-label text-muted-foreground`.
-- With `mt-2`, the number as a `<p>` in `font-mono text-h2 font-bold tabular-nums whitespace-nowrap text-foreground` (`whitespace-nowrap`, because a line could otherwise break at a hyphen; it fits at 375px), here in `text-h2` in place of the label size the Labels note gives a reference number, with no `aria-labelledby`, which a `<p>` may not have: the label is read just before it. It is plain text that can be selected; no input, no letter spacing of your own.
+- With `mt-2`, the number as a `<p>` in `font-mono text-h2 tabular-nums whitespace-nowrap text-foreground` (`text-h2` brings weight 700) (`whitespace-nowrap`, because a line could otherwise break at a hyphen; it fits at 375px), here in `text-h2` in place of the label size the Labels note gives a reference number, with no `aria-labelledby`, which a `<p>` may not have: the label is read just before it. It is plain text that can be selected; no input, no letter spacing of your own.
 - With `mt-4`, a wrapper `<div>` holding a `secondary` `Button` "Copy reference number" with the `Copy` icon before the words, and after the button, in the same wrapper, the status element from the layout notes, whose message is a `<p>` with `mt-2`.
 - With `mt-4`, one sentence: keep the number, and quote it if you contact the council.
 
@@ -41,13 +41,13 @@ The three steps:
 
 1. "We check your application", by 18 November 2026: the council checks the address and the vehicle record, and may email to ask for more proof of address.
 2. "You pay for the permit", by 25 November 2026: once it is approved, an email brings a link to pay £96. The link works for 7 days.
-3. "Your permit starts", on 1 December 2026: the permit is linked to KX19 TDV, so there is nothing to display. It runs to 30 November 2027, and a reminder comes 4 weeks before it ends.
+3. "Your permit starts", on 1 December 2026: the permit is linked to KX19 TDV, so there is nothing to display. It runs to 30 November 2027, and a reminder comes 4 weeks before it ends. That date is a `<time>` too, as the Dates note says.
 
 Then with `mt-6` one paragraph: if the application is turned down, the email says why and how to ask for the decision to be looked at again.
 
 ### 4. If you need help
 
-An `<h2>` "If you need help", then with `mt-4` a paragraph holding the phone number as a `tel:` text link with `font-bold`, and the opening hours. With `mt-4`, a paragraph holding the email address as a `mailto:` text link with `break-words`, and a sentence that answers come within 2 working days. With `mt-4`, one sentence: have your reference number ready.
+An `<h2>` "If you need help", then with `mt-4` a paragraph holding the phone number as a `tel:` text link with `font-bold`, and the opening hours. With `mt-4`, a paragraph holding the email address as a `mailto:` text link with `wrap-break-word`, and a sentence that answers come within 2 working days. With `mt-4`, one sentence: have your reference number ready.
 
 ### 5. Feedback
 

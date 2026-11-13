@@ -31,7 +31,7 @@ The header from the layout notes, with "Guestbook" as the current page; its link
 
 ### 2. Opening
 
-A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The block element itself carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `For Clem and Rafe`, and the `<h1>` "Leave us a few words" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "A memory, a wish or a piece of advice for the years ahead. We read every one, and we are keeping them all."
+A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The `<section>` is the block element, and it carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `For Clem and Rafe`, and the `<h1>` "Leave us a few words" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "A memory, a wish or a piece of advice for the years ahead. We read every one, and we are keeping them all."
 
 ### 3. Messages and the form
 
@@ -39,7 +39,7 @@ Here, in place of a section, the `<main>`'s item is a `<div>` with the grid clas
 
 **Messages,** a section with `md:col-span-7`, `flex flex-col gap-6`, and its `aria-labelledby` pointing at its `<h2>`. It opens with a `flex flex-col gap-2` holding the `<h2>` "Messages" and, under it, a small figure: `6 messages` (`1 message` at one). Then the messages as a `<ul>` with no markers and no padding and `flex flex-col gap-6`, newest first. Each `<li>` is a card from the layout notes, with the card's `gap-3`:
 
-- A row, `flex items-center gap-3`: the avatar from the layout notes with the writer's initials, then a `flex min-w-0 flex-col gap-2` holding the writer's name as an `<h3>` in `text-body` and, under it, a small figure: how they know the couple and the date, joined with ` · `: `Clem's godmother · 2 March 2027`, the date a `<time dateTime="2027-03-02">`. The small figure wraps under the name at 375px, not beside it.
+- A row, `flex items-center gap-3`: the avatar from the layout notes with the writer's initials, then a `flex min-w-0 flex-col gap-2` holding the writer's name as an `<h3>` in `text-body` (in the heading font, as the Headings note says) and, under it, a small figure: how they know the couple and the date, joined with ` · `: `Clem's godmother · 2 March 2027`, the date a `<time dateTime="2027-03-02">`. The small figure wraps under the name at 375px, not beside it. Every message date takes this short form, without the weekday.
 - The message, one `<p>` in `text-body`.
 
 The cards have no other parts: no badge, no button, no reply link.
@@ -62,7 +62,7 @@ The footer from the layout notes.
 
 ### Behavior
 
-- Keep the messages in component state as a list of objects with a name, the initials, how they know the couple (or none), the date (or none, for a new one) and the text. The count reads from the list.
+- Keep the messages in component state as a list of objects with an `id` (the React key, since two guests can share a name), a name, the initials, how they know the couple (or none), the date (or none, for a new one) and the text. The count reads from the list.
 - When the form is sent, check it in code:
   - Name: empty, or only spaces, gives "Write your name, so they know who it is from."
   - Message: empty, or only spaces, gives "Write a message. A line or two is plenty."

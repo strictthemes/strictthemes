@@ -17,9 +17,9 @@ Each of the 23 Strict themes has five page prompts. We take three themes whose p
 
 | Theme | Made for | Its pricing page | Prompt |
 |---|---|---|---|
-| [Strict One](/themes/strict-one/) | Software products, editorial sites | Pricing: three plans, a monthly and yearly switch, a comparison table, a FAQ | 5,061 words |
-| [Primer](/themes/primer/) | Courses, schools, learning tools | Plans: three plans, a yearly switch, a comparison, questions | 6,702 words |
-| [Solace](/themes/solace/) | Therapists, coaches, private practices | Fees: a table of session fees, cancelling and paying, questions | 7,568 words |
+| [Strict One](/themes/strict-one/) | Software products, editorial sites | Pricing: three plans, a monthly and yearly switch, a comparison table, a FAQ | 5,868 words |
+| [Primer](/themes/primer/) | Courses, schools, learning tools | Plans: three plans, a yearly switch, a comparison, questions | 7,494 words |
+| [Solace](/themes/solace/) | Therapists, coaches, private practices | Fees: a table of session fees, cancelling and paying, questions | 8,397 words |
 
 The word counts are of the prompt as the site serves it, counted with `curl -s <address> | wc -w`. They are long on purpose, and the next section says what the words are spent on.
 

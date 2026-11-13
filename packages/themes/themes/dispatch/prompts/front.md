@@ -39,7 +39,7 @@ The next item of `<main>`, across the full width: a box, `flex flex-col gap-2 md
 
 - An `<h2>` that is the live marker: it carries the Live marker note's classes and holds the dot and the word "Live".
 - An `<h3>` small headline that is a link: `BRIDGE VOTE: COUNCIL MEETS AT 18:00`.
-- The latest update, the live blog's first, at `17:30`: one `<p>` with `flex items-baseline gap-2 md:flex-1`, holding the time as a `<time>` label in `text-muted-foreground` and a `<span>` with one sentence in `text-body`. The `<p>` is one item of the box, so the time and the sentence stay together.
+- The latest update, the live blog's first, at `17:30`: one `<p>` with `flex items-baseline gap-2 md:flex-1`, holding the time as a `<time>` label in `text-muted-foreground` and a `<span>` with one sentence in `text-body` and `max-w-xl`, the Measure note's cap, so the `<p>` still fills the row. The `<p>` is one item of the box, so the time and the sentence stay together.
 
 At `md` and up these sit in one line and wrap where they must; below `md` they stack.
 

@@ -33,7 +33,7 @@ A section with a visually hidden `<h2>` "About Ossa Bloom" and the grid from the
 
 1. An `<h3>` in `text-h2`: "Music you can see".
 2. Three paragraphs in `text-body`, in a stack with `gap-3`, each at most `max-w-xl`: how the two met, what a set sounds like, and how the light rig is built from parts found at scrap yards. Write them yourself; keep them plain and specific, about 120 words in all.
-3. A row of facts with `border-t border-border pt-5` and `flex flex-wrap gap-x-8 gap-y-3`, three pairs, each a stack with `gap-1`: a label, here in `text-muted-foreground` in place of the Labels note's `text-foreground`, and its value in `text-body`. `Plays` "Live electronics and light", `First album` "Static Harbour, 2024", `Members` "Edda Lind, Sami Rahko".
+3. A row of facts, a `<dl>` with `border-t border-border pt-5` and `flex flex-wrap gap-x-8 gap-y-3`, three pairs, each a `<div>` stack with `flex flex-col gap-1`: a `<dt>` label, here in `text-muted-foreground` in place of the Labels note's `text-foreground`, and a `<dd>` with its value in `text-body`. `Plays` "Live electronics and light", `First album` "Static Harbour, 2024", `Members` "Edda Lind, Sami Rahko".
 
 ### 3. Sets
 
@@ -51,10 +51,10 @@ On a phone the three parts stack in that order inside the row.
 
 A section. Its heading row holds the `<h2>` "Also on Friday" and, at the right end, a text link "Full line-up" (`/line-up`).
 
-Then the grid from the layout notes with four panels, each `md:col-span-6 lg:col-span-3`: two by two on a tablet, four in a row on a laptop, one under another on a phone. Each panel is the stock panel, laid out as a row: `flex-row items-center gap-3`, in place of the panel's `flex-col`. It holds:
+Then the grid from the layout notes with four panels, each `md:col-span-6 xl:col-span-3`: two by two from `md`, four in a row from `xl`, one under another on a phone. Not `lg:col-span-3`: at 1024px four panels leave the name about 130px and break "Basement". Each panel is the stock panel, laid out as a row: `flex-row items-center gap-3`, in place of the panel's `flex-col`. It holds:
 
 - An avatar from the Avatars note with the act's initials (`GG`, `NF`, `SA`, `BC`).
-- A stack with `min-w-0 flex-1 gap-1` (`flex flex-col`): the act's name as an `<h3>` in `text-h2 break-words` holding a link to its page (`/artists/<slug>`; no underline at rest, `underline underline-offset-4` on hover), and under it a label line with the start as a `<time>` and the stage: `19:00 · Crane Stage`. A long name wraps between words inside the stack, and `break-words` breaks a single word too long for it, which can happen four to a row at `lg`.
+- A stack with `min-w-0 flex-1 gap-1` (`flex flex-col`): the act's name as an `<h3>` in `text-h2 break-words` holding a link to its page (`/artists/<slug>`; no underline at rest, `underline underline-offset-4` on hover), and under it a label line with the start as a `<time>` and the stage: `19:00 · Crane Stage`. A long name wraps between words inside the stack, and `break-words` breaks a single word too long for it, which can happen four to a row.
 
 ### 5. Footer
 

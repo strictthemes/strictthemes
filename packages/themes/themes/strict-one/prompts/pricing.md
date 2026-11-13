@@ -35,8 +35,8 @@ Then, with `mt-8`, three plans side by side, stacked below `md`. They are column
 Each plan, top to bottom, with `p-8`:
 
 1. The plan name as a label heading, an `<h3>`.
-2. The price in `font-heading text-display`, with `/ person / month` as a label in `text-muted-foreground` beside it, on the price's baseline (`flex flex-wrap items-baseline gap-2`). At `md` a plan's box is too narrow for both, so the label wraps under the price there, `gap-2` below it, and shares its line from `lg` up and below `md`. The free plan shows "$0" with the same label.
-3. A billing note as a label in `text-muted-foreground`, e.g. `BILLED YEARLY` or `BILLED MONTHLY`. The free plan says `FREE FOREVER`.
+2. The price in `font-heading text-display`, with `/ person / month` as a label in `text-muted-foreground` beside it, on the price's baseline (`flex flex-wrap items-baseline gap-2`). At `md` a plan's box is too narrow for both, so the label wraps under the price there, `gap-2` below it, and shares its line from `lg` up and below `md`: give the label `md:basis-full lg:basis-auto`, so all three plans wrap at the same widths, whatever the price's length. The free plan shows "$0" with the same label.
+3. A billing note as a label in `text-muted-foreground`, `BILLED MONTHLY`, or `BILLED YEARLY` with the year's total, e.g. `BILLED YEARLY, $120 PER PERSON`; at `md` it may take two lines, which the subgrid keeps level. The free plan says `FREE FOREVER`.
 4. One sentence saying who the plan is for.
 5. The call to action, full width: an `<a>` styled as a button. The recommended plan uses the default variant; the others use `outline`. The three sit on one line across the plans. They keep the stock `whitespace-nowrap`, so each label is at most 15 characters, which fits a plan's box at `md`: `START FREE`, `START TEAM`, `START BUSINESS`.
 6. A 1px top border, then a list of five or six features. Mark each with a small check icon from the project's icon set, in `text-foreground`.

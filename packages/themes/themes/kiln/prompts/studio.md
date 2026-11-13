@@ -36,7 +36,7 @@ The `<h2>` "The people". Then with `mt-6` a `<ul>` of three people, `grid gap-y-
 
 ### 4. The process
 
-A section with the `id` `process` and `scroll-mt-10`. The `<h2>` "From clay to kiln", then with `mt-4` one sentence: a piece takes about three weeks from a bag of clay to the shop. Then with `mt-6` an ordered list (`<ol>`) of five steps, with no markers and no padding. Each step is an `<li>` with a 1px top border and `py-6`, the last also with a 1px bottom border, laid out as `md:grid md:grid-cols-12 md:gap-x-6`:
+A section with the `id` `process` and `scroll-mt-10`. The `<h2>` "From clay to kiln", then with `mt-4` one sentence: a piece takes about three weeks from a bag of clay to the shop. Then with `mt-6` an ordered list (`<ol>`) of five steps, with no markers and no padding. Each step is an `<li>` with `border-t py-6 last:border-b`, a 1px top border and on the last a bottom one, laid out as `md:grid md:grid-cols-12 md:gap-x-6`:
 
 - Columns 1–3: the step as a label (a `<p>`) in `text-muted-foreground`, `Step 1`, and with `mt-1` how long it takes, a label (a `<p>`) in `text-foreground` with `tabular-nums`: `1 hour`, `20 minutes a piece`, `7 days`, `1 day`, `2 days`.
 - Columns 4–12: the step's name as an `<h3>` in `font-sans text-body font-medium`, and with `mt-2` one paragraph of two sentences. Below `md` this part sits under the labels with `mt-4 md:mt-0`.

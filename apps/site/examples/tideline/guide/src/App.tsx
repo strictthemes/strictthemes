@@ -18,8 +18,8 @@ const navLink = cn(
 const label = "font-mono text-label uppercase"
 const smallFigure =
   "font-mono text-label text-muted-foreground uppercase tabular-nums"
-const card = "flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
 const paragraph = "max-w-xl text-body"
+const card = "flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
 
 const navItems = [
   { label: "Lessons", href: "/lessons" },
@@ -28,9 +28,8 @@ const navItems = [
   { label: "Book", href: "/booking" },
 ]
 
-const otherGuides = [
+const guides = [
   {
-    id: "skerrin-cove",
     badge: "Improvers",
     name: "Skerrin Cove",
     facts: "4 miles north · Best at mid tide",
@@ -38,7 +37,6 @@ const otherGuides = [
     link: "Read the guide to Skerrin Cove",
   },
   {
-    id: "maddow-strand",
     badge: "All levels",
     name: "Maddow Strand",
     facts: "7 miles south · Best at low water",
@@ -108,12 +106,12 @@ function Opening() {
         </div>
       </div>
       <div className="flex items-center gap-4">
-        <span
+        <div
           aria-hidden="true"
           className="flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary font-mono text-label text-secondary-foreground"
         >
           TR
-        </span>
+        </div>
         <div className="flex min-w-0 flex-col gap-2">
           <p className="text-body font-bold text-foreground">Tamsin Rowe</p>
           <p className={smallFigure}>
@@ -126,72 +124,51 @@ function Opening() {
   )
 }
 
-const facts: { term: string; value: ReactNode }[] = [
-  {
-    term: "Parking",
-    value: (
-      <>
-        Beach Road car park, 180 spaces, £5 a day. Full by{" "}
-        <Time dateTime="10:30">10:30</Time> on sunny weekends.
-      </>
-    ),
-  },
-  {
-    term: "Lifeguards",
-    value: (
-      <>
-        On duty <Time dateTime="10:00">10:00</Time>–
-        <Time dateTime="18:00">18:00</Time>, every day from{" "}
-        <time dateTime="2027-05-15">15 May</time> to{" "}
-        <time dateTime="2027-09-26">26 September 2027</time>.
-      </>
-    ),
-  },
-  { term: "Best state of tide", value: "Two hours either side of low water." },
-  {
-    term: "Hazards",
-    value:
-      "A rip current beside the north rocks. Weever fish in the shallows at low water.",
-  },
-  {
-    term: "Facilities",
-    value:
-      "Toilets and a tap at the car park. Hot showers at the Boat Shed, £1.",
-  },
-  {
-    term: "Dogs",
-    value: "Welcome from 1 October to 30 April, and on a lead on the slipway.",
-  },
-]
+function FactRow({ term, children }: { term: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0">
+      <dt className={cn(label, "text-muted-foreground")}>{term}</dt>
+      <dd className="min-w-0 text-body text-foreground">{children}</dd>
+    </div>
+  )
+}
 
 function Facts() {
   return (
     <aside
-      aria-labelledby="at-a-glance"
+      aria-label="Plan your visit"
       className="flex flex-col gap-6 md:col-span-4 md:col-start-9"
     >
       <div className={card}>
-        <h2 id="at-a-glance" className="text-h2">
-          At a glance
-        </h2>
+        <h2 className="text-h2 text-foreground">At a glance</h2>
         <dl className="divide-y divide-border">
-          {facts.map((fact) => (
-            <div
-              key={fact.term}
-              className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0"
-            >
-              <dt className={cn(label, "shrink-0 text-muted-foreground")}>
-                {fact.term}
-              </dt>
-              <dd className="min-w-0 text-body text-foreground">
-                {fact.value}
-              </dd>
-            </div>
-          ))}
+          <FactRow term="Parking">
+            Beach Road car park, 180 spaces, £5 a day. Full by{" "}
+            <Time dateTime="10:30">10:30</Time> on sunny weekends.
+          </FactRow>
+          <FactRow term="Lifeguards">
+            On duty <Time dateTime="10:00">10:00</Time>–
+            <Time dateTime="18:00">18:00</Time>, every day from{" "}
+            <time dateTime="2027-05-15">15 May</time> to{" "}
+            <time dateTime="2027-09-26">26 September 2027</time>.
+          </FactRow>
+          <FactRow term="Best state of tide">
+            Two hours either side of low water.
+          </FactRow>
+          <FactRow term="Hazards">
+            A rip current beside the north rocks. Weever fish in the shallows at
+            low water.
+          </FactRow>
+          <FactRow term="Facilities">
+            Toilets and a tap at the car park. Hot showers at the Boat Shed, £1.
+          </FactRow>
+          <FactRow term="Dogs">
+            Welcome from 1 October to 30 April, and on a lead on the slipway.
+          </FactRow>
         </dl>
       </div>
       <div className={card}>
-        <h2 className="text-h2">Learn on this beach</h2>
+        <h2 className="text-h2 text-foreground">Learn on this beach</h2>
         <p className="text-body">
           Our lessons run here every day of the year, from £42 a person, wetsuit
           and board included.
@@ -221,31 +198,11 @@ function ArticleSection({
 }) {
   return (
     <section aria-labelledby={id} className="flex flex-col gap-4">
-      <h2 id={id} className="text-h2">
+      <h2 id={id} className="text-h2 text-foreground">
         {title}
       </h2>
       {children}
     </section>
-  )
-}
-
-function SafetyTip() {
-  return (
-    <div className="flex flex-col gap-6 rounded-xl bg-coral p-6 text-coral-foreground md:p-10">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <p className={label}>Safety tip</p>
-          <h3 className="text-h2">
-            Caught in a rip? Float, then swim sideways
-          </h3>
-        </div>
-        <p className={paragraph}>
-          A rip is a channel of water running out to sea. Do not swim against
-          it. Lie back, raise one arm and shout. When the pull eases, swim along
-          the beach until you are clear, then come in with the waves.
-        </p>
-      </div>
-    </div>
   )
 }
 
@@ -268,6 +225,7 @@ function Article() {
           fall off, and much the same from one day to the next.
         </p>
       </ArticleSection>
+
       <ArticleSection id="when-to-surf" title="When to surf">
         <p className={paragraph}>
           The beach is at its best for two hours either side of low water. The
@@ -283,7 +241,7 @@ function Article() {
           </a>{" "}
           before you set off.
         </p>
-        <ul className="flex max-w-xl list-disc flex-col gap-2 pl-6 text-body">
+        <ul className={cn(paragraph, "flex list-disc flex-col gap-2 pl-6")}>
           <li>A small swell, 1 to 3 ft: good for a first lesson.</li>
           <li>
             A middling swell, 3 to 5 ft: good for improvers, out the back.
@@ -294,13 +252,29 @@ function Article() {
           </li>
         </ul>
       </ArticleSection>
+
       <ArticleSection id="staying-safe" title="Staying safe">
         <p className={paragraph}>
           In season the lifeguards put out two kinds of flags. Swim and
           bodyboard between the red and yellow ones; surf between the black and
           white ones. If no flags are flying, nobody is watching the water.
         </p>
-        <SafetyTip />
+        <div className="flex flex-col gap-6 rounded-xl bg-coral p-6 text-coral-foreground md:p-10">
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <p className={label}>Safety tip</p>
+              <h3 className="text-h2">
+                Caught in a rip? Float, then swim sideways
+              </h3>
+            </div>
+            <p className={paragraph}>
+              A rip is a channel of water running out to sea. Do not swim
+              against it. Lie back, raise one arm and shout. When the pull
+              eases, swim along the beach until you are clear, then come in with
+              the waves.
+            </p>
+          </div>
+        </div>
         <p className={paragraph}>
           The one rip to know runs beside the north rocks, and is strongest in
           the hour after high water. Weever fish bury themselves in the warm
@@ -308,6 +282,7 @@ function Article() {
           you, the lifeguards have hot water, which stops the pain.
         </p>
       </ArticleSection>
+
       <ArticleSection id="getting-there" title="Getting there and parking">
         <p className={paragraph}>
           Follow Beach Road to its end, a mile and a half from the village of
@@ -321,6 +296,7 @@ function Article() {
           Boat Shed.
         </p>
       </ArticleSection>
+
       <ArticleSection id="after-your-surf" title="After your surf">
         <p className={paragraph}>
           The Slipway Café opens at <Time dateTime="08:00">08:00</Time> and does
@@ -336,17 +312,17 @@ function Article() {
 function MoreGuides() {
   return (
     <section aria-labelledby="more-guides" className="flex flex-col gap-6">
-      <h2 id="more-guides" className="text-h2">
+      <h2 id="more-guides" className="text-h2 text-foreground">
         More beach guides
       </h2>
       <ul className="grid list-none grid-cols-1 gap-6 p-0 md:grid-cols-2">
-        {otherGuides.map((guide) => (
-          <li key={guide.id} className={card}>
+        {guides.map((guide) => (
+          <li key={guide.name} className={card}>
             <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase">
               {guide.badge}
             </Badge>
             <div className="flex flex-col gap-2">
-              <h3 className="text-h2">{guide.name}</h3>
+              <h3 className="text-h2 text-foreground">{guide.name}</h3>
               <p className={smallFigure}>{guide.facts}</p>
             </div>
             <p className={paragraph}>{guide.text}</p>
@@ -384,15 +360,15 @@ function Footer() {
           <p className="text-body">
             <a href="tel:+441632960418" className={textLink}>
               01632 960 418
-            </a>
-            {" · "}
+            </a>{" "}
+            ·{" "}
             <a href="mailto:hello@sandhopper.example" className={textLink}>
               hello@sandhopper.example
             </a>
           </p>
-          <p className={cn(label, "text-muted-foreground")}>
-            Every day · <Time dateTime="08:30">08:30</Time>–
-            <Time dateTime="18:00">18:00</Time> · © 2027 Sandhopper Surf School
+          <p className={cn(label, "text-muted-foreground tabular-nums")}>
+            Every day · <time dateTime="08:30">08:30</time>–
+            <time dateTime="18:00">18:00</time> · © 2027 Sandhopper Surf School
           </p>
         </div>
       </div>

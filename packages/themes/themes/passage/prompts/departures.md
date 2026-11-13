@@ -41,7 +41,7 @@ The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-
 
 ### 3. Notice
 
-A section with `mt-16`, in columns 1–8 of a grid: a card with `aria-labelledby` pointing at its heading, holding:
+A section with `mt-16`, in columns 1–8 of a grid: a card that is a nested `<section>` (no margin of its own) with `aria-labelledby` pointing at its heading, so that it is a named region, holding:
 
 - A `<p>` holding the state from the layout notes, `Cancelled`.
 - With `mt-2`, an `<h2>` "The 14:00 to Wrenholm is cancelled", the time in a `<time>`.
@@ -68,7 +68,7 @@ The cells keep the stock `whitespace-nowrap`, so the table is wider than a phone
 
 A section with `mt-16`, as a grid (`grid gap-5 md:grid-cols-12 md:items-start`):
 
-- In columns 1–7: an `<h2>` "At the port", then with `mt-5` a description list as the layout notes describe, on the page, not in a card, with five rows: Address (an `<address className="not-italic">` with three block `<span>`s, `Harbour Road`, `Harrowmouth`, `HW1 4QS`); Check-in desk (`Opens 05:45`, a label in `text-foreground` with the time in a `<time>`); Foot passengers (`Desk closes 30 min before`); Vehicles (`Lane closes 45 min before`); Parking (`Long stay · £8.00 a day`, a label in `text-foreground`).
+- In columns 1–7: an `<h2>` "At the port", then with `mt-5` a description list as the layout notes describe, on the page, not in a card, with five rows: Address (an `<address className="not-italic">` with three block `<span>`s, `Harbour Road`, `Harrowmouth`, `HW1 4QS`); Check-in desk (`Opens 05:45`, a label in `text-foreground` with the time in a `<time>`); Foot passengers (`Desk closes 30 min before`, a label in `text-foreground`); Vehicles (`Lane closes 45 min before`, a label in `text-foreground`); Parking (`Long stay · £8.00 a day`, a label in `text-foreground`).
 - In columns 9–12: a card with a label `Sailing another day?`, then with `mt-2` an `<h3>` in `text-h2`, "Book a crossing", then with `mt-3` one sentence: fares are lowest a few weeks ahead, and dogs and bicycles can be added when booking. Then with `mt-5`, in a `<div>`, the page's one default button: an `<a>` styled as a button, "Search sailings", that goes to `/`.
 
 ### 6. Footer

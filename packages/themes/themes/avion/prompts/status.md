@@ -35,7 +35,7 @@ A panel with rows. Heading: `Systems`, and at the right end of the heading row t
 
 - A row with the system's name as an `<h3>` in `text-body font-medium`, and at the right end its state.
 - With `mt-3`, the uptime bar: 30 segments in a row with `gap-px`, each `h-6 flex-1 rounded-sm`. A day that was fully up is `bg-success`, a day with slow service `bg-tertiary`, a day with an outage `bg-destructive`. The bar has `role="img"` and an `aria-label` such as "99.2% uptime over 30 days. Slow on 2 days, down on 1 day."
-- With `mt-2`, a line `grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3`, in this order: the label `30 days ago` at the left; the uptime percentage as a small figure, followed in the same figure by the days that were slow or down, in words, where there were any (`99.91% · 1 day down`); and the label `Today`, right-aligned (`text-right`). At 375px the figure does not fit between the two labels, so below `md` it is `order-last col-span-2` and stands on its own line under them, left-aligned; from `md` up it is `md:order-none md:col-span-1 md:text-center`, in the middle column.
+- With `mt-2`, a line `grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3`, in this order: the label `30 days ago` at the left; the uptime percentage as a small figure, followed in the same figure by the days that were slow or down, in words, where there were any (`99.91% · 1 day down`); and the label `Today`, right-aligned (`text-right`). At 375px the figure does not fit between the two labels, so below `md` it is `order-last col-span-2` and stands on its own line under them, left-aligned; from `md` up it is `md:order-none md:col-span-1 md:text-center`, in the middle column. A slow day counts as up: only a down day lowers the percentage.
 
 Five systems are "Operational" with a success dot. Label printing is "Degraded" with a caution dot. Across the six bars, most days are fully up, three or four are slow and one is down.
 
@@ -47,24 +47,24 @@ A panel. Heading: `Planned maintenance`, with a caution badge "Scheduled" at the
 
 ### 5. Get updates
 
-A panel with the `id` `updates` and `scroll-mt-5`. Heading: `Get updates`. One sentence in `text-body` on what can be followed, such as "Get an email about incidents and planned maintenance for Northgate.", then with `mt-5` a form: the field's label "Email address", then with `mt-2` a row with `gap-3` holding the email field (`md:flex-1`) and the default button "Subscribe"; below `md` the row is a column and the button goes under the field at full width (its label fits on one line). The error line goes under the row. Under the form with `mt-2`, after the `<form>` and so after the error line inside it, the field's helper text, which says when mail comes and how to stop it rather than repeating the sentence above: "One email when an incident opens and one when it is resolved. Every email has an unsubscribe link."
+A panel with the `id` `updates` and `scroll-mt-5`. Heading: `Get updates`. One sentence in `text-body` on what can be followed, such as "Get an email about incidents and planned maintenance for Northgate.", then with `mt-5` a form: the field's label "Email address", then with `mt-2` a row with `gap-3` holding the email field (`md:flex-1`) and the default button "Subscribe"; below `md` the row is a column and the button goes under the field at full width (its label fits on one line). Under the row with `mt-2`, inside the form, the field's helper text, and the error line after it. The helper text says when mail comes and how to stop it rather than repeating the sentence above: "One email when an incident opens and one when it is resolved. Every email has an unsubscribe link."
 
 ### 6. Past incidents
 
 An `<h2>` in `text-h2`, "Past incidents", directly on the page with `mt-3`, which with the stack's gap puts it 32px under the panel before it. Then three panels, one per incident, as items of the same stack. Each panel has:
 
 - A heading row: the incident's title as an `<h3>` in `text-body font-medium`, and at the right end its state, "Resolved" with a neutral dot.
-- With `mt-2`, a line of small figures, `flex flex-wrap gap-x-5`: the date (a `<time>`), and how long it lasted (`38 min`, not a `<time>`).
+- With `mt-2`, a line of small figures, `flex flex-wrap gap-x-5`: the date (a `<time>`), and how long it lasted (`38 min`, or `1 h 12 min` over an hour; not a `<time>`).
 - With `mt-5`, the updates as an ordered list without numbers, newest first. Each update has a 1px top border and `py-3`: the kind of update as a label in `text-foreground` (Resolved, Monitoring, Identified, Investigating) with the time beside it as a small figure, in a `flex items-baseline gap-2`, and with `mt-1` a `<p>` with one or two sentences in `text-body`. The last update has no bottom padding (`last:pb-0`).
 
 These three panels use an `<h3>` in place of the usual label heading. Its row keeps `min-h-7`, and what follows it uses the margins given here, not the `mt-3` of the Panel heading note.
 
 ### 7. Footer
 
-Not a panel: a `<footer>` in the container, a row with `pb-5` holding two labels, the company's name and year at the left and the time zone all times are shown in at the right.
+Not a panel: a `<footer>` in the container, a row with `pb-5` holding two labels, the company's name and year at the left (`Northgate Parcels Ltd, 2026`) and the time zone all times are shown in at the right (`All times UTC`; every `dateTime` then ends in `Z`).
 
 ### Behavior
 
-- An empty or malformed address shows the error line. A good one replaces the form with a confirmation in `text-body`: a check icon in `text-success` and "Subscribed. We will write when something changes." The helper text is removed together with the form: the form, the helper text and the empty `role="status"` element share the one wrapper with `mt-5`.
+- An empty or malformed address shows the error line: "Enter your email address." or "Enter an email address such as name@example.com." A good one replaces the form with a confirmation in `text-body`: a check icon in `text-success` and "Subscribed. We will write when something changes." The helper text, inside the form, goes with it: the form and the empty `role="status"` element share the one wrapper with `mt-5`.
 - "Get updates" scrolls to the panel and moves focus to the email field, or to the confirmation once the form is gone. A link to `#updates` cannot do both on its own: handle its click in code (`preventDefault`, then `scrollIntoView`, then `focus` with `preventScroll`).
 - No button on this page gets `focusableWhenDisabled`, so `components/ui/button.tsx` needs no `data-disabled:` classes.

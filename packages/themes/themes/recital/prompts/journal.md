@@ -24,7 +24,7 @@ In the reading column, with `pt-12`: the `<h1>` "Journal", then with `mt-4` two 
 
 ### 3. Start here
 
-In the reading column, with `mt-12`: a card that points a new reader to one entry. Inside it a label ("Start here"), then with `mt-2` the entry's title as an `<h2>` in `text-h2`, then with `mt-4` two sentences about it, then a `<p>` with `mt-6` holding a link styled as the default button: "Read the entry". The title itself is not a link.
+In the reading column, with `mt-12`: a card that points a new reader to one of the twelve entries in the list. Inside it a label ("Start here"), then with `mt-2` the entry's title as an `<h2>` in `text-h2`, then with `mt-4` two sentences about it, then a `<p>` with `mt-6` holding a link styled as the default button: "Read the entry". The title itself is not a link.
 
 ### 4. Topic filter
 
@@ -46,7 +46,7 @@ The newest entry has the page's one badge, "New". Its label line is `flex flex-w
 
 When the chosen topic has no entries, show one sentence in place of all the year sections, a `<p>` with `mt-12`: "No entries on this topic yet." The count then reads `0 entries`, and the "Older entries" link is not shown.
 
-Under the last year: a `<p>` with `mt-12` that holds only the link "Older entries", styled as a link in running text.
+Under the last year: a `<p>` with `mt-12` that holds only the link "Older entries" (`/journal/older`, whatever the topic), styled as a link in running text.
 
 ### 6. Sign-up
 

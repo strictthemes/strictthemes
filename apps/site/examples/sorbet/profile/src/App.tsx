@@ -11,21 +11,19 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { cn } from "@/lib/utils"
 
 const container = "mx-auto max-w-[1168px] px-4 md:px-6"
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const codeFocusOutline =
+const codeFocusRing =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const buttonClasses = "h-11 px-6 font-mono text-label"
-const inputClasses = "h-11 px-4 text-body md:text-body"
-const labelClasses = "block font-mono text-label text-muted-foreground"
+const textLink = `text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${focusRing}`
+const labelClass = "block font-mono text-label text-muted-foreground"
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-const cardClasses =
-  "flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
-const textLink =
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground"
+const inputClass = "h-11 px-4 text-body md:text-body"
+const errorClass = "flex items-start gap-2 font-mono text-label text-destructive"
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const navLinks = [
   { label: "Today", href: "/today" },
@@ -34,19 +32,11 @@ const navLinks = [
   { label: "Profile", href: "/profile" },
 ]
 
-const reminderTimes = [
-  "06:00",
-  "06:30",
-  "07:00",
-  "07:30",
-  "08:00",
-  "08:30",
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-].map((time) => ({ value: time, label: time }))
+const reminderTimes = Array.from({ length: 11 }, (_, i) => {
+  const minutes = 6 * 60 + i * 30
+  const value = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`
+  return { value, label: value }
+})
 
 type ReminderKey = "morning" | "evening" | "weekly" | "streak"
 
@@ -69,47 +59,36 @@ const reminders: { key: ReminderKey; title: string; detail: string }[] = [
   },
 ]
 
-const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 function initialsOf(name: string) {
   const words = name.trim().split(/\s+/).filter(Boolean)
   if (words.length === 0) return ""
-  const first = words[0][0]
-  const last = words.length > 1 ? words[words.length - 1][0] : ""
+  const first = words[0].charAt(0)
+  const last = words.length > 1 ? words[words.length - 1].charAt(0) : ""
   return (first + last).toUpperCase()
 }
 
 function FieldError({ id, children }: { id: string; children: string }) {
   return (
-    <p
-      id={id}
-      className="flex items-start gap-2 font-mono text-label text-destructive"
-    >
+    <p id={id} className={errorClass}>
       <CircleAlert
         className="size-4 shrink-0"
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      <span>{children}</span>
+      {children}
     </p>
   )
 }
 
-function Header() {
+function SiteHeader() {
   return (
     <header className="border-b border-border">
       <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
-        )}
+        className={`${container} flex flex-wrap items-center gap-x-6 gap-y-2 py-3`}
       >
         <a
           href="/today"
-          className={cn(
-            "inline-flex h-11 items-center font-heading text-h2 text-foreground",
-            focusOutline
-          )}
+          className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusRing}`}
         >
           Mossy
         </a>
@@ -122,13 +101,11 @@ function Header() {
                   <a
                     href={link.href}
                     aria-current={current ? "page" : undefined}
-                    className={cn(
-                      "inline-flex h-11 items-center rounded-lg px-3 font-mono text-label",
+                    className={`inline-flex h-11 items-center rounded-lg px-3 font-mono text-label ${focusRing} ${
                       current
                         ? "bg-secondary text-secondary-foreground"
-                        : "text-foreground underline-offset-4 hover:underline",
-                      focusOutline
-                    )}
+                        : "text-foreground underline-offset-4 hover:underline"
+                    }`}
                   >
                     {link.label}
                   </a>
@@ -142,10 +119,25 @@ function Header() {
   )
 }
 
+function SiteFooter() {
+  return (
+    <footer className="border-t border-border">
+      <div
+        className={`${container} flex flex-wrap items-center justify-between gap-3 py-10`}
+      >
+        <p className="font-heading text-h2 text-foreground">Mossy</p>
+        <p className="font-mono text-label text-muted-foreground">
+          Mossy · Made for small, daily steps · 2026
+        </p>
+      </div>
+    </footer>
+  )
+}
+
 function YouCard() {
-  const [savedName, setSavedName] = useState("Ines Okafor")
   const [name, setName] = useState("Ines Okafor")
   const [email, setEmail] = useState("ines.okafor@example.com")
+  const [savedName, setSavedName] = useState("Ines Okafor")
   const [errors, setErrors] = useState<{ name?: string; email?: string }>({})
   const [saved, setSaved] = useState(false)
   const nameRef = useRef<HTMLInputElement>(null)
@@ -156,96 +148,98 @@ function YouCard() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const next: { name?: string; email?: string } = {}
-    if (name.trim() === "") {
-      next.name = "Add your name, so Mossy knows what to call you."
-    }
-    if (!emailPattern.test(email.trim())) {
-      next.email = "Check your email: it needs an @ and a domain."
-    }
-    setErrors(next)
     window.clearTimeout(timer.current)
-    if (next.name || next.email) {
+
+    const nextName = name.trim()
+    const nextEmail = email.trim()
+    const nextErrors: { name?: string; email?: string } = {}
+    if (!nextName) {
+      nextErrors.name = "Add your name, so Mossy knows what to call you."
+    }
+    if (!EMAIL_PATTERN.test(nextEmail)) {
+      nextErrors.email = "Check your email: it needs an @ and a domain."
+    }
+    setErrors(nextErrors)
+
+    if (nextErrors.name || nextErrors.email) {
       setSaved(false)
-      if (next.name) nameRef.current?.focus()
+      if (nextErrors.name) nameRef.current?.focus()
       else emailRef.current?.focus()
       return
     }
-    setSavedName(name.trim())
-    setName(name.trim())
-    setEmail(email.trim())
+
+    setName(nextName)
+    setEmail(nextEmail)
+    setSavedName(nextName)
     setSaved(true)
     timer.current = window.setTimeout(() => setSaved(false), 4000)
   }
 
   return (
-    <section aria-labelledby="you-heading" className={cardClasses}>
+    <section
+      aria-labelledby="you-heading"
+      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+    >
       <div className="flex items-center gap-3">
-        <span
+        <div
           aria-hidden="true"
           className="flex size-11 shrink-0 items-center justify-center rounded-full bg-secondary font-mono text-label text-secondary-foreground"
         >
           {initialsOf(savedName)}
-        </span>
-        <h2 id="you-heading" className="text-h2">
+        </div>
+        <h2 id="you-heading" className="text-h2 text-foreground">
           You
         </h2>
       </div>
       <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <label htmlFor="profile-name" className={labelClasses}>
+          <label htmlFor="name" className={labelClass}>
             Name
           </label>
           <Input
             ref={nameRef}
-            id="profile-name"
-            name="name"
+            id="name"
             autoComplete="name"
             value={name}
             onChange={(event) => {
               setName(event.target.value)
-              if (errors.name) setErrors({ ...errors, name: undefined })
+              setErrors((current) => ({ ...current, name: undefined }))
             }}
             aria-invalid={errors.name ? true : undefined}
-            aria-describedby={errors.name ? "profile-name-error" : undefined}
-            className={inputClasses}
+            aria-describedby={errors.name ? "name-error" : undefined}
+            className={inputClass}
           />
-          {errors.name && (
-            <FieldError id="profile-name-error">{errors.name}</FieldError>
-          )}
+          {errors.name && <FieldError id="name-error">{errors.name}</FieldError>}
         </div>
         <div className="flex flex-col gap-2">
-          <label htmlFor="profile-email" className={labelClasses}>
+          <label htmlFor="email" className={labelClass}>
             Email
           </label>
           <Input
             ref={emailRef}
-            id="profile-email"
-            name="email"
+            id="email"
             type="email"
             autoComplete="email"
             value={email}
             onChange={(event) => {
               setEmail(event.target.value)
-              if (errors.email) setErrors({ ...errors, email: undefined })
+              setErrors((current) => ({ ...current, email: undefined }))
             }}
             aria-invalid={errors.email ? true : undefined}
             aria-describedby={
-              errors.email
-                ? "profile-email-help profile-email-error"
-                : "profile-email-help"
+              errors.email ? "email-help email-error" : "email-help"
             }
-            className={inputClasses}
+            className={inputClass}
           />
-          <p id="profile-email-help" className={smallFigure}>
+          <p id="email-help" className={smallFigure}>
             We only write to you about your account.
           </p>
           {errors.email && (
-            <FieldError id="profile-email-error">{errors.email}</FieldError>
+            <FieldError id="email-error">{errors.email}</FieldError>
           )}
         </div>
         <div className="flex items-center">
-          <Button type="submit" className={buttonClasses}>
+          <Button type="submit" className="h-11 px-6 font-mono text-label">
             Save changes
           </Button>
           <div role="status">
@@ -267,57 +261,65 @@ function YouCard() {
 }
 
 function RemindersCard() {
-  const [settings, setSettings] = useState<Record<ReminderKey, boolean>>({
+  const [enabled, setEnabled] = useState<Record<ReminderKey, boolean>>({
     morning: true,
     evening: true,
     weekly: false,
     streak: true,
   })
   const [time, setTime] = useState("08:00")
-  const morningOn = settings.morning
+  const morningOn = enabled.morning
 
   return (
-    <section aria-labelledby="reminders-heading" className={cardClasses}>
-      <h2 id="reminders-heading" className="text-h2">
+    <section
+      aria-labelledby="reminders-heading"
+      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+    >
+      <h2 id="reminders-heading" className="text-h2 text-foreground">
         Reminders
       </h2>
-      <p className="max-w-lg">Changes here save as you make them.</p>
+      <p className="max-w-lg text-foreground">
+        Changes here save as you make them.
+      </p>
       <div className="flex flex-col">
         {reminders.map((reminder, index) => (
           <div
             key={reminder.key}
-            className={cn(
-              "flex min-h-11 items-center justify-between gap-4 py-3",
-              index > 0 && "border-t border-border"
-            )}
+            className={`flex min-h-11 items-center justify-between gap-4 py-3 ${
+              index > 0 ? "border-t border-border" : ""
+            }`}
           >
             <div className="flex min-w-0 flex-col gap-2">
               <p
-                id={`reminder-${reminder.key}-title`}
-                className="font-sans text-body font-medium"
+                id={`${reminder.key}-title`}
+                className="font-sans text-body font-medium text-foreground"
               >
                 {reminder.title}
               </p>
-              <p id={`reminder-${reminder.key}-detail`} className={smallFigure}>
+              <p id={`${reminder.key}-detail`} className={smallFigure}>
                 {reminder.detail}
               </p>
             </div>
             <Switch
-              checked={settings[reminder.key]}
+              checked={enabled[reminder.key]}
               onCheckedChange={(checked) =>
-                setSettings((current) => ({
+                setEnabled((current) => ({
                   ...current,
                   [reminder.key]: checked,
                 }))
               }
-              aria-labelledby={`reminder-${reminder.key}-title`}
-              aria-describedby={`reminder-${reminder.key}-detail`}
+              aria-labelledby={`${reminder.key}-title`}
+              aria-describedby={`${reminder.key}-detail`}
             />
           </div>
         ))}
       </div>
       <div className="flex flex-col gap-2 border-t border-border pt-4">
-        <label htmlFor="reminder-time" className={labelClasses}>
+        <label
+          id="reminder-time-label"
+          htmlFor="reminder-time"
+          className={labelClass}
+        >
           Morning reminder time
         </label>
         <div className="w-full md:w-40">
@@ -331,14 +333,15 @@ function RemindersCard() {
           >
             <SelectTrigger
               id="reminder-time"
+              aria-labelledby="reminder-time-label"
               aria-describedby="reminder-time-help"
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {reminderTimes.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
+              {reminderTimes.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -356,16 +359,23 @@ function RemindersCard() {
 
 function PlanCard() {
   return (
-    <section aria-labelledby="plan-heading" className={cardClasses}>
-      <h2 id="plan-heading" className="text-h2">
+    <section
+      aria-labelledby="plan-heading"
+      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+    >
+      <h2 id="plan-heading" className="text-h2 text-foreground">
         Your plan
       </h2>
       <div className="flex flex-wrap items-baseline gap-2">
-        <p className="font-heading text-h1 tabular-nums">Free</p>
+        <p className="font-heading text-h1 tabular-nums text-foreground">
+          Free
+        </p>
         <p className={smallFigure}>5 of 5 habits in use</p>
       </div>
-      <p className="max-w-lg">You are using all five habits on Free.</p>
-      <a href="/plans" className={cn("self-start", textLink, focusOutline)}>
+      <p className="max-w-lg text-foreground">
+        You are using all five habits on Free.
+      </p>
+      <a href="/plans" className={`self-start ${textLink}`}>
         See plans
       </a>
     </section>
@@ -384,12 +394,16 @@ function DeleteCard() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (canDelete) setDeleted(true)
+    if (!canDelete) return
+    setDeleted(true)
   }
 
   return (
-    <section aria-labelledby="delete-heading" className={cardClasses}>
-      <h2 id="delete-heading" className="text-h2">
+    <section
+      aria-labelledby="delete-heading"
+      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
+    >
+      <h2 id="delete-heading" className="text-h2 text-foreground">
         Delete your account
       </h2>
       <div>
@@ -399,41 +413,41 @@ function DeleteCard() {
             onSubmit={handleSubmit}
             className="flex flex-col gap-4"
           >
-            <p className="max-w-lg">
+            <p className="max-w-lg text-body text-foreground">
               This deletes your habits, your streak and all your history. It
               cannot be undone.
             </p>
             <div className="flex flex-col gap-2">
-              <label htmlFor="delete-confirm" className={labelClasses}>
+              <label htmlFor="delete-confirm" className={labelClass}>
                 Type delete to confirm
               </label>
               <Input
                 id="delete-confirm"
-                name="confirm"
                 autoComplete="off"
                 value={confirmText}
                 onChange={(event) => setConfirmText(event.target.value)}
-                className={inputClasses}
+                className={inputClass}
               />
             </div>
             <Button
               type="submit"
               variant="destructive"
-              disabled={!canDelete}
               focusableWhenDisabled
-              className={cn(
-                buttonClasses,
-                "w-full hover:text-foreground md:w-auto md:self-start"
-              )}
+              disabled={!canDelete}
+              className="h-11 w-full px-6 font-mono text-label hover:text-foreground md:w-auto md:self-start"
             >
-              <Trash2 className="size-4" strokeWidth={1.5} aria-hidden="true" />
+              <Trash2 strokeWidth={1.5} aria-hidden="true" />
               Delete my account
             </Button>
           </form>
         )}
         <div role="status">
           {deleted && (
-            <p ref={messageRef} tabIndex={-1} className={codeFocusOutline}>
+            <p
+              ref={messageRef}
+              tabIndex={-1}
+              className={`text-body text-foreground ${codeFocusRing}`}
+            >
               This is where your account would be deleted.
             </p>
           )}
@@ -443,34 +457,16 @@ function DeleteCard() {
   )
 }
 
-function Footer() {
-  return (
-    <footer className="border-t border-border">
-      <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center justify-between gap-3 py-10"
-        )}
-      >
-        <p className="font-heading text-h2">Mossy</p>
-        <p className="font-mono text-label text-muted-foreground">
-          Mossy · Made for small, daily steps · 2026
-        </p>
-      </div>
-    </footer>
-  )
-}
-
 export function App() {
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <Header />
-      <main className={cn(container, "flex flex-col gap-10 pt-10 pb-16")}>
+      <SiteHeader />
+      <main className={`${container} flex flex-col gap-10 pt-10 pb-16`}>
         <div className="flex flex-col gap-2">
           <p className={smallFigure}>
             With Mossy since <time dateTime="2026-09-02">2 September 2026</time>
           </p>
-          <h1 className="text-h1">Your profile</h1>
+          <h1 className="text-h1 text-foreground">Your profile</h1>
         </div>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-x-6">
           <div className="flex flex-col gap-10 md:col-span-7">
@@ -483,7 +479,7 @@ export function App() {
           </div>
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

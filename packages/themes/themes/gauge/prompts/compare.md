@@ -32,8 +32,8 @@ The count reads `11 of 16 rows differ` while all rows show, and `Showing the 11 
 
 The shadcn `Table` with the label "Comparison of three parts", four columns:
 
-- **The header row:** the first header cell reads "Property". Each of the other three is a `<th scope="col">`, right-aligned, holding a stack with `gap-1` and `items-end`: the part number as a text link in `font-mono text-body text-foreground` (`/part` for `TVL-2047-RS`, `#` for the other two), then a small figure with its seals, `Rubber seals` or `Metal shields`; `TVL-2552-RS` also has the "New" badge after its part number, in a `flex items-center gap-2`. These three cells hold two lines, so give them `h-auto py-2` in place of the stock height; they keep the stock `whitespace-nowrap`.
-- **The body rows:** each starts with a `<th scope="row">`, not the stock `TableHead`, with `px-4 py-2 text-left align-top font-normal text-body text-foreground`. It holds a `<div>` with `flex flex-wrap items-baseline gap-2`: the property's name with its unit in brackets, then, on a row whose values differ, the word `Differs` as a small figure in `text-foreground`. The three value cells are right-aligned; a figure is `font-mono tabular-nums`, a phrase is `text-body`. On a row whose values differ, the three value cells also get `font-bold`, all three, since none of them is the odd one out on its own.
+- **The header row:** the first header cell, "Property", is a `TableHead` with `scope="col"`, left-aligned, with the Tables note's header classes. Each of the other three is a `<th scope="col">`, right-aligned, holding a stack with `gap-1` and `items-end`: the part number as a text link in `font-mono text-body text-foreground` (`/part` for `TVL-2047-RS`, `#` for the other two), then a small figure with its seals, `Rubber seals` or `Metal shields`; `TVL-2552-RS` also has the "New" badge after its part number, in a `flex items-center gap-2`. These three cells hold two lines, so give them `h-auto py-2` in place of the stock height; they keep the stock `whitespace-nowrap`.
+- **The body rows:** each starts with a `<th scope="row">`, not the stock `TableHead`, with `px-4 py-2 text-left align-top font-normal text-body text-foreground`. It holds a `<div>` with `flex flex-wrap items-baseline gap-2`: the property's name with its unit in brackets, then, on a row whose values differ, the word `Differs` as a small figure in `text-foreground`. The three value cells are right-aligned; a figure is `font-mono tabular-nums`, a phrase is `text-body`. On a row whose values differ, the three value cells also get `font-bold`, all three, since none of them is the odd one out on its own; a stock state's word gets it too, as the Stock states note says.
 
 The sixteen rows, in this order, with the values of `TVL-2047-RS`, `TVL-2047-ZZ` and `TVL-2552-RS`:
 
@@ -56,13 +56,13 @@ The sixteen rows, in this order, with the values of `TVL-2047-RS`, `TVL-2047-ZZ`
 
 Write `C0` as two plain characters: a `<sub>` would take a size outside the type scale. A stock state cell holds the state's `inline-flex`; the cell is right-aligned, so the state ends on the column's edge.
 
-The table has four columns of about 180px to 220px each and fits the panel at 1280px. On a phone it scrolls sideways in its box.
+Every header cell, "Property" too, gets `min-w-48`, so no column is narrower than 192px. At 1280px the stock `w-full` table shares the panel's width among the four columns; below about 800px it scrolls sideways in its box.
 
 Under the table, inside the same panel, a row with `border-t border-border px-4 py-3` holding one small figure: "Load ratings are calculated to ISO 281 and ISO 76. Limiting speeds are for grease lubrication. Prices exclude VAT."
 
 ### 4. Next steps
 
-A grid row of two panels, six columns each from `lg` up, stacked below. Each has a heading row with an `<h2>` and, under it, one paragraph in `text-body`, then a text link.
+A grid row of two panels, six columns each from `lg` up, stacked below. Each has a heading row with an `<h2>` and, under it, one paragraph in `text-body`, then a text link with `self-start`, so its outline and its click area end with its words.
 
 - **"Not sure which to choose?"**: "Shields let a bearing run faster and warmer; seals keep out more dirt and water. For a pump shaft near water, choose the rubber seals." Then the link "Ask an engineer" to `#`.
 - **"Need the files?"**: "Data sheets, 3D models and certificates for the whole TVL range are on one page." Then the link "Range documents" to `/downloads`.

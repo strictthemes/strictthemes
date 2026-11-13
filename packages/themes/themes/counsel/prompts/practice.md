@@ -11,7 +11,7 @@ checks:
   - "No heading or text on the page is bold or italic, and nothing on the page is round."
 ---
 
-Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in one office at 4 Chancery Row, Wexcombe WX1 2LN. This page is for its **Commercial disputes** team: 4 partners and 16 lawyers, led by David Achterberg (head of commercial disputes, partner since 2007; `01632 960 231`, d.achterberg@harrowvane.example) and Ruth Calloway (partner since 1 May 2026; `01632 960 237`, r.calloway@harrowvane.example). The team acts for owner-managed companies, their buyers and sellers, and their lenders, in the courts, in arbitration and at mediation, and settles most claims before trial. It is ranked in the first band for commercial disputes in the region by the Northern Legal Review, 2026, an invented directory. Every name, client and matter is invented: name no real firm, person, case or court ruling. Write the rest of the copy yourself, plain and exact.
+Sample firm, if the user gave none: **Harrow & Vane LLP**, an invented commercial law firm in Wexcombe, an invented English city, founded in 1952, with 14 partners and 86 lawyers in one office at 4 Chancery Row, Wexcombe WX1 2LN. This page is for its **Commercial disputes** team: 4 partners and 16 lawyers, led by David Achterberg (head of commercial disputes, partner since 2007; `01632 960 231`, d.achterberg@harrowvane.example) and Ruth Calloway (partner since 1 May 2026; `01632 960 237`, r.calloway@harrowvane.example). The team acts for owner-managed companies, their buyers and sellers, and their lenders, in the courts, in arbitration and at mediation, and settles about eight in ten of its claims before trial, most of them at mediation. It is ranked in the first band for commercial disputes in the region by the Northern Legal Review, 2026, an invented directory. Every name, client and matter is invented: name no real firm, person, case or court ruling. Write the rest of the copy yourself, plain and exact.
 
 Build these parts in order.
 
@@ -39,7 +39,7 @@ A section in the grid, with two parts:
 **The note**, in columns 9–12 (`md:col-start-9 md:col-span-4`), with `mt-14 md:mt-0`, as the Text and note rule says:
 
 - A label heading "The team", an `<h3>`.
-- With `mt-4`, a `<dl>` as the layout notes describe it, with four rows: Partners (`4`), Lawyers (`16`), Head of practice (`David Achterberg`), Ranked (`Band 1, Northern Legal Review, 2026`). The two counts are in `font-mono tabular-nums` inside the `<dd>`.
+- With `mt-4`, a `<dl>` as the layout notes describe it, with four rows: Partners (`4`), Lawyers (`16`), Head of practice (`David Achterberg`), Ranked (`Band 1, Northern Legal Review, 2026`). The two `<dd>` elements that hold a count have `font-mono tabular-nums` beside their `text-body`.
 
 ### 4. Typical matters
 
@@ -69,7 +69,7 @@ A section that is not a grid:
 - An `<h2>` in `text-h2`: "Who leads it".
 - With `mt-8`, a `<ul>` with `list-none` that is itself the grid (`grid grid-cols-1 md:grid-cols-12 md:gap-x-8`), with two `<li>`: the first in columns 1–6 (`md:col-span-6`), the second in columns 7–12 (`md:col-start-7 md:col-span-6`) with `mt-14 md:mt-0`. Each `<li>` is itself a grid of its own from `md` up, `md:grid md:grid-cols-6 md:gap-x-8`, with two parts:
   - The portrait from the layout notes in columns 1–2 (`md:col-span-2`), with the person's initials. On a phone it is `w-1/2` wide, so it does not fill the screen: write `w-1/2 md:w-full` in place of the notes' `w-full`.
-  - In columns 3–6 (`md:col-span-4`), with `mt-4 md:mt-0`, a `<div>` holding: the name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link (Ruth Calloway to `/people/ruth-calloway`, David Achterberg to `#`); with `mt-2` the role, a label line in `text-muted-foreground`; with `mt-4` one sentence in `text-body` on what they handle; with `mt-4` two `<p>` label lines, the second with `mt-2`: the telephone number as a `tel:` link and the email address as a `mailto:` link in `normal-case`, both styled as links in running text.
+  - In columns 3–6 (`md:col-span-4`), with `mt-4 md:mt-0`, a `<div>` holding: the name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link (Ruth Calloway to `/people/ruth-calloway`, David Achterberg to `#`); with `mt-2` the role, a label line in `text-muted-foreground`; with `mt-4` one sentence in `text-body` on what they handle; with `mt-4` two `<p>` label lines, the second with `mt-2`: the telephone number as a `tel:` link and the email address as a `mailto:` link in `normal-case`, both styled as links in running text. The email's `<p>` also has `wrap-anywhere`: from 768px to about 1000px the address is wider than its four columns.
 
   People: David Achterberg (`DA`, `Head of commercial disputes`, `01632 960 231`, `d.achterberg@harrowvane.example`): trials and urgent court orders. Ruth Calloway (`RC`, `Partner · Commercial disputes`, `01632 960 237`, `r.calloway@harrowvane.example`): disputes that follow the sale of a company. Each portrait's `aria-label` describes a photograph of that person in one sentence.
 

@@ -23,7 +23,7 @@ The header from the layout notes, with "Reply" as the current page; its link kee
 
 ### 2. Opening
 
-A full-width section that is a pastel block in mist, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The block element itself carries `bg-mist text-mist-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `Reply by Friday 30 April 2027` (the date a `<time dateTime="2027-04-30">`), and the `<h1>` "Will you come?" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "Tell us who is coming and what you would like for dinner. It takes a minute, and it helps us plan the tables and the minibuses."
+A full-width section that is a pastel block in mist, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The `<section>` is the block element, and it carries `bg-mist text-mist-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `Reply by Friday 30 April 2027` (the date a `<time dateTime="2027-04-30">`), and the `<h1>` "Will you come?" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "Tell us who is coming and what you would like for dinner. It takes a minute, and it helps us plan the tables and the minibuses."
 
 ### 3. Your reply and the day in short
 

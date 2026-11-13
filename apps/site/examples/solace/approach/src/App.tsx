@@ -1,17 +1,17 @@
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focus =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const textLink = cn(
-  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focus
-)
 
 const navLink = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focus
+  focusRing
+)
+
+const textLink = cn(
+  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
+  focusRing
 )
 
 const navItems = [
@@ -21,7 +21,7 @@ const navItems = [
   { label: "First session", href: "/first-session" },
 ]
 
-const current = "/approach"
+const currentHref = "/approach"
 
 const contents = [
   { id: "before", label: "Before we meet" },
@@ -54,24 +54,24 @@ const notOffered = [
   "Reports for courts, employers or insurers.",
 ]
 
-function NavLinks() {
+function NavLinks({ className }: { className?: string }) {
   return (
-    <>
+    <ul className={className}>
       {navItems.map((item) => {
-        const isCurrent = item.href === current
+        const current = item.href === currentHref
         return (
           <li key={item.href}>
             <a
               href={item.href}
-              aria-current={isCurrent ? "page" : undefined}
-              className={cn(navLink, isCurrent && "underline")}
+              aria-current={current ? "page" : undefined}
+              className={cn(navLink, current && "underline")}
             >
               {item.label}
             </a>
           </li>
         )
       })}
-    </>
+    </ul>
   )
 }
 
@@ -82,16 +82,14 @@ export function App() {
         <a
           href="/"
           className={cn(
-            "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
-            focus
+            "inline-flex h-11 items-center font-heading text-h2 text-foreground",
+            focusRing
           )}
         >
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
-            <NavLinks />
-          </ul>
+          <NavLinks className="flex flex-wrap gap-x-4 md:gap-x-7" />
         </nav>
       </header>
 
@@ -109,7 +107,7 @@ export function App() {
           >
             How we would <em className="italic">work together</em>
           </h1>
-          <p className="mt-7 max-w-xl text-body md:col-span-7 md:col-start-1">
+          <p className="mt-7 max-w-xl md:col-span-7 md:col-start-1">
             This page says what a session is like, from the first call to the
             last meeting. Read as much of it as helps. You can also just ask
             me.
@@ -128,9 +126,9 @@ export function App() {
               On this page
             </h2>
             <ol className="mt-4 list-none p-0">
-              {contents.map((item, i) => (
-                <li key={item.id} className={cn(i > 0 && "mt-2")}>
-                  <a href={`#${item.id}`} className={cn(textLink, "text-body")}>
+              {contents.map((item, index) => (
+                <li key={item.id} className={index > 0 ? "mt-2" : undefined}>
+                  <a href={`#${item.id}`} className={textLink}>
                     {item.label}
                   </a>
                 </li>
@@ -142,17 +140,17 @@ export function App() {
             <h2 id="before" className="scroll-mt-7 text-h2">
               Before we meet
             </h2>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               It starts with a call of 20 minutes, by phone or video. It is
               free.
             </p>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               You can tell me a little about what is going on, and ask me
               anything. I will say how I work and whether I think I can help.
               If I am not the right person, I will say so, and where I can I
               will suggest who might be.
             </p>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               Nothing is booked until we have spoken and you have had time to
               think.
             </p>
@@ -160,26 +158,26 @@ export function App() {
             <h2 id="first-session" className="mt-12 scroll-mt-7 text-h2">
               The first session
             </h2>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               A first session is 50 minutes, like every session after it. It
               costs the same, £68.
             </p>
             <ol className="mt-7 list-none border-b border-border p-0">
-              {firstSession.map((step) => (
+              {firstSession.map((entry) => (
                 <li
-                  key={step.label}
+                  key={entry.label}
                   className="border-t border-border py-4 md:grid md:grid-cols-7 md:items-baseline md:gap-x-7"
                 >
                   <p className="font-mono text-label text-muted-foreground md:col-span-2">
-                    {step.label}
+                    {entry.label}
                   </p>
-                  <p className="mt-2 max-w-xl text-body md:col-span-5 md:mt-0">
-                    {step.text}
+                  <p className="mt-2 max-w-xl md:col-span-5 md:mt-0">
+                    {entry.text}
                   </p>
                 </li>
               ))}
             </ol>
-            <p className="mt-7 max-w-xl text-body">
+            <p className="mt-7 max-w-xl">
               You do not have to decide in the room. You can write to me a few
               days later.
             </p>
@@ -187,16 +185,16 @@ export function App() {
             <h2 id="after" className="mt-12 scroll-mt-7 text-h2">
               After that
             </h2>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               If we go on, we meet once a week, on the same day and at the same
               time. A steady rhythm matters more than a fast one.
             </p>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               Some people come for eight or ten sessions. Some stay for a year
               or longer. Every sixth session we take a few minutes to ask
               whether this is still useful to you.
             </p>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               You can end at any point. I ask only that we have one last
               session to finish properly, rather than stopping by email.
             </p>
@@ -205,12 +203,12 @@ export function App() {
               What a client said
             </h2>
             <figure className="mt-7">
-              <blockquote className="border-0 p-0">
+              <blockquote>
                 <p className="font-heading text-h2 italic">
                   “I kept waiting to be told what was wrong with me. It took a
-                  few weeks to notice that nobody was going to, and that I
-                  could put things down in that room that I had carried
-                  everywhere else.”
+                  few weeks to notice that nobody was going to, and that I could
+                  put things down in that room that I had carried everywhere
+                  else.”
                 </p>
               </blockquote>
               <figcaption className="mt-4 font-mono text-label text-muted-foreground">
@@ -218,7 +216,7 @@ export function App() {
                 permission, and changed to keep it private.
               </figcaption>
             </figure>
-            <p className="mt-7 max-w-xl text-body">
+            <p className="mt-7 max-w-xl">
               People say many different things about therapy. This is one of
               them, and it is not a promise of what it would be for you.
             </p>
@@ -226,21 +224,21 @@ export function App() {
             <h2 id="not-offered" className="mt-12 scroll-mt-7 text-h2">
               What I do not offer
             </h2>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               It is better to know this before you write.
             </p>
-            <ul className="mt-7 max-w-xl list-disc pl-7 text-body">
-              {notOffered.map((item, i) => (
-                <li key={item} className={cn(i > 0 && "mt-2")}>
+            <ul className="mt-7 max-w-xl list-disc pl-7">
+              {notOffered.map((item, index) => (
+                <li key={item} className={index > 0 ? "mt-2" : undefined}>
                   {item}
                 </li>
               ))}
             </ul>
-            <p className="mt-7 max-w-xl text-body">
+            <p className="mt-7 max-w-xl">
               If you need one of these, tell me when you write. Where I can, I
               will point you towards someone who offers it.
             </p>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               In an emergency, call your local emergency number or go to the
               nearest emergency department.
             </p>
@@ -255,9 +253,10 @@ export function App() {
             <h2 id="action-title" className="text-h2">
               If this sounds right for you
             </h2>
-            <p className="mt-4 max-w-xl text-body">
-              Write to me with the form. I reply within two working days. The
-              first call is free, and nothing is booked until we have spoken.
+            <p className="mt-4 max-w-xl">
+              The button leads to a short form. I reply within two working
+              days. The first call is free, and nothing is booked until we have
+              spoken.
             </p>
             <div className="mt-7">
               <a
@@ -284,7 +283,7 @@ export function App() {
             <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
-            <p className="mt-2 text-body">
+            <p className="mt-2 wrap-break-word">
               <a href="mailto:hello@ellingham.example" className={textLink}>
                 hello@ellingham.example
               </a>
@@ -294,9 +293,7 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <ul>
-              <NavLinks />
-            </ul>
+            <NavLinks />
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

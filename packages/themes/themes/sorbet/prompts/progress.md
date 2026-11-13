@@ -37,7 +37,7 @@ The three cards:
 
 1. "Current streak": `12` with `days`, and a good-news badge (add it with `npx shadcn@latest add badge`) "Your longest since September" with the `Flame` icon. Sentence: "Finish today's habits and it becomes 13." The streak does not change with the switch.
 2. "Habits done": `32` with `of 35` (week) or `129` with `of 150` (month). Sentence: "That is 91% of everything you planned." (week) or "That is 86% …" (month).
-3. "Best day": `Tuesday` (week) or `Monday` (month) in `font-heading text-h1` (a word, so the smaller key figure), with no unit. Sentence: "You finish the most on Tuesdays." or "… on Mondays." The best day is the weekday with the highest total in the period; where weekdays tie, the most recent wins. In the week the six days before today all tie at 5, so Tuesday; in the month Monday leads with 20.
+3. "Best day": `Tuesday` (week) or `Monday` (month) in `font-heading text-h1` (a word, so the smaller key figure), with no unit. Sentence: "All 5 done, as on the five days before it." (week: the six days tie, so a sentence about Tuesdays would claim a pattern) or "You finish the most on Mondays." (month). The best day is the weekday with the highest total in the period; where weekdays tie, the most recent wins. In the week the six days before today all tie at 5, so Tuesday; in the month Monday leads with 20.
 
 ### 4. Chart
 
@@ -47,7 +47,7 @@ The chart is a `flex gap-3`: the scale, `relative h-48 w-6`, and the plot, `rela
 
 Under the plot, in the card's `gap-4`, the day labels, lined up with the bars: a second `flex gap-3` with an empty `w-6` column first, then a row with the same gap as the bars and one `flex-1 min-w-0` cell per bar (`min-w-0`, or a cell grows to fit its label and stops lining up with its bar). The labels are small figures, centered in their cells and not wrapped (`whitespace-nowrap`; a month's label may run wider than its cell, over the empty cells beside it): for a week, every day (`Thu` to `Tue`, then "Today" in `text-foreground` under the last bar, written through `cn` so that it replaces the small figure's color); for a month, a date every seventh cell counting back from today (`4 Nov`, `28 Oct`, `21 Oct`, `14 Oct`), ending with "Today" under the last bar, and the other cells empty. In the week view at 375px, a centered "Today" (about 40px in a 30px cell) runs into the gaps beside it and stops short of "Tue", which is right. In the month view, "Today" ends at the plot's right edge rather than being centered (`flex justify-end` on its cell), so it does not run past the plot.
 
-The drawing (scale, plot and labels) has `aria-hidden="true"`. The text alternative is a plain `<table>` (not the shadcn `Table`) inside a `<div>` with `sr-only` (the class does not work on a `<table>` itself), with a `<caption>` "Habits done each day, out of 5", and a row for every day in the period: the date as a `<time>`, written `Thursday, 5 November` (`dateTime="2026-11-05"`), and the number.
+The drawing is two rows, the scale with the plot and the labels under them; each row has `aria-hidden="true"`. The text alternative is a plain `<table>` (not the shadcn `Table`) inside a `<div>` with `sr-only` (the class does not work on a `<table>` itself), with a `<caption>` "Habits done each day, out of 5", a `<thead>` row with the `<th scope="col">` cells "Day" and "Habits done", and a row for every day in the period: a `<th scope="row">` holding the date as a `<time>`, written `Thursday, 5 November` (`dateTime="2026-11-05"`), and a `<td>` with the number.
 
 At 375px the month's 30 bars (about 7px each) fit the card. Nothing in the chart scrolls.
 
@@ -55,7 +55,7 @@ At 375px the month's 30 bars (about 7px each) fit the card. Nothing in the chart
 
 A section with an `<h2>` "By habit". Under it, one card holding a `<ul>` with `flex flex-col gap-4`. Each `<li>` is a `flex flex-col gap-2`, and every `<li>` after the first has `border-t border-border pt-4`:
 
-- A row, `flex flex-wrap items-center justify-between gap-3`: first a `flex flex-wrap items-center gap-2` holding the habit's name in `text-body font-medium` (add `font-sans`) and, for a habit at 100%, a good-news badge "Every day" after it; then, at the right end, the numbers as a small figure: `6 of 7 days · 86%`.
+- A row, `flex flex-wrap items-center justify-between gap-3`: first a `flex flex-wrap items-center gap-2` holding the habit's name in `text-body font-medium` (add `font-sans`) and, for a habit at 100%, a good-news badge "Every day" after it; then, at the right end, the numbers as a small figure: `6 of 7 days · 86%` for the week, `29 of 30 days · 97%` for the month.
 - The meter from the layout notes, its fill the same percentage.
 
 Sort the habits from the highest share to the lowest; habits with the same share keep the sample's order. Percentages are rounded to whole numbers. A habit under 50% gets no warning color: its numbers say it.

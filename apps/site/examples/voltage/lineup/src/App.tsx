@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { KeyboardEvent } from "react"
 import { Check, Plus } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -11,15 +12,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 
-type Day = "fri" | "sat"
-type Stage = "crane" | "pump" | "office"
-type StageFilter = "all" | Stage
+type DayId = "fri" | "sat"
+type StageId = "crane" | "pump" | "office"
+type StageFilter = "all" | StageId
 
-type LineupSet = {
+type SetItem = {
   id: string
-  day: Day
-  stage: Stage
+  day: DayId
+  stage: StageId
   act: string
   slug: string
   start: string
@@ -30,26 +32,26 @@ type LineupSet = {
 }
 
 const DAYS: Record<
-  Day,
-  { date: string; nextDate: string; short: string; long: string; name: string }
+  DayId,
+  { button: string; heading: string; name: string; date: string; next: string }
 > = {
   fri: {
-    date: "2026-12-04",
-    nextDate: "2026-12-05",
-    short: "Fri 4 Dec",
-    long: "Friday 4 December",
+    button: "Fri 4 Dec",
+    heading: "Friday 4 December",
     name: "Friday",
+    date: "2026-12-04",
+    next: "2026-12-05",
   },
   sat: {
-    date: "2026-12-05",
-    nextDate: "2026-12-06",
-    short: "Sat 5 Dec",
-    long: "Saturday 5 December",
+    button: "Sat 5 Dec",
+    heading: "Saturday 5 December",
     name: "Saturday",
+    date: "2026-12-05",
+    next: "2026-12-06",
   },
 }
 
-const STAGES: Record<Stage, string> = {
+const STAGES: Record<StageId, string> = {
   crane: "Crane Stage",
   pump: "Pump House",
   office: "Drawing Office",
@@ -62,71 +64,108 @@ const STAGE_ITEMS: { value: StageFilter; label: string }[] = [
   { value: "office", label: STAGES.office },
 ]
 
-const SETS: LineupSet[] = [
-  // Friday
-  { id: "fri-juno-halde", day: "fri", stage: "crane", act: "Juno Halde", slug: "juno-halde", start: "17:30", end: "18:15" },
-  { id: "fri-gravel-and-gold", day: "fri", stage: "crane", act: "Gravel & Gold", slug: "gravel-and-gold", start: "19:00", end: "19:50" },
-  { id: "fri-the-night-ferries", day: "fri", stage: "crane", act: "The Night Ferries", slug: "the-night-ferries", start: "20:40", end: "21:40" },
-  { id: "fri-ossa-bloom", day: "fri", stage: "crane", act: "Ossa Bloom", slug: "ossa-bloom", start: "22:40", end: "23:50" },
-  { id: "fri-neon-allotment", day: "fri", stage: "pump", act: "Neon Allotment", slug: "neon-allotment", start: "18:00", end: "18:45", isNew: true },
-  { id: "fri-pia-strand", day: "fri", stage: "pump", act: "Pia Strand", slug: "pia-strand", start: "19:30", end: "20:20" },
-  { id: "fri-sister-antenna", day: "fri", stage: "pump", act: "Sister Antenna", slug: "sister-antenna", start: "21:00", end: "22:00" },
-  { id: "fri-basement-choir", day: "fri", stage: "pump", act: "Basement Choir", slug: "basement-choir", start: "23:00", end: "00:30" },
-  { id: "fri-teo-marsh", day: "fri", stage: "office", act: "Teo Marsh", slug: "teo-marsh", start: "17:00", end: "17:45", kind: "Talk", title: "Posters that shout" },
-  { id: "fri-fold-press", day: "fri", stage: "office", act: "Fold Press", slug: "fold-press", start: "18:30", end: "19:30", kind: "Workshop", title: "Print your own poster" },
-  // Saturday
-  { id: "sat-odd-weather", day: "sat", stage: "crane", act: "Odd Weather", slug: "odd-weather", start: "14:00", end: "14:45" },
-  { id: "sat-lumen-varga", day: "sat", stage: "crane", act: "Lumen Varga", slug: "lumen-varga", start: "16:00", end: "17:00" },
-  { id: "sat-halvard-ek", day: "sat", stage: "crane", act: "Halvard Ek", slug: "halvard-ek", start: "19:00", end: "20:00" },
-  { id: "sat-kettle-drum-union", day: "sat", stage: "crane", act: "Kettle Drum Union", slug: "kettle-drum-union", start: "21:30", end: "23:00" },
-  { id: "sat-mira-sallis", day: "sat", stage: "pump", act: "Mira Sallis", slug: "mira-sallis", start: "13:30", end: "14:15" },
-  { id: "sat-low-tide-radio", day: "sat", stage: "pump", act: "Low Tide Radio", slug: "low-tide-radio", start: "17:30", end: "18:30" },
-  { id: "sat-cassette-saints", day: "sat", stage: "pump", act: "Cassette Saints", slug: "cassette-saints", start: "20:00", end: "21:00" },
-  { id: "sat-rook-and-ivy", day: "sat", stage: "pump", act: "Rook & Ivy", slug: "rook-and-ivy", start: "23:30", end: "01:00" },
-  { id: "sat-studio-kantor", day: "sat", stage: "office", act: "Studio Kantor", slug: "studio-kantor", start: "13:00", end: "13:45", kind: "Talk", title: "Type for loud places" },
-  { id: "sat-ossa-bloom", day: "sat", stage: "office", act: "Ossa Bloom", slug: "ossa-bloom", start: "15:00", end: "15:45", kind: "Talk", title: "Light shows from scrap" },
-]
-
-const STORAGE_KEY = "tremor-days-my-list"
-
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const LABEL = "font-mono text-label font-bold uppercase text-foreground"
-const BUTTON = "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
-const NAV_LINK = `${LABEL} hover:underline underline-offset-4 ${FOCUS}`
-const CURRENT = "underline decoration-2 underline-offset-4"
-
-const NAV = [
-  { label: "Line-up", href: "/line-up", current: true },
-  { label: "Tickets", href: "/tickets", current: false },
-  { label: "Info", href: "/info", current: false },
-]
-
-function dateTime(day: Day, time: string, after?: string) {
-  const d = DAYS[day]
-  const date = after !== undefined && time < after ? d.nextDate : d.date
-  return `${date}T${time}+01:00`
+function slugify(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "")
 }
 
-function plural(n: number, noun: string) {
-  return `${n} ${noun}${n === 1 ? "" : "s"}`
+function set(
+  day: DayId,
+  stage: StageId,
+  act: string,
+  start: string,
+  end: string,
+  extra: Partial<SetItem> = {}
+): SetItem {
+  const slug = slugify(act)
+  return { id: `${day}-${slug}`, day, stage, act, slug, start, end, ...extra }
 }
+
+const SETS: SetItem[] = [
+  set("fri", "crane", "Juno Halde", "17:30", "18:15"),
+  set("fri", "crane", "Gravel & Gold", "19:00", "19:50"),
+  set("fri", "crane", "The Night Ferries", "20:40", "21:40"),
+  set("fri", "crane", "Ossa Bloom", "22:40", "23:50"),
+  set("fri", "pump", "Neon Allotment", "18:00", "18:45", { isNew: true }),
+  set("fri", "pump", "Pia Strand", "19:30", "20:20"),
+  set("fri", "pump", "Sister Antenna", "21:00", "22:00"),
+  set("fri", "pump", "Basement Choir", "23:00", "00:30"),
+  set("fri", "office", "Teo Marsh", "17:00", "17:45", {
+    kind: "Talk",
+    title: "Posters that shout",
+  }),
+  set("fri", "office", "Fold Press", "18:30", "19:30", {
+    kind: "Workshop",
+    title: "Print your own poster",
+  }),
+  set("sat", "crane", "Odd Weather", "14:00", "14:45"),
+  set("sat", "crane", "Lumen Varga", "16:00", "17:00"),
+  set("sat", "crane", "Halvard Ek", "19:00", "20:00"),
+  set("sat", "crane", "Kettle Drum Union", "21:30", "23:00"),
+  set("sat", "pump", "Mira Sallis", "13:30", "14:15"),
+  set("sat", "pump", "Low Tide Radio", "17:30", "18:30"),
+  set("sat", "pump", "Cassette Saints", "20:00", "21:00"),
+  set("sat", "pump", "Rook & Ivy", "23:30", "01:00"),
+  set("sat", "office", "Studio Kantor", "13:00", "13:45", {
+    kind: "Talk",
+    title: "Type for loud places",
+  }),
+  set("sat", "office", "Ossa Bloom", "15:00", "15:45", {
+    kind: "Talk",
+    title: "Light shows from scrap",
+  }),
+]
+
+const SET_IDS = new Set(SETS.map((s) => s.id))
+const STORAGE_KEY = "tremor-days-saved-sets"
 
 function readSaved(): string[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
     if (!raw) return []
     const parsed: unknown = JSON.parse(raw)
-    return Array.isArray(parsed)
-      ? parsed.filter(
-          (v): v is string =>
-            typeof v === "string" && SETS.some((s) => s.id === v)
-        )
-      : []
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter(
+      (id): id is string => typeof id === "string" && SET_IDS.has(id)
+    )
   } catch {
     return []
   }
 }
+
+function writeSaved(ids: string[]) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids))
+  } catch {
+    // Storage is not available: the list still works for this visit.
+  }
+}
+
+function dateTimeFor(item: SetItem, time: string, isEnd: boolean) {
+  const day = DAYS[item.day]
+  const date = isEnd && time < item.start ? day.next : day.date
+  return `${date}T${time}+01:00`
+}
+
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label font-bold uppercase text-foreground"
+const buttonText = "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
+const navLink = cn(
+  label,
+  "text-foreground hover:underline underline-offset-4",
+  focusRing
+)
+const currentLink = "underline decoration-2 underline-offset-4"
+
+const NAV = [
+  { href: "/line-up", text: "Line-up", current: true },
+  { href: "/tickets", text: "Tickets", current: false },
+  { href: "/info", text: "Info", current: false },
+]
 
 function FestivalDates() {
   return (
@@ -139,26 +178,24 @@ function FestivalDates() {
 
 function SiteHeader() {
   const [open, setOpen] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
-  useEffect(() => {
-    if (!open) return
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") {
-        setOpen(false)
-        buttonRef.current?.focus()
-      }
+  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (open && event.key === "Escape") {
+      setOpen(false)
+      menuButton.current?.focus()
     }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
-  }, [open])
+  }
 
   return (
-    <header className="border-b border-border">
+    <header className="border-b border-border" onKeyDown={onKeyDown}>
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-3 px-3 py-3 md:px-5">
         <a
           href="/"
-          className={`font-heading text-h2 text-foreground underline-offset-4 hover:underline ${FOCUS}`}
+          className={cn(
+            "font-heading text-h2 text-foreground hover:underline underline-offset-4",
+            focusRing
+          )}
         >
           Tremor Days
         </a>
@@ -168,22 +205,22 @@ function SiteHeader() {
               key={link.href}
               href={link.href}
               aria-current={link.current ? "page" : undefined}
-              className={`${NAV_LINK} ${link.current ? CURRENT : ""}`}
+              className={cn(navLink, link.current && currentLink)}
             >
-              {link.label}
+              {link.text}
             </a>
           ))}
         </nav>
-        <p className={`ml-auto hidden md:block ${LABEL}`}>
+        <p className={cn(label, "ml-auto hidden tabular-nums md:block")}>
           <FestivalDates />
         </p>
         <Button
-          ref={buttonRef}
+          ref={menuButton}
           variant="outline"
           aria-expanded={open}
           aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
-          className={`ml-auto md:hidden ${BUTTON}`}
+          onClick={() => setOpen((value) => !value)}
+          className={cn(buttonText, "ml-auto md:hidden")}
         >
           Menu
         </Button>
@@ -200,9 +237,9 @@ function SiteHeader() {
               key={link.href}
               href={link.href}
               aria-current={link.current ? "page" : undefined}
-              className={`block py-2 ${NAV_LINK} ${link.current ? CURRENT : ""}`}
+              className={cn(navLink, "block py-2", link.current && currentLink)}
             >
-              {link.label}
+              {link.text}
             </a>
           ))}
         </div>
@@ -217,9 +254,9 @@ function SiteFooter() {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-3 py-8 md:px-5">
         <p className="font-heading text-h2">Tremor Days</p>
         <p className="text-body">
-          A two-day music and design festival on three stages at Varsby Docks.
+          A two-day music and design festival at Varsby Docks.
         </p>
-        <p className={LABEL}>
+        <p className={cn(label, "tabular-nums")}>
           Varsby Docks · <FestivalDates /> · © 2026 Tremor Days
         </p>
       </div>
@@ -228,74 +265,65 @@ function SiteFooter() {
 }
 
 export function App() {
-  const [day, setDay] = useState<Day>("fri")
+  const [day, setDay] = useState<DayId>("fri")
   const [stage, setStage] = useState<StageFilter>("all")
   const [onlyMine, setOnlyMine] = useState(false)
   const [saved, setSaved] = useState<string[]>(readSaved)
-  // Where focus goes after the next render, if anywhere.
+
+  const saveButtons = useRef(new Map<string, HTMLButtonElement>())
+  const showAllButton = useRef<HTMLButtonElement>(null)
+  const stageTrigger = useRef<HTMLButtonElement>(null)
   const pendingFocus = useRef<string | null>(null)
 
-  const saveRefs = useRef(new Map<string, HTMLButtonElement>())
-  const showAllRef = useRef<HTMLButtonElement>(null)
-  const stageRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(saved))
-    } catch {
-      // Storage is not available: the list still works for this visit.
-    }
-  }, [saved])
-
-  useEffect(() => {
-    const target = pendingFocus.current
-    if (target === null) return
-    pendingFocus.current = null
-    if (target === "show-all") showAllRef.current?.focus()
-    else if (target === "stage") stageRef.current?.focus()
-    else saveRefs.current.get(target)?.focus()
-  })
-
-  const daySets = useMemo(
-    () =>
-      SETS.filter((s) => s.day === day).sort((a, b) =>
-        a.start.localeCompare(b.start)
-      ),
-    [day]
+  const daySets = SETS.filter((s) => s.day === day).sort((a, b) =>
+    a.start.localeCompare(b.start)
   )
-
   const shown = daySets.filter(
     (s) =>
       (stage === "all" || s.stage === stage) &&
       (!onlyMine || saved.includes(s.id))
   )
+  const savedCount = saved.filter((id) => SET_IDS.has(id)).length
 
-  const total = daySets.length
-  const shownText =
-    shown.length === total
-      ? plural(total, "set")
-      : `${shown.length} of ${plural(total, "set")}`
+  useEffect(() => {
+    const target = pendingFocus.current
+    if (target === null) return
+    pendingFocus.current = null
+    if (target === "show-all") showAllButton.current?.focus()
+    else saveButtons.current.get(target)?.focus()
+  }, [saved])
 
-  const savedText =
-    saved.length === 0 ? "no sets yet" : plural(saved.length, "set")
+  function toggleSaved(item: SetItem) {
+    const isSaved = saved.includes(item.id)
+    const next = isSaved
+      ? saved.filter((id) => id !== item.id)
+      : [...saved, item.id]
 
-  function toggleSave(id: string) {
-    const isSaved = saved.includes(id)
     if (isSaved && onlyMine) {
-      const index = shown.findIndex((s) => s.id === id)
-      const next = shown[index + 1] ?? shown[index - 1]
-      pendingFocus.current = next ? next.id : "show-all"
+      const index = shown.findIndex((s) => s.id === item.id)
+      const neighbour = shown[index + 1] ?? shown[index - 1]
+      pendingFocus.current = neighbour ? neighbour.id : "show-all"
     }
-    setSaved((list) =>
-      isSaved ? list.filter((v) => v !== id) : [...list, id]
-    )
+
+    setSaved(next)
+    writeSaved(next)
   }
 
   function showAll() {
     setStage("all")
     setOnlyMine(false)
-    pendingFocus.current = "stage"
+    stageTrigger.current?.focus()
   }
+
+  const shownText =
+    shown.length === daySets.length
+      ? `${daySets.length} sets`
+      : `${shown.length} of ${daySets.length} sets`
+
+  const savedText =
+    savedCount === 0
+      ? "My list · no sets yet"
+      : `My list · ${savedCount} ${savedCount === 1 ? "set" : "sets"}`
 
   return (
     <div className="min-h-screen bg-background font-sans text-body text-foreground">
@@ -304,7 +332,7 @@ export function App() {
       <main className="mx-auto flex max-w-[1200px] flex-col gap-16 px-3 py-8 md:px-5 md:py-16">
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-2">
-            <p className={LABEL}>
+            <p className={cn(label, "tabular-nums")}>
               Tremor Days · <FestivalDates />
             </p>
             <h1 className="text-h1 md:text-display">Line-up</h1>
@@ -318,7 +346,7 @@ export function App() {
           <h2 className="sr-only">Filter the programme</h2>
           <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 md:flex-row md:flex-wrap md:items-end">
             <div className="flex flex-col gap-2">
-              <p id="day-label" className={LABEL}>
+              <p id="day-label" className={label}>
                 Day
               </p>
               <div
@@ -326,18 +354,18 @@ export function App() {
                 aria-labelledby="day-label"
                 className="flex flex-wrap gap-2"
               >
-                {(Object.keys(DAYS) as Day[]).map((d) => {
-                  const chosen = d === day
+                {(Object.keys(DAYS) as DayId[]).map((id) => {
+                  const chosen = id === day
                   return (
                     <Button
-                      key={d}
-                      variant={chosen ? "secondary" : "outline"}
+                      key={id}
                       aria-pressed={chosen}
-                      onClick={() => setDay(d)}
-                      className={BUTTON}
+                      variant={chosen ? "secondary" : "outline"}
+                      onClick={() => setDay(id)}
+                      className={buttonText}
                     >
                       {chosen && <Check aria-hidden="true" className="size-4" />}
-                      {DAYS[d].short}
+                      {DAYS[id].button}
                     </Button>
                   )
                 })}
@@ -345,7 +373,11 @@ export function App() {
             </div>
 
             <div className="flex w-full flex-col gap-2 md:w-56">
-              <label htmlFor="stage-filter" className={`block ${LABEL}`}>
+              <label
+                id="stage-label"
+                htmlFor="stage-select"
+                className={cn(label, "block")}
+              >
                 Stage
               </label>
               <Select
@@ -355,7 +387,11 @@ export function App() {
                   if (value !== null) setStage(value as StageFilter)
                 }}
               >
-                <SelectTrigger id="stage-filter" ref={stageRef}>
+                <SelectTrigger
+                  id="stage-select"
+                  ref={stageTrigger}
+                  aria-labelledby="stage-label"
+                >
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -368,20 +404,20 @@ export function App() {
               </Select>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:pb-2">
               <Checkbox
                 id="only-my-list"
                 className="rounded-sm"
                 checked={onlyMine}
                 onCheckedChange={(checked) => setOnlyMine(checked)}
               />
-              <label htmlFor="only-my-list" className={LABEL}>
+              <label htmlFor="only-my-list" className={label}>
                 Only my list
               </label>
             </div>
 
-            <p className={`tabular-nums md:ml-auto ${LABEL}`}>
-              My list · {savedText}
+            <p className={cn(label, "tabular-nums md:ml-auto md:pb-2")}>
+              {savedText}
             </p>
           </div>
         </section>
@@ -390,7 +426,7 @@ export function App() {
           <div className="flex flex-col gap-0 overflow-hidden rounded-xl border border-border bg-card">
             <div className="flex flex-wrap items-baseline justify-between gap-3 border-b border-border px-5 pt-5 pb-3">
               <h2 className="text-h2">
-                <time dateTime={DAYS[day].date}>{DAYS[day].long}</time>
+                <time dateTime={DAYS[day].date}>{DAYS[day].heading}</time>
               </h2>
               <p
                 aria-live="polite"
@@ -402,56 +438,59 @@ export function App() {
 
             {shown.length > 0 ? (
               <ul className="list-none p-0">
-                {shown.map((set) => {
-                  const isSaved = saved.includes(set.id)
+                {shown.map((item) => {
+                  const isSaved = saved.includes(item.id)
                   return (
                     <li
-                      key={set.id}
+                      key={item.id}
                       className="flex items-start gap-5 border-t border-border px-5 py-3 first:border-t-0 md:items-center"
                     >
                       <div className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-5">
                         <p className="font-mono text-label font-bold tabular-nums md:w-32 md:shrink-0">
-                          <time dateTime={dateTime(set.day, set.start)}>
-                            {set.start}
+                          <time dateTime={dateTimeFor(item, item.start, false)}>
+                            {item.start}
                           </time>
                           –
-                          <time dateTime={dateTime(set.day, set.end, set.start)}>
-                            {set.end}
+                          <time dateTime={dateTimeFor(item, item.end, true)}>
+                            {item.end}
                           </time>
                         </p>
-                        <div className="flex min-w-0 flex-wrap items-center gap-2 md:flex-1">
-                          <h3 className="min-w-0 text-h2 wrap-break-word">
+                        <div className="flex flex-wrap items-center gap-2 md:min-w-0 md:flex-1">
+                          <h3 className="min-w-0 text-h2">
                             <a
-                              href={`/artists/${set.slug}`}
-                              className={`text-foreground underline-offset-4 hover:underline ${FOCUS}`}
+                              href={`/artists/${item.slug}`}
+                              className={cn(
+                                "text-foreground hover:underline underline-offset-4",
+                                focusRing
+                              )}
                             >
-                              {set.act}
+                              {item.act}
                             </a>
                           </h3>
-                          {set.isNew && (
-                            <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-bold text-tertiary-foreground uppercase">
+                          {item.isNew && (
+                            <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-bold uppercase text-tertiary-foreground">
                               New
                             </Badge>
                           )}
-                          {set.kind && (
+                          {item.kind && (
                             <p className="text-body">
-                              {set.kind}: {set.title}
+                              {item.kind}: {item.title}
                             </p>
                           )}
                         </div>
-                        <p className={`md:w-40 md:shrink-0 ${LABEL}`}>
-                          {STAGES[set.stage]}
+                        <p className={cn(label, "md:w-40 md:shrink-0")}>
+                          {STAGES[item.stage]}
                         </p>
                       </div>
                       <Button
-                        ref={(el: HTMLButtonElement | null) => {
-                          if (el) saveRefs.current.set(set.id, el)
-                          else saveRefs.current.delete(set.id)
+                        ref={(node: HTMLButtonElement | null) => {
+                          if (node) saveButtons.current.set(item.id, node)
+                          else saveButtons.current.delete(item.id)
                         }}
-                        variant={isSaved ? "secondary" : "outline"}
                         aria-pressed={isSaved}
-                        onClick={() => toggleSave(set.id)}
-                        className={`shrink-0 ${BUTTON}`}
+                        variant={isSaved ? "secondary" : "outline"}
+                        onClick={() => toggleSaved(item)}
+                        className={cn(buttonText, "shrink-0")}
                       >
                         {isSaved ? (
                           <Check aria-hidden="true" className="size-4" />
@@ -460,7 +499,8 @@ export function App() {
                         )}
                         Save
                         <span className="sr-only">
-                          {` ${set.act}, ${DAYS[set.day].name}`}
+                          {" "}
+                          {item.act}, {DAYS[item.day].name}
                         </span>
                       </Button>
                     </li>
@@ -471,10 +511,10 @@ export function App() {
               <div className="flex flex-col items-start gap-3 px-5 py-3">
                 <p className="text-body">No sets match these filters.</p>
                 <Button
-                  ref={showAllRef}
+                  ref={showAllButton}
                   variant="outline"
                   onClick={showAll}
-                  className={BUTTON}
+                  className={buttonText}
                 >
                   Show all sets
                 </Button>

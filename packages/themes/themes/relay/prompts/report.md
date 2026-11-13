@@ -116,7 +116,7 @@ Each figure is a `<div>` with `flex flex-col gap-2`: a `<dt>`, the figure's name
 
 - The club's name as a label with `w-28 shrink-0`: `WENDMOOR FC`, `OTTERBY TOWN`.
 - The bar's track, a `<div>` with `min-w-0 flex-1` and no fill, which holds the bar: a `<div>` with `h-3 rounded-sm` and `aria-hidden="true"`, `bg-secondary` for Wendmoor FC (navy in light mode, ice blue in dark mode; not `bg-navy`, which would not show on a dark card) and `bg-muted-foreground` for Otterby Town, its width an inline `style` in percent.
-- The figure itself, written out, in `text-h2` with `w-12 shrink-0 text-right`: `56%`, `14`.
+- The figure itself, written out, in `text-h2` with `w-14 shrink-0 text-right`: `56%`, `14`. `56%` is about 51px wide in Saira, so `w-12` would be too narrow.
 
 The five figures, in this order: "Possession", `56%` and `44%`; "Shots", `14` and `9`; "Shots on target", `7` and `3`; "Corners", `6` and `4`; "Fouls", `9` and `13`. A possession bar is as wide as its percent. Any other bar is the figure's share of the larger of the two, so the larger is 100%: 9 shots against 14 is 64.3%. The widths are worked out in code. The two clubs are told apart by their names; the two bar colors only help.
 

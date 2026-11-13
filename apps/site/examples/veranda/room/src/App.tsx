@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { ArrowRight, Check } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -16,7 +17,9 @@ import { cn } from "@/lib/utils"
 const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const plainLink = cn(
+const label = "font-mono text-label uppercase"
+
+const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focus
 )
@@ -26,13 +29,15 @@ const textLink = cn(
   focus
 )
 
-const label = "font-mono text-label uppercase"
+const section = "mt-12 border-t border-border pt-6 md:mt-26"
+
+const sectionGrid = "grid gap-6 md:grid-cols-12 md:items-start"
 
 const navLinks = [
   { label: "Rooms", href: "/rooms", current: true },
-  { label: "Menu", href: "/menu", current: false },
-  { label: "Find us", href: "/#find-us", current: false },
-  { label: "Reserve", href: "/reserve", current: false },
+  { label: "Menu", href: "/menu" },
+  { label: "Find us", href: "/#find-us" },
+  { label: "Reserve", href: "/reserve" },
 ]
 
 const facts = [
@@ -45,6 +50,10 @@ const facts = [
 ]
 
 const included = [
+  <>
+    Breakfast on the veranda, from <time dateTime="08:00">08:00</time> to{" "}
+    <time dateTime="10:00">10:00</time>
+  </>,
   "Linen sheets and wool blankets",
   "A kettle, loose tea and fresh milk",
   "Towels, soap and a hot water bottle",
@@ -68,7 +77,33 @@ const otherRooms = [
   { name: "Thrift", price: "From £104 a night" },
 ]
 
-const cellPad = "px-4 py-2 first:pl-0 last:pr-0"
+const cell = "px-4 py-2 whitespace-normal first:pl-0 last:pr-0"
+
+function FactsList({
+  items,
+  className,
+}: {
+  items: { term: string; detail: ReactNode }[]
+  className?: string
+}) {
+  return (
+    <dl
+      className={cn("divide-y divide-border border-y border-border", className)}
+    >
+      {items.map((item) => (
+        <div
+          key={item.term}
+          className="flex items-baseline justify-between gap-4 py-2"
+        >
+          <dt className={cn(label, "text-muted-foreground")}>{item.term}</dt>
+          <dd className="text-right text-body text-foreground">
+            {item.detail}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  )
+}
 
 function Plate({
   label: description,
@@ -102,7 +137,7 @@ export function App() {
   return (
     <div className="mx-auto max-w-[1160px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-4 border-b border-border py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", plainLink)}>
+        <a href="/" className={cn("font-heading text-h2", headerLink)}>
           Kittiwake House
         </a>
         <nav aria-label="Main">
@@ -112,7 +147,7 @@ export function App() {
                 <a
                   href={link.href}
                   aria-current={link.current ? "true" : undefined}
-                  className={cn(label, plainLink, link.current && "underline")}
+                  className={cn(label, headerLink, link.current && "underline")}
                 >
                   {link.label}
                 </a>
@@ -134,10 +169,13 @@ export function App() {
                   Sea view
                 </Badge>
               </div>
-              <h1 id="room-title" className="mt-2 text-h1 lg:text-display">
+              <h1
+                id="room-title"
+                className="mt-2 text-h1 text-foreground lg:text-display"
+              >
                 Marram
               </h1>
-              <p className="mt-4 max-w-xl">
+              <p className="mt-4 max-w-xl text-body text-foreground">
                 The bay window at the front of the house, with the sea in all
                 three panes.
               </p>
@@ -166,15 +204,15 @@ export function App() {
                 />
               </div>
             </div>
-            <figcaption className={cn("mt-2", label, "text-muted-foreground")}>
+            <figcaption className={cn(label, "mt-2 text-muted-foreground")}>
               Marram · The bay window, the writing table and the bath
             </figcaption>
           </figure>
         </section>
 
         <section
-          aria-labelledby="room-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
+          aria-labelledby="the-room"
+          className={cn(section, sectionGrid)}
         >
           <aside
             aria-label="Price and request"
@@ -182,37 +220,35 @@ export function App() {
           >
             <p className={cn(label, "text-muted-foreground")}>From</p>
             <p className="mt-2 flex items-baseline gap-2">
-              <span className="font-heading text-h1 tabular-nums">£128</span>
+              <span className="font-heading text-h1 text-foreground tabular-nums">
+                £128
+              </span>
               <span className={cn(label, "text-muted-foreground")}>
                 a night
               </span>
             </p>
-            <p className={cn("mt-2", label, "text-foreground")}>
+            <p className={cn(label, "mt-2 text-foreground")}>
               Sleeps 2 · Breakfast included
             </p>
-            <dl className="mt-6 divide-y divide-border border-y border-border">
-              <div className="flex items-baseline justify-between gap-4 py-2">
-                <dt className={cn(label, "text-muted-foreground")}>Arrive</dt>
-                <dd className="text-right text-body text-foreground">
-                  <time dateTime="15:00">15:00</time>–
-                  <time dateTime="20:00">20:00</time>
-                </dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 py-2">
-                <dt className={cn(label, "text-muted-foreground")}>Leave by</dt>
-                <dd className="text-right text-body text-foreground">
-                  <time dateTime="10:30">10:30</time>
-                </dd>
-              </div>
-              <div className="flex items-baseline justify-between gap-4 py-2">
-                <dt className={cn(label, "text-muted-foreground")}>
-                  July and August
-                </dt>
-                <dd className="text-right text-body text-foreground">
-                  Two nights or more
-                </dd>
-              </div>
-            </dl>
+            <FactsList
+              className="mt-6"
+              items={[
+                {
+                  term: "Arrive",
+                  detail: (
+                    <>
+                      <time dateTime="15:00">15:00</time>–
+                      <time dateTime="20:00">20:00</time>
+                    </>
+                  ),
+                },
+                {
+                  term: "Leave by",
+                  detail: <time dateTime="10:30">10:30</time>,
+                },
+                { term: "July and August", detail: "Two nights or more" },
+              ]}
+            />
             <p className="mt-6">
               <a
                 href="/reserve?room=marram"
@@ -234,69 +270,40 @@ export function App() {
             <p className={cn(label, "text-muted-foreground")}>
               At the front of the house
             </p>
-            <h2 id="room-heading" className="mt-2 text-h2 md:text-h1">
+            <h2
+              id="the-room"
+              className="mt-2 text-h2 text-foreground md:text-h1"
+            >
               The room
             </h2>
-            <p className="mt-4 max-w-xl">
-              Marram was the room the harbour pilot kept for himself when the
-              house was built in 1894. Its bay window faces south over the
+            <p className="mt-4 max-w-xl text-body text-foreground">
+              This was the room the harbour pilot kept for himself when the
+              house was built in 1894. The bay window faces south over the
               harbour wall, so the sun is in the room from breakfast until late
-              afternoon, and the sea fills all three panes.
+              afternoon, and from the bed you look straight out to sea.
             </p>
-            <p className="mt-4 max-w-xl">
-              The bed is a king, made up with linen sheets and wool blankets. In
-              the bay stands a writing table with two chairs, a good place for a
-              pot of tea while the boats come in past the wall.
+            <p className="mt-4 max-w-xl text-body text-foreground">
+              The bed is a king, made up with linen sheets and wool blankets,
+              with a spare blanket in the chest at its foot. In the bay stands a
+              writing table with two chairs, where most guests end up with their
+              first cup of tea.
             </p>
-            <p className="mt-4 max-w-xl">
-              The bathroom has a deep bath with a shower over it. The room is
+            <p className="mt-4 max-w-xl text-body text-foreground">
+              The bathroom has a deep bath with a shower over it. Marram is
               above the breakfast room, so you will hear the first kettle at
-              about <time dateTime="07:30">07:30</time>, a while before we serve
-              breakfast at <time dateTime="08:00">08:00</time>.
+              about <time dateTime="07:30">07:30</time>; we keep the rest of the
+              morning as quiet as we can.
             </p>
 
-            <h3
-              className={cn(
-                "mt-12 font-mono text-label uppercase",
-                "text-foreground"
-              )}
-            >
-              The facts
-            </h3>
-            <dl className="mt-4 divide-y divide-border border-y border-border">
-              {facts.map((fact) => (
-                <div
-                  key={fact.term}
-                  className="flex items-baseline justify-between gap-4 py-2"
-                >
-                  <dt className={cn(label, "text-muted-foreground")}>
-                    {fact.term}
-                  </dt>
-                  <dd className="text-right text-body text-foreground">
-                    {fact.detail}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <h3 className={cn(label, "mt-12 text-foreground")}>The facts</h3>
+            <FactsList className="mt-4" items={facts} />
 
             <div className="mt-12 rounded-xl bg-clay p-6 text-clay-foreground">
               <p className={label}>In the price of the room</p>
               <h3 className="mt-2 text-h2">What is included</h3>
               <ul className="mt-6 grid list-none gap-x-6 gap-y-2 p-0 md:grid-cols-2">
-                <li className="flex items-start gap-2 text-body">
-                  <Check
-                    className="mt-1 size-4 shrink-0"
-                    strokeWidth={1.5}
-                    aria-hidden="true"
-                  />
-                  <span>
-                    Breakfast on the veranda, from{" "}
-                    <time dateTime="08:00">08:00</time> to{" "}
-                    <time dateTime="10:00">10:00</time>
-                  </span>
-                </li>
-                {included.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-body">
+                {included.map((item, index) => (
+                  <li key={index} className="flex items-start gap-2 text-body">
                     <Check
                       className="mt-1 size-4 shrink-0"
                       strokeWidth={1.5}
@@ -310,18 +317,15 @@ export function App() {
           </div>
         </section>
 
-        <section
-          aria-labelledby="prices-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
-        >
+        <section aria-labelledby="prices" className={cn(section, sectionGrid)}>
           <div className="md:col-span-4">
             <p className={cn(label, "text-muted-foreground")}>
               Per night · Breakfast included
             </p>
-            <h2 id="prices-heading" className="mt-2 text-h2 md:text-h1">
+            <h2 id="prices" className="mt-2 text-h2 text-foreground md:text-h1">
               Prices by season
             </h2>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 max-w-xl text-body text-foreground">
               The price is for the room, for one guest or two, and each night is
               charged at the price of its season.
             </p>
@@ -331,16 +335,14 @@ export function App() {
               <TableCaption className="sr-only">Prices by season</TableCaption>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  {["Season", "Dates", "A night"].map((heading, i) => (
+                  {["Season", "Dates", "A night"].map((heading, index) => (
                     <TableHead
                       key={heading}
                       scope="col"
                       className={cn(
-                        "h-auto font-normal",
-                        cellPad,
                         label,
-                        "text-muted-foreground",
-                        i === 2 && "text-right"
+                        "h-auto px-4 py-2 font-normal text-muted-foreground first:pl-0 last:pr-0",
+                        index === 2 && "text-right"
                       )}
                     >
                       {heading}
@@ -354,21 +356,19 @@ export function App() {
                     <TableHead
                       scope="row"
                       className={cn(
-                        "h-auto whitespace-normal",
-                        cellPad,
+                        "h-auto",
+                        cell,
                         "text-left font-sans text-body font-normal text-foreground"
                       )}
                     >
                       {row.season}
                     </TableHead>
-                    <TableCell
-                      className={cn(cellPad, "text-body whitespace-normal")}
-                    >
+                    <TableCell className={cn(cell, "text-body")}>
                       {row.dates}
                     </TableCell>
                     <TableCell
                       className={cn(
-                        cellPad,
+                        cell,
                         label,
                         "text-right whitespace-nowrap text-foreground tabular-nums"
                       )}
@@ -386,14 +386,17 @@ export function App() {
         </section>
 
         <section
-          aria-labelledby="other-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
+          aria-labelledby="other-rooms"
+          className={cn(section, sectionGrid)}
         >
           <div className="md:col-span-4">
             <p className={cn(label, "text-muted-foreground")}>
               Five more rooms
             </p>
-            <h2 id="other-heading" className="mt-2 text-h2 md:text-h1">
+            <h2
+              id="other-rooms"
+              className="mt-2 text-h2 text-foreground md:text-h1"
+            >
               Other rooms
             </h2>
           </div>
@@ -401,7 +404,7 @@ export function App() {
             <ul className="list-none p-0">
               {otherRooms.map((room) => (
                 <li key={room.name} className="flex items-baseline gap-2 py-2">
-                  <a href="#" className={cn("min-w-0 text-body", plainLink)}>
+                  <a href="#" className={cn("min-w-0 text-body", headerLink)}>
                     {room.name}
                   </a>
                   <span
@@ -424,8 +427,8 @@ export function App() {
                 href="/rooms"
                 className={cn(
                   label,
-                  textLink,
-                  "inline-flex items-center gap-2"
+                  "inline-flex items-center gap-2",
+                  textLink
                 )}
               >
                 See all six rooms
@@ -443,21 +446,23 @@ export function App() {
       <footer className="mt-12 border-t border-border py-12 md:mt-26">
         <div className="grid gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-5">
-            <p className="font-heading text-h2">Kittiwake House</p>
-            <p className="mt-2 text-body">
+            <p className="font-heading text-h2 text-foreground">
+              Kittiwake House
+            </p>
+            <p className="mt-2 text-body text-foreground">
               Six rooms above the harbour at Port Lowan, with breakfast on the
               veranda.
             </p>
           </div>
           <div className="md:col-span-5 md:col-start-8">
-            <address className="text-body not-italic">
+            <address className="text-body text-foreground not-italic">
               <span className="block">9 Harbour Terrace</span>
               <span className="block">Port Lowan LW6 3QT</span>
             </address>
             <p className="mt-4">
               <a
                 href="tel:+441632960352"
-                className={cn("text-body", plainLink)}
+                className={cn("text-body", headerLink)}
               >
                 01632 960 352
               </a>
@@ -465,14 +470,14 @@ export function App() {
             <p className="mt-2">
               <a
                 href="mailto:stay@kittiwakehouse.example"
-                className={cn("text-body", plainLink)}
+                className={cn("text-body wrap-break-word", headerLink)}
               >
                 stay@kittiwakehouse.example
               </a>
             </p>
           </div>
         </div>
-        <p className={cn("mt-6", label, "text-muted-foreground")}>
+        <p className={cn(label, "mt-6 text-muted-foreground")}>
           © 2027 Kittiwake House · Open all year
         </p>
       </footer>

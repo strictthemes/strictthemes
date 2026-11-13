@@ -23,8 +23,8 @@ A single row with a 1px bottom border. Left: the product name in `font-heading t
 - Columns 1–12: an eyebrow label, e.g. `SPREADSHEETS FOR TEAMS`.
 - Columns 1–10: the `<h1>` in `text-display` on `md` and up, `text-h1` below. Sample: "The spreadsheet everyone on the team can actually read."
 - Columns 1–6: one paragraph in `text-body`, two or three sentences.
-- Then a row with the default button ("Start free") and one text link ("See how it works").
-- Then, across all 12 columns, a product figure: a `bg-card` panel with `p-8` (`p-4` below `md`), holding a plain `<table>` that follows the Tables note: a header row of labels and five data rows of plausible sample data in `text-body`, names in the inherited body font, numbers in `font-mono tabular-nums` aligned right, rows divided by 1px borders, `first:pl-0 last:pr-0` on the cells. Below `md`, hide the less important columns so the table fits; it then needs no scroll box. Give the figure a caption.
+- Then, with `mt-8`, a row with the default button ("Start free") and one text link ("See how it works").
+- Then, with `mt-8`, across all 12 columns, a product figure: a `bg-card` panel with `p-8` (`p-4` below `md`), holding a plain `<table>` that follows the Tables note: a header row of labels and five data rows of plausible sample data in `text-body`, names in the inherited body font, numbers in `font-mono tabular-nums` aligned right, and their header cells aligned right too, rows divided by 1px borders, `first:pl-0 last:pr-0` on the cells. Below `md`, hide the less important columns so the table fits; it then needs no scroll box. Give the figure a caption.
 
 ### 3. Proof row
 
