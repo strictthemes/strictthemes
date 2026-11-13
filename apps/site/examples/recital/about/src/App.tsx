@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLink = cn(
+const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
@@ -19,68 +19,68 @@ const textLink = cn(
   focusRing
 )
 
+const label = "font-mono text-label text-muted-foreground"
+
 const fieldClass =
   "mt-2 h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
 
-const labelClass = "block font-mono text-label"
-
 const numbers = [
-  { term: "Letters answered", value: "1,140" },
-  { term: "Paying readers", value: "3,862" },
+  { term: "Letters answered", value: "312" },
+  { term: "Paying readers", value: "1,240" },
   { term: "Years in print", value: "7" },
 ]
 
 const people = [
   {
-    initials: "MO",
-    name: "Maren Oduya",
+    initials: "HL",
+    name: "Hanne Lindqvist",
     role: "Editor",
-    bio: "Maren started the magazine after ten years editing trade journals about bridges and drainage. She chooses what we cover, edits every essay twice and answers the letters herself.",
+    about:
+      "Hanne started the magazine after ten years of writing short pieces to deadline. She edits every essay twice, once for sense and once for sound. She lives above a bookbinder's shop and says this is not a coincidence.",
   },
   {
-    initials: "TR",
-    name: "Tomas Reyle",
+    initials: "TM",
+    name: "Tobias Merrow",
     role: "Writer",
-    bio: "Tomas writes the long pieces, the ones that need a season of visits. He has followed a clockmaker, a hedge layer and a team relining a canal, and he still keeps the notebooks.",
+    about:
+      "Tobias writes about trades that take a decade to learn: thatching, organ building, the restoration of clocks. He spends weeks with each person before he writes a word.",
   },
   {
-    initials: "IF",
-    name: "Ines Fairlie",
-    role: "Designer and subeditor",
-    bio: "Ines sets each issue, checks every fact and date, and looks after the readers' accounts. She is the reason the printed copies arrive on time.",
+    initials: "AK",
+    name: "Ada Kestrel",
+    role: "Writer and letters",
+    about:
+      "Ada writes the journal and answers the letters readers send in. Before joining she worked as a field ecologist, counting the same hedgerow birds every spring for eight years.",
   },
 ]
 
 const details = [
-  {
-    term: "Typefaces",
-    value: <>Fraunces for headings, Source Sans 3 for text</>,
-  },
-  { term: "Published", value: <>Four issues a year, in print and online</> },
-  { term: "Paid for by", value: <>Its readers, with no advertising</> },
+  { term: "Typefaces", value: "Fraunces and Source Sans 3" },
+  { term: "Published", value: "Four issues a year, online and in print" },
+  { term: "Paid for by", value: "1,240 readers, at £4 a month" },
   { term: "Since", value: <time dateTime="2019">2019</time> },
 ]
 
 const history = [
   {
     year: "2019",
-    text: "Maren posted the first issue, twelve stapled pages, to 140 friends and former colleagues.",
+    text: "The first issue went out to 46 friends, with a single essay about a dry-stone waller in the Dales.",
   },
   {
     year: "2020",
-    text: "Tomas joined and wrote a year-long piece on a family rebuilding a dry stone wall.",
+    text: "We stopped taking advertising and asked readers to pay for the magazine instead.",
   },
   {
-    year: "2022",
-    text: "Readers voted to drop the free tier, and the magazine has been paid for by them alone ever since.",
+    year: "2021",
+    text: "Ada joined as the third writer and started answering every letter by hand.",
   },
   {
-    year: "2024",
-    text: "Ines redesigned the print edition so that each issue fits in a coat pocket.",
+    year: "2023",
+    text: "The first printed issue came off a small press in Hebden Bridge, in a run of 600 copies.",
   },
   {
-    year: "2026",
-    text: "The magazine passed 3,800 paying readers and published its twenty-eighth issue.",
+    year: "2025",
+    text: "We published our hundredth essay, about a woman who has been planting the same oak wood for forty years.",
   },
 ]
 
@@ -89,7 +89,7 @@ type Errors = Partial<Record<Field, string>>
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function ErrorLine({ id, text }: { id: string; text: string }) {
+function ErrorLine({ id, children }: { id: string; children: string }) {
   return (
     <p
       id={id}
@@ -100,17 +100,13 @@ function ErrorLine({ id, text }: { id: string; text: string }) {
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      <span>{text}</span>
+      <span>{children}</span>
     </p>
   )
 }
 
 function ContactForm() {
-  const [values, setValues] = useState<Record<Field, string>>({
-    name: "",
-    email: "",
-    message: "",
-  })
+  const [values, setValues] = useState({ name: "", email: "", message: "" })
   const [errors, setErrors] = useState<Errors>({})
   const [sent, setSent] = useState(false)
 
@@ -119,50 +115,52 @@ function ContactForm() {
   const messageRef = useRef<HTMLTextAreaElement>(null)
   const thanksRef = useRef<HTMLHeadingElement>(null)
 
-  useEffect(() => {
-    if (sent) thanksRef.current?.focus()
-  }, [sent])
-
-  function change(field: Field, value: string) {
-    setValues((v) => ({ ...v, [field]: value }))
+  function update(field: Field, value: string) {
+    setValues((current) => ({ ...current, [field]: value }))
     if (errors[field]) {
-      setErrors((e) => {
-        const next = { ...e }
+      setErrors((current) => {
+        const next = { ...current }
         delete next[field]
         return next
       })
     }
   }
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const trimmed = {
-      name: values.name.trim(),
-      email: values.email.trim(),
-      message: values.message.trim(),
+    const name = values.name.trim()
+    const email = values.email.trim()
+    const message = values.message.trim()
+
+    const found: Errors = {}
+    if (!name) found.name = "Enter your name."
+    if (!email) {
+      found.email = "Enter your email address."
+    } else if (!emailPattern.test(email)) {
+      found.email = "Enter an email address in the form name@example.com."
     }
-    setValues(trimmed)
+    if (!message) found.message = "Write a message before you send it."
 
-    const next: Errors = {}
-    if (!trimmed.name) next.name = "Enter your name."
-    if (!trimmed.email) next.email = "Enter your email address."
-    else if (!emailPattern.test(trimmed.email))
-      next.email = "Enter an email address in the form name@example.com."
-    if (!trimmed.message) next.message = "Write a message before you send it."
-    setErrors(next)
+    setErrors(found)
 
-    if (next.name) nameRef.current?.focus()
-    else if (next.email) emailRef.current?.focus()
-    else if (next.message) messageRef.current?.focus()
-    else setSent(true)
+    if (found.name) {
+      nameRef.current?.focus()
+    } else if (found.email) {
+      emailRef.current?.focus()
+    } else if (found.message) {
+      messageRef.current?.focus()
+    } else {
+      setSent(true)
+      requestAnimationFrame(() => thanksRef.current?.focus())
+    }
   }
 
   return (
     <div className="mt-6">
       {!sent && (
-        <form noValidate onSubmit={submit}>
+        <form noValidate onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className={labelClass}>
+            <label htmlFor="name" className="block font-mono text-label">
               Your name
             </label>
             <Input
@@ -171,15 +169,17 @@ function ContactForm() {
               name="name"
               autoComplete="name"
               value={values.name}
-              onChange={(e) => change("name", e.target.value)}
+              onChange={(event) => update("name", event.target.value)}
               aria-invalid={errors.name ? true : undefined}
               aria-describedby={errors.name ? "name-error" : undefined}
               className={fieldClass}
             />
-            {errors.name && <ErrorLine id="name-error" text={errors.name} />}
+            {errors.name && (
+              <ErrorLine id="name-error">{errors.name}</ErrorLine>
+            )}
           </div>
           <div className="mt-6">
-            <label htmlFor="email" className={labelClass}>
+            <label htmlFor="email" className="block font-mono text-label">
               Email address
             </label>
             <Input
@@ -189,15 +189,17 @@ function ContactForm() {
               type="email"
               autoComplete="email"
               value={values.email}
-              onChange={(e) => change("email", e.target.value)}
+              onChange={(event) => update("email", event.target.value)}
               aria-invalid={errors.email ? true : undefined}
               aria-describedby={errors.email ? "email-error" : undefined}
               className={fieldClass}
             />
-            {errors.email && <ErrorLine id="email-error" text={errors.email} />}
+            {errors.email && (
+              <ErrorLine id="email-error">{errors.email}</ErrorLine>
+            )}
           </div>
           <div className="mt-6">
-            <label htmlFor="message" className={labelClass}>
+            <label htmlFor="message" className="block font-mono text-label">
               Message
             </label>
             <Textarea
@@ -205,13 +207,13 @@ function ContactForm() {
               id="message"
               name="message"
               value={values.message}
-              onChange={(e) => change("message", e.target.value)}
+              onChange={(event) => update("message", event.target.value)}
               aria-invalid={errors.message ? true : undefined}
               aria-describedby={errors.message ? "message-error" : undefined}
               className={cn(fieldClass, "min-h-48 resize-none")}
             />
             {errors.message && (
-              <ErrorLine id="message-error" text={errors.message} />
+              <ErrorLine id="message-error">{errors.message}</ErrorLine>
             )}
           </div>
           <div className="mt-6">
@@ -235,7 +237,7 @@ function ContactForm() {
               Thank you
             </h3>
             <p className="mt-4">
-              Maren will write back within a week, usually on a Sunday evening.
+              Your message is with Ada, who will write back within a week.
             </p>
           </>
         )}
@@ -248,20 +250,20 @@ export function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-y-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn(navLink, "font-heading text-h2")}>
+        <a href="/" className={cn("font-heading text-h2", headerLink)}>
           The Long Margin
         </a>
-        <nav aria-label="Main" className="flex gap-6 text-body">
-          <a href="/essays" className={navLink}>
+        <nav aria-label="Main" className="flex gap-6">
+          <a href="/essays" className={headerLink}>
             Essays
           </a>
-          <a href="/journal" className={navLink}>
+          <a href="/journal" className={headerLink}>
             Journal
           </a>
           <a
             href="/about"
             aria-current="page"
-            className={cn(navLink, "underline")}
+            className={cn(headerLink, "underline")}
           >
             About
           </a>
@@ -269,131 +271,126 @@ export function App() {
       </header>
 
       <main>
-        {/* Opening */}
         <div className="mx-auto max-w-lg pt-12">
-          <p className="font-mono text-label text-muted-foreground">About</p>
+          <p className={label}>About</p>
           <h1 className="mt-4 text-h1">
             A small magazine about work that takes a long time
           </h1>
           <p className="mt-6">
-            Most of what gets written about work is about speed: who shipped
-            first, who grew fastest. We started The Long Margin to write about
-            the other kind, the restorations, apprenticeships and building
-            projects that take years and only make sense when you stay with
-            them.
+            Most writing about work is about speed: how to ship sooner, how to
+            do more before lunch. We started The Long Margin in 2019 because we
+            wanted to read about the other kind, the bell founder who waits a
+            year to hear a bell, the editor who spends a decade on one
+            dictionary.
           </p>
           <p className="mt-6">
-            It is for people who do slow work themselves, and for anyone who
-            would rather read one careful piece a season than a hundred quick
-            ones. There are no adverts and no tracking, and every issue can be
-            read in a single sitting.
+            It is for people who make slow things, and for people who simply
+            like to read about them. There are no ads and no trackers. Each
+            essay is long, and we expect you to sit down with it.
           </p>
         </div>
 
-        {/* In numbers */}
-        <dl className="my-12 grid gap-6 md:grid-cols-3">
-          {numbers.map((n) => (
-            <div key={n.term} className="flex flex-col-reverse border-t pt-4">
-              <dt className="mt-2 font-mono text-label text-muted-foreground">
-                {n.term}
-              </dt>
-              <dd className="font-heading text-h1">{n.value}</dd>
+        <dl className="my-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          {numbers.map((item) => (
+            <div
+              key={item.term}
+              className="flex flex-col-reverse border-t pt-4"
+            >
+              <dt className={cn("mt-2", label)}>{item.term}</dt>
+              <dd className="font-heading text-h1 tabular-nums">
+                {item.value}
+              </dd>
             </div>
           ))}
         </dl>
 
-        {/* Who makes it */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">Who makes it</h2>
-          {people.map((p, i) => (
-            <div key={p.name} className={i === 0 ? "mt-6" : "mt-12"}>
+          {people.map((person, index) => (
+            <div key={person.name} className={index === 0 ? "mt-6" : "mt-12"}>
               <div className="flex items-center gap-4">
                 <div
                   aria-hidden="true"
                   className="flex size-12 shrink-0 items-center justify-center rounded-full border bg-card font-heading text-body"
                 >
-                  {p.initials}
+                  {person.initials}
                 </div>
                 <div>
-                  <h3 className="text-body font-semibold">{p.name}</h3>
-                  <p className="mt-2 font-mono text-label text-muted-foreground">
-                    {p.role}
-                  </p>
+                  <h3 className="text-body font-semibold">{person.name}</h3>
+                  <p className={cn("mt-2", label)}>{person.role}</p>
                 </div>
               </div>
-              <p className="mt-4">{p.bio}</p>
+              <p className="mt-4">{person.about}</p>
             </div>
           ))}
         </div>
 
-        {/* How it is made */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">How it is made</h2>
           <p className="mt-4">
-            Each piece starts with a visit and ends months later, sometimes a
-            year. We go back to the same people until the work has changed in
-            front of us, and we write only about what we saw. That is why there
-            are just four issues a year, and why each one is <em>finished</em>{" "}
-            before it is sent, not updated after.
+            Each essay starts with a visit, and most take three or four. We
+            write only about people we have met in person, and we show them the
+            finished piece before it goes out, though we do <em>not</em> let
+            them change it.
           </p>
           <p className="mt-6">
-            Readers pay between £3 and £12 a month, whatever suits them, and
-            that money covers printing, postage and our three salaries. Once a
-            year we publish the{" "}
+            An essay is read aloud by all three of us before it is published,
+            which catches more mistakes than any proofreading tool. If you want
+            to know how we decide what to cover, our{" "}
             <a href="#" className={textLink}>
-              full accounts
+              notes for contributors
             </a>{" "}
-            so you can see where it goes.
+            set it out.
           </p>
+
           <div className="my-12 rounded-xl border bg-card p-6">
             <dl>
-              {details.map((d, i) => (
+              {details.map((row, index) => (
                 <div
-                  key={d.term}
+                  key={row.term}
                   className={cn(
-                    i > 0 && "mt-4",
+                    index > 0 && "mt-4",
                     "md:grid md:grid-cols-4 md:items-baseline md:gap-x-6"
                   )}
                 >
-                  <dt className="font-mono text-label text-muted-foreground">
-                    {d.term}
-                  </dt>
-                  <dd className="mt-2 md:col-span-3 md:mt-0">{d.value}</dd>
+                  <dt className={label}>{row.term}</dt>
+                  <dd className="mt-2 tabular-nums md:col-span-3 md:mt-0">
+                    {row.value}
+                  </dd>
                 </div>
               ))}
             </dl>
           </div>
         </div>
 
-        {/* A short history */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">A short history</h2>
           <ol className="mt-6 list-none">
-            {history.map((h) => (
-              <li key={h.year} className="border-t py-4">
-                <p className="font-mono text-label text-muted-foreground">
-                  <time dateTime={h.year}>{h.year}</time>
+            {history.map((entry) => (
+              <li key={entry.year} className="border-t py-4">
+                <p className={cn(label, "tabular-nums")}>
+                  <time dateTime={entry.year}>{entry.year}</time>
                 </p>
-                <p className="mt-2">{h.text}</p>
+                <p className="mt-2">{entry.text}</p>
               </li>
             ))}
           </ol>
+
           <blockquote className="my-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              It is the only thing that arrives in my post that I save for a
-              quiet evening.
+              It is the only magazine I read twice, once quickly and once
+              slowly.
             </p>
-            <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Ingrid, Leeds
+            <footer className={cn("mt-4 not-italic", label)}>
+              Agnes, Dundee
             </footer>
           </blockquote>
         </div>
 
-        {/* Write to us */}
         <div id="contact" className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">Write to us</h2>
           <p className="mt-4">
-            Maren reads every message herself and answers within a week.
+            Ada reads every message and answers within a week, usually sooner.
           </p>
           <ContactForm />
         </div>
@@ -403,10 +400,9 @@ export function App() {
         <div className="border-t py-12">
           <p className="font-heading text-h2">The Long Margin</p>
           <p className="mt-2">
-            A small magazine about work that takes a long time, written by three
-            people and paid for by its readers.
+            A reader-funded magazine about work that takes a long time.
           </p>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
+          <p className={cn("mt-6 tabular-nums", label)}>
             © 2026 The Long Margin
           </p>
         </div>

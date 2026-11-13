@@ -13,9 +13,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
 
-// ---------------------------------------------------------------------------
-// The house
+/* ---------- The house ---------- */
 
 type Room = {
   value: string
@@ -39,25 +39,33 @@ const ROOM_ITEMS = ROOMS.map((room) => ({
   label: `${room.name} · sleeps ${room.sleeps}`,
 }))
 
-const GUEST_ITEMS = ["1", "2", "3", "4"].map((value) => ({
-  value,
-  label: count(Number(value), "guest", "guests"),
+const GUEST_ITEMS = [1, 2, 3, 4].map((n) => ({
+  value: String(n),
+  label: count(n, "guest"),
 }))
 
 const TIME_ITEMS = [
-  { value: "15:00", label: "15:00 to 16:00" },
-  { value: "16:00", label: "16:00 to 17:00" },
-  { value: "17:00", label: "17:00 to 18:00" },
-  { value: "18:00", label: "18:00 to 19:00" },
-  { value: "19:00", label: "19:00 to 20:00" },
+  { value: "15-16", label: "15:00 to 16:00" },
+  { value: "16-17", label: "16:00 to 17:00" },
+  { value: "17-18", label: "17:00 to 18:00" },
+  { value: "18-19", label: "18:00 to 19:00" },
+  { value: "19-20", label: "19:00 to 20:00" },
   { value: "later", label: "Later than 20:00" },
 ]
 
-const MAX_NIGHTS = 14
+/* ---------- Words and figures ---------- */
 
-// ---------------------------------------------------------------------------
-// Dates, written as a date field holds them: "2027-05-14"
+function count(n: number, noun: string) {
+  return `${n} ${noun}${n === 1 ? "" : "s"}`
+}
 
+function pounds(n: number) {
+  return `£${n.toLocaleString("en-GB")}`
+}
+
+/* ---------- Calendar dates, counted in UTC ---------- */
+
+const DAY = 24 * 60 * 60 * 1000
 const WEEKDAYS = [
   "Sunday",
   "Monday",
@@ -81,95 +89,98 @@ const MONTHS = [
   "November",
   "December",
 ]
-const DAY = 86_400_000
 
 function parts(value: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
-  if (!match) return null
-  const y = Number(match[1])
-  const m = Number(match[2])
-  const d = Number(match[3])
-  const check = new Date(Date.UTC(y, m - 1, d))
-  if (
-    check.getUTCFullYear() !== y ||
-    check.getUTCMonth() !== m - 1 ||
-    check.getUTCDate() !== d
-  ) {
-    return null
-  }
-  return { y, m, d }
+  const [year, month, day] = value.split("-").map(Number)
+  return { year, month, day }
 }
 
-function dayNumber(value: string) {
-  const p = parts(value)
-  return p ? Date.UTC(p.y, p.m - 1, p.d) / DAY : NaN
+function utc(value: string) {
+  const { year, month, day } = parts(value)
+  return Date.UTC(year, month - 1, day)
 }
 
-function fromDayNumber(n: number) {
-  const date = new Date(n * DAY)
-  const y = String(date.getUTCFullYear()).padStart(4, "0")
-  const m = String(date.getUTCMonth() + 1).padStart(2, "0")
-  const d = String(date.getUTCDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+function fromUtc(time: number) {
+  const date = new Date(time)
+  const year = String(date.getUTCFullYear()).padStart(4, "0")
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0")
+  const day = String(date.getUTCDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
+function addDays(value: string, days: number) {
+  return fromUtc(utc(value) + days * DAY)
+}
+
+function nightsBetween(arrive: string, leave: string) {
+  return Math.round((utc(leave) - utc(arrive)) / DAY)
+}
+
+function isDateValue(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const { year, month, day } = parts(value)
+  const date = new Date(Date.UTC(year, month - 1, day))
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  )
 }
 
 function todayValue() {
   const now = new Date()
-  const y = String(now.getFullYear()).padStart(4, "0")
-  const m = String(now.getMonth() + 1).padStart(2, "0")
-  const d = String(now.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+  const year = String(now.getFullYear()).padStart(4, "0")
+  const month = String(now.getMonth() + 1).padStart(2, "0")
+  const day = String(now.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
 }
 
 function longDate(value: string) {
-  const p = parts(value)
-  if (!p) return value
-  const weekday = new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay()
-  return `${WEEKDAYS[weekday]} ${p.d} ${MONTHS[p.m - 1]} ${p.y}`
+  const date = new Date(utc(value))
+  return `${WEEKDAYS[date.getUTCDay()]} ${date.getUTCDate()} ${
+    MONTHS[date.getUTCMonth()]
+  } ${date.getUTCFullYear()}`
 }
 
 // 0 winter, 1 spring and autumn, 2 summer
-function season(month: number) {
-  if (month >= 11 || month <= 3) return 0
+function season(value: string) {
+  const { month } = parts(value)
   if (month === 7 || month === 8) return 2
-  return 1
+  if (month >= 4 && month <= 10) return 1
+  return 0
 }
 
-function nightsBetween(arrive: string, leave: string) {
-  if (!parts(arrive) || !parts(leave)) return 0
-  return dayNumber(leave) - dayNumber(arrive)
-}
+type PriceLine = { season: number; nights: number; price: number; sum: number }
 
-type PriceLine = { nights: number; price: number; sum: number }
-
-function priceLines(room: Room, arrive: string, nights: number) {
-  const lines: { season: number; line: PriceLine }[] = []
-  const start = dayNumber(arrive)
+function priceLines(arrive: string, leave: string, room: Room | undefined) {
+  if (!arrive || !leave || !room) return null
+  const nights = nightsBetween(arrive, leave)
+  if (nights < 1) return null
+  const bySeason = new Map<number, PriceLine>()
   for (let i = 0; i < nights; i++) {
-    const month = Number(fromDayNumber(start + i).slice(5, 7))
-    const s = season(month)
+    const s = season(addDays(arrive, i))
     const price = room.prices[s]
-    const last = lines[lines.length - 1]
-    if (last && last.season === s) {
-      last.line.nights += 1
-      last.line.sum += price
-    } else {
-      lines.push({ season: s, line: { nights: 1, price, sum: price } })
-    }
+    const line = bySeason.get(s) ?? { season: s, nights: 0, price, sum: 0 }
+    line.nights += 1
+    line.sum += price
+    bySeason.set(s, line)
   }
-  return lines.map((entry) => entry.line)
+  const lines = [...bySeason.values()]
+  return { lines, total: lines.reduce((t, l) => t + l.sum, 0), nights }
 }
 
-function count(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
+function reference(arrive: string) {
+  const { year, month, day } = parts(arrive)
+  return `KH-${String(year % 100).padStart(2, "0")}${String(month).padStart(
+    2,
+    "0"
+  )}-${String(day).padStart(3, "0")}`
 }
 
-function pounds(n: number) {
-  return `£${n.toLocaleString("en-GB")}`
-}
+/* ---------- Form state ---------- */
 
-// ---------------------------------------------------------------------------
-// The form
+type Field =
+  "arrive" | "leave" | "room" | "guests" | "name" | "email" | "phone" | "time"
 
 type Values = {
   arrive: string
@@ -182,20 +193,6 @@ type Values = {
   time: string | null
   note: string
 }
-
-type Field = Exclude<keyof Values, "note">
-type Errors = Partial<Record<Field, string>>
-
-const FIELD_ORDER: Field[] = [
-  "arrive",
-  "leave",
-  "room",
-  "guests",
-  "name",
-  "email",
-  "phone",
-  "time",
-]
 
 const EMPTY: Values = {
   arrive: "",
@@ -211,81 +208,75 @@ const EMPTY: Values = {
 
 function fromAddress(): Values {
   const values = { ...EMPTY }
-  if (typeof window === "undefined") return values
   const query = new URLSearchParams(window.location.search)
   const arrive = query.get("arrive")
   const leave = query.get("leave")
   const guests = query.get("guests")
   const room = query.get("room")
-  if (arrive && parts(arrive)) values.arrive = arrive
-  if (leave && parts(leave)) values.leave = leave
+  if (arrive && isDateValue(arrive)) values.arrive = arrive
+  if (leave && isDateValue(leave)) values.leave = leave
   if (guests && /^[1-4]$/.test(guests)) values.guests = guests
   if (room && ROOMS.some((r) => r.value === room)) values.room = room
   return values
 }
 
-function findRoom(value: string | null) {
-  return ROOMS.find((room) => room.value === value)
-}
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function check(values: Values, today: string): Errors {
-  const errors: Errors = {}
+function check(values: Values, today: string) {
+  const errors: Partial<Record<Field, string>> = {}
+  const { arrive, leave } = values
 
-  if (!values.arrive) {
-    errors.arrive = "Choose the day you arrive."
-  } else if (dayNumber(values.arrive) < dayNumber(today)) {
-    errors.arrive = "Choose today or a later day."
-  }
+  if (!arrive) errors.arrive = "Choose the day you arrive."
+  else if (arrive < today) errors.arrive = "Choose today or a later day."
 
-  if (!values.leave) {
-    errors.leave = "Choose the day you leave."
-  } else if (values.arrive) {
-    const nights = nightsBetween(values.arrive, values.leave)
-    const month = Number(values.arrive.slice(5, 7))
-    if (nights < 1) {
-      errors.leave = "Choose a day after the day you arrive."
-    } else if (nights > MAX_NIGHTS) {
+  if (!leave) errors.leave = "Choose the day you leave."
+  else if (arrive) {
+    const nights = nightsBetween(arrive, leave)
+    const { month } = parts(arrive)
+    if (nights < 1) errors.leave = "Choose a day after the day you arrive."
+    else if (nights > 14)
       errors.leave =
         "We take requests for up to 14 nights. For a longer stay, write to us."
-    } else if (nights === 1 && (month === 7 || month === 8)) {
+    else if (nights === 1 && (month === 7 || month === 8))
       errors.leave =
         "In July and August we take stays of two nights or more. Choose a later day."
-    }
   }
 
-  const room = findRoom(values.room)
-  if (!room) {
-    errors.room = "Choose a room."
-  } else if (Number(values.guests) > room.sleeps) {
+  const room = ROOMS.find((r) => r.value === values.room)
+  if (!room) errors.room = "Choose a room."
+  else if (Number(values.guests) > room.sleeps)
     errors.guests = `${room.name} sleeps ${room.sleeps}. Choose fewer guests or another room.`
-  }
 
-  if (!values.name.trim()) {
-    errors.name = "Write your name."
-  }
+  if (!values.name.trim()) errors.name = "Write your name."
 
   const email = values.email.trim()
-  if (!email) {
-    errors.email = "Write your email address."
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email) errors.email = "Write your email address."
+  else if (!EMAIL.test(email))
     errors.email = "Check the email address: it needs an @ and a domain."
-  }
 
   const phone = values.phone.trim()
-  if (phone) {
-    const digits = phone.replace(/\D/g, "").length
-    if (!/^\+?[0-9 ]+$/.test(phone) || digits < 7) {
-      errors.phone =
-        "Write the number in digits, such as 01632 960 352, or leave it empty."
-    }
-  }
+  if (
+    phone &&
+    (!/^\+?[\d ]+$/.test(phone) || (phone.match(/\d/g) ?? []).length < 7)
+  )
+    errors.phone =
+      "Write the number in digits, such as 01632 960 352, or leave it empty."
 
-  if (!values.time) {
-    errors.time = "Choose when you expect to arrive."
-  }
+  if (!values.time) errors.time = "Choose when you expect to arrive."
 
   return errors
 }
+
+const ORDER: Field[] = [
+  "arrive",
+  "leave",
+  "room",
+  "guests",
+  "name",
+  "email",
+  "phone",
+  "time",
+]
 
 type Confirmation = {
   room: string
@@ -295,25 +286,23 @@ type Confirmation = {
   nights: number
   total: number
   email: string
-  reference: string
 }
 
-// ---------------------------------------------------------------------------
-// Shared classes
+/* ---------- Shared classes ---------- */
 
-const focusRing =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const codeFocusRing =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const navLink = `font-mono text-label uppercase text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focusRing}`
-const footerLink = `text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focusRing}`
-const textLink = `text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground ${focusRing}`
-const buttonClasses =
+const LABEL = "font-mono text-label uppercase"
+const FIELD_LABEL = `block ${LABEL} text-foreground`
+const HELP = "mt-2 font-mono text-label text-muted-foreground"
+const NAV_LINK = `text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${FOCUS}`
+const TEXT_LINK = `text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground ${FOCUS}`
+const INPUT = "mt-2 h-11 rounded-md px-4 text-body md:text-body"
+const BUTTON =
   "h-auto rounded-md px-6 py-2 font-mono text-label font-normal uppercase"
-const fieldLabel = "block font-mono text-label uppercase text-foreground"
-const inputClasses = "mt-2 h-11 rounded-md px-4 text-body md:text-body"
-const helperLine = "mt-2 font-mono text-label text-muted-foreground"
-const label = "font-mono text-label uppercase"
+const SECTION = "mt-12 border-t border-border pt-6 md:mt-26"
+const GRID = "grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start"
+const CARD = "rounded-xl border border-border bg-card p-6"
 
 function ErrorLine({ id, message }: { id: string; message?: string }) {
   if (!message) return null
@@ -322,151 +311,168 @@ function ErrorLine({ id, message }: { id: string; message?: string }) {
       id={id}
       className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
     >
-      <CircleAlert className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+      <CircleAlert
+        className="size-4 shrink-0"
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
       <span>{message}</span>
     </p>
   )
 }
 
 function describedBy(...ids: (string | false | undefined)[]) {
-  const list = ids.filter(Boolean)
-  return list.length ? list.join(" ") : undefined
+  const list = ids.filter(Boolean).join(" ")
+  return list || undefined
 }
 
-// ---------------------------------------------------------------------------
-// The page
+/* ---------- Page ---------- */
+
+const NAV = [
+  { label: "Rooms", href: "/rooms" },
+  { label: "Menu", href: "/menu" },
+  { label: "Find us", href: "/#find-us" },
+  { label: "Reserve", href: "/reserve", current: true },
+]
 
 export function App() {
-  const today = todayValue()
-  const tomorrow = fromDayNumber(dayNumber(today) + 1)
-
   const [values, setValues] = React.useState<Values>(fromAddress)
-  const [errors, setErrors] = React.useState<Errors>({})
+  const [errors, setErrors] = React.useState<Partial<Record<Field, string>>>({})
   const [confirmation, setConfirmation] = React.useState<Confirmation | null>(
     null
   )
   const [focusRequest, setFocusRequest] = React.useState<{
-    id: string
+    field: Field | "confirmation"
     n: number
   } | null>(null)
+
+  const arriveRef = React.useRef<HTMLButtonElement>(null)
+  const leaveRef = React.useRef<HTMLButtonElement>(null)
+  const roomRef = React.useRef<HTMLButtonElement>(null)
+  const guestsRef = React.useRef<HTMLButtonElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const phoneRef = React.useRef<HTMLInputElement>(null)
+  const timeRef = React.useRef<HTMLButtonElement>(null)
+  const confirmationRef = React.useRef<HTMLHeadingElement>(null)
 
   React.useEffect(() => {
     if (!focusRequest) return
     const frame = requestAnimationFrame(() => {
-      document.getElementById(focusRequest.id)?.focus()
+      if (focusRequest.field === "confirmation")
+        confirmationRef.current?.focus()
+      else {
+        const fieldRefs = {
+          arrive: arriveRef,
+          leave: leaveRef,
+          room: roomRef,
+          guests: guestsRef,
+          name: nameRef,
+          email: emailRef,
+          phone: phoneRef,
+          time: timeRef,
+        }
+        fieldRefs[focusRequest.field].current?.focus()
+      }
     })
     return () => cancelAnimationFrame(frame)
   }, [focusRequest])
 
-  function focusLater(id: string) {
-    setFocusRequest((previous) => ({ id, n: (previous?.n ?? 0) + 1 }))
+  const today = todayValue()
+  const room = ROOMS.find((r) => r.value === values.room)
+  const guests = Number(values.guests)
+  const stay = priceLines(values.arrive, values.leave, room)
+  const nights =
+    values.arrive && values.leave
+      ? nightsBetween(values.arrive, values.leave)
+      : 0
+
+  function requestFocus(field: Field | "confirmation") {
+    setFocusRequest((current) => ({ field, n: (current?.n ?? 0) + 1 }))
   }
 
-  // Set a value and clear the errors that depend on it.
-  function update<K extends keyof Values>(key: K, value: Values[K]) {
-    setValues((previous) => ({ ...previous, [key]: value }))
-    setErrors((previous) => {
-      const next = { ...previous }
-      if (key !== "note") delete next[key as Field]
-      if (key === "arrive") delete next.leave
-      if (key === "room") delete next.guests
+  function clear(...fields: Field[]) {
+    setErrors((current) => {
+      if (!fields.some((f) => current[f])) return current
+      const next = { ...current }
+      for (const f of fields) delete next[f]
       return next
     })
   }
 
-  const room = findRoom(values.room)
-  const nights = nightsBetween(values.arrive, values.leave)
-  const hasNights = nights >= 1
-  const lines = room && hasNights ? priceLines(room, values.arrive, nights) : []
-  const total = lines.reduce((sum, line) => sum + line.sum, 0)
+  function set<K extends keyof Values>(key: K, value: Values[K]) {
+    setValues((current) => ({ ...current, [key]: value }))
+  }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const found = check(values, today)
     setErrors(found)
-    const first = FIELD_ORDER.find((field) => found[field])
+    const first = ORDER.find((f) => found[f])
     if (first) {
-      focusLater(first)
+      requestFocus(first)
       return
     }
-    if (!room) return
-    const p = parts(values.arrive)!
+    const priced = priceLines(values.arrive, values.leave, room)
+    if (!room || !priced) return
     setConfirmation({
       room: room.name,
-      guests: Number(values.guests),
+      guests,
       arrive: values.arrive,
       leave: values.leave,
-      nights,
-      total,
+      nights: priced.nights,
+      total: priced.total,
       email: values.email.trim(),
-      reference: `KH-${String(p.y % 100).padStart(2, "0")}${String(p.m).padStart(2, "0")}-${String(p.d).padStart(3, "0")}`,
     })
-    focusLater("confirmation-heading")
+    requestFocus("confirmation")
   }
 
   function startAgain() {
+    setConfirmation(null)
     setValues({ ...EMPTY })
     setErrors({})
-    setConfirmation(null)
-    focusLater("arrive")
+    window.history.replaceState(
+      window.history.state,
+      "",
+      window.location.pathname
+    )
+    requestFocus("arrive")
   }
-
-  const departureMin = values.arrive
-    ? fromDayNumber(dayNumber(values.arrive) + 1)
-    : tomorrow
 
   return (
     <div className="mx-auto max-w-[1160px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-4 border-b border-border py-6 md:flex-row md:items-baseline md:justify-between">
-        <a
-          href="/"
-          className={`font-heading text-h2 text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focusRing}`}
-        >
+        <a href="/" className={cn("font-heading text-h2", NAV_LINK)}>
           Kittiwake House
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            <li>
-              <a href="/rooms" className={navLink}>
-                Rooms
-              </a>
-            </li>
-            <li>
-              <a href="/menu" className={navLink}>
-                Menu
-              </a>
-            </li>
-            <li>
-              <a href="/#find-us" className={navLink}>
-                Find us
-              </a>
-            </li>
-            <li>
-              <a
-                href="/reserve"
-                aria-current="page"
-                className={`${navLink} underline`}
-              >
-                Reserve
-              </a>
-            </li>
+            {NAV.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  aria-current={item.current ? "page" : undefined}
+                  className={cn(LABEL, NAV_LINK, item.current && "underline")}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
 
       <main>
-        <section
-          aria-labelledby="page-title"
-          className="grid gap-6 pt-12 md:grid-cols-12 md:items-start"
-        >
+        {/* Opening */}
+        <section aria-labelledby="page-title" className={cn(GRID, "pt-12")}>
           <div className="md:col-span-7">
-            <p className={`${label} text-muted-foreground`}>
+            <p className={cn(LABEL, "text-muted-foreground")}>
               Six rooms · We reply within a day
             </p>
             <h1 id="page-title" className="mt-2 text-h1 lg:text-display">
               Request a reservation
             </h1>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               Tell us the days and the room you would like. Nothing is charged
               now: we write back to confirm, and you pay at the house when you
               leave.
@@ -474,104 +480,121 @@ export function App() {
           </div>
 
           <div className="rounded-xl bg-clay p-6 text-clay-foreground md:col-span-4 md:col-start-9">
-            <p className={label}>How it works</p>
+            <p className={LABEL}>How it works</p>
             <h2 className="mt-2 text-h2">A request, not a payment</h2>
-            <ol className="mt-6 list-none p-0">
-              <li className="flex items-baseline gap-4">
-                <span className={`${label} tabular-nums`}>01</span>
-                <p className="text-body">
-                  You send the days and the room you would like.
-                </p>
-              </li>
-              <li className="mt-4 flex items-baseline gap-4">
-                <span className={`${label} tabular-nums`}>02</span>
-                <p className="text-body">
-                  We check the room and write back within a day.
-                </p>
-              </li>
-              <li className="mt-4 flex items-baseline gap-4">
-                <span className={`${label} tabular-nums`}>03</span>
-                <p className="text-body">
-                  You pay at the house when you leave, by card or in cash.
-                </p>
-              </li>
+            <ol className="mt-6">
+              {[
+                "You send the days and the room you would like.",
+                "We check the room and write back within a day.",
+                "You pay at the house when you leave, by card or in cash.",
+              ].map((step, i) => (
+                <li
+                  key={step}
+                  className={cn("flex items-baseline gap-4", i > 0 && "mt-4")}
+                >
+                  <span className={cn(LABEL, "tabular-nums")}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <p className="min-w-0">{step}</p>
+                </li>
+              ))}
             </ol>
           </div>
         </section>
 
-        <section
-          aria-label="Request and summary"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
-        >
-          <div className="rounded-xl border border-border bg-card p-6 md:col-span-7">
+        {/* Request and summary */}
+        <section aria-label="Request and summary" className={cn(SECTION, GRID)}>
+          <div className={cn(CARD, "md:col-span-7")}>
             {confirmation ? null : (
               <form
                 noValidate
-                aria-labelledby="request-heading"
+                aria-labelledby="request-title"
                 onSubmit={handleSubmit}
               >
-                <h2 id="request-heading" className="text-h2">
+                <h2 id="request-title" className="text-h2">
                   Your request
                 </h2>
 
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label id="arrive-label" htmlFor="arrive" className={fieldLabel}>
+                    <label
+                      id="arrive-label"
+                      htmlFor="arrive"
+                      className={FIELD_LABEL}
+                    >
                       Arrival date
                     </label>
                     <DatePicker
                       id="arrive"
                       labelId="arrive-label"
                       name="arrive"
+                      ref={arriveRef}
                       value={values.arrive}
-                      onValueChange={(value) => update("arrive", value)}
+                      onValueChange={(value) => {
+                        set("arrive", value)
+                        clear("arrive", "leave")
+                      }}
                       min={today}
-                      className="mt-2"
-                      aria-invalid={Boolean(errors.arrive)}
+                      aria-invalid={!!errors.arrive}
                       aria-describedby={describedBy(
                         errors.arrive && "arrive-error"
                       )}
+                      className="mt-2"
                     />
                     <ErrorLine id="arrive-error" message={errors.arrive} />
                   </div>
                   <div>
-                    <label id="leave-label" htmlFor="leave" className={fieldLabel}>
+                    <label
+                      id="leave-label"
+                      htmlFor="leave"
+                      className={FIELD_LABEL}
+                    >
                       Departure date
                     </label>
                     <DatePicker
                       id="leave"
                       labelId="leave-label"
                       name="leave"
+                      ref={leaveRef}
                       value={values.leave}
-                      onValueChange={(value) => update("leave", value)}
-                      min={departureMin}
-                      className="mt-2"
-                      aria-invalid={Boolean(errors.leave)}
+                      onValueChange={(value) => {
+                        set("leave", value)
+                        clear("leave")
+                      }}
+                      min={addDays(values.arrive || today, 1)}
+                      aria-invalid={!!errors.leave}
                       aria-describedby={describedBy(
                         errors.leave && "leave-error"
                       )}
+                      className="mt-2"
                     />
                     <ErrorLine id="leave-error" message={errors.leave} />
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label id="room-label" htmlFor="room" className={fieldLabel}>
+                    <label
+                      id="room-label"
+                      htmlFor="room"
+                      className={FIELD_LABEL}
+                    >
                       Room
                     </label>
                     <Select
-                      name="room"
                       items={ROOM_ITEMS}
                       value={values.room}
                       onValueChange={(value) => {
-                        if (value !== null) update("room", value)
+                        if (value === null) return
+                        set("room", value)
+                        clear("room", "guests")
                       }}
                     >
                       <SelectTrigger
                         id="room"
+                        ref={roomRef}
                         aria-labelledby="room-label"
-                        aria-invalid={errors.room ? true : undefined}
+                        aria-invalid={!!errors.room || undefined}
                         aria-describedby={describedBy(
                           errors.room && "room-error"
                         )}
@@ -590,21 +613,27 @@ export function App() {
                     <ErrorLine id="room-error" message={errors.room} />
                   </div>
                   <div>
-                    <label id="guests-label" htmlFor="guests" className={fieldLabel}>
+                    <label
+                      id="guests-label"
+                      htmlFor="guests"
+                      className={FIELD_LABEL}
+                    >
                       Guests
                     </label>
                     <Select
-                      name="guests"
                       items={GUEST_ITEMS}
                       value={values.guests}
                       onValueChange={(value) => {
-                        if (value !== null) update("guests", value)
+                        if (value === null) return
+                        set("guests", value)
+                        clear("guests")
                       }}
                     >
                       <SelectTrigger
                         id="guests"
+                        ref={guestsRef}
                         aria-labelledby="guests-label"
-                        aria-invalid={errors.guests ? true : undefined}
+                        aria-invalid={!!errors.guests || undefined}
                         aria-describedby={describedBy(
                           errors.guests && "guests-error"
                         )}
@@ -625,79 +654,90 @@ export function App() {
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="name" className={fieldLabel}>
+                  <label htmlFor="name" className={FIELD_LABEL}>
                     Name
                   </label>
                   <Input
                     id="name"
-                    name="name"
+                    ref={nameRef}
                     autoComplete="name"
                     value={values.name}
-                    onChange={(event) => update("name", event.target.value)}
-                    aria-invalid={errors.name ? true : undefined}
+                    onChange={(event) => {
+                      set("name", event.target.value)
+                      clear("name")
+                    }}
+                    aria-invalid={!!errors.name || undefined}
                     aria-describedby={describedBy(errors.name && "name-error")}
-                    className={inputClasses}
+                    className={INPUT}
                   />
                   <ErrorLine id="name-error" message={errors.name} />
                 </div>
 
-                <div className="mt-6 grid gap-6 md:grid-cols-2">
+                <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <label htmlFor="email" className={fieldLabel}>
+                    <label htmlFor="email" className={FIELD_LABEL}>
                       Email address
                     </label>
                     <Input
                       id="email"
-                      name="email"
+                      ref={emailRef}
                       type="email"
                       autoComplete="email"
                       value={values.email}
-                      onChange={(event) => update("email", event.target.value)}
-                      aria-invalid={errors.email ? true : undefined}
+                      onChange={(event) => {
+                        set("email", event.target.value)
+                        clear("email")
+                      }}
+                      aria-invalid={!!errors.email || undefined}
                       aria-describedby={describedBy(
                         errors.email && "email-error"
                       )}
-                      className={inputClasses}
+                      className={INPUT}
                     />
                     <ErrorLine id="email-error" message={errors.email} />
                   </div>
                   <div>
-                    <label htmlFor="phone" className={fieldLabel}>
+                    <label htmlFor="phone" className={FIELD_LABEL}>
                       Phone (optional)
                     </label>
                     <Input
                       id="phone"
-                      name="phone"
+                      ref={phoneRef}
                       type="tel"
                       autoComplete="tel"
                       value={values.phone}
-                      onChange={(event) => update("phone", event.target.value)}
-                      aria-invalid={errors.phone ? true : undefined}
+                      onChange={(event) => {
+                        set("phone", event.target.value)
+                        clear("phone")
+                      }}
+                      aria-invalid={!!errors.phone || undefined}
                       aria-describedby={describedBy(
                         errors.phone && "phone-error"
                       )}
-                      className={inputClasses}
+                      className={INPUT}
                     />
                     <ErrorLine id="phone-error" message={errors.phone} />
                   </div>
                 </div>
 
                 <div className="mt-6">
-                  <label id="time-label" htmlFor="time" className={fieldLabel}>
+                  <label id="time-label" htmlFor="time" className={FIELD_LABEL}>
                     Time of arrival
                   </label>
                   <Select
-                    name="time"
                     items={TIME_ITEMS}
                     value={values.time}
                     onValueChange={(value) => {
-                      if (value !== null) update("time", value)
+                      if (value === null) return
+                      set("time", value)
+                      clear("time")
                     }}
                   >
                     <SelectTrigger
                       id="time"
+                      ref={timeRef}
                       aria-labelledby="time-label"
-                      aria-invalid={errors.time ? true : undefined}
+                      aria-invalid={!!errors.time || undefined}
                       aria-describedby={describedBy(
                         "time-help",
                         errors.time && "time-error"
@@ -714,34 +754,33 @@ export function App() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p id="time-help" className={helperLine}>
-                    The door is open from <time dateTime="15:00">15:00</time>{" "}
-                    to <time dateTime="20:00">20:00</time>. For a later arrival
-                    we leave a key in the porch.
+                  <p id="time-help" className={HELP}>
+                    The door is open from <time dateTime="15:00">15:00</time> to{" "}
+                    <time dateTime="20:00">20:00</time>. For a later arrival we
+                    leave a key in the porch.
                   </p>
                   <ErrorLine id="time-error" message={errors.time} />
                 </div>
 
                 <div className="mt-6">
-                  <label htmlFor="note" className={fieldLabel}>
+                  <label htmlFor="note" className={FIELD_LABEL}>
                     Note (optional)
                   </label>
                   <Textarea
                     id="note"
-                    name="note"
                     maxLength={400}
                     value={values.note}
-                    onChange={(event) => update("note", event.target.value)}
+                    onChange={(event) => set("note", event.target.value)}
                     aria-describedby="note-help"
                     className="mt-2 min-h-24 resize-none rounded-md px-4 py-2 text-body md:text-body"
                   />
-                  <p id="note-help" className={helperLine}>
+                  <p id="note-help" className={HELP}>
                     An allergy, a cot, a late train: anything we should know.
                   </p>
                 </div>
 
                 <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2">
-                  <Button type="submit" className={buttonClasses}>
+                  <Button type="submit" className={BUTTON}>
                     Send request
                   </Button>
                   <p className="font-mono text-label text-muted-foreground">
@@ -755,15 +794,15 @@ export function App() {
               {confirmation ? (
                 <div>
                   <h2
-                    id="confirmation-heading"
+                    ref={confirmationRef}
                     tabIndex={-1}
-                    className={`text-h2 ${codeFocusRing}`}
+                    className="text-h2 focus:outline-2 focus:outline-offset-2 focus:outline-ring focus:outline-solid"
                   >
                     Thank you. We have your request
                   </h2>
-                  <p className="mt-4 max-w-xl text-body">
+                  <p className="mt-4 max-w-xl">
                     {confirmation.room} for{" "}
-                    {count(confirmation.guests, "guest", "guests")}, from{" "}
+                    {count(confirmation.guests, "guest")}, from{" "}
                     <time dateTime={confirmation.arrive}>
                       {longDate(confirmation.arrive)}
                     </time>{" "}
@@ -771,15 +810,20 @@ export function App() {
                     <time dateTime={confirmation.leave}>
                       {longDate(confirmation.leave)}
                     </time>
-                    : {count(confirmation.nights, "night", "nights")},{" "}
+                    : {count(confirmation.nights, "night")},{" "}
                     {pounds(confirmation.total)} in all.
                   </p>
-                  <p className="mt-4 max-w-xl text-body wrap-break-word">
+                  <p className="mt-4 max-w-xl wrap-break-word">
                     We will write to {confirmation.email} within a day to say
                     whether the room is free. Nothing has been paid.
                   </p>
-                  <p className={`mt-4 ${label} text-muted-foreground`}>
-                    Reference · {confirmation.reference}
+                  <p
+                    className={cn(
+                      LABEL,
+                      "mt-4 text-muted-foreground tabular-nums"
+                    )}
+                  >
+                    Reference · {reference(confirmation.arrive)}
                   </p>
                 </div>
               ) : null}
@@ -788,9 +832,8 @@ export function App() {
             {confirmation ? (
               <div className="mt-6">
                 <Button
-                  type="button"
                   variant="secondary"
-                  className={buttonClasses}
+                  className={BUTTON}
                   onClick={startAgain}
                 >
                   Make another request
@@ -799,61 +842,70 @@ export function App() {
             ) : null}
           </div>
 
+          {/* Summary */}
           <aside
-            aria-labelledby="summary-heading"
-            className="rounded-xl border border-border bg-card p-6 md:sticky md:top-6 md:col-span-4 md:col-start-9"
+            aria-labelledby="summary-title"
+            className={cn(
+              CARD,
+              "md:sticky md:top-6 md:col-span-4 md:col-start-9"
+            )}
           >
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className={`${label} text-muted-foreground`}>Your stay</p>
+              <p className={cn(LABEL, "text-muted-foreground")}>Your stay</p>
               <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
                 Breakfast included
               </Badge>
             </div>
-            <h2 id="summary-heading" className="mt-2 text-h2">
+            <h2 id="summary-title" className="mt-2 text-h2">
               Summary
             </h2>
 
             <dl className="mt-6 divide-y divide-border border-y border-border">
-              <SummaryRow term="Arrive">
-                {parts(values.arrive) ? (
-                  <time dateTime={values.arrive}>{longDate(values.arrive)}</time>
+              <FactRow term="Arrive">
+                {values.arrive ? (
+                  <time dateTime={values.arrive}>
+                    {longDate(values.arrive)}
+                  </time>
                 ) : null}
-              </SummaryRow>
-              <SummaryRow term="Leave">
-                {parts(values.leave) ? (
+              </FactRow>
+              <FactRow term="Leave">
+                {values.leave ? (
                   <time dateTime={values.leave}>{longDate(values.leave)}</time>
                 ) : null}
-              </SummaryRow>
-              <SummaryRow term="Nights">
-                {hasNights ? count(nights, "night", "nights") : null}
-              </SummaryRow>
-              <SummaryRow term="Room">{room ? room.name : null}</SummaryRow>
-              <SummaryRow term="Guests">
-                {count(Number(values.guests), "guest", "guests")}
-              </SummaryRow>
+              </FactRow>
+              <FactRow term="Nights">
+                {nights >= 1 ? count(nights, "night") : null}
+              </FactRow>
+              <FactRow term="Room">{room ? room.name : null}</FactRow>
+              <FactRow term="Guests">{count(guests, "guest")}</FactRow>
             </dl>
 
             <dl className="mt-6 divide-y divide-border border-y border-border">
-              {lines.map((line, index) => (
+              {stay?.lines.map((line) => (
                 <div
-                  key={index}
+                  key={line.season}
                   className="flex items-baseline justify-between gap-4 py-2"
                 >
-                  <dt className={`${label} text-muted-foreground tabular-nums`}>
-                    {count(line.nights, "night", "nights")} at {pounds(line.price)}
+                  <dt
+                    className={cn(LABEL, "text-muted-foreground tabular-nums")}
+                  >
+                    {count(line.nights, "night")} at {pounds(line.price)}
                   </dt>
                   <dd
-                    className={`${label} text-right text-foreground tabular-nums`}
+                    className={cn(
+                      LABEL,
+                      "text-right text-foreground tabular-nums"
+                    )}
                   >
                     {pounds(line.sum)}
                   </dd>
                 </div>
               ))}
               <div className="flex items-baseline justify-between gap-4 py-2">
-                <dt className={`${label} text-muted-foreground`}>Total</dt>
-                {lines.length ? (
+                <dt className={cn(LABEL, "text-muted-foreground")}>Total</dt>
+                {stay ? (
                   <dd className="text-right font-heading text-h2 text-foreground tabular-nums">
-                    {pounds(total)}
+                    {pounds(stay.total)}
                   </dd>
                 ) : (
                   <dd className="text-right text-body text-muted-foreground">
@@ -869,18 +921,16 @@ export function App() {
           </aside>
         </section>
 
-        <section
-          aria-labelledby="before-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
-        >
+        {/* Before you arrive */}
+        <section aria-labelledby="before-title" className={cn(SECTION, GRID)}>
           <div className="md:col-span-4">
-            <p className={`${label} text-muted-foreground`}>Good to know</p>
-            <h2 id="before-heading" className="mt-2 text-h2 md:text-h1">
+            <p className={cn(LABEL, "text-muted-foreground")}>Good to know</p>
+            <h2 id="before-title" className="mt-2 text-h2 md:text-h1">
               Before you arrive
             </h2>
           </div>
           <div className="md:col-span-7 md:col-start-6">
-            <ul className="list-none p-0">
+            <ul>
               <TimeRow name="Arrive">
                 <time dateTime="15:00">15:00</time>–
                 <time dateTime="20:00">20:00</time>
@@ -891,17 +941,22 @@ export function App() {
               <TimeRow name="Change or cancel, free of charge">
                 Up to 7 days before
               </TimeRow>
-              <TimeRow name="Stays in July and August">Two nights or more</TimeRow>
+              <TimeRow name="Stays in July and August">
+                Two nights or more
+              </TimeRow>
             </ul>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl wrap-break-word">
               For anything else, write to{" "}
-              <a href="mailto:stay@kittiwakehouse.example" className={textLink}>
+              <a
+                href="mailto:stay@kittiwakehouse.example"
+                className={TEXT_LINK}
+              >
                 stay@kittiwakehouse.example
               </a>{" "}
               or call{" "}
               <a
                 href="tel:+441632960352"
-                className={`${textLink} whitespace-nowrap`}
+                className={cn(TEXT_LINK, "whitespace-nowrap")}
               >
                 01632 960 352
               </a>
@@ -912,32 +967,32 @@ export function App() {
       </main>
 
       <footer className="mt-12 border-t border-border py-12 md:mt-26">
-        <div className="grid gap-6 md:grid-cols-12 md:items-start">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-5">
             <p className="font-heading text-h2">Kittiwake House</p>
-            <p className="mt-2 text-body">
+            <p className="mt-2 max-w-xl">
               Six rooms above the harbour at Port Lowan, with breakfast on the
               veranda.
             </p>
           </div>
           <div className="md:col-span-5 md:col-start-8">
-            <address className="text-body not-italic">
+            <address className="not-italic">
               <span className="block">9 Harbour Terrace</span>
               <span className="block">Port Lowan LW6 3QT</span>
             </address>
             <p className="mt-4">
-              <a href="tel:+441632960352" className={footerLink}>
+              <a href="tel:+441632960352" className={NAV_LINK}>
                 01632 960 352
               </a>
             </p>
-            <p className="mt-2">
-              <a href="mailto:stay@kittiwakehouse.example" className={footerLink}>
+            <p className="mt-2 wrap-break-word">
+              <a href="mailto:stay@kittiwakehouse.example" className={NAV_LINK}>
                 stay@kittiwakehouse.example
               </a>
             </p>
           </div>
         </div>
-        <p className={`mt-6 ${label} text-muted-foreground`}>
+        <p className={cn(LABEL, "mt-6 text-muted-foreground")}>
           © 2027 Kittiwake House · Open all year
         </p>
       </footer>
@@ -945,7 +1000,7 @@ export function App() {
   )
 }
 
-function SummaryRow({
+function FactRow({
   term,
   children,
 }: {
@@ -955,9 +1010,12 @@ function SummaryRow({
   const missing = children === null || children === undefined
   return (
     <div className="flex items-baseline justify-between gap-4 py-2">
-      <dt className={`${label} text-muted-foreground`}>{term}</dt>
+      <dt className={cn(LABEL, "text-muted-foreground")}>{term}</dt>
       <dd
-        className={`text-right text-body ${missing ? "text-muted-foreground" : "text-foreground"}`}
+        className={cn(
+          "text-right text-body tabular-nums",
+          missing ? "text-muted-foreground" : "text-foreground"
+        )}
       >
         {missing ? "Not chosen yet" : children}
       </dd>
@@ -974,8 +1032,11 @@ function TimeRow({
 }) {
   return (
     <li className="flex items-baseline gap-2 py-2">
-      <span className="min-w-0 text-body">{name}</span>
-      <span aria-hidden="true" className="min-w-4 flex-1 border-b border-border" />
+      <span className="min-w-0">{name}</span>
+      <span
+        aria-hidden="true"
+        className="min-w-4 flex-1 border-b border-border"
+      />
       <span className="shrink-0 font-mono text-label whitespace-nowrap text-foreground uppercase tabular-nums">
         {children}
       </span>

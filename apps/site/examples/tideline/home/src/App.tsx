@@ -4,46 +4,24 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 hover:decoration-2",
-  focusRing
+  focusOutline
 )
 
 const navLink = cn(
   "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
-  focusRing
+  focusOutline
 )
-
-const label = "font-mono text-label uppercase"
-const smallFigure =
-  "font-mono text-label uppercase tabular-nums text-muted-foreground"
-
-const container = "mx-auto max-w-[1248px] px-6"
 
 const navItems = [
   { label: "Lessons", href: "/lessons" },
   { label: "Forecast", href: "/forecast" },
   { label: "Guide", href: "/guide" },
   { label: "Book", href: "/booking" },
-]
-
-const conditions = [
-  {
-    term: "Tide",
-    figure: <time dateTime="13:34">13:34</time>,
-    unit: "low",
-    note: (
-      <>
-        1.5 m · High at <time dateTime="19:41">19:41</time>
-      </>
-    ),
-  },
-  { term: "Swell", figure: "3", unit: "ft", note: "9 s · From the west" },
-  { term: "Wind", figure: "8", unit: "mph", note: "East · Offshore" },
-  { term: "Water", figure: "15", unit: "°C", note: "Summer wetsuit" },
 ]
 
 const lessons = [
@@ -77,24 +55,24 @@ const toBring = [
   "A bottle of water",
 ]
 
+const label = "font-mono text-label uppercase"
+
 export function App() {
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b border-border">
-        <div
-          className={cn(container, "flex flex-wrap items-center gap-x-6 py-2")}
-        >
+        <div className="mx-auto flex max-w-[1248px] flex-wrap items-center gap-x-6 px-6 py-2">
           <a
             href="/"
             className={cn(
               "inline-flex h-11 items-center font-heading text-h2 text-foreground",
-              focusRing
+              focusOutline
             )}
           >
             Sandhopper
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+            <ul className="flex flex-wrap gap-x-6">
               {navItems.map((item) => (
                 <li key={item.href}>
                   <a href={item.href} className={navLink}>
@@ -107,7 +85,7 @@ export function App() {
         </div>
       </header>
 
-      <main className={cn(container, "flex flex-col gap-24 pt-10 pb-24")}>
+      <main className="mx-auto flex max-w-[1248px] flex-col gap-24 px-6 pt-10 pb-24">
         <section
           aria-labelledby="opening-heading"
           className="flex flex-col gap-6"
@@ -125,7 +103,7 @@ export function App() {
                 waves. Every lesson includes your wetsuit and your board.
               </p>
             </div>
-            <ul className="flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
               <li className={label}>Lessons from £42</li>
               <li className={label}>Ages 6 and up</li>
               <li className={label}>Every day of the year</li>
@@ -164,21 +142,44 @@ export function App() {
               </h2>
             </div>
             <dl className="grid grid-cols-2 gap-6 md:grid-cols-4">
-              {conditions.map((fact) => (
-                <div
-                  key={fact.term}
-                  className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4"
-                >
-                  <dt className={label}>{fact.term}</dt>
-                  <dd className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-heading text-h1 tabular-nums">
-                      {fact.figure}
-                    </span>
-                    <span className={label}>{fact.unit}</span>
-                  </dd>
-                  <dd className={cn(label, "tabular-nums")}>{fact.note}</dd>
-                </div>
-              ))}
+              <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
+                <dt className={label}>Tide</dt>
+                <dd className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-heading text-h1 tabular-nums">
+                    <time dateTime="13:34">13:34</time>
+                  </span>
+                  <span className={label}>Low</span>
+                </dd>
+                <dd className={cn(label, "tabular-nums")}>
+                  1.5 m · High at <time dateTime="19:41">19:41</time>
+                </dd>
+              </div>
+              <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
+                <dt className={label}>Swell</dt>
+                <dd className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-heading text-h1 tabular-nums">3</span>
+                  <span className={label}>ft</span>
+                </dd>
+                <dd className={cn(label, "tabular-nums")}>
+                  9 s · From the west
+                </dd>
+              </div>
+              <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
+                <dt className={label}>Wind</dt>
+                <dd className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-heading text-h1 tabular-nums">8</span>
+                  <span className={label}>mph</span>
+                </dd>
+                <dd className={label}>East · Offshore</dd>
+              </div>
+              <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
+                <dt className={label}>Water</dt>
+                <dd className="flex flex-wrap items-baseline gap-x-2">
+                  <span className="font-heading text-h1 tabular-nums">15</span>
+                  <span className={label}>°C</span>
+                </dd>
+                <dd className={label}>Summer wetsuit</dd>
+              </div>
             </dl>
             <p className="max-w-xl text-body">
               Clean, waist-high waves and a light offshore wind. A good day for
@@ -218,7 +219,7 @@ export function App() {
               the day before.
             </p>
           </div>
-          <ul className="grid list-none grid-cols-1 gap-6 p-0 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {lessons.map((lesson) => (
               <li
                 key={lesson.name}
@@ -229,7 +230,11 @@ export function App() {
                 </Badge>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-h2 text-foreground">{lesson.name}</h3>
-                  <p className={smallFigure}>{lesson.facts}</p>
+                  <p
+                    className={cn(label, "text-muted-foreground tabular-nums")}
+                  >
+                    {lesson.facts}
+                  </p>
                 </div>
                 <p className="text-body text-foreground">{lesson.text}</p>
                 <div className="mt-auto flex flex-col gap-4 border-t border-border pt-4">
@@ -238,14 +243,14 @@ export function App() {
                       {lesson.price}
                     </span>
                     <span className={cn(label, "text-muted-foreground")}>
-                      a person
+                      A person
                     </span>
                   </p>
                   <p className="text-body">
                     <a
                       href="/lessons"
-                      aria-label={`What is included in ${lesson.name}`}
                       className={textLink}
+                      aria-label={`What is included in ${lesson.name}`}
                     >
                       What is included
                     </a>
@@ -298,7 +303,7 @@ export function App() {
                 <dt className={cn(label, "shrink-0 text-muted-foreground")}>
                   Parking
                 </dt>
-                <dd className="min-w-0 text-right text-body text-foreground">
+                <dd className="min-w-0 text-right text-body text-foreground tabular-nums">
                   Beach Road car park, £5 a day
                 </dd>
               </div>
@@ -306,7 +311,7 @@ export function App() {
                 <dt className={cn(label, "shrink-0 text-muted-foreground")}>
                   Phone
                 </dt>
-                <dd className="min-w-0 text-right text-body text-foreground">
+                <dd className="min-w-0 text-right text-body text-foreground tabular-nums">
                   <a href="tel:+441632960418" className={textLink}>
                     01632 960 418
                   </a>
@@ -314,10 +319,9 @@ export function App() {
               </div>
             </dl>
           </div>
-
           <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:col-span-4 md:col-start-9">
             <h3 className="text-h2 text-foreground">What to bring</h3>
-            <ul className="flex list-none flex-col gap-4 p-0">
+            <ul className="flex flex-col gap-4">
               {toBring.map((item) => (
                 <li key={item} className="flex items-start gap-2">
                   <Check
@@ -337,31 +341,23 @@ export function App() {
       </main>
 
       <footer className="border-t border-border">
-        <div
-          className={cn(
-            container,
-            "flex flex-col gap-6 py-10 md:flex-row md:items-start md:justify-between"
-          )}
-        >
-          <div className="flex flex-col gap-2">
+        <div className="mx-auto flex max-w-[1248px] flex-col gap-6 px-6 py-10 md:flex-row md:items-start md:justify-between">
+          <div className="flex min-w-0 flex-col gap-2">
             <p className="font-heading text-h2">Sandhopper Surf School</p>
             <p className="text-body">
               Surf lessons and kit hire at Pentarrow Sands since 2009.
             </p>
           </div>
-          <div className="flex flex-col gap-2 md:items-end">
+          <div className="flex min-w-0 flex-col gap-2 md:items-end">
             <p className={cn(label, "text-muted-foreground")}>
               The Boat Shed · Beach Road · Pentarrow Sands · ZP7 3SB
             </p>
-            <p className="text-body">
+            <p className="text-body wrap-break-word">
               <a href="tel:+441632960418" className={textLink}>
                 01632 960 418
               </a>{" "}
               ·{" "}
-              <a
-                href="mailto:hello@sandhopper.example"
-                className={cn(textLink, "wrap-break-word")}
-              >
+              <a href="mailto:hello@sandhopper.example" className={textLink}>
                 hello@sandhopper.example
               </a>
             </p>

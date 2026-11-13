@@ -46,7 +46,10 @@ function SelectTrigger({
       {children}
       <SelectPrimitive.Icon
         render={
-          <ChevronDownIcon strokeWidth={1.5} className="pointer-events-none size-4 text-muted-foreground" />
+          <ChevronDownIcon
+            strokeWidth={1.5}
+            className="pointer-events-none size-4 text-muted-foreground"
+          />
         }
       />
     </SelectPrimitive.Trigger>
@@ -124,7 +127,7 @@ function SelectItem({
       </SelectPrimitive.ItemText>
       <SelectPrimitive.ItemIndicator
         render={
-          <span className="pointer-events-none absolute right-1 flex size-4 text-primary items-center justify-center" />
+          <span className="pointer-events-none absolute right-1 flex size-4 items-center justify-center text-primary" />
         }
       >
         <CheckIcon strokeWidth={1.5} className="pointer-events-none" />

@@ -48,7 +48,7 @@ A section in the grid, with two parts:
 - A label heading "Languages", an `<h3>`.
 - With `mt-4`, one `<p>` in `text-body`: "English and German".
 - With `mt-8`, a label heading "Practice areas", an `<h3>`.
-- With `mt-4`, a `<p>` in `text-body`: "Commercial disputes; Corporate (on the sale side of disputes)".
+- With `mt-4`, a `<p>` in `text-body`: "Commercial disputes; Corporate, for claims that follow a sale".
 
 ### 4. Admissions and education
 
@@ -70,7 +70,7 @@ A section that is not a grid:
 - With `mt-8`, a `<ul>` as a list of entries, three entries, each with `py-8`. Each `<li>` is also `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`, with three parts:
   - Columns 1–3 (`md:col-span-3`): a label line in `text-muted-foreground`, the year and the kind of claim, `2026 · Warranty claim`, with the year in a `<time>`.
   - Columns 4–10 (`md:col-span-7`), with `mt-2 md:mt-0`: a `<div>` holding the matter's name as an `<h3>` in `text-h2`, not a link, then with `mt-2` one sentence in `text-body`, at most `max-w-xl`, on what she did.
-  - Columns 11–12 (`md:col-span-2`), with `mt-2 md:mt-0`: the value, a `<p>` in `font-mono text-label uppercase tabular-nums text-foreground` with `md:text-right`.
+  - Columns 11–12 (`md:col-span-2`), with `mt-2 md:mt-0`: the value, a `<p>` in `font-mono text-label tabular-nums text-foreground` with `md:text-right`, and no `uppercase`, so a sum keeps its small `m`.
 
   Entries, in this order: "The sellers of Halden Print" (`2026 · Warranty claim`, `£3.4m`): led the defence of a buyer's warranty claim, struck out because its notice arrived one day after the contract's deadline. "Estley Mills v Brandreth Engineering" (`2026 · Trial`, `£6.2m`): with David Achterberg, won a claim for a textile mill after a nine-day trial. "Pellam Foods" (`2025 · Arbitration`, `£1.8m`): recovered the cost of a failed packaging contract for a food producer in an arbitration seated in Wexcombe.
 
@@ -81,7 +81,7 @@ A section that is not a grid:
 - An `<h2>` in `text-h2`: "Briefings by Ruth".
 - With `mt-8`, a `<ul>` as a list of entries, two entries, each with `py-8`. Each `<li>` is also `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`: in columns 1–3 (`md:col-span-3`) a label line in `text-muted-foreground` with the date as a `<time>` and the reading time, `10 November 2026 · 8 min read`; in columns 4–12 (`md:col-span-9`), with `mt-2 md:mt-0`, the title as an `<h3>` in `text-h2` holding a link, styled as a title that is a link.
 
-  Entries, newest first: "Notice clauses after a sale: when a late letter ends a warranty claim" (10 November 2026, 8 min read, to `/insights/notice-clauses`); "Earn-outs that end in dispute" (17 September 2026, 6 min read, to `#`).
+  Entries, newest first: "Notice clauses after a sale: when a late letter ends a warranty claim" (10 November 2026, 8 min read, to `/insights/notice-clauses`); "Earn-outs that end in dispute" (17 September 2026, 6 min read, to `#`). At 768px the label lines here and in Recent matters wrap onto two lines in their three columns; that is fine.
 
 ### 7. Footer
 

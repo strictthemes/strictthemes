@@ -1,24 +1,29 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Check } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-type SailingState = "Seats free" | "Few seats left" | "Sold out"
+type State = "Seats free" | "Few seats left" | "Sold out"
 
 type Sailing = {
   id: string
   departs: string
   arrives: string
   minutes: number
-  stops: number
+  way: "Direct" | "1 stop"
   ship: string
   fare: number | null
-  state: SailingState
+  state: State | null
   badge?: string
   note?: string
 }
+
+type SortKey = "departure" | "price" | "duration"
+
+const FROM = "Harrowmouth"
+const TO = "Port Ellery"
 
 const SAILINGS: Sailing[] = [
   {
@@ -26,7 +31,7 @@ const SAILINGS: Sailing[] = [
     departs: "06:30",
     arrives: "08:15",
     minutes: 105,
-    stops: 0,
+    way: "Direct",
     ship: "MV Merlin Tide",
     fare: 64,
     state: "Seats free",
@@ -36,7 +41,7 @@ const SAILINGS: Sailing[] = [
     departs: "09:15",
     arrives: "11:00",
     minutes: 105,
-    stops: 0,
+    way: "Direct",
     ship: "MV Isla Grey",
     fare: 78,
     state: "Seats free",
@@ -46,10 +51,10 @@ const SAILINGS: Sailing[] = [
     departs: "12:40",
     arrives: "14:35",
     minutes: 115,
-    stops: 1,
+    way: "1 stop",
     ship: "MV Merlin Tide",
     fare: 58,
-    state: "Seats free",
+    state: null,
     badge: "Lowest fare",
     note: "Calls at Brindle Ness · 10 min stop",
   },
@@ -58,7 +63,7 @@ const SAILINGS: Sailing[] = [
     departs: "15:30",
     arrives: "17:15",
     minutes: 105,
-    stops: 0,
+    way: "Direct",
     ship: "MV Isla Grey",
     fare: null,
     state: "Sold out",
@@ -68,39 +73,43 @@ const SAILINGS: Sailing[] = [
     departs: "19:00",
     arrives: "20:45",
     minutes: 105,
-    stops: 0,
+    way: "Direct",
     ship: "MV Merlin Tide",
     fare: 64,
     state: "Few seats left",
   },
 ]
 
-const FROM = "Harrowmouth"
-const TO = "Port Ellery"
-const PASSENGERS = "2 adults"
-
-type SortKey = "departure" | "price" | "duration"
-
-const SORTS: { key: SortKey; label: string; phrase: string }[] = [
-  { key: "departure", label: "Departure", phrase: "earliest first" },
-  { key: "price", label: "Price", phrase: "lowest fare first" },
-  { key: "duration", label: "Duration", phrase: "shortest first" },
+const SORTS: { key: SortKey; label: string; status: string }[] = [
+  { key: "departure", label: "Departure", status: "earliest first" },
+  { key: "price", label: "Price", status: "lowest fare first" },
+  { key: "duration", label: "Duration", status: "shortest first" },
 ]
+
+const STATE_STYLES: Record<State, { dot: string; word: string }> = {
+  "Seats free": { dot: "bg-primary", word: "text-foreground" },
+  "Few seats left": { dot: "bg-foreground", word: "text-foreground" },
+  "Sold out": { dot: "bg-muted-foreground", word: "text-muted-foreground" },
+}
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const inlineLink = cn(
-  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusRing
-)
+
 const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
+
+const textLink = cn(
+  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+
 const buttonClasses = "h-auto rounded-md px-5 py-2 font-mono text-label"
 
-function formatFare(fare: number) {
-  return `£${fare.toFixed(2)}`
+function minutesOf(time: string) {
+  const [h, m] = time.split(":").map(Number)
+  return h * 60 + m
 }
 
 function formatDuration(minutes: number) {
@@ -111,41 +120,37 @@ function formatDuration(minutes: number) {
   return `${h} h ${m} min`
 }
 
-function formatStops(stops: number) {
-  if (stops === 0) return "Direct"
-  return stops === 1 ? "1 stop" : `${stops} stops`
+function formatFare(fare: number) {
+  return `£${fare.toFixed(2)}`
 }
 
-function sortSailings(list: Sailing[], key: SortKey) {
-  const byDeparture = [...list].sort((a, b) =>
-    a.departs.localeCompare(b.departs)
-  )
-  if (key === "departure") return byDeparture
-  return byDeparture.sort((a, b) => {
-    const aOut = a.fare === null
-    const bOut = b.fare === null
-    if (aOut !== bOut) return aOut ? 1 : -1
-    if (key === "price") return (a.fare ?? 0) - (b.fare ?? 0)
-    return a.minutes - b.minutes
+function sortSailings(sailings: Sailing[], key: SortKey) {
+  const byDeparture = (a: Sailing, b: Sailing) =>
+    minutesOf(a.departs) - minutesOf(b.departs)
+  const soldOutLast = (a: Sailing, b: Sailing) =>
+    Number(a.fare === null) - Number(b.fare === null)
+
+  return [...sailings].sort((a, b) => {
+    if (key === "departure") return byDeparture(a, b)
+    const last = soldOutLast(a, b)
+    if (last !== 0) return last
+    const diff =
+      key === "price"
+        ? (a.fare ?? 0) - (b.fare ?? 0)
+        : a.minutes - b.minutes
+    return diff !== 0 ? diff : byDeparture(a, b)
   })
 }
 
-function StateMark({ state }: { state: SailingState }) {
-  const dot =
-    state === "Sold out"
-      ? "bg-muted-foreground"
-      : state === "Few seats left"
-        ? "bg-foreground"
-        : "bg-primary"
-  const word =
-    state === "Sold out" ? "text-muted-foreground" : "text-foreground"
+function StateMark({ state }: { state: State }) {
+  const style = STATE_STYLES[state]
   return (
     <span className="inline-flex items-center gap-2">
       <span
         aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", dot)}
+        className={cn("size-2 shrink-0 rounded-full", style.dot)}
       />
-      <span className={cn("font-mono text-label", word)}>{state}</span>
+      <span className={cn("font-mono text-label", style.word)}>{state}</span>
     </span>
   )
 }
@@ -171,19 +176,21 @@ function Journey({
         </p>
       </div>
       <div className="min-w-0 flex-1 text-center">
-        <p className="font-mono text-label text-muted-foreground">
+        <p className="font-mono text-label text-muted-foreground tabular-nums">
           {formatDuration(sailing.minutes)}
         </p>
         <div aria-hidden="true" className="mt-1 h-px bg-border" />
         <p className="mt-1 font-mono text-label text-muted-foreground">
-          {formatStops(sailing.stops)}
+          {sailing.way}
         </p>
       </div>
       <div className="shrink-0 text-right">
         <p className={timeClass}>
           <time dateTime={sailing.arrives}>{sailing.arrives}</time>
         </p>
-        <p className="mt-1 font-mono text-label text-muted-foreground">{TO}</p>
+        <p className="mt-1 font-mono text-label text-muted-foreground">
+          {TO}
+        </p>
       </div>
     </div>
   )
@@ -194,10 +201,12 @@ export function App() {
   const [chosenId, setChosenId] = useState("0915")
   const [sortKey, setSortKey] = useState<SortKey>("departure")
 
-  const sorted = sortSailings(sailings, sortKey)
-  const chosen = sailings.find((s) => s.id === chosenId) ?? sailings[0]
-  const sortPhrase = SORTS.find((s) => s.key === sortKey)?.phrase
-  const count = sailings.length
+  const sorted = useMemo(
+    () => sortSailings(sailings, sortKey),
+    [sailings, sortKey]
+  )
+  const chosen = sailings.find((s) => s.id === chosenId) ?? sailings[1]
+  const sortStatus = SORTS.find((s) => s.key === sortKey)?.status
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
@@ -238,30 +247,30 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-[1120px] px-5">
-        <section className="grid gap-5 pt-8 md:grid-cols-12">
+        <section className="grid grid-cols-1 gap-5 pt-8 md:grid-cols-12">
           <div className="md:col-span-8">
             <p className="font-mono text-label text-muted-foreground">
               Step 1 of 3 · Choose a sailing
             </p>
             <h1 className="mt-2 text-h1">Harrowmouth to Port Ellery</h1>
             <p className="mt-3 font-mono text-label text-foreground tabular-nums">
-              <time dateTime="2026-12-19">Saturday 19 December 2026</time> · One
-              way · {PASSENGERS}
+              <time dateTime="2026-12-19">Saturday 19 December 2026</time> ·
+              One way · 2 adults
             </p>
-            <p className="mt-3">
-              <a href="/" className={inlineLink}>
+            <p className="mt-3 max-w-xl">
+              <a href="/" className={textLink}>
                 Change search
               </a>
             </p>
           </div>
         </section>
 
-        <section className="mt-16 grid gap-5 lg:grid-cols-12 lg:items-start">
+        <section className="mt-16 grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-8">
             <h2 className="text-h2">Sailings</h2>
             <p className="mt-3 max-w-xl">
-              Fares are for the whole booking of 2 adults, one way, and include
-              port fees.
+              Fares are for 2 adults travelling one way, and include port
+              fees.
             </p>
 
             <div className="mt-5 rounded-xl border bg-card p-5">
@@ -276,30 +285,31 @@ export function App() {
                 aria-labelledby="sort-label"
                 className="mt-2 flex flex-wrap gap-2"
               >
-                {SORTS.map((s) => {
-                  const pressed = s.key === sortKey
+                {SORTS.map((sort) => {
+                  const active = sort.key === sortKey
                   return (
                     <Button
-                      key={s.key}
-                      variant={pressed ? "secondary" : "outline"}
-                      aria-pressed={pressed}
+                      key={sort.key}
+                      variant={active ? "secondary" : "outline"}
+                      aria-pressed={active}
                       className={buttonClasses}
-                      onClick={() => setSortKey(s.key)}
+                      onClick={() => setSortKey(sort.key)}
                     >
-                      {s.label}
+                      {sort.label}
                     </Button>
                   )
                 })}
               </div>
               <p
                 role="status"
-                className="mt-3 font-mono text-label text-muted-foreground"
+                className="mt-3 font-mono text-label text-muted-foreground tabular-nums"
               >
-                {count} {count === 1 ? "sailing" : "sailings"}, {sortPhrase}
+                {sailings.length}{" "}
+                {sailings.length === 1 ? "sailing" : "sailings"}, {sortStatus}
               </p>
             </div>
 
-            <ol className="mt-5 grid list-none gap-5 p-0">
+            <ol className="mt-5 grid grid-cols-1 gap-5">
               {sorted.map((sailing) => {
                 const isChosen = sailing.id === chosen.id
                 return (
@@ -315,15 +325,15 @@ export function App() {
                         <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground">
                           {sailing.badge}
                         </Badge>
-                      ) : (
+                      ) : sailing.state ? (
                         <StateMark state={sailing.state} />
-                      )}
+                      ) : null}
                       {isChosen && (
                         <span className="inline-flex items-center gap-2 font-mono text-label text-foreground">
                           <Check
-                            aria-hidden="true"
                             className="size-4"
                             strokeWidth={1.5}
+                            aria-hidden="true"
                           />
                           Chosen
                         </span>
@@ -341,7 +351,7 @@ export function App() {
                               {formatFare(sailing.fare)}
                             </p>
                             <p className="mt-1 font-mono text-label text-muted-foreground">
-                              {PASSENGERS}
+                              2 adults
                             </p>
                           </div>
                           <Button
@@ -403,7 +413,7 @@ export function App() {
                   Passengers
                 </dt>
                 <dd className="min-w-0 text-right text-body text-foreground">
-                  {PASSENGERS}
+                  2 adults
                 </dd>
               </div>
             </dl>
@@ -416,11 +426,7 @@ export function App() {
             <div className="mt-5">
               <a
                 href="/details"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  buttonClasses,
-                  "w-full"
-                )}
+                className={cn(buttonVariants(), buttonClasses, "w-full")}
               >
                 Continue
               </a>
@@ -431,16 +437,16 @@ export function App() {
           </aside>
         </section>
 
-        <section className="mt-16 grid gap-5 md:grid-cols-12">
+        <section className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-12">
           <div className="md:col-span-8">
             <h2 className="text-h2">Before you sail</h2>
             <p className="mt-3 max-w-xl">
               Check-in at Harrowmouth closes 30 minutes before a sailing for
-              foot passengers and 45 minutes before if you travel with a
+              foot passengers and 45 minutes before for passengers with a
               vehicle. Fares go up as a sailing fills.
             </p>
-            <p className="mt-3">
-              <a href="/departures" className={inlineLink}>
+            <p className="mt-3 max-w-xl">
+              <a href="/departures" className={textLink}>
                 Today&apos;s departures from Harrowmouth
               </a>
             </p>
@@ -450,10 +456,10 @@ export function App() {
 
       <footer className="mt-16 border-t bg-card">
         <div className="mx-auto max-w-[1120px] px-5 py-8">
-          <div className="grid gap-5 md:grid-cols-12 md:items-start">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
               <p className="font-heading text-h2">Kestrel Ferries</p>
-              <p className="mt-2">
+              <p className="mt-2 max-w-xl">
                 Crossings from Harrowmouth to Port Ellery, Brindle Ness,
                 Wrenholm and Tollan Quay since 1987.
               </p>
@@ -462,8 +468,8 @@ export function App() {
               <p className="font-mono text-label text-muted-foreground">
                 Customer desk
               </p>
-              <p className="mt-2 text-body">
-                <a href="tel:+441632960512" className={inlineLink}>
+              <p className="mt-2 max-w-xl text-body">
+                <a href="tel:+441632960512" className={textLink}>
                   01632 960 512
                 </a>
               </p>

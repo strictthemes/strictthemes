@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 
 type Topic = "Spreadsheets" | "SQL" | "Charts"
 type Level = "Beginner" | "Intermediate" | "Advanced"
-type LevelFilter = "All levels" | Level
+type LevelChoice = "All levels" | Level
 
 type Course = {
   title: string
@@ -21,7 +21,7 @@ type Course = {
   href: string
 }
 
-const COURSES: Course[] = [
+const courses: Course[] = [
   {
     title: "Spreadsheets from scratch",
     topic: "Spreadsheets",
@@ -62,8 +62,7 @@ const COURSES: Course[] = [
     lessons: 9,
     minutes: 135,
     teacher: "Samir Okonjo",
-    summary:
-      "Fix dates, doubles and stray spaces before they spoil your sums.",
+    summary: "Fix dates, doubles and stray spaces before they spoil your sums.",
     href: "#",
   },
   {
@@ -120,22 +119,62 @@ const COURSES: Course[] = [
   },
 ]
 
-const LEVELS: LevelFilter[] = ["All levels", "Beginner", "Intermediate", "Advanced"]
+const levelChoices: LevelChoice[] = [
+  "All levels",
+  "Beginner",
+  "Intermediate",
+  "Advanced",
+]
 
-const TOPIC_FILL: Record<Topic, string> = {
+const topicFill: Record<Topic, string> = {
   Spreadsheets: "bg-azure",
   SQL: "bg-tertiary",
   Charts: "bg-berry",
 }
 
-const OPENING_FIGURES = [
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const buttonText = "h-10 px-5 font-sans text-body font-semibold"
+const container = "mx-auto w-full max-w-[1240px] px-5"
+
+function formatLength(minutes: number) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h === 0) return `${m} min`
+  if (m === 0) return `${h} h`
+  return `${h} h ${m} min`
+}
+
+function plural(count: number, noun: string) {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`
+}
+
+function matches(course: Course, query: string, level: LevelChoice) {
+  const text = query.trim().toLowerCase()
+  const byText =
+    text === "" ||
+    [course.title, course.topic, course.teacher].some((field) =>
+      field.toLowerCase().includes(text)
+    )
+  const byLevel = level === "All levels" || course.level === level
+  return byText && byLevel
+}
+
+const navLinks = [
+  { label: "Courses", href: "/catalogue", current: true },
+  { label: "My progress", href: "/progress", current: false },
+  { label: "Plans", href: "/plans", current: false },
+]
+
+const openingFigures = [
   { value: "9", unit: "courses", rule: "border-azure" },
   { value: "102", unit: "lessons", rule: "border-tertiary" },
   { value: "3", unit: "topics", rule: "border-sun" },
   { value: "3", unit: "teachers", rule: "border-berry" },
 ]
 
-const STEPS = [
+const lessonSteps = [
   {
     icon: BookOpen,
     title: "Read for a quarter of an hour",
@@ -153,71 +192,41 @@ const STEPS = [
   },
 ]
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const NAV_LINK = cn(
-  "inline-flex h-10 items-center font-sans text-body font-semibold text-foreground underline-offset-8",
-  FOCUS
-)
-
-function formatLength(minutes: number) {
-  const h = Math.floor(minutes / 60)
-  const m = minutes % 60
-  if (h === 0) return `${m} min`
-  if (m === 0) return `${h} h`
-  return `${h} h ${m} min`
-}
-
-function plural(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
-}
-
-function matches(course: Course, query: string, level: LevelFilter) {
-  const q = query.trim().toLowerCase()
-  const byText =
-    q === "" ||
-    [course.title, course.topic, course.teacher].some((field) =>
-      field.toLowerCase().includes(q)
-    )
-  const byLevel = level === "All levels" || course.level === level
-  return byText && byLevel
-}
-
-function Header() {
+function SiteHeader() {
   return (
     <header className="border-b border-border">
-      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center gap-x-8 gap-y-1 px-5 py-3">
+      <div
+        className={cn(
+          container,
+          "flex flex-wrap items-center gap-x-8 gap-y-1 py-3"
+        )}
+      >
         <a
           href="/catalogue"
           className={cn(
             "inline-flex h-10 items-center font-heading text-h2 text-foreground",
-            FOCUS
+            focusOutline
           )}
         >
           Rowlark
         </a>
         <nav aria-label="Main" className="w-full md:w-auto">
           <ul className="flex gap-5">
-            <li>
-              <a
-                href="/catalogue"
-                aria-current="page"
-                className={cn(NAV_LINK, "underline decoration-2")}
-              >
-                Courses
-              </a>
-            </li>
-            <li>
-              <a href="/progress" className={cn(NAV_LINK, "hover:underline")}>
-                My progress
-              </a>
-            </li>
-            <li>
-              <a href="/plans" className={cn(NAV_LINK, "hover:underline")}>
-                Plans
-              </a>
-            </li>
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  aria-current={link.current ? "page" : undefined}
+                  className={cn(
+                    "inline-flex h-10 items-center font-sans text-body font-semibold text-foreground underline-offset-8",
+                    link.current ? "underline decoration-2" : "hover:underline",
+                    focusOutline
+                  )}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>
@@ -232,21 +241,21 @@ function Opening() {
         <h1 className="text-h1 md:max-w-3xl md:text-display">
           Data skills you will use on Monday
         </h1>
-        <p className="max-w-2xl">
+        <p className="max-w-2xl text-body">
           Nine courses in spreadsheets, SQL and charts. Every lesson is short,
           ends with one question, and starts where the last one stopped.
         </p>
       </div>
       <ul className="grid grid-cols-2 gap-5 md:max-w-2xl md:grid-cols-4">
-        {OPENING_FIGURES.map((figure) => (
+        {openingFigures.map((figure) => (
           <li
             key={figure.unit}
             className={cn("flex flex-col gap-1 border-l-2 pl-3", figure.rule)}
           >
-            <span className="font-heading text-h1 tabular-nums text-foreground">
+            <span className="font-heading text-h1 tabular-nums">
               {figure.value}
             </span>
-            <span className={SMALL_FIGURE}>{figure.unit}</span>
+            <span className={smallFigure}>{figure.unit}</span>
           </li>
         ))}
       </ul>
@@ -255,17 +264,16 @@ function Opening() {
 }
 
 function CourseCard({ course }: { course: Course }) {
-  const footFigure = cn(
-    SMALL_FIGURE,
-    "text-foreground inline-flex items-center gap-2"
-  )
   return (
     <li className="flex h-full flex-col gap-5 rounded-xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-2 font-mono text-label text-muted-foreground">
           <span
             aria-hidden="true"
-            className={cn("size-2 shrink-0 rounded-full", TOPIC_FILL[course.topic])}
+            className={cn(
+              "size-2 shrink-0 rounded-full",
+              topicFill[course.topic]
+            )}
           />
           {course.topic}
         </span>
@@ -279,21 +287,33 @@ function CourseCard({ course }: { course: Course }) {
             href={course.href}
             className={cn(
               "text-foreground underline-offset-4 hover:underline",
-              FOCUS
+              focusOutline
             )}
           >
             {course.title}
           </a>
         </h3>
         <p className="text-body">{course.summary}</p>
-        <p className={SMALL_FIGURE}>With {course.teacher}</p>
+        <p className={smallFigure}>With {course.teacher}</p>
       </div>
       <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-border pt-3">
-        <span className={footFigure}>
+        <span
+          className={cn(
+            "inline-flex items-center gap-2",
+            smallFigure,
+            "text-foreground"
+          )}
+        >
           <BookOpen className="size-4" aria-hidden="true" />
-          {plural(course.lessons, "lesson", "lessons")}
+          {plural(course.lessons, "lesson")}
         </span>
-        <span className={footFigure}>
+        <span
+          className={cn(
+            "inline-flex items-center gap-2",
+            smallFigure,
+            "text-foreground"
+          )}
+        >
           <Clock className="size-4" aria-hidden="true" />
           {formatLength(course.minutes)}
         </span>
@@ -304,21 +324,20 @@ function CourseCard({ course }: { course: Course }) {
 
 function AllCourses() {
   const [query, setQuery] = useState("")
-  const [level, setLevel] = useState<LevelFilter>("All levels")
+  const [level, setLevel] = useState<LevelChoice>("All levels")
   const searchRef = useRef<HTMLInputElement>(null)
   const ids = useId()
   const searchId = `${ids}-search`
   const helperId = `${ids}-search-help`
   const levelLabelId = `${ids}-level`
 
-  const shown = COURSES.filter((course) => matches(course, query, level))
-  const total = COURSES.length
+  const shown = courses.filter((course) => matches(course, query, level))
   const count =
-    shown.length === 0
-      ? "No courses match"
-      : shown.length === total
-        ? `Showing all ${total} courses`
-        : `Showing ${shown.length} of ${total} courses`
+    shown.length === courses.length
+      ? `Showing all ${courses.length} courses`
+      : shown.length === 0
+        ? "No courses match"
+        : `Showing ${shown.length} of ${courses.length} courses`
 
   function clearAll() {
     setQuery("")
@@ -332,7 +351,7 @@ function AllCourses() {
         All courses
       </h2>
 
-      <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div className="flex w-full flex-col gap-2 md:max-w-sm">
           <label
             htmlFor={searchId}
@@ -345,12 +364,12 @@ function AllCourses() {
             id={searchId}
             type="search"
             autoComplete="off"
-            aria-describedby={helperId}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            aria-describedby={helperId}
             className="h-10 px-3 text-body md:text-body [&::-webkit-search-cancel-button]:appearance-none"
           />
-          <p id={helperId} className={SMALL_FIGURE}>
+          <p id={helperId} className={smallFigure}>
             By title, topic or teacher
           </p>
         </div>
@@ -367,17 +386,17 @@ function AllCourses() {
             aria-labelledby={levelLabelId}
             className="flex flex-wrap gap-2"
           >
-            {LEVELS.map((option) => {
-              const chosen = option === level
+            {levelChoices.map((choice) => {
+              const chosen = choice === level
               return (
                 <Button
-                  key={option}
+                  key={choice}
                   variant={chosen ? "secondary" : "outline"}
                   aria-pressed={chosen}
-                  onClick={() => setLevel(option)}
-                  className="h-10 px-5 font-sans text-body font-semibold"
+                  onClick={() => setLevel(choice)}
+                  className={buttonText}
                 >
-                  {option}
+                  {choice}
                 </Button>
               )
             })}
@@ -385,7 +404,7 @@ function AllCourses() {
         </div>
       </div>
 
-      <p role="status" className={cn(SMALL_FIGURE, "text-foreground")}>
+      <p role="status" className={cn(smallFigure, "text-foreground")}>
         {count}
       </p>
 
@@ -401,11 +420,7 @@ function AllCourses() {
             No courses match your search
           </p>
           <p className="text-body">Try a shorter word, or another level.</p>
-          <Button
-            variant="secondary"
-            onClick={clearAll}
-            className="h-10 px-5 font-sans text-body font-semibold"
-          >
+          <Button variant="secondary" onClick={clearAll} className={buttonText}>
             Clear search and level
           </Button>
         </div>
@@ -416,21 +431,21 @@ function AllCourses() {
 
 function HowALessonWorks() {
   return (
-    <section aria-labelledby="how-a-lesson-works" className="flex flex-col gap-5">
+    <section
+      aria-labelledby="how-a-lesson-works"
+      className="flex flex-col gap-5"
+    >
       <h2 id="how-a-lesson-works" className="text-h2">
         How a lesson works
       </h2>
       <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
-        {STEPS.map((step) => {
-          const Icon = step.icon
-          return (
-            <li key={step.title} className="flex flex-col gap-2">
-              <Icon className="size-5 text-foreground" aria-hidden="true" />
-              <h3 className="text-h2">{step.title}</h3>
-              <p className="text-body">{step.text}</p>
-            </li>
-          )
-        })}
+        {lessonSteps.map((step) => (
+          <li key={step.title} className="flex flex-col gap-2">
+            <step.icon className="size-5 text-foreground" aria-hidden="true" />
+            <h3 className="text-h2">{step.title}</h3>
+            <p className="text-body">{step.text}</p>
+          </li>
+        ))}
       </ul>
       <p className="max-w-2xl text-body">
         The first module of every course is free.{" "}
@@ -438,7 +453,7 @@ function HowALessonWorks() {
           href="/plans"
           className={cn(
             "text-foreground underline underline-offset-4 hover:decoration-2",
-            FOCUS
+            focusOutline
           )}
         >
           See the plans
@@ -448,12 +463,17 @@ function HowALessonWorks() {
   )
 }
 
-function Footer() {
+function SiteFooter() {
   return (
     <footer className="border-t border-border">
-      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-3 px-5 py-8">
+      <div
+        className={cn(
+          container,
+          "flex flex-wrap items-center justify-between gap-3 py-8"
+        )}
+      >
         <p className="font-heading text-h2">Rowlark</p>
-        <p className={SMALL_FIGURE}>
+        <p className={smallFigure}>
           Rowlark · Practical data skills, one short lesson at a time · 2027
         </p>
       </div>
@@ -464,15 +484,15 @@ function Footer() {
 export function App() {
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <Header />
+      <SiteHeader />
       <main className="flex-1">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-20 px-5 pt-8 pb-20">
+        <div className={cn(container, "flex flex-col gap-20 pt-8 pb-20")}>
           <Opening />
           <AllCourses />
           <HowALessonWorks />
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

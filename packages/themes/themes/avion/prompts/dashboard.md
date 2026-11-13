@@ -28,10 +28,10 @@ The `<h1>` "Overview". The actions are the period switch, a button group named "
 Four panels in a row: three columns each from `lg` up, six each from `md`, full width below. Each panel has:
 
 - Its label heading, e.g. `Delivered`, `In transit`, `Late`, `On-time rate`.
-- With `mt-3`, the key number, with its unit beside it as a small figure where it has one (`%`), the two in `flex items-baseline gap-1`.
-- With `mt-2`, the change against the period before (for `In transit`, up is neither better nor worse), as a short line in `flex items-center gap-2 font-mono text-label`, not uppercased: an icon (`ArrowUp`, `ArrowDown`, or `Minus` for no change) and at most six words, e.g. "Up 4% on yesterday", "Down 2% on last week". For the on-time rate, which is a percentage itself, give the change in points: "Down 1 point on yesterday". A change for the better is `text-success`, one for the worse `text-destructive`, none `text-muted-foreground`. `In transit` counts the parcels on the road now, so in every period its value is the same and its change line compares with this time yesterday.
+- With `mt-3`, the key number, with its unit beside it as a small figure where it has one (`%`), the two in `flex items-baseline gap-1`. The counts have no unit beside them.
+- With `mt-2`, the change against the period before (for `In transit`, up is neither better nor worse), as a short line in `flex items-center gap-2 font-mono text-label`, not uppercased: an icon (`ArrowUp`, `ArrowDown`, or `Minus` for no change) and at most six words, e.g. "Up 4% on yesterday", "Down 2% on last week", "Down 1% on previous 30 days". Today's figures count the day so far, and their changes compare with yesterday at this time. For the on-time rate, which is a percentage itself, give the change in points: "Down 1 point on yesterday". A change for the better is `text-success`, one for the worse `text-destructive`, none `text-muted-foreground`. `In transit` counts the parcels on the road now, so in every period its value is the same and its change line compares with this time yesterday.
 
-The `Late` panel also has a caution badge, "Check", in its heading row.
+The `Late` panel also has a caution badge, "Check", in its heading row, in every period.
 
 ### 4. Deliveries chart
 
@@ -45,7 +45,7 @@ A panel with rows, four columns from `lg` up, full width below. Heading: `Needs 
 
 ### 6. Recent shipments
 
-A panel with rows, twelve columns. Its heading row holds the heading `Recent shipments` and, at the right end, a search field and the status filter, a button group named "Status" with the choices All, In transit, Delivered, Late. The two controls sit together with `gap-3` and wrap under the heading where the row is too narrow. The search field has no visible label: it has the `aria-label` "Search shipments" and a search icon inside it, in a wrapper with `relative w-64` (the icon `absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground`, the input `pl-8`).
+A panel with rows, twelve columns. Its heading row holds the heading `Recent shipments` and, at the right end, a search field and the status filter, a button group named "Status" with the choices All, In transit, Delivered, Late. The two controls sit together with `gap-3` and wrap under the heading where the row is too narrow. The search field has no visible label: it has the `aria-label` "Search shipments", the placeholder "ID or destination" and a search icon inside it, in a wrapper with `relative w-64` (the icon `absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground`, the input `pl-8`).
 
 The table has ten rows and these columns: ID (mono, a text link), Destination, Depot, Status (a state: In transit is neutral, Delivered is good, Late is failed), Weight with the header "Weight (kg)" (right-aligned) and Due (a time of day, right-aligned). It scrolls in its box on a phone.
 

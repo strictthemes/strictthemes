@@ -10,27 +10,32 @@ import { ChevronLeft, CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { cn } from "@/lib/utils"
 
 const PAGE_TITLE =
   "Check your application – Apply for a resident's parking permit – Callowmere Council"
 
-const CONTAINER = "mx-auto max-w-[720px] px-4 md:px-6"
+const DECLARATION_ERROR = "Tick the box to confirm your answers are correct"
 
-const FOCUS =
+const SENT_MESSAGE =
+  "In the full service, your application would be sent now and the confirmation page would open."
+
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const TEXT_LINK = `text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 ${FOCUS}`
-
-const DECLARATION_ERROR = "Tick the box to confirm your answers are correct"
+const textLink = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusOutline
+)
 
 type Answer = {
   question: string
   answer: ReactNode
-  change: string
+  hidden: string
 }
 
 const yourDetails: Answer[] = [
-  { question: "Name", answer: "Priya Okafor", change: "name" },
+  { question: "Name", answer: "Priya Okafor", hidden: "name" },
   {
     question: "Address",
     answer: (
@@ -40,15 +45,15 @@ const yourDetails: Answer[] = [
         <span className="block">CM4 7QJ</span>
       </>
     ),
-    change: "address",
+    hidden: "address",
   },
-  { question: "Permit zone", answer: "Zone B", change: "permit zone" },
+  { question: "Permit zone", answer: "Zone B", hidden: "permit zone" },
   {
     question: "Email",
     answer: "priya.okafor@mail.example",
-    change: "email address",
+    hidden: "email address",
   },
-  { question: "Phone", answer: "07700 900 214", change: "phone number" },
+  { question: "Phone", answer: "07700 900 214", hidden: "phone number" },
   {
     question: "Proof of address",
     answer: (
@@ -57,7 +62,7 @@ const yourDetails: Answer[] = [
         <time dateTime="2026-11-09">9 November 2026</time>
       </>
     ),
-    change: "proof of address",
+    hidden: "proof of address",
   },
 ]
 
@@ -65,22 +70,22 @@ const yourVehicle: Answer[] = [
   {
     question: "Registration number",
     answer: "KX19 TDV",
-    change: "vehicle registration number",
+    hidden: "vehicle registration number",
   },
   {
     question: "Make and model",
     answer: "Velmar Arden",
-    change: "make and model",
+    hidden: "make and model",
   },
   {
     question: "Runs on",
     answer: "Petrol or diesel",
-    change: "what the vehicle runs on",
+    hidden: "what the vehicle runs on",
   },
   {
     question: "Permit start date",
     answer: <time dateTime="2026-12-01">1 December 2026</time>,
-    change: "permit start date",
+    hidden: "permit start date",
   },
 ]
 
@@ -99,9 +104,12 @@ function SummaryList({ rows }: { rows: Answer[] }) {
           <dd className="mt-2 md:col-span-2 md:mt-0 md:text-right">
             <a
               href="#"
-              className={`inline-flex min-h-11 items-center md:items-start ${TEXT_LINK}`}
+              className={cn(
+                textLink,
+                "inline-flex min-h-11 items-center md:items-start"
+              )}
             >
-              Change<span className="sr-only"> {row.change}</span>
+              Change<span className="sr-only"> {row.hidden}</span>
             </a>
           </dd>
         </div>
@@ -112,82 +120,97 @@ function SummaryList({ rows }: { rows: Answer[] }) {
 
 export function App() {
   const [confirmed, setConfirmed] = useState(false)
-  const [declarationError, setDeclarationError] = useState(false)
-  const [showSummary, setShowSummary] = useState(false)
-  const [status, setStatus] = useState("")
+  const [fieldError, setFieldError] = useState(false)
+  const [summaryShown, setSummaryShown] = useState(false)
+  const [statusMessage, setStatusMessage] = useState("")
   const [sendCount, setSendCount] = useState(0)
 
   const summaryRef = useRef<HTMLDivElement>(null)
   const checkboxRef = useRef<HTMLElement>(null)
-  const checkboxLabelRef = useRef<HTMLLabelElement>(null)
+  const labelRef = useRef<HTMLLabelElement>(null)
 
   useEffect(() => {
-    document.title = showSummary ? `Error: ${PAGE_TITLE}` : PAGE_TITLE
-  }, [showSummary])
+    document.title = summaryShown ? `Error: ${PAGE_TITLE}` : PAGE_TITLE
+  }, [summaryShown])
 
   useEffect(() => {
-    if (sendCount > 0 && showSummary) {
+    if (sendCount > 0 && summaryShown) {
       summaryRef.current?.focus()
     }
-  }, [sendCount, showSummary])
+  }, [sendCount, summaryShown])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setSendCount((count) => count + 1)
-
     if (!confirmed) {
-      setDeclarationError(true)
-      setShowSummary(true)
-      setStatus("")
+      setFieldError(true)
+      setSummaryShown(true)
+      setStatusMessage("")
       return
     }
+    setFieldError(false)
+    setSummaryShown(false)
+    setStatusMessage(SENT_MESSAGE)
+  }
 
-    setDeclarationError(false)
-    setShowSummary(false)
-    setStatus(
-      "In the full service, your application would be sent now and the confirmation page would open."
-    )
+  function handleConfirmedChange(checked: boolean) {
+    setConfirmed(checked)
+    setFieldError(false)
+    setStatusMessage("")
   }
 
   function goToCheckbox(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
     checkboxRef.current?.focus({ preventScroll: true })
-    checkboxLabelRef.current?.scrollIntoView()
+    labelRef.current?.scrollIntoView()
   }
 
   return (
     <div className="bg-background text-body text-foreground">
       <a
         href="#main"
-        className={`sr-only text-primary underline underline-offset-4 focus-visible:not-sr-only focus-visible:block focus-visible:px-4 focus-visible:py-2 ${FOCUS}`}
+        className={cn(
+          "sr-only text-primary underline underline-offset-4 focus-visible:not-sr-only focus-visible:block focus-visible:px-4 focus-visible:py-2",
+          focusOutline
+        )}
       >
         Skip to main content
       </a>
 
       <header className="border-b border-border">
-        <div
-          className={`${CONTAINER} flex flex-wrap items-baseline gap-x-6 gap-y-1 py-4`}
-        >
+        <div className="mx-auto flex max-w-[720px] flex-wrap items-baseline gap-x-6 gap-y-1 px-4 py-4 md:px-6">
           <a
             href="/"
-            className={`font-heading text-h2 text-foreground no-underline underline-offset-4 hover:underline ${FOCUS}`}
+            className={cn(
+              "font-heading text-h2 text-foreground no-underline underline-offset-4 transition-colors duration-150 hover:underline",
+              focusOutline
+            )}
           >
             Callowmere Council
           </a>
           <a
             href="#"
-            className={`text-body font-bold text-foreground no-underline underline-offset-4 hover:underline ${FOCUS}`}
+            className={cn(
+              "text-body font-bold text-foreground no-underline underline-offset-4 transition-colors duration-150 hover:underline",
+              focusOutline
+            )}
           >
             Apply for a resident&apos;s parking permit
           </a>
         </div>
       </header>
 
-      <main id="main" className={`${CONTAINER} pt-10 pb-16`}>
+      <main
+        id="main"
+        className="mx-auto max-w-[720px] px-4 pt-10 pb-16 md:px-6"
+      >
         <p>
           <a
             href="#"
-            className={`inline-flex min-h-11 items-center gap-2 ${TEXT_LINK}`}
+            className={cn(
+              "inline-flex min-h-11 items-center gap-2 text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+              focusOutline
+            )}
           >
             <ChevronLeft
               className="size-5"
@@ -198,7 +221,7 @@ export function App() {
           </a>
         </p>
 
-        {showSummary && (
+        {summaryShown && (
           <div
             ref={summaryRef}
             tabIndex={-1}
@@ -209,12 +232,15 @@ export function App() {
             <p id="error-summary-title" className="font-heading text-h2">
               Your answers need a change
             </p>
-            <ul className="mt-4 list-none p-0">
+            <ul className="mt-4">
               <li>
                 <a
                   href="#declaration"
                   onClick={goToCheckbox}
-                  className={`font-bold text-destructive underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${FOCUS}`}
+                  className={cn(
+                    "font-bold text-destructive underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+                    focusOutline
+                  )}
                 >
                   {DECLARATION_ERROR}
                 </a>
@@ -228,8 +254,8 @@ export function App() {
         </p>
         <h1 className="mt-2 text-h1">Check your application</h1>
         <p className="mt-6">
-          Read your answers before you send them. If any answer is wrong, change
-          it first.
+          Read your answers. If any of them are wrong, change them before you
+          send your application.
         </p>
 
         <h2 className="mt-10 text-h2">Your details</h2>
@@ -247,8 +273,8 @@ export function App() {
             <time dateTime="2027-11-30">30 November 2027</time>
           </p>
           <p className="mt-4">
-            You pay nothing now. If the council approves your application, it
-            will email you a link to pay.
+            You pay after we approve your application. We will email you a link
+            to pay.
           </p>
         </div>
 
@@ -256,14 +282,16 @@ export function App() {
           <form noValidate onSubmit={handleSubmit}>
             <h2 className="text-h2">Declaration</h2>
             <p className="mt-4">
-              If you give false information to get a permit, the council can
-              cancel it and you will not get a refund.
+              If you give false information to get a permit, we can cancel it
+              and you will not get a refund.
             </p>
-
             <div
-              className={`mt-6 ${declarationError ? "border-l-4 border-destructive pl-4" : ""}`}
+              className={cn(
+                "mt-6",
+                fieldError && "border-l-4 border-destructive pl-4"
+              )}
             >
-              {declarationError && (
+              {fieldError && (
                 <p
                   id="declaration-error"
                   className="flex items-start gap-2 text-body font-bold text-destructive"
@@ -280,25 +308,26 @@ export function App() {
                 </p>
               )}
               <div
-                className={`flex min-h-11 items-start gap-4 ${declarationError ? "mt-2" : ""}`}
+                className={cn(
+                  "flex min-h-11 items-start gap-4",
+                  fieldError && "mt-2"
+                )}
               >
                 <Checkbox
                   ref={checkboxRef}
                   id="declaration"
+                  name="declaration"
+                  className="mt-0.5"
+                  checked={confirmed}
+                  onCheckedChange={handleConfirmedChange}
                   aria-labelledby="declaration-label"
                   aria-describedby={
-                    declarationError ? "declaration-error" : undefined
+                    fieldError ? "declaration-error" : undefined
                   }
-                  aria-invalid={declarationError || undefined}
-                  checked={confirmed}
-                  onCheckedChange={(checked) => {
-                    setConfirmed(checked)
-                    setDeclarationError(false)
-                  }}
-                  className="mt-0.5"
+                  aria-invalid={fieldError || undefined}
                 />
                 <label
-                  ref={checkboxLabelRef}
+                  ref={labelRef}
                   id="declaration-label"
                   htmlFor="declaration"
                   className="text-body"
@@ -309,7 +338,6 @@ export function App() {
                 </label>
               </div>
             </div>
-
             <div className="mt-10">
               <Button
                 type="submit"
@@ -319,19 +347,18 @@ export function App() {
               </Button>
             </div>
           </form>
-
           <div role="status">
-            {status && (
-              <p className="mt-6 text-body text-foreground">{status}</p>
+            {statusMessage && (
+              <p className="mt-6 text-body text-foreground">{statusMessage}</p>
             )}
           </div>
         </div>
       </main>
 
       <footer className="border-t border-border bg-card">
-        <div className={`${CONTAINER} py-10`}>
+        <div className="mx-auto max-w-[720px] px-4 py-10 md:px-6">
           <nav aria-label="Footer">
-            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+            <ul className="flex flex-wrap gap-x-6">
               {[
                 "Accessibility",
                 "Privacy",
@@ -339,7 +366,7 @@ export function App() {
                 "Contact the council",
               ].map((item) => (
                 <li key={item}>
-                  <a href="#" className={`inline-block py-2 ${TEXT_LINK}`}>
+                  <a href="#" className={cn(textLink, "inline-block py-2")}>
                     {item}
                   </a>
                 </li>

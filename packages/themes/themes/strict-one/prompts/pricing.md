@@ -16,13 +16,15 @@ Build these sections in order.
 
 ### 1. Header
 
-A single row with a 1px bottom border: product name in `font-heading text-h2` on the left, three label links, Product (`#`), Templates (`#`) and Pricing (`#`, the current page), then a "Sign in" label link (`#`) and an `outline` button "Start free" (`#`). Below `md` the row holds only the product name, "Start free" and a "Menu" button; the links and "Sign in" move into the menu.
+A single row with a 1px bottom border: product name in `font-heading text-h2` on the left, three label links, Product (`#`), Templates (`#`) and Pricing (`#`, the current page), then a "Sign in" label link (`#`) and an `outline` button "Start free" (`#`). Below `md` the row holds only the product name, "Start free" and a "Menu" button; the menu lists Product, Templates, Pricing and "Sign in", in that order.
 
 ### 2. Intro
 
-- An eyebrow label: `PRICING`.
+- Columns 1–12: an eyebrow label: `PRICING`.
 - Columns 1–8: the `<h1>` in `text-display` on `md` and up, `text-h1` below. Sample: "One price per person. No tiers hidden in a sales call."
 - Columns 1–6: one paragraph in `text-body`.
+
+Space them with margins: `mt-2` on the `<h1>`, `mt-4` on the paragraph.
 
 ### 3. Plans
 
@@ -34,12 +36,12 @@ Then, with `mt-8`, three plans side by side, stacked below `md`. They are column
 
 Each plan, top to bottom, with `p-8`:
 
-1. The plan name as a label heading, an `<h3>`.
+1. The plan name as a label heading, an `<h3>`, in a `flex flex-wrap items-center gap-2` row that every plan has, so the names stay level beside the taller badge.
 2. The price in `font-heading text-display`, with `/ person / month` as a label in `text-muted-foreground` beside it, on the price's baseline (`flex flex-wrap items-baseline gap-2`). At `md` a plan's box is too narrow for both, so the label wraps under the price there, `gap-2` below it, and shares its line from `lg` up and below `md`: give the label `md:basis-full lg:basis-auto`, so all three plans wrap at the same widths, whatever the price's length. The free plan shows "$0" with the same label.
 3. A billing note as a label in `text-muted-foreground`, `BILLED MONTHLY`, or `BILLED YEARLY` with the year's total, e.g. `BILLED YEARLY, $120 PER PERSON`; at `md` it may take two lines, which the subgrid keeps level. The free plan says `FREE FOREVER`.
 4. One sentence saying who the plan is for.
 5. The call to action, full width: an `<a>` styled as a button. The recommended plan uses the default variant; the others use `outline`. The three sit on one line across the plans. They keep the stock `whitespace-nowrap`, so each label is at most 15 characters, which fits a plan's box at `md`: `START FREE`, `START TEAM`, `START BUSINESS`.
-6. A 1px top border, then a list of five or six features. Mark each with a small check icon from the project's icon set, in `text-foreground`.
+6. A 1px top border, then a list of five or six features. Mark each with a small check icon from the project's icon set, in `text-foreground`: each feature is a `flex items-start gap-2` row, and the icon takes `mt-1 shrink-0`, so it sits by the first line when the text wraps.
 
 Spacing inside a plan is margins, not gap: `mt-2` before the price and before the billing note, `mt-4` before the sentence, `mt-8` before the call to action, `mt-8` before the list's top border, `pt-8` under that border, and `gap-2` between features. To keep the calls to action level from `md` up, make each plan `row-span-6 grid grid-rows-subgrid gap-0`, so every part shares a row with its neighbours. Give the row no `grid-rows-*` class: the spans create six implicit rows sized to their content, where `grid-rows-6` would make six equal ones.
 
@@ -55,7 +57,7 @@ Section header: `02 / QUESTIONS`. Columns 4–12: an `Accordion` with six questi
 
 ### 6. Closing line
 
-A section with a 1px top border and `pt-16`: an `<h2>` in `text-h1` across columns 1–8 ("Still deciding? Start on the free plan."), and, in a `<p>` with `mt-4` under it, one text link to contact sales. No second primary button here, since the plan row may still be on screen.
+A section with a 1px top border and `pt-16`: an `<h2>` in `text-h1` across columns 1–8 ("Still deciding? Start on the free plan."), and, in a `<p>` with `mt-4` under it, also across columns 1–8, one text link to contact sales. No second primary button here, since the plan row may still be on screen.
 
 ### 7. Footer
 

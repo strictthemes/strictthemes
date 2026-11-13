@@ -25,28 +25,28 @@ The header from the layout notes. No link is the current page here.
 
 The first section, with `pt-12` and `aria-labelledby` pointing at the `<h1>`. It holds a grid and, after it, the date check of part 3.
 
-The grid is `grid gap-6 md:grid-cols-12` with no `md:items-start`: its two items stretch to the same height.
+The grid is `grid grid-cols-1 gap-6 md:grid-cols-12` with no `md:items-start`: its two items stretch to the same height.
 
-- In columns 1–5 (`md:col-span-5`): the page's clay block, with `flex items-end` beside the block's own classes, so its text sits at the foot of the block. It holds one `<div>`, in normal block flow:
+- In columns 1–5 (`md:col-span-5`): the page's clay block, the grid item itself, with `flex items-end` beside the block's own classes and the span, so its text sits at the foot of the block. It holds one `<div>`, in normal block flow:
   - A label with no text color class, so it takes the block's ink: `Guesthouse · Port Lowan`.
   - With `mt-2`, the `<h1>` in `text-h1 lg:text-display`: "A quiet house above the harbour", with the words "above the harbour" in a `<span className="italic">`. This is the page's one italic phrase in a heading.
   - With `mt-4`, a `<p>` in `text-body`: "Six rooms and a veranda that faces the bay. Breakfast is included, and nothing hurries you."
 - In columns 6–12 (`md:col-span-7 md:col-start-6`): a plate with no caption, `aspect-4/3`, the window at `right-1/6`, with the `aria-label` "The glazed veranda of Kittiwake House at breakfast time, with the bay beyond its windows". The plate itself is the grid item.
 
-From `md` up the block is as tall as the plate; where its text needs more room, it grows and the plate keeps its shape. On a phone the block comes first, as tall as its text, and the plate follows.
+From `md` up the block is as tall as the plate; where its text needs more room, it grows and the plate keeps its shape. Add no `items-stretch` or `self-stretch`: under the default alignment a grid item with an aspect ratio keeps it, and a stretch would pull the plate to the block's height. On a phone the block comes first, as tall as its text, and the plate follows.
 
 ### 3. Date check
 
 Still in the opening section, after the grid, with `mt-6`: a `<form>` that is a card, with `noValidate`, `action="/reserve"`, `method="get"` and `aria-labelledby` pointing at its heading. Here, in place of the Forms note's stack of fields, the three fields and the button share one row. Inside the card:
 
 - A label heading, an `<h2>` with an `id`: "Check your dates".
-- With `mt-4`, a row: `grid gap-6 md:grid-cols-12 md:items-end`, with four items, each a `<div>` of three columns (`md:col-span-3`):
+- With `mt-4`, a row: `grid grid-cols-1 gap-6 md:grid-cols-12 md:items-end`, with four items, each a `<div>` of three columns (`md:col-span-3`):
   1. The label "Arrive", then with `mt-2` a date field from the layout notes with `name="arrive"` and `min` set to today.
   2. The label "Leave", then with `mt-2` a date field with `name="leave"` and `min` set to the day after the day of arriving, or to tomorrow while no day of arriving is set.
   3. The label "Guests", then with `mt-2` a `Select` with `name="guests"` and four choices, `1 guest`, `2 guests`, `3 guests` and `4 guests`, with the values `1` to `4`. It starts on `2 guests` and has no placeholder.
   4. The page's one default button, `type="submit"`: "Check dates", with `h-11 w-full` in place of the Buttons note's `h-auto`, so it is as tall as the fields beside it. This item has no label.
 - Under the row, the error lines, one for each date field that has an error, in the order of the fields, each with `mt-2` as the Errors note says for a row.
-- With `mt-4`, a `<p>` with `role="status"`, a label in `text-foreground`, uppercased as every label is. While a date is missing, or the day of leaving is not after the day of arriving, it reads `Choose the days you arrive and leave`. With two good dates it says the nights in words: `3 nights · Friday 14 May 2027 to Monday 17 May 2027`, each date a `<time>`. Unlike the confirmations in the layout notes, this element holds its first text from the start: it is a line that changes, not a message that replaces a form.
+- With `mt-4`, a `<p>` with `role="status"`, a label in `text-foreground`, uppercased as every label is. While a date is missing, the day of arriving is before today, or the day of leaving is not after the day of arriving, it reads `Choose the days you arrive and leave`. With two good dates it says the nights in words: `3 nights · Friday 14 May 2027 to Monday 17 May 2027`, each date a `<time>`. Unlike the confirmations in the layout notes, this element holds its first text from the start: it is a line that changes, not a message that replaces a form.
 - With `mt-2`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "Rooms from £78 a night, breakfast included. Nothing is paid until we confirm your stay."
 
 On a phone the four items stack, 24px apart, the button last and at the full width.
@@ -58,7 +58,7 @@ A section with the hairline from the layout notes:
 - A label line in `text-muted-foreground`: `Six rooms · From £78 a night`.
 - With `mt-2`, an `<h2>`: "Three of our rooms".
 - With `mt-4`, one sentence in `text-body`: "Each room is named for a plant that grows on the cliff path, and no two are alike."
-- With `mt-6`, a `<ul>` with no markers and no padding, `grid gap-6 md:grid-cols-3`: three equal columns, the one even row on the page. No `md:items-start` is needed. Each `<li>` holds, in block flow:
+- With `mt-6`, a `<ul>` with no markers and no padding, `grid grid-cols-1 gap-6 md:grid-cols-3`: three equal columns, the one even row on the page. No `md:items-start` is needed. Each `<li>` holds, in block flow:
   - A plate with no caption, `aspect-4/3`.
   - With `mt-4`, the room's name as an `<h3>` in `text-h2`.
   - With `mt-2`, a `<p>` label in `text-foreground`, the room's three facts: `Sleeps 2 · King bed · Sea view`.
@@ -75,19 +75,19 @@ A section with the hairline from the layout notes:
 
 A section with the hairline, holding a grid and, after it, a guest's words.
 
-The grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+The grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7 (`md:col-span-7`): a `<figure>` with a plate, `aspect-4/3`, the window at `left-1/6` and the ground `h-1/2`, with the `aria-label` "Kittiwake House seen from the quay, the third house of Harbour Terrace, with its white veranda", and the caption `Harbour Terrace from the quay`.
 - In columns 9–12 (`md:col-span-4 md:col-start-9`): a label line in `text-muted-foreground`, `Since 1894`, with the year in a `<time dateTime="1894">`; with `mt-2` an `<h2>`, "The house"; with `mt-4` two short paragraphs in `text-body`, the second with `mt-4`. Sample: "The harbour pilot built this house in 1894, with a glazed veranda across the front so that he could watch for ships and stay dry. We have kept it since 2016 and changed as little as we could." and "There are six rooms, a breakfast room that opens onto the veranda, and a walled garden at the back. The quay is at the foot of the terrace steps."
 
-After the grid, with `mt-12`, the guest's words: a `<figure>` in columns 1–9 of a grid of its own (`grid gap-6 md:grid-cols-12`, the `<figure>` with `md:col-span-9`):
+After the grid, with `mt-12`, the guest's words: a `<figure>` in columns 1–9 of a grid of its own (`grid grid-cols-1 gap-6 md:grid-cols-12`, the `<figure>` with `md:col-span-9`):
 
 - A `<blockquote>` holding one `<p>` in `font-heading text-h2 italic md:text-h1`, in curly quotation marks: “We meant to walk the cliff path every day. Mostly we sat on the veranda and watched the boats come in.” It has no border and no fill.
-- With `mt-4`, a `<figcaption>`, a label in `text-muted-foreground`: `Ines and Paul · Stayed in Marram, April 2027`.
+- With `mt-4`, a `<figcaption>`, a label in `text-muted-foreground`: `Ines and Paul · Stayed in Marram, April 2027`, with the month and year in a `<time dateTime="2027-04">`.
 
 ### 6. Breakfast in brief
 
-A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4 (`md:col-span-4`):
   - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Every morning` in `text-muted-foreground`, then the badge "Breakfast included".
@@ -104,7 +104,7 @@ A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-sta
 
 ### 7. Find us
 
-A section with the hairline, the `id` `find-us` and `scroll-mt-6`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline, the `id` `find-us` and `scroll-mt-6`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4 (`md:col-span-4`):
   - A label line in `text-muted-foreground`: `Port Lowan`.

@@ -21,7 +21,7 @@ The header from the layout notes, with "Rooms" as the current page.
 
 ### 2. Opening
 
-The first section, with `pt-12`, in columns 1–8 of a grid (`grid gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-8`):
+The first section, with `pt-12`, in columns 1–8 of a grid (`grid grid-cols-1 gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-8`):
 
 - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Six rooms · From £78 a night` in `text-muted-foreground`, then the badge "Breakfast included".
 - With `mt-2`, the `<h1>` in `text-h1 lg:text-display`: "Six rooms, no two alike", with the words "no two alike" in a `<span className="italic">`. This is the page's only italic.
@@ -38,7 +38,7 @@ A section with the hairline from the layout notes. Its heading is an `<h2>` with
 
 Under that row, with `mt-4`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "A guest travelling alone is welcome in any room for two, at the room's price."
 
-**The list.** With `mt-12`, a `<ul>` with no markers and no padding, and `divide-y divide-border`, so a hairline falls between rooms and none above the first or below the last. Each `<li>` is a room row: `grid gap-6 py-12 first:pt-0 last:pb-0 md:grid-cols-12 md:items-center` (here `md:items-center` takes the place of the notes' `md:items-start`). A row has two items, the plate first in the code, then the text:
+**The list.** With `mt-12`, a `<ul>` with no markers and no padding, and `divide-y divide-border`, so a hairline falls between rooms and none above the first or below the last. Each `<li>` is a room row: `grid grid-cols-1 gap-6 py-12 first:pt-0 last:pb-0 md:grid-cols-12 md:items-center` (here `md:items-center` takes the place of the notes' `md:items-start`). A row has two items, the plate first in the code, then the text:
 
 - **The plate**, with no caption, `aspect-4/3`, the plate itself the grid item.
 - **The text**, a `<div>` in block flow:
@@ -65,12 +65,12 @@ The six rooms, in this order. The plate's shapes belong to the room, not to its 
 
 ### 4. In every room
 
-A section that holds nothing but the clay block and its action, so it has `mt-12 md:mt-26` and no hairline, as the Sections note says. Its `aria-labelledby` names the block's heading. It is a grid (`grid gap-6 md:grid-cols-12 md:items-end`; here `md:items-end` takes the place of `md:items-start`, so the action lines up with the foot of the block):
+A section that holds nothing but the clay block and its action, so it has `mt-12 md:mt-26` and no hairline, as the Sections note says. Its `aria-labelledby` names the block's heading. It is a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-end`; here `md:items-end` takes the place of `md:items-start`, so the action lines up with the foot of the block):
 
-- In columns 1–7 (`md:col-span-7`): the page's clay block, holding:
+- In columns 1–7 (`md:col-span-7`): the page's clay block, the grid item itself (the block's classes and the span on one element), holding:
   - A label with no text color class, so it takes the block's ink: `Included in every price`.
   - With `mt-2`, an `<h2>`: "In every room".
-  - With `mt-6`, a `<ul>` with no markers and no padding, `grid gap-x-6 gap-y-2 md:grid-cols-2`, of six items. Each `<li>` is `flex items-start gap-2` in `text-body`: the `Check` icon with `mt-1 shrink-0`, then the words. The items: "Breakfast on the veranda", "Linen sheets and wool blankets", "A kettle, loose tea and fresh milk", "Wifi through the house", "Free parking at the quay", "A key of your own, to come and go as you like".
+  - With `mt-6`, a `<ul>` with no markers and no padding, `grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2`, of six items. Each `<li>` is `flex items-start gap-2` in `text-body`: the `Check` icon with `mt-1 shrink-0`, then the words. The items: "Breakfast on the veranda", "Linen sheets and wool blankets", "A kettle, loose tea and fresh milk", "Wifi through the house", "Free parking at the quay", "A key of your own, to come and go as you like".
 - In columns 9–12 (`md:col-span-4 md:col-start-9`), on the paper: a `<div>` holding a label in `text-muted-foreground`, `No payment now`; with `mt-2` a `<p>` in `text-body`, "Send a request and we reply within a day."; and with `mt-6` a `<p>` holding the page's one default button, an `<a>` styled as a button: "Request a room", to `/reserve`.
 
 On a phone the block comes first and the action under it.

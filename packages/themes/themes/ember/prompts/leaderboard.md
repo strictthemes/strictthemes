@@ -70,7 +70,7 @@ When Americas or Asia-Pacific is chosen, the viewer is not in the list, and unde
 
 ### 5. Tiers
 
-The third `<section>`, with `mt-20`. An `<h2>` "Tiers" in `text-h2 md:text-h1 uppercase`, then with `mt-3` one sentence: every rating starts the season at Cinder, and a tier is won and lost with the rating. With `mt-6`, a `<ul>` with `grid grid-cols-1 gap-6 md:grid-cols-3`, three entries, each an `<li>` with `border-t border-border pt-3`: a rank mark and the tier's name as a `<span>` in `font-heading text-h2`, in a row `flex items-center gap-2` (the mark keeps `size-3`); with `mt-2`, a label in `text-muted-foreground` with its range and its count on the ladder: `2,800 and up · 5 players`, `2,600 to 2,799 · 7 players`, `Under 2,600 · 7 players`.
+The third `<section>`, with `mt-20`. An `<h2>` "Tiers" in `text-h2 md:text-h1 uppercase`, then with `mt-3` one sentence: every player starts the season in Cinder and moves up or down a tier as their rating crosses its line. With `mt-6`, a `<ul>` with `grid grid-cols-1 gap-6 md:grid-cols-3`, three entries, each an `<li>` with `border-t border-border pt-3`: a rank mark and the tier's name as a `<span>` in `font-heading text-h2`, in a row `flex items-center gap-2` (the mark keeps `size-3`); with `mt-2`, a label in `text-muted-foreground` with its range and its count on the ladder: `2,800 and up · 5 players`, `2,600 to 2,799 · 7 players`, `Under 2,600 · 7 players`.
 
 ### 6. Footer
 

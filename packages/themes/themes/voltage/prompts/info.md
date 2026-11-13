@@ -23,7 +23,7 @@ A section with no heading row. Its stack has `gap-3`:
 
 ### 2. Getting there
 
-A section. Its heading row holds the `<h2>` "Getting there". Then the grid from the layout notes with three panels, each `md:col-span-4`. Each panel is the stock panel with `gap-3`: an `<h3>` in `text-h2` ("By train", "By tram", "By bike"), a label line with the one fact that matters most (`12 min walk from Varsby Central`, `Tram 4 · Docks Gate stop`, `400 bike stands at the north gate`), and two sentences in `text-body` with the details. The trains and trams run late after both nights: the last train to Varsby Central leaves at 01:40 and the last tram 4 at 01:55. In those sentences the two times are `<time>` elements in the sentence's font, with the time alone as their `dateTime` (`01:40`), since it holds after both nights.
+A section. Its heading row holds the `<h2>` "Getting there". Then the grid from the layout notes with three panels, each `md:col-span-4`. Each panel is the stock panel with `gap-3`: an `<h3>` in `text-h2` ("By train", "By tram", "By bike"), a label line with the one fact that matters most (`12 min walk from Varsby Central`, `Tram 4 · Docks Gate stop`, `400 bike stands at the north gate`), and two sentences in `text-body` with the details. The trains and trams run late after both nights: the last train to Varsby Central leaves at 01:40 and the last tram 4 at 01:55. In those sentences the two times are `<time>` elements in the sentence's font, with the time alone as their `dateTime` (`01:40`), since it holds after both nights. The bike panel's two sentences: the stands are free and lit, and a cycle path along Kajgatan leads to the north gate.
 
 ### 3. Opening times
 
@@ -34,7 +34,7 @@ One panel across the full width, with `gap-5`, holding the shadcn `Table` (add i
 - Friday 4 December: 16:00, 17:00, 00:30, 22:00.
 - Saturday 5 December: 12:00, 13:00, 01:00, 22:00.
 
-The header cells are `TableHead` with `scope="col"`. The day in each row is a `<th scope="row">` with the body cells' padding (`px-3 py-2 first:pl-0`), `whitespace-nowrap align-middle`, as the stock `TableCell` has, plus `text-left text-body font-bold`, and its date in a `<time dateTime="2026-12-04">`. Every time is a `<time>` with a full `dateTime` and the offset, in `font-mono tabular-nums`; a set that ends after midnight ends on the next date (`2026-12-05T00:30+01:00`, `2026-12-06T01:00+01:00`). The stock cells do not wrap, so on a phone the table is wider than its panel and scrolls inside its box.
+The header cells are `TableHead` with `scope="col"`. The day in each row is a `<th scope="row">` with the body cells' padding (`px-3 py-2 first:pl-0`), `whitespace-nowrap align-middle`, as the stock `TableCell` has, plus `text-left text-body font-bold`, and its date in a `<time dateTime="2026-12-04">`. Every time is a `<time>` with a full `dateTime` and the offset, in `font-mono tabular-nums`; put those classes on each time's `TableCell`, which stays `text-body`, not a label; a set that ends after midnight ends on the next date (`2026-12-05T00:30+01:00`, `2026-12-06T01:00+01:00`). The stock cells do not wrap, so on a phone the table is wider than its panel and scrolls inside its box.
 
 Under the table, in the panel's stack, small print: "Weekend wristbands can leave and come back until 22:00." It is a sentence, so 22:00 is plain text, not a `<time>`.
 
@@ -55,9 +55,9 @@ A section. Its heading row holds the `<h2>` "Access". One panel across the full 
 
 ### 6. Questions
 
-A section. Its heading row holds the `<h2>` "Questions". One panel across the full width, with `gap-0`, holding the shadcn `Accordion` (add it with `npx shadcn@latest add accordion`) with six items and the `multiple` prop (`<Accordion multiple>`), so more than one may be open at a time; Base UI's default is one.
+A section. Its heading row holds the `<h2>` "Questions". One panel across the full width, with `gap-0` and its `p-5` (it is not a panel with rows: the accordion's own lines divide it), holding the shadcn `Accordion` (add it with `npx shadcn@latest add accordion`) with six items and the `multiple` prop (`<Accordion multiple>`), so more than one may be open at a time; Base UI's default is one.
 
-- Each trigger gets `className="items-center gap-3 py-3 font-sans text-body font-bold"`, which replaces its stock size and weight. Keep its stock corner, its hover underline and its chevron icons.
+- Each trigger gets `className="items-center gap-3 py-3 font-sans text-body font-bold"`, which replaces its stock size and weight. Keep its stock corner, its hover underline and its chevron icons. In `components/ui/accordion.tsx`, replace `**:data-[slot=accordion-trigger-icon]:text-muted-foreground` with `**:data-[slot=accordion-trigger-icon]:text-foreground`: nothing inside a button is muted.
 - Each content gets `className="pb-3 text-body"`. Every answer is one short paragraph of one to three sentences, so the stock space between paragraphs never applies.
 - Items keep the stock line between them, a 1px `border-border` line.
 - Each trigger sits in the stock `<h3>`. A question is not a headline: the Headings note's five-word limit does not apply to it.

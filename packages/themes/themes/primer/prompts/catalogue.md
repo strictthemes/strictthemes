@@ -51,7 +51,7 @@ The rules only decorate: here a color does not stand for a topic.
 
 A section with the `<h2>` "All courses". Its content, in the section's `gap-5`, is the controls, the count, and the grid or the empty state.
 
-**The controls.** A `<div>` with `flex flex-col gap-5 md:flex-row md:items-end md:justify-between`:
+**The controls.** A `<div>` with `flex flex-col gap-5 md:flex-row md:items-start md:justify-between`, so that from `md` up the two labels stand on one line and the buttons level with the field, not with its helper text. It holds:
 
 - The search field, in a wrapper with `w-full md:max-w-sm`: a field from the layout notes with the label "Search courses", an `Input` with `type="search"` and `autoComplete="off"`, and the helper text `By title, topic or teacher`. No placeholder and no search button: the grid follows as you type. A browser draws a clear button of its own inside a search field that holds text: add `[&::-webkit-search-cancel-button]:appearance-none` to the `Input`'s `className`, beside the classes of the Inputs note, so the field keeps the theme's look. Escape still empties the field where the browser does that.
 - The level filter, a `flex flex-col gap-2`: a `<p>` with an `id` in `font-mono text-label text-muted-foreground`, the look of a field's label (a `<p>` needs no `block`), "Level"; then a button group from the layout notes, named by that `<p>` with `aria-labelledby` (in place of the `aria-label`), with four buttons: "All levels", chosen at the start, "Beginner", "Intermediate" and "Advanced".
@@ -80,7 +80,7 @@ A section with the `<h2>` "How a lesson works", then a `<ul>` with `grid grid-co
 - `ListChecks`, "Answer one question": "Each lesson ends with a question with four answers. You are told in words whether you were right, and why."
 - `Bookmark`, "Pick up where you stopped": "Rowlark keeps your place, your lessons done and your days in a row."
 
-Under the list, in the section's `gap-5`, one line in `text-body`: "The first module of every course is free." followed by a text link, "See the plans", to `/plans`.
+Under the list, in the section's `gap-5`, one line in `text-body`: "The first module of every course is free." followed by a text link, "See the plans", to `/plans`, with no full stop after the link.
 
 ### 5. Footer
 

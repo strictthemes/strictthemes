@@ -1,23 +1,19 @@
-import { Fragment } from "react"
-
 import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focus =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focus
+  focusRing
 )
 
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focus
+  focusRing
 )
-
-const label = "font-mono text-label uppercase"
 
 type Letter = "V" | "VG" | "GF" | "DF"
 
@@ -27,6 +23,8 @@ const letterWords: Record<Letter, string> = {
   GF: "No gluten",
   DF: "No dairy",
 }
+
+const keyOrder: Letter[] = ["V", "VG", "GF", "DF"]
 
 type Dish = {
   name: string
@@ -41,7 +39,7 @@ type Course = {
   dishes: Dish[]
 }
 
-const breakfast: Course[] = [
+const breakfastCourses: Course[] = [
   {
     id: "cooked-to-order",
     title: "Cooked to order",
@@ -107,7 +105,7 @@ const breakfast: Course[] = [
   },
 ]
 
-const supper: Course[] = [
+const supperCourses: Course[] = [
   {
     id: "to-start",
     title: "To start",
@@ -182,13 +180,6 @@ const supper: Course[] = [
   },
 ]
 
-const navLinks = [
-  { label: "Rooms", href: "/rooms" },
-  { label: "Menu", href: "/menu", current: true },
-  { label: "Find us", href: "/#find-us" },
-  { label: "Reserve", href: "/reserve" },
-]
-
 function Hours({ from, to }: { from: string; to: string }) {
   return (
     <>
@@ -197,47 +188,46 @@ function Hours({ from, to }: { from: string; to: string }) {
   )
 }
 
-function Letters({ letters }: { letters: Letter[] }) {
+function DishLetters({ letters }: { letters: Letter[] }) {
   return (
-    <p className={cn("mt-2", label, "text-muted-foreground")}>
+    <p className="mt-2 font-mono text-label text-muted-foreground uppercase">
       {letters.map((letter, i) => {
         const last = i === letters.length - 1
         return (
-          <Fragment key={letter}>
+          <span key={letter}>
             <span aria-hidden="true">{letter}</span>
             <span className="sr-only">
               {letterWords[letter]}
               {last ? "." : ", "}
             </span>
             {!last && <span aria-hidden="true"> · </span>}
-          </Fragment>
+          </span>
         )
       })}
     </p>
   )
 }
 
-function DishItem({ dish, first }: { dish: Dish; first: boolean }) {
+function DishList({ dishes }: { dishes: Dish[] }) {
   return (
-    <li className={first ? undefined : "mt-6"}>
-      <div className="flex items-baseline gap-2">
-        <h4 className="min-w-0 text-h2">{dish.name}</h4>
-        <span
-          aria-hidden="true"
-          className="min-w-4 flex-1 border-b border-border"
-        />
-        <p
-          className={cn(
-            label,
-            "shrink-0 whitespace-nowrap text-foreground tabular-nums"
-          )}
-        >
-          {dish.price}
-        </p>
-      </div>
-      <p className="mt-2 max-w-xl">{dish.description}</p>
-      {dish.letters.length > 0 && <Letters letters={dish.letters} />}
-    </li>
+    <ul className="mt-4">
+      {dishes.map((dish, i) => (
+        <li key={dish.name} className={i > 0 ? "mt-6" : undefined}>
+          <div className="flex items-baseline gap-2">
+            <h4 className="min-w-0 text-h2">{dish.name}</h4>
+            <span
+              aria-hidden="true"
+              className="min-w-4 flex-1 border-b border-border"
+            />
+            <p className="shrink-0 font-mono text-label whitespace-nowrap text-foreground uppercase tabular-nums">
+              {dish.price}
+            </p>
+          </div>
+          <p className="mt-2 max-w-xl">{dish.description}</p>
+          {dish.letters.length > 0 && <DishLetters letters={dish.letters} />}
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -245,21 +235,19 @@ function Courses({ courses }: { courses: Course[] }) {
   return (
     <div className="md:col-span-7 md:col-start-6">
       {courses.map((course, i) => (
-        <div key={course.id} className={i === 0 ? undefined : "mt-12"}>
-          <h3 className={cn(label, "text-foreground")}>{course.title}</h3>
-          <ul className="mt-4 list-none p-0">
-            {course.dishes.map((dish, j) => (
-              <DishItem key={dish.name} dish={dish} first={j === 0} />
-            ))}
-          </ul>
+        <div key={course.id} className={i > 0 ? "mt-12" : undefined}>
+          <h3 className="font-mono text-label text-foreground uppercase">
+            {course.title}
+          </h3>
+          <DishList dishes={course.dishes} />
         </div>
       ))}
     </div>
   )
 }
 
-const sectionRule =
-  "mt-12 border-t border-border pt-6 md:mt-26 grid gap-6 md:grid-cols-12"
+const sectionClasses =
+  "mt-12 grid grid-cols-1 gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12"
 
 export function App() {
   return (
@@ -269,18 +257,43 @@ export function App() {
           Kittiwake House
         </a>
         <nav aria-label="Main">
-          <ul className="flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={cn(label, headerLink, link.current && "underline")}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            <li>
+              <a
+                href="/rooms"
+                className={cn("font-mono text-label uppercase", headerLink)}
+              >
+                Rooms
+              </a>
+            </li>
+            <li>
+              <a
+                href="/menu"
+                aria-current="page"
+                className={cn(
+                  "font-mono text-label uppercase underline",
+                  headerLink
+                )}
+              >
+                Menu
+              </a>
+            </li>
+            <li>
+              <a
+                href="/#find-us"
+                className={cn("font-mono text-label uppercase", headerLink)}
+              >
+                Find us
+              </a>
+            </li>
+            <li>
+              <a
+                href="/reserve"
+                className={cn("font-mono text-label uppercase", headerLink)}
+              >
+                Reserve
+              </a>
+            </li>
           </ul>
         </nav>
       </header>
@@ -288,12 +301,11 @@ export function App() {
       <main>
         <section
           aria-labelledby="menu-title"
-          className="grid gap-6 pt-12 md:grid-cols-12 md:items-start"
+          className="grid grid-cols-1 gap-6 pt-12 md:grid-cols-12 md:items-start"
         >
           <div className="md:col-span-7">
-            <p className={cn(label, "text-muted-foreground")}>
-              Spring menu · From{" "}
-              <time dateTime="2027-04-01">1 April 2027</time>
+            <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+              Spring menu · From <time dateTime="2027-04-01">1 April 2027</time>
             </p>
             <h1 id="menu-title" className="mt-2 text-h1 lg:text-display">
               Breakfast <span className="italic">and supper</span>
@@ -305,10 +317,12 @@ export function App() {
               the day before.
             </p>
             <dl className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-              {(Object.keys(letterWords) as Letter[]).map((letter) => (
+              {keyOrder.map((letter) => (
                 <div key={letter} className="flex items-baseline gap-2">
-                  <dt className={cn(label, "text-foreground")}>{letter}</dt>
-                  <dd className={cn(label, "text-muted-foreground")}>
+                  <dt className="font-mono text-label text-foreground uppercase">
+                    {letter}
+                  </dt>
+                  <dd className="font-mono text-label text-muted-foreground uppercase">
                     {letterWords[letter]}
                   </dd>
                 </div>
@@ -321,28 +335,28 @@ export function App() {
           </div>
 
           <div className="rounded-xl bg-clay p-6 text-clay-foreground md:col-span-4 md:col-start-9">
-            <h2 className={label}>When we serve</h2>
+            <h2 className="font-mono text-label uppercase">When we serve</h2>
             <dl className="mt-4">
               <div>
-                <dt>Breakfast, every day</dt>
-                <dd className={cn("mt-2", label, "tabular-nums")}>
+                <dt className="text-body">Breakfast, every day</dt>
+                <dd className="mt-2 font-mono text-label uppercase tabular-nums">
                   <Hours from="08:00" to="10:00" />
                 </dd>
               </div>
               <div className="mt-4">
-                <dt>Breakfast on Sundays</dt>
-                <dd className={cn("mt-2", label, "tabular-nums")}>
+                <dt className="text-body">Breakfast on Sundays</dt>
+                <dd className="mt-2 font-mono text-label uppercase tabular-nums">
                   <Hours from="08:00" to="10:30" />
                 </dd>
               </div>
               <div className="mt-4">
-                <dt>Supper, Thursday to Saturday</dt>
-                <dd className={cn("mt-2", label, "tabular-nums")}>
+                <dt className="text-body">Supper, Thursday to Saturday</dt>
+                <dd className="mt-2 font-mono text-label uppercase tabular-nums">
                   <Hours from="18:30" to="20:30" />
                 </dd>
               </div>
             </dl>
-            <p className="mt-6">
+            <p className="mt-6 text-body">
               Tell us by <time dateTime="14:00">14:00</time> if you would like
               supper.
             </p>
@@ -352,11 +366,11 @@ export function App() {
         <section
           id="breakfast"
           aria-labelledby="breakfast-title"
-          className={cn(sectionRule, "md:items-start")}
+          className={cn(sectionClasses, "md:items-start")}
         >
           <div className="md:col-span-4">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className={cn(label, "text-muted-foreground")}>
+              <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
                 Every day · <Hours from="08:00" to="10:00" />
               </p>
               <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
@@ -367,37 +381,37 @@ export function App() {
               Breakfast
             </h2>
             <p className="mt-4 max-w-xl">
-              We serve breakfast on the glazed veranda, looking over the
-              harbour. Order as much or as little as you like: for guests of the
-              house the prices do not apply.
+              We serve breakfast on the veranda, and you can order as much or as
+              little of it as you like. For guests of the house it comes with
+              the room, so the prices do not apply.
             </p>
           </div>
-          <Courses courses={breakfast} />
+          <Courses courses={breakfastCourses} />
         </section>
 
         <section
           id="supper"
           aria-labelledby="supper-title"
-          className={cn(sectionRule, "md:items-start")}
+          className={cn(sectionClasses, "md:items-start")}
         >
           <div className="md:col-span-4">
-            <p className={cn(label, "text-muted-foreground")}>
+            <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
               Thursday to Saturday · <Hours from="18:30" to="20:30" />
             </p>
             <h2 id="supper-title" className="mt-2 text-h2 md:text-h1">
               Supper
             </h2>
             <p className="mt-4 max-w-xl">
-              Three courses or one, at the long table in the breakfast room.
-              The fish comes from that morning's boats.
+              Have three courses or just one. Everyone sits at the long table in
+              the breakfast room, and the fish comes from that morning's boats.
             </p>
           </div>
-          <Courses courses={supper} />
+          <Courses courses={supperCourses} />
         </section>
 
-        <section aria-labelledby="table-title" className={sectionRule}>
+        <section aria-labelledby="table-title" className={sectionClasses}>
           <div className="md:col-span-7">
-            <p className={cn(label, "text-muted-foreground")}>
+            <p className="font-mono text-label text-muted-foreground uppercase">
               Guests and visitors
             </p>
             <h2 id="table-title" className="mt-2 text-h2 md:text-h1">
@@ -418,7 +432,7 @@ export function App() {
               >
                 Write to us
               </a>
-              <p className={cn(label, "text-foreground")}>
+              <p className="font-mono text-label text-foreground uppercase tabular-nums">
                 Or call{" "}
                 <a href="tel:+441632960352" className={textLink}>
                   01632 960 352
@@ -430,10 +444,10 @@ export function App() {
       </main>
 
       <footer className="mt-12 border-t border-border py-12 md:mt-26">
-        <div className="grid gap-6 md:grid-cols-12 md:items-start">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-5">
             <p className="font-heading text-h2">Kittiwake House</p>
-            <p className="mt-2 max-w-xl text-body">
+            <p className="mt-2 text-body">
               Six rooms above the harbour at Port Lowan, with breakfast on the
               veranda.
             </p>
@@ -458,7 +472,7 @@ export function App() {
             </p>
           </div>
         </div>
-        <p className={cn("mt-6", label, "text-muted-foreground")}>
+        <p className="mt-6 font-mono text-label text-muted-foreground uppercase">
           © 2027 Kittiwake House · Open all year
         </p>
       </footer>

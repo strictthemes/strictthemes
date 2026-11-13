@@ -42,7 +42,7 @@ Then with `mt-4` two sentences: it takes about 10 minutes, and you do not pay un
 
 A `<p>` with `mt-10` holding the main action: an `<a href="#">` styled as a default button, `cn(buttonVariants(), "h-11 w-full px-6 font-mono text-label md:w-auto")`, with the text "Start now" and the `ArrowRight` icon after it (`aria-hidden="true"`). It is the only default button on the page.
 
-Under it, with `mt-4`, one sentence in `text-body`: you can save your answers and come back within 7 days.
+Under it, with `mt-4`, one plain paragraph: you can save your answers and come back within 7 days.
 
 ### 6. Other ways to apply
 
@@ -65,5 +65,5 @@ The footer from the layout notes.
 
 ### Behavior
 
-- "Start now" and every other link go to `#`; the page needs no other behavior.
+- "Start now" and every other link go to `#`, except the council's name in the header, which goes to `/`; the page needs no other behavior.
 - On a phone the "Start now" link fills the column and the header's service name wraps under the council's name. 

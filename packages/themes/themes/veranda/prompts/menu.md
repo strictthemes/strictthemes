@@ -29,7 +29,7 @@ The header from the layout notes, with "Menu" as the current page.
 
 ### 2. Opening
 
-The first section, with `pt-12`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+The first section, with `pt-12`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7 (`md:col-span-7`):
   - A label line in `text-muted-foreground`: `Spring menu · From 1 April 2027`, with the date in a `<time dateTime="2027-04-01">`.
@@ -37,7 +37,7 @@ The first section, with `pt-12`, as a grid (`grid gap-6 md:grid-cols-12 md:items
   - With `mt-4`, a `<p>` in `text-body`: "Breakfast is cooked to order every morning and is included with a room. Supper is a short menu on three evenings a week. If you are not staying, you are welcome at both, at the prices shown: book the day before."
   - With `mt-6`, the key (see below).
   - With `mt-4`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "Everything is cooked in one small kitchen that also uses nuts, milk, eggs and gluten. Tell us about an allergy before you order."
-- In columns 9–12 (`md:col-span-4 md:col-start-9`): the page's clay block, holding:
+- In columns 9–12 (`md:col-span-4 md:col-start-9`): the page's clay block, the grid item itself (the block's classes and the span on one element), holding:
   - A label heading, an `<h2>`: "When we serve". Here it has no text color class, so it takes the block's ink: `font-mono text-label uppercase` only.
   - With `mt-4`, a `<dl>` with three entries, the second and third with `mt-4`. Each entry is a `<div>`: the `<dt>` in `text-body`, and with `mt-2` the `<dd>`, a label with `tabular-nums`, the span of hours as two `<time>` elements. No hairlines here, as the clay block has none.
     - Breakfast, every day: `08:00–10:00`
@@ -49,7 +49,7 @@ The first section, with `pt-12`, as a grid (`grid gap-6 md:grid-cols-12 md:items
 
 ### 3. Breakfast
 
-A section with the hairline from the layout notes and the `id` `breakfast`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline from the layout notes and the `id` `breakfast`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4 (`md:col-span-4`):
   - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Every day · 08:00–10:00` in `text-muted-foreground`, the hours two `<time>` elements, then the badge "Included for guests".
@@ -63,7 +63,7 @@ A section with the hairline from the layout notes and the `id` `breakfast`, as a
 
 - A row, a `<div>` with `flex items-baseline gap-2`:
   - The dish's name as an `<h4>` in `text-h2` with `min-w-0`.
-  - The hairline: an empty `<span>` with `aria-hidden="true"` and `min-w-4 flex-1 border-b border-border`. It runs from the name to the price on the baseline of the name.
+  - The hairline: an empty `<span>` with `aria-hidden="true"` and `min-w-4 flex-1 border-b border-border`. It runs from the name to the price on the baseline of the name: an empty flex item's baseline is its bottom edge, so keep it empty, with no padding.
   - The price: a `<p>` label in `text-foreground` with `shrink-0 whitespace-nowrap tabular-nums`, `£13.50`.
 - With `mt-2`, the description: a `<p>` in `text-body`, at most `max-w-xl`.
 - Where the dish has letters, with `mt-2`, a `<p>` label in `text-muted-foreground` holding them, joined with ` · `: `VG · GF`. Each letter is a `<span>` with `aria-hidden="true"`, followed by a `<span>` with `sr-only` that holds its word from the key and a comma or a full stop ("Vegan, ", "No gluten."), so a screen reader says the words and not the letters. The ` · ` between two letters is a third `<span>` with `aria-hidden="true"`, after the `sr-only` one: `<span aria-hidden="true">VG</span><span className="sr-only">Vegan, </span><span aria-hidden="true"> · </span>`. A dish with no letters has no such line.
@@ -79,7 +79,7 @@ A section with the hairline and the `id` `supper`, laid out as Breakfast is, wit
 
 ### 5. A table for supper
 
-A section with the hairline, in columns 1–7 of a grid (`grid gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-7`):
+A section with the hairline, in columns 1–7 of a grid (`grid grid-cols-1 gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-7`):
 
 - A label line in `text-muted-foreground`: `Guests and visitors`.
 - With `mt-2`, an `<h2>`: "A table for supper".

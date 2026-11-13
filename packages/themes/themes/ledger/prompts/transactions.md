@@ -12,7 +12,7 @@ checks:
   - 'The account filter is the theme''s `Select`, with no native `<select>` on the page: its list opens under its trigger, as wide as it, with a 1px rule between rows and a check on the chosen row, and the arrow keys, Enter and Escape work in it.'
 ---
 
-Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, and its customer "Hollis & Vane", a two-person print studio. The statement covers 30 October to 27 November 2026 on two accounts: the current account (ending 4417) and the tax reserve (ending 8830). Invent 28 transactions, newest first: client payments in (Larkspur Café, Brennan Wholesale, Odell & Pryce Architects), payments out for rent, paper stock (Copperleaf Paper Mill), ink, software, card fees and a van lease, the quarter's VAT paid out of the tax reserve, and two transfers to the tax reserve, each shown as two rows with the same date and amount: "To tax reserve" out of the current account and "From current account" into the tax reserve, so four of the 28 rows are transfers. The tax reserve then has rows in and out, for the Account and In or out filters to work on. Each has a reference such as `INV-0139` or `RENT NOV`.
+Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, and its customer "Hollis & Vane", a two-person print studio. The statement covers 30 October to 27 November 2026 on two accounts: the current account (ending 4417) and the tax reserve (ending 8830). Invent 28 transactions, newest first: client payments in (Larkspur Café, Brennan Wholesale, Odell & Pryce Architects), payments out for rent, paper stock (Copperleaf Paper Mill), ink, software, card fees and a van lease, the quarter's VAT paid out of the tax reserve (described as "VAT payment", with no tax office named), and two transfers to the tax reserve, each shown as two rows with the same date and amount: "To tax reserve" out of the current account and "From current account" into the tax reserve, so four of the 28 rows are transfers. The tax reserve then has rows in and out, for the Account and In or out filters to work on. Each has a reference such as `INV-0139` or `RENT NOV`.
 
 This page uses the stock `button`, `input`, `select` and `table`; add any the project lacks with `npx shadcn@latest add button input select table`.
 
@@ -44,7 +44,7 @@ The table, with the label "Statement", has these columns:
 - **Date:** a `<time>` in mono, `27 Nov`.
 - **Description:** the payee or the payer in `text-body`.
 - **Reference:** a small figure, `INV-0139`.
-- **Account:** "Current" or "Tax reserve".
+- **Account:** "Current" or "Tax reserve" in `text-body`, not a small figure.
 - **Amount:** a signed amount (the word "In" or "Out", then the figure), right-aligned, with a right-aligned header.
 
 Ten rows a page. The table scrolls in its box on a phone; nothing in it wraps except the empty state.

@@ -169,7 +169,7 @@ Passing does not make the page good. It makes it consistent, and it removes the 
 
 A check removes defaults. It cannot tell you what to put in their place, and neither can a list of rules. That comes from looking at a lot of designed work and asking why each choice was made: why this page has one accent and that one has none, why the heading is left-aligned, how much space separates two sections.
 
-A habit that works: once a week, pick one page you admire and write down its text sizes, its spacing steps and its colors, the way a `DESIGN.md` would. You will find a short list every time. For a steady supply of pages and the reasoning behind them, design publications help; [Designmodo's articles](https://designmodo.com/articles/) cover web and email design with examples, and its yearly trend pieces are a quick way to see what the field is moving toward and away from.
+A habit that works: once a week, pick one page you admire and write down its text sizes, its spacing steps and its colors, the way a `DESIGN.md` would. You will find a short list every time. For a steady supply of pages and the reasoning behind them, design publications help; [Designmodo](https://designmodo.com/) publishes articles on web and email design with examples, and its yearly trend pieces are a quick way to see what the field is moving toward and away from.
 
 ## A review checklist that needs no tool
 

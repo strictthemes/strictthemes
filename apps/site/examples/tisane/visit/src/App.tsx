@@ -13,6 +13,7 @@ import {
 import {
   Table,
   TableBody,
+  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -21,71 +22,107 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const codeFocusOutline =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
 
 const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
+  focusRing
 )
 
 const chromeLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusOutline
+  focusRing
 )
 
-const navLinks = [
-  { label: "Menu", href: "/menu" },
-  { label: "Book a table", href: "/booking" },
-  { label: "Journal", href: "/journal" },
-  { label: "Visit", href: "/visit" },
-]
+const label = "font-mono text-label"
 
 type Span = { from: string; to: string } | null
 
-const room = (from: string, to: string): Span => ({ from, to })
-const kitchen: Span = { from: "11:30", to: "14:30" }
+type Day = {
+  name: string
+  // Day of the week as JavaScript counts it: 0 is Sunday.
+  jsDay: number
+  room: Span
+  kitchen: Span
+}
 
-// `day` is the number Date.getDay() returns for that weekday.
-const hours: { name: string; day: number; room: Span; kitchen: Span }[] = [
-  { name: "Monday", day: 1, room: null, kitchen: null },
-  { name: "Tuesday", day: 2, room: room("09:00", "17:00"), kitchen },
-  { name: "Wednesday", day: 3, room: room("09:00", "17:00"), kitchen },
-  { name: "Thursday", day: 4, room: room("09:00", "17:00"), kitchen },
-  { name: "Friday", day: 5, room: room("09:00", "17:00"), kitchen },
-  { name: "Saturday", day: 6, room: room("09:00", "18:00"), kitchen },
-  { name: "Sunday", day: 0, room: room("10:00", "16:00"), kitchen },
+const kitchenHours = { from: "11:30", to: "14:30" }
+
+const days: Day[] = [
+  { name: "Monday", jsDay: 1, room: null, kitchen: null },
+  {
+    name: "Tuesday",
+    jsDay: 2,
+    room: { from: "09:00", to: "17:00" },
+    kitchen: kitchenHours,
+  },
+  {
+    name: "Wednesday",
+    jsDay: 3,
+    room: { from: "09:00", to: "17:00" },
+    kitchen: kitchenHours,
+  },
+  {
+    name: "Thursday",
+    jsDay: 4,
+    room: { from: "09:00", to: "17:00" },
+    kitchen: kitchenHours,
+  },
+  {
+    name: "Friday",
+    jsDay: 5,
+    room: { from: "09:00", to: "17:00" },
+    kitchen: kitchenHours,
+  },
+  {
+    name: "Saturday",
+    jsDay: 6,
+    room: { from: "09:00", to: "18:00" },
+    kitchen: kitchenHours,
+  },
+  {
+    name: "Sunday",
+    jsDay: 0,
+    room: { from: "10:00", to: "16:00" },
+    kitchen: kitchenHours,
+  },
 ]
 
-// "09:00" is shown as "9:00"; the dateTime keeps two-digit hours.
-function Clock({ value }: { value: string }) {
-  return <time dateTime={value}>{value.replace(/^0/, "")}</time>
+// "09:00" reads "9:00"; the dateTime keeps two-digit hours.
+function clock(value: string) {
+  return value.replace(/^0/, "")
 }
 
 function Hours({ span }: { span: Span }) {
   if (!span) return <>Closed</>
   return (
     <>
-      <Clock value={span.from} />–<Clock value={span.to} />
+      <time dateTime={span.from}>{clock(span.from)}</time>–
+      <time dateTime={span.to}>{clock(span.to)}</time>
     </>
   )
 }
 
+const navLinks = [
+  { label: "Menu", href: "/menu" },
+  { label: "Book a table", href: "/booking" },
+  { label: "Journal", href: "/journal" },
+  { label: "Visit", href: "/visit", current: true },
+]
+
 const routes = [
   {
     title: "By train",
-    text: "Ashby Wold station is a four-minute walk. Leave by the main exit and turn right down Station Road.",
+    text: "Ashby Wold station is a four-minute walk away. Leave by the main exit and turn left onto Station Road.",
   },
   {
     title: "By bus",
-    text: "The 12 and 31 stop outside Orchard Park, across the road from our door.",
+    text: "The 12 and the 31 stop outside Orchard Park, across the road from our door.",
   },
   {
     title: "By bike",
-    text: "There is a rack for six bikes beside the entrance on Mill Lane, under the linden tree.",
+    text: "There are four bike stands on Mill Lane, just beside the entrance.",
   },
   {
     title: "By car",
@@ -94,12 +131,12 @@ const routes = [
 ]
 
 const accessNotes = [
-  "The entrance on Mill Lane is step-free, with a door wide enough for any chair.",
+  "The entrance on Mill Lane is step-free.",
   "There is an accessible toilet on the ground floor.",
   "Two tables by the window are at wheelchair height.",
-  "A printed large-type menu waits at the counter: ask for it whenever you like.",
-  "Assistance dogs are welcome, with a bowl of water by the door.",
-  "The first hour on Tuesdays is a quiet hour, with the music off.",
+  "A printed large-type menu is kept at the counter.",
+  "Assistance dogs are welcome.",
+  "On Tuesdays the first hour is quiet, with the music off.",
 ]
 
 const subjects = [
@@ -113,21 +150,33 @@ type Field = "name" | "email" | "about" | "message"
 type Errors = Partial<Record<Field, string>>
 
 const fieldOrder: Field[] = ["name", "email", "about", "message"]
+const fieldIds: Record<Field, string> = {
+  name: "contact-name",
+  email: "contact-email",
+  about: "contact-about",
+  message: "contact-message",
+}
 
-const tag =
-  "rounded-sm bg-card px-2 py-1 font-mono text-label whitespace-nowrap text-foreground"
+function isEmail(value: string) {
+  if (/\s/.test(value)) return false
+  const parts = value.split("@")
+  if (parts.length !== 2) return false
+  const [local, domain] = parts
+  return local.length > 0 && domain.includes(".")
+}
 
-const labelClass = "block font-mono text-label text-foreground"
-const fieldClass = "mt-2 h-auto rounded-md px-4 py-2 text-body md:text-body"
-
-function ErrorLine({ id, message }: { id: string; message: string }) {
+function ErrorLine({ id, children }: { id: string; children: string }) {
   return (
     <p
       id={id}
       className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
     >
-      <CircleAlert className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
-      <span>{message}</span>
+      <CircleAlert
+        className="size-4 shrink-0"
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
+      <span>{children}</span>
     </p>
   )
 }
@@ -139,11 +188,6 @@ function ContactForm() {
   const [message, setMessage] = useState("")
   const [errors, setErrors] = useState<Errors>({})
   const [sentTo, setSentTo] = useState<string | null>(null)
-
-  const nameRef = useRef<HTMLInputElement>(null)
-  const emailRef = useRef<HTMLInputElement>(null)
-  const aboutRef = useRef<HTMLButtonElement>(null)
-  const messageRef = useRef<HTMLTextAreaElement>(null)
   const thanksRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -161,45 +205,42 @@ function ContactForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const values = {
-      name: name.trim(),
-      email: email.trim(),
-      message: message.trim(),
-    }
-    const found: Errors = {}
-    if (!values.name) found.name = "Write your name."
-    if (!values.email) found.email = "Write your email address."
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email))
-      found.email = "Check the email address: it needs an @ and a domain."
-    if (!about) found.about = "Choose what your message is about."
-    if (!values.message) found.message = "Write a message."
-    setErrors(found)
+    const next: Errors = {}
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
+    const trimmedMessage = message.trim()
 
-    const first = fieldOrder.find((field) => found[field])
+    if (!trimmedName) next.name = "Write your name."
+    if (!trimmedEmail) next.email = "Write your email address."
+    else if (!isEmail(trimmedEmail))
+      next.email = "Check the email address: it needs an @ and a domain."
+    if (!about) next.about = "Choose what your message is about."
+    if (!trimmedMessage) next.message = "Write a message."
+
+    setErrors(next)
+    const first = fieldOrder.find((field) => next[field])
     if (first) {
-      const refs = {
-        name: nameRef,
-        email: emailRef,
-        about: aboutRef,
-        message: messageRef,
-      }
-      refs[first].current?.focus()
+      document.getElementById(fieldIds[first])?.focus()
       return
     }
-    setSentTo(values.email)
+    setSentTo(trimmedEmail)
   }
+
+  const errorId = (field: Field) => `${fieldIds[field]}-error`
 
   return (
     <div className="mt-6 rounded-xl border bg-card p-6">
       {sentTo === null && (
         <form noValidate aria-label="Write to us" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="name" className={labelClass}>
+            <label
+              htmlFor={fieldIds.name}
+              className="block font-mono text-label text-foreground"
+            >
               Your name
             </label>
             <Input
-              ref={nameRef}
-              id="name"
+              id={fieldIds.name}
               autoComplete="name"
               value={name}
               onChange={(event) => {
@@ -207,19 +248,23 @@ function ContactForm() {
                 clearError("name")
               }}
               aria-invalid={errors.name ? true : undefined}
-              aria-describedby={errors.name ? "name-error" : undefined}
-              className={fieldClass}
+              aria-describedby={errors.name ? errorId("name") : undefined}
+              className="mt-2 h-auto rounded-md px-4 py-2 text-body md:text-body"
             />
-            {errors.name && <ErrorLine id="name-error" message={errors.name} />}
+            {errors.name && (
+              <ErrorLine id={errorId("name")}>{errors.name}</ErrorLine>
+            )}
           </div>
 
           <div className="mt-6">
-            <label htmlFor="email" className={labelClass}>
+            <label
+              htmlFor={fieldIds.email}
+              className="block font-mono text-label text-foreground"
+            >
               Email address
             </label>
             <Input
-              ref={emailRef}
-              id="email"
+              id={fieldIds.email}
               type="email"
               autoComplete="email"
               value={email}
@@ -228,16 +273,20 @@ function ContactForm() {
                 clearError("email")
               }}
               aria-invalid={errors.email ? true : undefined}
-              aria-describedby={errors.email ? "email-error" : undefined}
-              className={fieldClass}
+              aria-describedby={errors.email ? errorId("email") : undefined}
+              className="mt-2 h-auto rounded-md px-4 py-2 text-body md:text-body"
             />
             {errors.email && (
-              <ErrorLine id="email-error" message={errors.email} />
+              <ErrorLine id={errorId("email")}>{errors.email}</ErrorLine>
             )}
           </div>
 
           <div className="mt-6">
-            <label id="about-label" htmlFor="about" className={labelClass}>
+            <label
+              id={`${fieldIds.about}-label`}
+              htmlFor={fieldIds.about}
+              className="block font-mono text-label text-foreground"
+            >
               About
             </label>
             <Select
@@ -250,11 +299,10 @@ function ContactForm() {
               }}
             >
               <SelectTrigger
-                ref={aboutRef}
-                id="about"
-                aria-labelledby="about-label"
+                id={fieldIds.about}
+                aria-labelledby={`${fieldIds.about}-label`}
                 aria-invalid={errors.about ? true : undefined}
-                aria-describedby={errors.about ? "about-error" : undefined}
+                aria-describedby={errors.about ? errorId("about") : undefined}
                 className="mt-2"
               >
                 <SelectValue placeholder="Choose a subject" />
@@ -268,28 +316,30 @@ function ContactForm() {
               </SelectContent>
             </Select>
             {errors.about && (
-              <ErrorLine id="about-error" message={errors.about} />
+              <ErrorLine id={errorId("about")}>{errors.about}</ErrorLine>
             )}
           </div>
 
           <div className="mt-6">
-            <label htmlFor="message" className={labelClass}>
+            <label
+              htmlFor={fieldIds.message}
+              className="block font-mono text-label text-foreground"
+            >
               Message
             </label>
             <Textarea
-              ref={messageRef}
-              id="message"
+              id={fieldIds.message}
               value={message}
               onChange={(event) => {
                 setMessage(event.target.value)
                 clearError("message")
               }}
               aria-invalid={errors.message ? true : undefined}
-              aria-describedby={errors.message ? "message-error" : undefined}
-              className={cn(fieldClass, "min-h-48 resize-none")}
+              aria-describedby={errors.message ? errorId("message") : undefined}
+              className="mt-2 h-auto min-h-48 resize-none rounded-md px-4 py-2 text-body md:text-body"
             />
             {errors.message && (
-              <ErrorLine id="message-error" message={errors.message} />
+              <ErrorLine id={errorId("message")}>{errors.message}</ErrorLine>
             )}
           </div>
 
@@ -309,7 +359,7 @@ function ContactForm() {
             <h3
               ref={thanksRef}
               tabIndex={-1}
-              className={cn("text-h2", codeFocusOutline)}
+              className="text-h2 focus:outline-2 focus:outline-offset-2 focus:outline-ring focus:outline-solid"
             >
               Thank you
             </h3>
@@ -325,6 +375,7 @@ function ContactForm() {
 }
 
 export function App() {
+  // Set once from the visitor's clock when the page loads.
   const [today] = useState(() => new Date().getDay())
 
   return (
@@ -335,43 +386,44 @@ export function App() {
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {navLinks.map((link) => {
-              const current = link.href === "/visit"
-              return (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={current ? "page" : undefined}
-                    className={cn("text-body", chromeLink, current && "underline")}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              )
-            })}
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  aria-current={link.current ? "page" : undefined}
+                  className={cn(
+                    "text-body",
+                    chromeLink,
+                    link.current && "underline"
+                  )}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
           </ul>
         </nav>
       </header>
 
       <main>
-        <section className="grid gap-6 pt-10 md:grid-cols-12">
+        <section className="grid grid-cols-1 gap-6 pt-10 md:grid-cols-12">
           <div className="md:col-span-8">
-            <p className="font-mono text-label text-muted-foreground">
+            <p className={cn(label, "text-muted-foreground")}>
               Mill Lane, Ashby Wold
             </p>
             <h1 className="mt-2 text-h1">Visit us</h1>
             <p className="mt-4 max-w-xl">
               We are on the corner of Mill Lane and Station Road, opposite
-              Orchard Park, four minutes from the station. Walk in whenever we
-              are open: you only need to book if you are four or more.
+              Orchard Park, a short walk from the station. There is no need to
+              book a table unless you are four or more.
             </p>
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12 md:items-start">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-4">
             <h2 className="text-h2">Address</h2>
-            <address className="mt-4 text-body not-italic">
+            <address className="mt-4 not-italic">
               <span className="block">14 Mill Lane</span>
               <span className="block">Ashby Wold</span>
               <span className="block">AW3 7LN</span>
@@ -392,7 +444,7 @@ export function App() {
             <h2 className="text-h2">Opening hours</h2>
             <div className="mt-6">
               <Table label="Opening hours" className="text-body">
-                <caption className="sr-only">Opening hours</caption>
+                <TableCaption className="sr-only">Opening hours</TableCaption>
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
                     {["Day", "Room", "Kitchen"].map((heading) => (
@@ -407,11 +459,11 @@ export function App() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {hours.map((row) => {
-                    const isToday = row.day === today
+                  {days.map((day) => {
+                    const isToday = day.jsDay === today
                     return (
                       <TableRow
-                        key={row.name}
+                        key={day.name}
                         aria-current={isToday ? "date" : undefined}
                         className="hover:bg-transparent"
                       >
@@ -419,7 +471,7 @@ export function App() {
                           scope="row"
                           className="h-auto px-4 py-2 text-left font-sans text-body font-normal whitespace-normal text-foreground first:pl-0 last:pr-0"
                         >
-                          {row.name}
+                          {day.name}
                           {isToday && (
                             <span className="block font-mono text-label text-primary">
                               Today
@@ -427,10 +479,10 @@ export function App() {
                           )}
                         </TableHead>
                         <TableCell className="px-4 py-2 font-mono text-label whitespace-nowrap text-foreground tabular-nums first:pl-0 last:pr-0">
-                          <Hours span={row.room} />
+                          <Hours span={day.room} />
                         </TableCell>
                         <TableCell className="px-4 py-2 font-mono text-label whitespace-nowrap text-foreground tabular-nums first:pl-0 last:pr-0">
-                          <Hours span={row.kitchen} />
+                          <Hours span={day.kitchen} />
                         </TableCell>
                       </TableRow>
                     )
@@ -441,14 +493,17 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12 md:items-start">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-5">
             <h2 className="text-h2">Getting here</h2>
-            <ul className="mt-6 list-none p-0">
+            <ul className="mt-6">
               {routes.map((route, index) => (
-                <li key={route.title} className={index > 0 ? "mt-6" : undefined}>
+                <li
+                  key={route.title}
+                  className={index > 0 ? "mt-6" : undefined}
+                >
                   <h3 className="text-body">{route.title}</h3>
-                  <p className="mt-2 max-w-xl text-body">{route.text}</p>
+                  <p className="mt-2 text-body">{route.text}</p>
                 </li>
               ))}
             </ul>
@@ -466,12 +521,14 @@ export function App() {
                 <div className="absolute inset-x-0 top-1/2 h-4 border-y border-muted-foreground bg-background" />
                 <div className="absolute inset-x-0 top-1/6 h-1 bg-secondary" />
                 <div className="absolute right-1/12 bottom-1/12 flex h-1/5 w-2/5 items-center justify-center border bg-card">
-                  <span className={tag}>Orchard Park</span>
+                  <span className="rounded-sm bg-card px-2 py-1 font-mono text-label whitespace-nowrap text-foreground">
+                    Orchard Park
+                  </span>
                 </div>
-                <span className={cn(tag, "absolute right-1/12 bottom-1/2")}>
+                <span className="absolute right-1/12 bottom-1/2 rounded-sm bg-card px-2 py-1 font-mono text-label whitespace-nowrap text-foreground">
                   Station Road
                 </span>
-                <span className={cn(tag, "absolute top-1/4 left-1/4")}>
+                <span className="absolute top-1/4 left-1/4 rounded-sm bg-card px-2 py-1 font-mono text-label whitespace-nowrap text-foreground">
                   Mill Lane
                 </span>
                 <div className="absolute top-7/12 left-1/4 flex items-center gap-1">
@@ -480,10 +537,12 @@ export function App() {
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
-                  <span className={cn(tag, "border")}>The Linden Room</span>
+                  <span className="rounded-sm border bg-card px-2 py-1 font-mono text-label whitespace-nowrap text-foreground">
+                    The Linden Room
+                  </span>
                 </div>
               </div>
-              <figcaption className="mt-2 font-mono text-label text-muted-foreground">
+              <figcaption className={cn(label, "mt-2 text-muted-foreground")}>
                 Not to scale
               </figcaption>
             </figure>
@@ -494,15 +553,12 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12">
           <div className="md:col-span-8">
             <h2 className="text-h2">Access</h2>
             <ul className="mt-4 list-disc pl-6">
               {accessNotes.map((note, index) => (
-                <li
-                  key={note}
-                  className={cn("max-w-xl", index > 0 && "mt-2")}
-                >
+                <li key={note} className={index > 0 ? "mt-2" : undefined}>
                   {note}
                 </li>
               ))}
@@ -510,11 +566,14 @@ export function App() {
           </div>
         </section>
 
-        <section id="contact" className="mt-18 grid gap-6 md:grid-cols-12">
+        <section
+          id="contact"
+          className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12"
+        >
           <div className="md:col-span-7">
             <h2 className="text-h2">Write to us</h2>
             <p className="mt-4 max-w-xl">
-              Hana and Teodor, who run the room, read every message themselves
+              Hannah and Tomas, who run the room, read every message themselves
               and answer within two days.
             </p>
             <ContactForm />
@@ -524,12 +583,12 @@ export function App() {
 
       <footer className="mt-18">
         <div className="border-t py-10">
-          <div className="grid gap-6 md:grid-cols-12 md:items-start">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
               <p className="font-heading text-h2">The Linden Room</p>
               <p className="mt-2 max-w-xl">
-                A tea room and tea shop on Mill Lane, pouring loose-leaf pots
-                and serving plates from a small kitchen.
+                A small tea room and shop in Ashby Wold, pouring loose-leaf tea
+                and serving lunch plates since 2014.
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8">
@@ -538,12 +597,12 @@ export function App() {
                 <span className="block">Ashby Wold</span>
                 <span className="block">AW3 7LN</span>
               </address>
-              <p className="mt-4 font-mono text-label text-muted-foreground">
+              <p className={cn(label, "mt-4 text-muted-foreground")}>
                 Tuesday to Sunday · Closed Mondays
               </p>
             </div>
           </div>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
+          <p className={cn(label, "mt-6 text-muted-foreground")}>
             © 2026 The Linden Room
           </p>
         </div>

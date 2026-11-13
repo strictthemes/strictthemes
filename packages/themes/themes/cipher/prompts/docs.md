@@ -29,7 +29,7 @@ Here `<main>` has no top padding, in place of the notes' `pt-12`. Its container 
 
 ### 3. Sidebar
 
-Three groups, each a label in a `<p>` (not a heading) in `text-muted-foreground`, and under it with `mt-2` a list of links; the groups are `mt-6` apart. Each link is a block with `py-1` in `text-body`, styled as a sidebar link from the layout notes, and the list's items have no margin; links that are commands are in `font-mono`. A docs page's address is `/docs/` plus its group and name, lowercase with hyphens: this page is `/docs/commands/deploy`, the previous `/docs/commands/init`, `plinth.toml` `/docs/reference/plinth-toml`.
+Three groups, each a label in a `<p>` (not a heading) in `text-muted-foreground`, and under it with `mt-2` a list of links; the groups are `mt-6` apart. Each link is a block with `py-1` in `text-body`, styled as a sidebar link from the layout notes, and the list's items have no margin; links that are commands or file names (`plinth.toml`) are in `font-mono`. A docs page's address is `/docs/` plus its group and name, lowercase with hyphens: this page is `/docs/commands/deploy`, the previous `/docs/commands/init`, `plinth.toml` `/docs/reference/plinth-toml`.
 
 - **Get started:** Install, Quick start, Configuration.
 - **Commands:** `plinth init`, `plinth deploy` (the current page), `plinth logs`, `plinth rollback`, `plinth env`.
@@ -39,7 +39,7 @@ Three groups, each a label in a `<p>` (not a heading) in `text-muted-foreground`
 
 In this order:
 
-1. A breadcrumb as a label in a `<p>`, `text-muted-foreground`: `Commands / plinth deploy`.
+1. A breadcrumb as a label in a `<p>`, `text-muted-foreground`, plain text with no links: `Commands / plinth deploy`.
 2. With `mt-2`, the `<h1>`: `plinth deploy`.
 3. With `mt-3`, one paragraph: what the command does.
 4. Four sections, each opened by an `<h2>` with `mt-12`, an `id` and `scroll-mt-6`: Usage, Flags, Examples, Exit codes. The headings and blocks are siblings in the content column, with no `<section>` around them, so each `<h2>` keeps its `mt-12`. Inside a section the rhythm of the layout notes holds: `mt-3` from the heading to the text and between paragraphs, `mt-6` before and after a code block, the table and the note. Every paragraph keeps the notes' `max-w-lg`, the note's too, while code blocks, the table and the note run the full column: the uneven right edge is meant.
@@ -49,7 +49,7 @@ In this order:
 **Flags.** One sentence, then the table, then the note.
 
 - Add the component with `npx shadcn@latest add table`. The table fills a panel with rows that has no heading row of its own: the section's `<h2>` names it, and the `Table`'s `label` is "Flags of plinth deploy". Columns: Flag, Short, Default and Description. Flag, Short and Default are `font-mono`; an em dash, as the notes say, marks no value. The Description cells hold a sentence and get `whitespace-normal`. Give the `<table>` `min-w-xl`, so on a phone it scrolls rather than squeezes. Seven rows: `--env <name>` (`-e`, `preview`), `--prebuilt` (no short, `false`), `--message <text>` (`-m`, no default: the description says the commit's message is used), `--wait` (no short, `false`), `--yes` (`-y`, `false`), `--json` (no short, `false`), `--token <token>` (no short, `$PLINTH_TOKEN`).
-- The note is an `<aside>`, a panel with `p-4` in place of `p-6`. Its first line is `flex items-center gap-2`, the `Info` icon and the label `note` in `text-foreground`. Under it, with `mt-2`, one or two sentences: `--yes` skips the confirmation before a production deploy, and a deploy run with no terminal attached, as in CI, needs it or stops with exit code 2.
+- The note is an `<aside>`, a panel with `p-4` in place of `p-6`. Its first line is `flex items-center gap-2`, the `Info` icon and the label `note` in `text-foreground`. Under it, with `mt-2`, one or two sentences: `--yes` skips the confirmation before a production deploy, and a deploy run with no terminal attached, as in CI, needs it or stops with exit code `2`, the `2` as inline code, as in the Exit codes list.
 
 **Examples.** A sentence, then a code block with the strip label `deploy a preview`, then with `mt-6` a sentence and a code block with the strip label `deploy to production and wait`. Each holds one command: `plinth deploy` and `plinth deploy --env production --wait --yes`. The shell blocks show no prompt sign. Lines that start with `#` are comments in `text-muted-foreground`; give the second block one comment line above the command.
 

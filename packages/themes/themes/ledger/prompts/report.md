@@ -32,13 +32,13 @@ Heading: "The year in figures". Under it a `<dl>` laid out as `grid grid-cols-1 
 
 - The `<dt>`, a label: "Income", "Costs", "Profit before tax".
 - The `<dd>`, the figure in `font-heading text-display tabular-nums` at every width (here, instead of the Key figures note's `text-h1 xl:text-display`: these columns are wide enough), `£412,860`. No sign and no color: the label says what it is.
-- A second `<dd>` in `text-body`, the change in words: "Up 14% on last year." It has no icon and no color: on these pages green and red mean money in and out, not better or worse.
+- A second `<dd>` in `text-body text-foreground max-w-lg`, as the Measure note asks of a paragraph, the change in words: "Up 14% on last year." It has no icon and no color: on these pages green and red mean money in and out, not better or worse.
 
 ### 4. Commentary
 
 Heading: "What happened". Three short paragraphs in a stack with `gap-4`, each at most `max-w-lg` wide, written plainly in the first person plural of the business, about 60 words each: income grew with two new café clients and a busy summer of event print; costs rose with paper prices, about 9% over the year; the second quarter was a loss because the folding machine was paid for in February, and cash was lowest at the end of March.
 
-Where a sentence relies on a note, it ends with a note marker, in order: the first paragraph's sentence with the year's income ends with marker 1, the second paragraph's sentence about paper prices with marker 2, the third paragraph's sentence about the folding machine with marker 3. A marker is a `<sup>` with `text-label` (a bare `<sup>` gets a size outside the type scale) in the body font, with no `font-mono`, and `relative -top-1 align-baseline` (so it does not open up its line), holding a text link to the note, `#note-2`, with the number as its text and the `aria-label` "Note 2". Note 4 has no marker.
+Where a sentence relies on a note, it ends with a note marker, in order: the first paragraph's sentence with the year's income ends with marker 1, the second paragraph's sentence about paper prices with marker 2, the third paragraph's sentence about the folding machine with marker 3. A marker is a `<sup>` with `text-label` (a bare `<sup>` gets a size outside the type scale) in the body font, with no `font-mono`, and `relative -top-1 align-baseline` (so it does not open up its line), holding a text link to its note: marker 1 links to `#note-1`, with "1" as its text and the `aria-label` "Note 1", and so on for 2 and 3. Note 4 has no marker.
 
 ### 5. By quarter
 

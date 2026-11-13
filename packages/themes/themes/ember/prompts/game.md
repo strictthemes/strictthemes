@@ -32,7 +32,7 @@ On a phone the text comes first and the key art under it.
 
 The second `<section>`, with `mt-20`. An `<h2>` "Four classes" in `text-h2 md:text-h1 uppercase`, then with `mt-3` one sentence: every match lets a team take any mix of the four, and a player can switch between rounds.
 
-With `mt-6`, a `<ul>` with `grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4`. Each `<li>` is a tile: `flex flex-col overflow-hidden rounded-xl border border-border bg-card`, holding an `<article>`:
+With `mt-6`, a `<ul>` with `grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4`. Each `<li>` is a tile: `overflow-hidden rounded-xl border border-border bg-card`, holding an `<article>`. The grid makes the tiles in a row one height; nothing sits at their bottom edge, so the tile needs no `flex`:
 
 - At the top, the class's emblem, a picture at the top of a tile (`aspect-video border-b border-border bg-muted flex items-center justify-center`) with the `aria-label` "Emblem of the" and the class's name. Inside it, one or two shapes, each a `<div>` with square corners:
   - Bulwark, a shield: `h-1/2 w-1/3 bg-heat-mid`.

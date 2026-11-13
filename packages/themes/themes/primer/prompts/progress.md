@@ -52,7 +52,7 @@ The three cards:
 
 A grid from the layout notes, with two cards that are sections.
 
-**Minutes a day.** `lg:col-span-7`. The card opens with a heading row from the layout notes: on the left a `flex flex-col gap-2` with the `<h2>` "Minutes a day" and, under it, the period line, a `<p>` with `role="status"` that is a small figure: `8 to 14 March · 3 h 35 min in all`; on the right a button group from the layout notes with the `aria-label` "Week" and two buttons, "This week", chosen at the start, and "Last week".
+**Minutes a day.** `lg:col-span-7`. The card opens with a heading row from the layout notes: on the left a `flex flex-col gap-2` with the `<h2>` "Minutes a day" and, under it, the period line, a `<p>` with `role="status"` that is a small figure; it always holds text, so it may be an item of that stack: `8 to 14 March · 3 h 35 min in all`; on the right a button group from the layout notes with the `aria-label` "Week" and two buttons, "This week", chosen at the start, and "Last week".
 
 The chart follows in the card's `gap-5`, as a `flex flex-col gap-2` of the drawing and its day labels, both with `aria-hidden="true"`:
 

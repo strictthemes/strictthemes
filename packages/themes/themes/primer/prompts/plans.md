@@ -69,7 +69,7 @@ The stock `Table` is off the type scale and its scroll box cannot take focus. Gi
 
 The nine rows, with the cells for Free, Plus and Team:
 
-1. Price: `$0`; `$18 a month`; `$24 a learner a month`. On yearly: `$0`; `$15 a month`; `$20 a learner a month`.
+1. Price: `$0 a month`; `$18 a month`; `$24 a learner a month`. On yearly: `$0 a month`; `$15 a month`; `$20 a learner a month`.
 2. Courses: "First module of each"; "All 9"; "All 9"
 3. A question after each lesson: Yes; Yes; Yes
 4. Progress and days in a row: Yes; Yes; Yes

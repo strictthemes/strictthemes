@@ -21,11 +21,11 @@ The header from the layout notes. This page is a step of booking, so here, in pl
 
 ### 2. Opening
 
-The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-cols-12`): a label, `Step 2 of 3 · Passengers and extras`, then with `mt-2` the `<h1>` "Who is travelling" in `text-h1`, then with `mt-3` one or two sentences: write each name as it is on the passenger's photo ID, and the lead passenger gets a text if the sailing changes. Then with `mt-3` a `<p>` holding a link in running text, "Back to sailings", that goes to `/results`.
+The first section, with `pt-8`, in columns 1–8 of a grid (`grid grid-cols-1 gap-5 md:grid-cols-12`): a label, `Step 2 of 3 · Passengers and extras`, then with `mt-2` the `<h1>` "Who is travelling" in `text-h1`, then with `mt-3` one or two sentences: write each name as it is on the passenger's photo ID, and the lead passenger gets a text if the sailing changes. Then with `mt-3` a `<p>` holding a link in running text, "Back to sailings", that goes to `/results`.
 
 ### 3. Form and fare summary
 
-A section with `mt-16`, as a grid that is a single column up to `lg`: `grid gap-5 lg:grid-cols-12 lg:items-start`.
+A section with `mt-16`, as a grid that is a single column up to `lg`: `grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start`.
 
 - In columns 1–8 (`lg:col-span-8`): a `<div>` that is the wrapper for the form and the confirmation. It holds the `<form>` (with `noValidate` and the `aria-label` "Passenger details") and, after it, the empty `role="status"` element. Add the fields with `npx shadcn@latest add input checkbox` if the project has none, and give the new files the edits the Added components note lists.
 - In columns 9–12 (`lg:col-span-4`): the fare summary card, with `lg:sticky lg:top-5`. Below `lg` it comes after the form and its button.

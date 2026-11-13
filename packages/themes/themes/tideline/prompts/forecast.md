@@ -87,7 +87,7 @@ A full-width section with its `aria-labelledby` pointing at the `<h2>`. It opens
 
 The day is a `<time>` with the day's `dateTime` (`<time dateTime="2027-06-17">Thu 17 Jun</time>`). Swell, period and wind have `tabular-nums`. The rating is a word, never a color or a row of stars. In Friday's rating cell the word and the page's one badge, from the layout notes, sit in a `<span>` with `inline-flex items-center gap-2`: `Very good`, then the badge "Best day".
 
-The chosen day's row is marked, and not by color alone: it has `bg-accent hover:bg-accent` in place of `hover:bg-transparent`, `aria-current="true"`, and `font-bold` on its day cell. The other rows have none of the three.
+The chosen day's row is marked, and not by color alone: it has `bg-secondary hover:bg-secondary` in place of `hover:bg-transparent` and `aria-current="true"`, its cells have `text-secondary-foreground` in place of `text-foreground`, and its day cell adds `font-bold`. It is sun yellow with ink (sand with ink in dark mode), like the chosen day's button; the stock `bg-accent` can hardly be seen on a white card. The other rows have none of this.
 
 **The action,** after the card, a row on the sand (`flex flex-wrap items-center gap-4`): the page's one main action, an `<a href="/booking">` styled as a default button, "Book a lesson", full width below `md` (`w-full md:w-auto`); and beside it a `<p>` in `text-body`: "Lessons run every day. We set the start time by the tide."
 

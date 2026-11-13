@@ -5,100 +5,106 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const headerLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
 
 const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
+  focusRing
 )
 
-const chromeLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusOutline
-)
+const label = "font-mono text-label text-muted-foreground"
+
+const buttonClasses = "h-auto rounded-md px-6 py-2 font-mono text-label"
 
 const navLinks = [
-  { label: "Menu", href: "/menu" },
-  { label: "Book a table", href: "/booking" },
-  { label: "Journal", href: "/journal" },
-  { label: "Visit", href: "/visit" },
+  { href: "/menu", text: "Menu" },
+  { href: "/booking", text: "Book a table" },
+  { href: "/journal", text: "Journal" },
+  { href: "/visit", text: "Visit" },
 ]
 
-const seasonItems = [
+const seasonal = [
   {
     kind: "Tea",
     name: "Pear and ginger tisane",
-    about:
-      "Dried pear, root ginger and a little lemon peel, steeped for five minutes. No caffeine, so it suits an afternoon pot.",
+    text: "Dried pear, fresh ginger and a little lemon peel. Caffeine free, and good after a walk in the cold.",
     price: "£4.20 a pot",
-    picture: "A brown teapot and a cup of pale amber tisane on a linen cloth",
+    picture: "A brown teapot and a cup of pale amber tisane on a wooden tray",
   },
   {
     kind: "Plate",
     name: "Roast squash and lentil soup",
-    about:
-      "Squash from a farm on the Wold road, roasted with cumin and cooked down with red lentils. Served at lunch only.",
+    text: "Squash from a farm outside the village, red lentils and a spoon of chilli oil. Served at lunch only.",
     price: "£7.50 with rye bread",
     picture: "A bowl of orange soup beside two slices of dark rye bread",
   },
   {
     kind: "Cake",
     name: "Pear and cardamom loaf",
-    about:
-      "Baked each morning with brown sugar and crushed cardamom, and sliced thick at the counter.",
+    text: "A plain loaf cake with poached pear through it, baked each morning and sliced thick.",
     price: "£3.60 a slice",
-    picture: "A thick slice of pear loaf on a small glazed plate",
+    picture: "A thick slice of loaf cake on a small plate, with pear showing in the crumb",
   },
 ]
 
-type EmailError = "empty" | "malformed" | null
+const hours = [
+  { day: "Tuesday to Friday", open: "09:00", openText: "9:00", close: "17:00" },
+  { day: "Saturday", open: "09:00", openText: "9:00", close: "18:00" },
+  { day: "Sunday", open: "10:00", openText: "10:00", close: "16:00" },
+]
 
-const errorText: Record<Exclude<EmailError, null>, string> = {
-  empty: "Write your email address.",
-  malformed: "Check the email address: it needs an @ and a domain.",
-}
-
-function checkEmail(value: string): EmailError {
-  const trimmed = value.trim()
-  if (trimmed === "") return "empty"
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return "malformed"
-  return null
+function isWellFormedEmail(value: string) {
+  if (/\s/.test(value)) return false
+  const parts = value.split("@")
+  if (parts.length !== 2) return false
+  const [local, domain] = parts
+  if (!local) return false
+  const dot = domain.indexOf(".")
+  return dot > 0 && dot < domain.length - 1
 }
 
 function Newsletter() {
   const [email, setEmail] = useState("")
-  const [error, setError] = useState<EmailError>(null)
-  const [done, setDone] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [sent, setSent] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (done) headingRef.current?.focus()
-  }, [done])
+    if (sent) headingRef.current?.focus()
+  }, [sent])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const result = checkEmail(email)
-    setError(result)
-    if (result) {
+    const value = email.trim()
+    let message: string | null = null
+    if (value === "") {
+      message = "Write your email address."
+    } else if (!isWellFormedEmail(value)) {
+      message = "Check the email address: it needs an @ and a domain."
+    }
+    setError(message)
+    if (message) {
       inputRef.current?.focus()
       return
     }
-    setEmail(email.trim())
-    setDone(true)
+    setSent(true)
   }
 
   return (
-    <div className="rounded-xl border bg-card p-6">
-      <p className="font-mono text-label text-muted-foreground">
-        Four letters a year
-      </p>
+    <div className="rounded-xl border bg-card p-6 md:col-span-7">
+      <p className={label}>Four letters a year</p>
       <h2 className="mt-2 text-h2">News from the room</h2>
       <p className="mt-4 max-w-xl">
         A short letter when the season&apos;s teas come in, and nothing else.
       </p>
-      {!done && (
+      {!sent && (
         <form className="mt-6" noValidate onSubmit={handleSubmit}>
           <label
             htmlFor="newsletter-email"
@@ -112,7 +118,6 @@ function Newsletter() {
                 ref={inputRef}
                 id="newsletter-email"
                 type="email"
-                name="email"
                 autoComplete="email"
                 value={email}
                 onChange={(event) => {
@@ -127,7 +132,7 @@ function Newsletter() {
             <Button
               type="submit"
               variant="secondary"
-              className="mt-4 h-auto rounded-md px-6 py-2 font-mono text-label md:mt-0"
+              className={cn(buttonClasses, "mt-4 md:mt-0")}
             >
               Sign up
             </Button>
@@ -142,13 +147,13 @@ function Newsletter() {
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
-              <span>{errorText[error]}</span>
+              <span>{error}</span>
             </p>
           )}
         </form>
       )}
       <div role="status">
-        {done && (
+        {sent && (
           <div className="mt-6">
             <h3
               ref={headingRef}
@@ -171,15 +176,15 @@ export function App() {
   return (
     <div className="mx-auto max-w-[1120px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", chromeLink)}>
+        <a href="/" className={cn(headerLink, "font-heading text-h2")}>
           The Linden Room
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className={cn("text-body", chromeLink)}>
-                  {link.label}
+                <a href={link.href} className={cn(headerLink, "text-body")}>
+                  {link.text}
                 </a>
               </li>
             ))}
@@ -188,26 +193,21 @@ export function App() {
       </header>
 
       <main>
-        <section className="grid gap-6 pt-10 md:grid-cols-12 md:items-center">
+        <section className="grid grid-cols-1 gap-6 pt-10 md:grid-cols-12 md:items-center">
           <div className="md:col-span-6">
-            <p className="font-mono text-label text-muted-foreground">
-              Tea room and shop · Ashby Wold
-            </p>
+            <p className={label}>Tea room and shop · Ashby Wold</p>
             <h1 className="mt-2 text-h1 md:text-display">
               Tea, soup and cake, made slowly
             </h1>
-            <p className="mt-4 max-w-xl">
-              A tea room in a former seed merchant&apos;s on Mill Lane, serving
-              loose-leaf teas, lunch and the morning&apos;s cakes, with the same
-              teas sold by weight to take home.
+            <p className="mt-4 max-w-xl text-body">
+              The Linden Room is a tea room and tea shop in the old seed
+              merchant&apos;s on Mill Lane, serving loose-leaf tea, lunch and
+              cake, and selling the same teas by weight.
             </p>
             <p className="mt-6">
               <a
                 href="/booking"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "h-auto rounded-md px-6 py-2 font-mono text-label"
-                )}
+                className={cn(buttonVariants({ variant: "default" }), buttonClasses)}
               >
                 Book a table
               </a>
@@ -219,7 +219,7 @@ export function App() {
               aria-label="The window seat on a grey morning, a pot of tea on the sill"
               className="aspect-4/3 rounded-xl bg-muted"
             />
-            <figcaption className="mt-2 font-mono text-label text-muted-foreground">
+            <figcaption className={cn(label, "mt-2")}>
               The window seat, Mill Lane
             </figcaption>
           </figure>
@@ -228,12 +228,12 @@ export function App() {
         <section className="mt-18">
           <h2 className="text-h2">In season</h2>
           <p className="mt-4 max-w-xl">
-            The tisane, the soup and the cake change on the first Tuesday of
-            each month, with whatever the growers nearby have most of.
+            The tisane, the soup and the cake change on the first of each
+            month, with what the growers nearby have to hand.
           </p>
-          <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {seasonItems.map((item) => (
-              <div
+          <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+            {seasonal.map((item) => (
+              <article
                 key={item.name}
                 className="overflow-hidden rounded-xl border bg-card"
               >
@@ -243,16 +243,14 @@ export function App() {
                   className="aspect-3/2 bg-muted"
                 />
                 <div className="p-6">
-                  <p className="font-mono text-label text-muted-foreground">
-                    {item.kind}
-                  </p>
+                  <p className={label}>{item.kind}</p>
                   <h3 className="mt-2 text-h2">{item.name}</h3>
-                  <p className="mt-4">{item.about}</p>
+                  <p className="mt-4">{item.text}</p>
                   <p className="mt-4 font-mono text-label text-foreground tabular-nums">
                     {item.price}
                   </p>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
           <p className="mt-6">
@@ -262,15 +260,13 @@ export function App() {
           </p>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12">
           <div className="md:col-span-8">
-            <p className="font-mono text-label text-muted-foreground">
-              Since 2019
-            </p>
+            <p className={label}>Since 2019</p>
             <p className="mt-2 max-w-xl font-heading text-h2">
-              We pour at the seed merchant&apos;s old oak counter, into cups
-              thrown at a pottery two streets away, and weigh out the teas you
-              take home on the same counter.
+              The counter is the seed merchant&apos;s old one, and we still
+              weigh the teas out on it. The cups are thrown at a pottery two
+              streets away.
             </p>
             <p className="mt-4">
               <a href="/visit" className={textLink}>
@@ -280,61 +276,52 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12">
           <div className="md:col-span-6">
             <h2 className="text-h2">Opening hours</h2>
             <ul className="mt-6 divide-y">
-              <li className="flex items-baseline justify-between gap-4 py-2">
-                <span>Tuesday to Friday</span>
-                <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
-                  <time dateTime="09:00">9:00</time>–
-                  <time dateTime="17:00">17:00</time>
-                </span>
-              </li>
-              <li className="flex items-baseline justify-between gap-4 py-2">
-                <span>Saturday</span>
-                <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
-                  <time dateTime="09:00">9:00</time>–
-                  <time dateTime="18:00">18:00</time>
-                </span>
-              </li>
-              <li className="flex items-baseline justify-between gap-4 py-2">
-                <span>Sunday</span>
-                <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
-                  <time dateTime="10:00">10:00</time>–
-                  <time dateTime="16:00">16:00</time>
-                </span>
-              </li>
+              {hours.map((row) => (
+                <li
+                  key={row.day}
+                  className="flex items-baseline justify-between gap-4 py-2"
+                >
+                  <span>{row.day}</span>
+                  <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
+                    <time dateTime={row.open}>{row.openText}</time>–
+                    <time dateTime={row.close}>{row.close}</time>
+                  </span>
+                </li>
+              ))}
               <li className="flex items-baseline justify-between gap-4 py-2">
                 <span>Monday</span>
-                <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
+                <span className="shrink-0 font-mono text-label text-foreground">
                   Closed
                 </span>
               </li>
             </ul>
             <p className="mt-4 max-w-xl">
-              Lunch is served from <time dateTime="11:30">11:30</time> to{" "}
-              <time dateTime="14:30">14:30</time>, and cakes until they run
-              out.
+              Lunch is served from{" "}
+              <time dateTime="11:30">11:30</time>{" "}
+              to{" "}
+              <time dateTime="14:30">14:30</time>
+              , and cakes until they run out.
             </p>
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12">
-          <div className="md:col-span-7">
-            <Newsletter />
-          </div>
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12">
+          <Newsletter />
         </section>
       </main>
 
       <footer className="mt-18">
         <div className="border-t py-10">
-          <div className="grid gap-6 md:grid-cols-12 md:items-start">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
               <p className="font-heading text-h2">The Linden Room</p>
               <p className="mt-2 max-w-xl">
-                A tea room and tea shop in the old seed merchant&apos;s on Mill
-                Lane.
+                A tea room and shop in a former seed merchant&apos;s, with tea
+                by the pot and by weight.
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8">
@@ -343,14 +330,12 @@ export function App() {
                 <span className="block">Ashby Wold</span>
                 <span className="block">AW3 7LN</span>
               </address>
-              <p className="mt-4 font-mono text-label text-muted-foreground">
+              <p className={cn(label, "mt-4")}>
                 Tuesday to Sunday · Closed Mondays
               </p>
             </div>
           </div>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
-            © 2026 The Linden Room
-          </p>
+          <p className={cn(label, "mt-6")}>© 2026 The Linden Room</p>
         </div>
       </footer>
     </div>

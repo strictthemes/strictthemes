@@ -29,11 +29,11 @@ A grid from the layout notes, `md:items-center`, as a plain `<div>` in the `<mai
 - A `flex flex-col gap-4` with the `<h1>` in `text-h1 md:text-display` ("Small steps, every day") and one paragraph under it: "Mossy helps you keep a few small habits. Tick each one off when it is done. It takes about ten seconds a day."
 - A row (`flex flex-wrap items-center gap-3`) with the page's one main button: an `<a>` to `#signup` styled as a default button, "Start for free". Beside it, a small figure: `Free for 5 habits · No card needed`.
 
-Its second item, `md:col-span-6`, is the preview (part 3). Below `md` it sits under the text.
+Its second item is a `<div>` with `md:col-span-6` holding the preview (part 3), so that the figure's `md:mx-auto` centers it in the column. Below `md` it sits under the text.
 
 ### 3. Preview of the app
 
-A `<figure>` with `flex w-full flex-col gap-2 md:mx-auto md:max-w-sm`: full width below `md`, at most 384px wide and centered in its column from `md` up. Inside it, a card with `role="img"` and the `aria-label` "The Mossy home screen: three of five habits done today, and a 12-day streak", as wide as the figure. Everything inside the card has `aria-hidden="true"`. The card is drawn from plain elements, top to bottom, in its own `gap-4`:
+A `<figure>` with `flex w-full flex-col gap-2 md:mx-auto md:max-w-sm`: full width below `md`, at most 384px wide and centered in its column from `md` up. Inside it, a card with `role="img"` and the `aria-label` "The Mossy home screen: three of five habits done today, and a 12-day streak", as wide as the figure. Each direct child of the card has `aria-hidden="true"`, which hides everything inside it; the card itself keeps its `aria-label`. The card is drawn from plain elements, top to bottom, in its own `gap-4`:
 
 - A small figure, `Wednesday, 11 November`, then the greeting "Good morning, Ines" in `font-heading text-h2`, in a `flex flex-col gap-2`. Both are fixed text, not read from the clock.
 - A row with a good-news badge (add it with `npx shadcn@latest add badge`), "12-day streak", with the `Flame` icon.
@@ -64,7 +64,7 @@ Its second item, `md:col-span-7`, is a card that is the wrapper for the form and
 
 - "Your first name": an `Input` (add it with `npx shadcn@latest add input`) with `autoComplete="given-name"`.
 - "Email": an `Input` with `type="email"` and `autoComplete="email"`, with helper text `We send one email to confirm, and nothing else.`
-- A `Select` from the layout notes, "Your first habit", full width: the five habits in the sample's order, then "I will choose later". "Drink 8 glasses of water", the first, is chosen at the start.
+- A `Select` from the layout notes, "Your first habit", full width: the five habits in the sample's order, then "I will choose later". "Drink 8 glasses of water", the first, is chosen at the start. It has no helper text and no error: a choice is always made.
 - The default `Button` with `type="submit"`, "Create my account", full width below `md` (`w-full md:w-auto md:self-start`).
 
 The sign-up button is the second raspberry button on the page; it is far below the opening and never on screen with it.

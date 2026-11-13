@@ -1,32 +1,47 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+  type RefObject,
+} from "react"
 import { CircleAlert, Minus, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const codeFocusRing =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const textLink = `text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground ${focusRing}`
-const headerLink = `text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focusRing}`
-const inputClass =
+const textLink = cn(
+  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const headerLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+const inputClasses =
   "mt-2 h-auto rounded-md border-muted-foreground px-3 py-2 text-body md:text-body"
-const labelClass = "block font-mono text-label text-foreground"
-const buttonClass = "h-auto rounded-md px-5 py-2 font-mono text-label"
+const buttonClasses = "h-auto rounded-md px-5 py-2 font-mono text-label"
 
 const FARE = 7800
 const EXTRAS = {
   car: { name: "Car", price: 4600 },
   lounge: { name: "Lounge seats", price: 2400 },
   priority: { name: "Priority boarding", price: 800 },
-} as const
-const BIKE_PRICE = 600
-const MAX_BIKES = 2
+}
+const BICYCLE = 600
+const MAX_BICYCLES = 2
 
 type FieldKey =
   "p1First" | "p1Last" | "email" | "phone" | "p2First" | "p2Last" | "conditions"
+
+type Errors = Partial<Record<FieldKey, string>>
 
 const FIELD_ORDER: FieldKey[] = [
   "p1First",
@@ -38,19 +53,6 @@ const FIELD_ORDER: FieldKey[] = [
   "conditions",
 ]
 
-type Errors = Partial<Record<FieldKey, string>>
-
-type TextFields = {
-  p1First: string
-  p1Last: string
-  email: string
-  phone: string
-  p2First: string
-  p2Last: string
-}
-
-type Confirmation = { total: number; email: string }
-
 function formatPrice(pence: number) {
   return `£${(pence / 100).toFixed(2)}`
 }
@@ -59,39 +61,7 @@ function bicycles(count: number) {
   return `${count} ${count === 1 ? "bicycle" : "bicycles"}`
 }
 
-function validate(fields: TextFields, accepted: boolean): Errors {
-  const errors: Errors = {}
-  const t = (value: string) => value.trim()
-
-  if (!t(fields.p1First))
-    errors.p1First =
-      "Write the first name as it is on the passenger's photo ID."
-  if (!t(fields.p1Last))
-    errors.p1Last = "Write the last name as it is on the passenger's photo ID."
-
-  const email = t(fields.email)
-  if (!email) errors.email = "Write an email address for the boarding pass."
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    errors.email = "Check the email address: it needs an @ and a domain."
-
-  const phone = t(fields.phone)
-  if (!phone) errors.phone = "Write a mobile number we can text on the day."
-  else if (!/^[0-9+\-\s]+$/.test(phone) || phone.replace(/\D/g, "").length < 10)
-    errors.phone = "Check the mobile number: it needs at least 10 digits."
-
-  if (!t(fields.p2First))
-    errors.p2First =
-      "Write the first name as it is on the passenger's photo ID."
-  if (!t(fields.p2Last))
-    errors.p2Last = "Write the last name as it is on the passenger's photo ID."
-
-  if (!accepted)
-    errors.conditions = "Tick the box to accept the conditions of carriage."
-
-  return errors
-}
-
-function ErrorLine({ id, message }: { id: string; message: string }) {
+function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
   return (
     <p
       id={id}
@@ -102,57 +72,165 @@ function ErrorLine({ id, message }: { id: string; message: string }) {
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      {message}
+      <span>{children}</span>
     </p>
   )
 }
 
-function describedBy(...ids: (string | false | undefined)[]) {
-  const list = ids.filter(Boolean)
-  return list.length ? list.join(" ") : undefined
+type TextFieldProps = {
+  id: FieldKey
+  label: string
+  value: string
+  onChange: (value: string) => void
+  error?: string
+  help?: string
+  type?: string
+  autoComplete: string
+  inputRef: RefObject<HTMLInputElement | null>
 }
 
+function TextField({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  help,
+  type = "text",
+  autoComplete,
+  inputRef,
+}: TextFieldProps) {
+  const helpId = `${id}-help`
+  const errorId = `${id}-error`
+  const describedBy = [help ? helpId : null, error ? errorId : null]
+    .filter(Boolean)
+    .join(" ")
+
+  return (
+    <div>
+      <label
+        htmlFor={id}
+        className="block font-mono text-label text-foreground"
+      >
+        {label}
+      </label>
+      <Input
+        ref={inputRef}
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy || undefined}
+        className={inputClasses}
+      />
+      {help ? (
+        <p
+          id={helpId}
+          className="mt-2 font-mono text-label text-muted-foreground"
+        >
+          {help}
+        </p>
+      ) : null}
+      {error ? <ErrorLine id={errorId}>{error}</ErrorLine> : null}
+    </div>
+  )
+}
+
+type ExtraRowProps = {
+  id: string
+  label: string
+  price: number
+  checked: boolean
+  onCheckedChange: (checked: boolean) => void
+}
+
+function ExtraRow({
+  id,
+  label,
+  price,
+  checked,
+  onCheckedChange,
+}: ExtraRowProps) {
+  return (
+    <li className="flex items-start justify-between gap-5 py-3 first:pt-0 last:pb-0">
+      <div className="min-w-0">
+        <div className="flex items-start gap-3">
+          <Checkbox
+            id={id}
+            aria-labelledby={`${id}-label`}
+            checked={checked}
+            onCheckedChange={(value) => onCheckedChange(value === true)}
+            className="mt-0.5"
+          />
+          <label
+            id={`${id}-label`}
+            htmlFor={id}
+            className="text-body text-foreground"
+          >
+            {label}
+          </label>
+        </div>
+      </div>
+      <p className="mt-1 shrink-0 font-mono text-label text-foreground tabular-nums">
+        {formatPrice(price)}
+      </p>
+    </li>
+  )
+}
+
+type Confirmation = { total: number; email: string }
+
 export function App() {
-  const [fields, setFields] = useState<TextFields>({
-    p1First: "",
-    p1Last: "",
-    email: "",
-    phone: "",
-    p2First: "",
-    p2Last: "",
-  })
-  const [extras, setExtras] = useState({
-    car: false,
-    lounge: false,
-    priority: false,
-  })
-  const [bikes, setBikes] = useState(0)
+  const [p1First, setP1First] = useState("")
+  const [p1Last, setP1Last] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [p2First, setP2First] = useState("")
+  const [p2Last, setP2Last] = useState("")
+  const [car, setCar] = useState(false)
+  const [lounge, setLounge] = useState(false)
+  const [priority, setPriority] = useState(false)
+  const [bikeCount, setBikeCount] = useState(0)
   const [accepted, setAccepted] = useState(false)
+
   const [errors, setErrors] = useState<Errors>({})
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
-  const [sendCount, setSendCount] = useState(0)
+  const [focusRequest, setFocusRequest] = useState<{
+    target: FieldKey | "confirmation"
+    n: number
+  } | null>(null)
 
-  const fieldRefs = useRef<Partial<Record<FieldKey, HTMLElement | null>>>({})
-  const confirmRef = useRef<HTMLHeadingElement>(null)
-  const pendingFocus = useRef<FieldKey | "confirmation" | null>(null)
+  const p1FirstRef = useRef<HTMLInputElement>(null)
+  const p1LastRef = useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const phoneRef = useRef<HTMLInputElement>(null)
+  const p2FirstRef = useRef<HTMLInputElement>(null)
+  const p2LastRef = useRef<HTMLInputElement>(null)
+  const conditionsRef = useRef<HTMLSpanElement>(null)
+  const confirmationRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    const target = pendingFocus.current
-    if (!target) return
-    pendingFocus.current = null
-    if (target === "confirmation") confirmRef.current?.focus()
-    else fieldRefs.current[target]?.focus()
-  }, [sendCount])
+    if (!focusRequest) return
+    if (focusRequest.target === "confirmation") {
+      confirmationRef.current?.focus()
+    } else {
+      const refs = {
+        p1First: p1FirstRef,
+        p1Last: p1LastRef,
+        email: emailRef,
+        phone: phoneRef,
+        p2First: p2FirstRef,
+        p2Last: p2LastRef,
+        conditions: conditionsRef,
+      }
+      refs[focusRequest.target].current?.focus()
+    }
+  }, [focusRequest])
 
-  const total =
-    FARE +
-    (Object.keys(EXTRAS) as (keyof typeof EXTRAS)[]).reduce(
-      (sum, key) => sum + (extras[key] ? EXTRAS[key].price : 0),
-      0
-    ) +
-    bikes * BIKE_PRICE
-
-  function clearError(key: FieldKey) {
+  const clearError = (key: FieldKey) => {
     setErrors((current) => {
       if (!current[key]) return current
       const next = { ...current }
@@ -161,94 +239,78 @@ export function App() {
     })
   }
 
-  function updateField(key: keyof TextFields, value: string) {
-    setFields((current) => ({ ...current, [key]: value }))
-    clearError(key)
-  }
+  const textHandler =
+    (key: FieldKey, setter: (value: string) => void) => (value: string) => {
+      setter(value)
+      clearError(key)
+    }
+
+  const rows: { name: string; price: number }[] = [
+    { name: "Fare, 2 adults", price: FARE },
+  ]
+  if (car) rows.push(EXTRAS.car)
+  if (lounge) rows.push(EXTRAS.lounge)
+  if (priority) rows.push(EXTRAS.priority)
+  if (bikeCount > 0)
+    rows.push({ name: bicycles(bikeCount), price: bikeCount * BICYCLE })
+  const total = rows.reduce((sum, row) => sum + row.price, 0)
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const found = validate(fields, accepted)
-    setErrors(found)
-    const first = FIELD_ORDER.find((key) => found[key])
+    const next: Errors = {}
+
+    if (!p1First.trim())
+      next.p1First =
+        "Write the first name as it is on the passenger's photo ID."
+    if (!p1Last.trim())
+      next.p1Last = "Write the last name as it is on the passenger's photo ID."
+
+    const emailValue = email.trim()
+    if (!emailValue)
+      next.email = "Write an email address for the boarding pass."
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue))
+      next.email = "Check the email address: it needs an @ and a domain."
+
+    const phoneValue = phone.trim()
+    if (!phoneValue)
+      next.phone = "Write a mobile number we can text on the day."
+    else if (
+      /[^\d\s+-]/.test(phoneValue) ||
+      phoneValue.replace(/\D/g, "").length < 10
+    )
+      next.phone = "Check the mobile number: it needs at least 10 digits."
+
+    if (!p2First.trim())
+      next.p2First =
+        "Write the first name as it is on the passenger's photo ID."
+    if (!p2Last.trim())
+      next.p2Last = "Write the last name as it is on the passenger's photo ID."
+
+    if (!accepted)
+      next.conditions = "Tick the box to accept the conditions of carriage."
+
+    setErrors(next)
+    const first = FIELD_ORDER.find((key) => next[key])
     if (first) {
       setConfirmation(null)
-      pendingFocus.current = first
+      setFocusRequest((current) => ({
+        target: first,
+        n: (current?.n ?? 0) + 1,
+      }))
     } else {
-      setConfirmation({ total, email: fields.email.trim() })
-      pendingFocus.current = "confirmation"
+      setConfirmation({ total, email: emailValue })
+      setFocusRequest((current) => ({
+        target: "confirmation",
+        n: (current?.n ?? 0) + 1,
+      }))
     }
-    setSendCount((count) => count + 1)
   }
-
-  function textField(
-    key: keyof TextFields,
-    label: string,
-    options: {
-      type?: string
-      autoComplete: string
-      helper?: string
-    }
-  ) {
-    const id = `field-${key}`
-    const helperId = options.helper ? `${id}-help` : undefined
-    const errorId = `${id}-error`
-    const error = errors[key]
-    return (
-      <>
-        <label htmlFor={id} className={labelClass}>
-          {label}
-        </label>
-        <Input
-          ref={(el) => {
-            fieldRefs.current[key] = el
-          }}
-          id={id}
-          type={options.type ?? "text"}
-          autoComplete={options.autoComplete}
-          value={fields[key]}
-          onChange={(event) => updateField(key, event.target.value)}
-          aria-invalid={error ? true : undefined}
-          aria-describedby={describedBy(helperId, error && errorId)}
-          className={inputClass}
-        />
-        {options.helper && (
-          <p
-            id={helperId}
-            className="mt-2 font-mono text-label text-muted-foreground"
-          >
-            {options.helper}
-          </p>
-        )}
-        {error && <ErrorLine id={errorId} message={error} />}
-      </>
-    )
-  }
-
-  const extraRows: { key: keyof typeof EXTRAS; text: string }[] = [
-    { key: "car", text: "A car up to 5 m long and 2 m high" },
-    { key: "lounge", text: "Seats in the quiet lounge for two" },
-    { key: "priority", text: "Priority boarding" },
-  ]
-
-  const summaryRows: { name: string; price: number }[] = [
-    { name: "Fare, 2 adults", price: FARE },
-    ...extraRows
-      .filter((row) => extras[row.key])
-      .map((row) => ({
-        name: EXTRAS[row.key].name,
-        price: EXTRAS[row.key].price,
-      })),
-    ...(bikes > 0
-      ? [{ name: bicycles(bikes), price: bikes * BIKE_PRICE }]
-      : []),
-  ]
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b bg-card">
         <div className="mx-auto flex max-w-[1120px] flex-col items-start gap-2 px-5 py-5 md:flex-row md:items-center md:justify-between">
-          <a href="/" className={`font-heading text-h2 ${headerLink}`}>
+          <a href="/" className={cn("font-heading text-h2", headerLink)}>
             Kestrel Ferries
           </a>
           <nav aria-label="Main">
@@ -257,23 +319,23 @@ export function App() {
                 <a
                   href="/"
                   aria-current="true"
-                  className={`text-body underline ${headerLink}`}
+                  className={cn("text-body underline", headerLink)}
                 >
                   Book
                 </a>
               </li>
               <li>
-                <a href="/departures" className={`text-body ${headerLink}`}>
+                <a href="/departures" className={cn("text-body", headerLink)}>
                   Departures
                 </a>
               </li>
               <li>
-                <a href="/ticket" className={`text-body ${headerLink}`}>
+                <a href="/ticket" className={cn("text-body", headerLink)}>
                   My booking
                 </a>
               </li>
               <li>
-                <a href="#" className={`text-body ${headerLink}`}>
+                <a href="#" className={cn("text-body", headerLink)}>
                   Help
                 </a>
               </li>
@@ -283,18 +345,17 @@ export function App() {
       </header>
 
       <main className="mx-auto max-w-[1120px] px-5">
-        <section className="grid gap-5 pt-8 md:grid-cols-12">
+        <section className="grid grid-cols-1 gap-5 pt-8 md:grid-cols-12">
           <div className="md:col-span-8">
             <p className="font-mono text-label text-muted-foreground">
               Step 2 of 3 · Passengers and extras
             </p>
             <h1 className="mt-2 text-h1">Who is travelling</h1>
             <p className="mt-3 max-w-xl">
-              Write each name exactly as it is on the passenger's photo ID, or
-              they may not be let on board. The lead passenger gets a text if
-              the sailing changes.
+              Write each name exactly as it is on the passenger's photo ID. If
+              the sailing changes, we text the lead passenger.
             </p>
-            <p className="mt-3">
+            <p className="mt-3 max-w-xl">
               <a href="/results" className={textLink}>
                 Back to sailings
               </a>
@@ -302,7 +363,7 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-16 grid gap-5 lg:grid-cols-12 lg:items-start">
+        <section className="mt-16 grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
           <div className="lg:col-span-8">
             <form
               noValidate
@@ -320,32 +381,51 @@ export function App() {
                 <h2 id="passenger-1-heading" className="mt-2 text-h2">
                   Passenger 1
                 </h2>
-                <div className="mt-5 grid gap-5 md:grid-cols-2">
-                  <div>
-                    {textField("p1First", "First name", {
-                      autoComplete: "given-name",
-                    })}
-                  </div>
-                  <div>
-                    {textField("p1Last", "Last name", {
-                      autoComplete: "family-name",
-                    })}
-                  </div>
+                <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <TextField
+                    id="p1First"
+                    label="First name"
+                    autoComplete="given-name"
+                    value={p1First}
+                    onChange={textHandler("p1First", setP1First)}
+                    error={errors.p1First}
+                    inputRef={p1FirstRef}
+                  />
+                  <TextField
+                    id="p1Last"
+                    label="Last name"
+                    autoComplete="family-name"
+                    value={p1Last}
+                    onChange={textHandler("p1Last", setP1Last)}
+                    error={errors.p1Last}
+                    inputRef={p1LastRef}
+                  />
                 </div>
                 <div className="mt-5">
-                  {textField("email", "Email address", {
-                    type: "email",
-                    autoComplete: "email",
-                    helper: "We send the boarding pass here.",
-                  })}
+                  <TextField
+                    id="email"
+                    label="Email address"
+                    type="email"
+                    autoComplete="email"
+                    value={email}
+                    onChange={textHandler("email", setEmail)}
+                    error={errors.email}
+                    help="We send the boarding pass here."
+                    inputRef={emailRef}
+                  />
                 </div>
                 <div className="mt-5">
-                  {textField("phone", "Mobile phone", {
-                    type: "tel",
-                    autoComplete: "tel",
-                    helper:
-                      "We text this number if the sailing is delayed or cancelled.",
-                  })}
+                  <TextField
+                    id="phone"
+                    label="Mobile phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={textHandler("phone", setPhone)}
+                    error={errors.phone}
+                    help="We text this number if the sailing is delayed or cancelled."
+                    inputRef={phoneRef}
+                  />
                 </div>
               </div>
 
@@ -360,17 +440,25 @@ export function App() {
                 <h2 id="passenger-2-heading" className="mt-2 text-h2">
                   Passenger 2
                 </h2>
-                <div className="mt-5 grid gap-5 md:grid-cols-2">
-                  <div>
-                    {textField("p2First", "First name", {
-                      autoComplete: "given-name",
-                    })}
-                  </div>
-                  <div>
-                    {textField("p2Last", "Last name", {
-                      autoComplete: "family-name",
-                    })}
-                  </div>
+                <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+                  <TextField
+                    id="p2First"
+                    label="First name"
+                    autoComplete="given-name"
+                    value={p2First}
+                    onChange={textHandler("p2First", setP2First)}
+                    error={errors.p2First}
+                    inputRef={p2FirstRef}
+                  />
+                  <TextField
+                    id="p2Last"
+                    label="Last name"
+                    autoComplete="family-name"
+                    value={p2Last}
+                    onChange={textHandler("p2Last", setP2Last)}
+                    error={errors.p2Last}
+                    inputRef={p2LastRef}
+                  />
                 </div>
               </div>
 
@@ -386,39 +474,27 @@ export function App() {
                   Extras
                 </h2>
                 <ul className="mt-5 divide-y">
-                  {extraRows.map((row) => (
-                    <li
-                      key={row.key}
-                      className="flex items-start justify-between gap-5 py-3 first:pt-0 last:pb-0"
-                    >
-                      <div className="min-w-0">
-                        <div className="flex items-start gap-3">
-                          <Checkbox
-                            id={`extra-${row.key}`}
-                            aria-labelledby={`extra-${row.key}-label`}
-                            checked={extras[row.key]}
-                            onCheckedChange={(checked) =>
-                              setExtras((current) => ({
-                                ...current,
-                                [row.key]: checked,
-                              }))
-                            }
-                            className="mt-0.5"
-                          />
-                          <label
-                            id={`extra-${row.key}-label`}
-                            htmlFor={`extra-${row.key}`}
-                            className="text-body text-foreground"
-                          >
-                            {row.text}
-                          </label>
-                        </div>
-                      </div>
-                      <p className="mt-1 shrink-0 font-mono text-label text-foreground tabular-nums">
-                        {formatPrice(EXTRAS[row.key].price)}
-                      </p>
-                    </li>
-                  ))}
+                  <ExtraRow
+                    id="extra-car"
+                    label="A car up to 5 m long and 2 m high"
+                    price={EXTRAS.car.price}
+                    checked={car}
+                    onCheckedChange={setCar}
+                  />
+                  <ExtraRow
+                    id="extra-lounge"
+                    label="Seats in the quiet lounge for two"
+                    price={EXTRAS.lounge.price}
+                    checked={lounge}
+                    onCheckedChange={setLounge}
+                  />
+                  <ExtraRow
+                    id="extra-priority"
+                    label="Priority boarding"
+                    price={EXTRAS.priority.price}
+                    checked={priority}
+                    onCheckedChange={setPriority}
+                  />
                   <li className="flex items-start justify-between gap-5 py-3 first:pt-0 last:pb-0">
                     <div className="min-w-0">
                       <p
@@ -437,10 +513,10 @@ export function App() {
                           size="icon"
                           className="rounded-md"
                           aria-label="Fewer bicycles"
-                          disabled={bikes === 0}
+                          disabled={bikeCount === 0}
                           focusableWhenDisabled
                           onClick={() =>
-                            setBikes((count) => Math.max(0, count - 1))
+                            setBikeCount((n) => Math.max(0, n - 1))
                           }
                         >
                           <Minus
@@ -453,17 +529,17 @@ export function App() {
                           aria-live="polite"
                           className="inline-flex min-w-24 justify-center font-mono text-label text-foreground tabular-nums"
                         >
-                          {bicycles(bikes)}
+                          {bicycles(bikeCount)}
                         </span>
                         <Button
                           variant="outline"
                           size="icon"
                           className="rounded-md"
                           aria-label="More bicycles"
-                          disabled={bikes === MAX_BIKES}
+                          disabled={bikeCount === MAX_BICYCLES}
                           focusableWhenDisabled
                           onClick={() =>
-                            setBikes((count) => Math.min(MAX_BIKES, count + 1))
+                            setBikeCount((n) => Math.min(MAX_BICYCLES, n + 1))
                           }
                         >
                           <Plus
@@ -475,7 +551,7 @@ export function App() {
                       </div>
                     </div>
                     <p className="shrink-0 font-mono text-label text-foreground tabular-nums">
-                      {formatPrice(BIKE_PRICE)} each
+                      {formatPrice(BICYCLE)} each
                     </p>
                   </li>
                 </ul>
@@ -492,7 +568,7 @@ export function App() {
                 <h2 id="conditions-heading" className="mt-2 text-h2">
                   Conditions
                 </h2>
-                <p className="mt-3 text-body">
+                <p className="mt-3 max-w-xl">
                   Under the{" "}
                   <a href="#" className={textLink}>
                     conditions of carriage
@@ -503,68 +579,65 @@ export function App() {
                 <div className="mt-5">
                   <div className="flex items-start gap-3">
                     <Checkbox
-                      ref={(el: HTMLElement | null) => {
-                        fieldRefs.current.conditions = el
-                      }}
-                      id="field-conditions"
-                      aria-labelledby="field-conditions-label"
-                      checked={accepted}
-                      onCheckedChange={(checked) => {
-                        setAccepted(checked)
-                        clearError("conditions")
-                      }}
+                      ref={conditionsRef}
+                      id="conditions"
+                      aria-labelledby="conditions-label"
                       aria-invalid={errors.conditions ? true : undefined}
                       aria-describedby={
-                        errors.conditions ? "field-conditions-error" : undefined
+                        errors.conditions ? "conditions-error" : undefined
                       }
+                      checked={accepted}
+                      onCheckedChange={(value) => {
+                        setAccepted(value === true)
+                        clearError("conditions")
+                      }}
                       className="mt-0.5"
                     />
                     <label
-                      id="field-conditions-label"
-                      htmlFor="field-conditions"
+                      id="conditions-label"
+                      htmlFor="conditions"
                       className="text-body text-foreground"
                     >
                       I have read the conditions of carriage and the fare rules.
                     </label>
                   </div>
-                  {errors.conditions && (
-                    <ErrorLine
-                      id="field-conditions-error"
-                      message={errors.conditions}
-                    />
-                  )}
+                  {errors.conditions ? (
+                    <ErrorLine id="conditions-error">
+                      {errors.conditions}
+                    </ErrorLine>
+                  ) : null}
                 </div>
               </div>
 
               <div className="mt-5">
-                <Button type="submit" className={buttonClass}>
+                <Button type="submit" className={buttonClasses}>
                   Continue to payment
                 </Button>
               </div>
             </form>
             <div role="status">
-              {confirmation && (
+              {confirmation ? (
                 <div className="mt-5">
                   <h2
-                    ref={confirmRef}
+                    ref={confirmationRef}
                     tabIndex={-1}
-                    className={`text-h2 text-foreground ${codeFocusRing}`}
+                    className={cn("text-h2", codeFocusRing)}
                   >
                     Ready for payment
                   </h2>
-                  <p className="mt-3 wrap-break-word text-foreground">
+                  <p className="mt-3 max-w-xl wrap-break-word">
                     Your details are complete. The total to pay is{" "}
                     {formatPrice(confirmation.total)}, and the boarding pass
                     goes to {confirmation.email}.
                   </p>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
 
           <aside
             aria-labelledby="summary-heading"
-            className="rounded-xl border bg-card p-5 lg:sticky lg:top-5 lg:col-span-4"
+            className="rounded-xl border bg-card p-5 lg:sticky lg:top-5 lg:col-span-4 lg:col-start-9"
           >
             <p className="font-mono text-label text-muted-foreground">
               Your sailing
@@ -604,7 +677,7 @@ export function App() {
               Isla Grey
             </p>
             <ul className="mt-5 divide-y">
-              {summaryRows.map((row) => (
+              {rows.map((row) => (
                 <li
                   key={row.name}
                   className="flex items-baseline justify-between gap-5 py-3 first:pt-0 last:pb-0"
@@ -631,10 +704,10 @@ export function App() {
 
       <footer className="mt-16 border-t bg-card">
         <div className="mx-auto max-w-[1120px] px-5 py-8">
-          <div className="grid gap-5 md:grid-cols-12 md:items-start">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
               <p className="font-heading text-h2">Kestrel Ferries</p>
-              <p className="mt-2">
+              <p className="mt-2 max-w-xl">
                 Crossings from Harrowmouth to Port Ellery, Brindle Ness,
                 Wrenholm and Tollan Quay since 1987.
               </p>

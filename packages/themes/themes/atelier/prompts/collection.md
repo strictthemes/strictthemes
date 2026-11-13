@@ -10,7 +10,7 @@ checks:
   - The credits for the whole shoot are a `<dl>`, and the season's text is at most `max-w-md` wide.
 ---
 
-Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. This page is its lookbook for Autumn–Winter 2026, called *Still Water*: seven looks in undyed wool, black linen and silk the color of skin, shot in the empty Bains du Rhône swimming baths in Lyon in September 2026. Photography by Tomas Reyl, styling by Anouk Delmas, casting by Petra Laine, hair and make-up by Sami Okafor. The models are Yara Benali, Marit Ekwall and Joon Seo. Pieces include the Lune wrap coat (€1,480), the Ilse pleated skirt (€640), the Mira silk shirt (€520), the Sorel wide trousers (€590), the Nadia knitted dress (€760), the Tove belted cardigan (€540) and the Ren linen shirt-dress (€610).
+Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon founded in 2014 by Inès Ardelle. This page is its lookbook for Autumn–Winter 2026, called *Still Water*: seven looks in undyed wool, black linen and silk the color of skin, shot in the empty Bains du Rhône swimming baths in Lyon in September 2026. Photography by Tomas Reyl, styling by Anouk Delmas, casting by Petra Laine, hair and make-up by Sami Okafor. The models are Yara Benali, Marit Ekwall and Joon Seo. The pieces are the Lune wrap coat, the Ilse pleated skirt, the Mira silk shirt, the Sorel wide trousers, the Nadia knitted dress, the Tove belted cardigan and the Ren linen shirt-dress. This page shows no prices.
 
 Build these parts in order.
 
@@ -28,7 +28,7 @@ The first section, in the grid:
 
 ### 3. The looks
 
-A section whose content is an `<ol>` with `list-none` that is itself the grid (`grid grid-cols-1 md:grid-cols-12 md:gap-x-8`). Each look is an `<li>` holding a `<figure>`; the margin is on the `<li>`, and the `<figure>` has none. Look 01 has no top margin at any width: the section's own margin is the gap above it. Every look after it has `mt-16` on a phone; the margin from `md` up is given for each. Lay them out exactly like this:
+A section whose content is an `<ol>` with `list-none` that is itself the grid (`grid grid-cols-1 md:grid-cols-12 md:gap-x-8`), with `aria-label="Looks"`: the section has no visible heading. Each look is an `<li>` holding a `<figure>`; the margin is on the `<li>`, and the `<figure>` has none. Look 01 has no top margin at any width: the section's own margin is the gap above it. Every look after it has `mt-16` on a phone; the margin from `md` up is given for each. Lay them out exactly like this:
 
 | Look | Columns of the `<li>` | Top margin from `md` | Picture | Caption |
 |---|---|---|---|---|
@@ -47,7 +47,17 @@ Each caption has three or four label lines, as the layout notes describe:
 - The look number in `text-foreground`: `Look 03`.
 - The pieces it shows in `text-muted-foreground`, joined with ` · `: `Lune wrap coat · Mira silk shirt`. In look 03, "Lune wrap coat" is a link to the piece page (`#`, as the Links note says), styled as a link in a caption and kept in `text-foreground`. The other pieces are plain text.
 - The credit in `text-muted-foreground`: `Worn by Marit Ekwall`.
-- For the two looks with the caption beside the picture, a fourth line in `text-muted-foreground` with what the pieces are made of. Look 01: `Lune wrap coat · Sorel wide trousers`, `Worn by Yara Benali`, `Undyed wool · Black linen`. Look 04: `Ren linen shirt-dress · Tove belted cardigan`, `Worn by Joon Seo`, `Black linen · Undyed wool`.
+- For the two looks with the caption beside the picture, a fourth line in `text-muted-foreground` with what the pieces are made of.
+
+The pieces and the model of each look:
+
+- 01: `Lune wrap coat · Sorel wide trousers`, Yara Benali; fourth line `Undyed wool · Black linen`.
+- 02: `Mira silk shirt · Ilse pleated skirt`, Marit Ekwall.
+- 03: `Lune wrap coat · Mira silk shirt`, Marit Ekwall.
+- 04: `Ren linen shirt-dress · Tove belted cardigan`, Joon Seo; fourth line `Black linen · Undyed wool`.
+- 05: `Nadia knitted dress`, Yara Benali.
+- 06: `Tove belted cardigan · Ilse pleated skirt`, Joon Seo.
+- 07: `Sorel wide trousers · Mira silk shirt`, Yara Benali.
 
 Each picture's `aria-label` describes that photograph in one sentence: the clothes, the pose, the room. The look number is in it too ("Look 03: …").
 

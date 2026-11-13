@@ -32,7 +32,7 @@ The header from the layout notes. This page is one entry of the journal, not the
 
 ### 2. Opening
 
-The first section, with `pt-10`, as a grid (`grid gap-6 md:grid-cols-12 md:items-end`; here `md:items-end` takes the place of `md:items-start`, so the foot of the figure, which is its caption, lines up with the label line at the foot of the text):
+The first section, with `pt-10`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-end`; here `md:items-end` takes the place of `md:items-start`, so the foot of the figure, which is its caption, lines up with the label line at the foot of the text):
 
 - In columns 1–7: a label in `text-muted-foreground`, `From the journal · Mara Hollis · 6 November 2026`, with the date in a `<time>`. With `mt-2` the `<h1>` in `text-h1 md:text-display`. With `mt-4` a standfirst: one or two sentences in a `<p>` with `font-heading text-h2`, upright and in its one weight. With `mt-6`, a label line in `text-foreground`: `Prep 10 min · Simmer 15 min · Steep 5 min · Serves 4`. It gives the recipe as written and does not change with the servings control.
 - In columns 8–12: a picture, `aspect-square`, with the `aria-label` "A clay teapot and two cups on a linen cloth, pear slices beside them" and a caption such as `The autumn pot, served from October`.
@@ -41,7 +41,7 @@ On a phone the picture comes under the label line.
 
 ### 3. Ingredients and method
 
-A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with `mt-18`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - Columns 1–5 hold the ingredients.
 - Columns 7–12 hold the method and, after it, the note.
@@ -70,7 +70,7 @@ The footer from the layout notes.
 - Round as you show it. A tie always rounds up.
   - Grams: to the nearest whole gram, never below 1 g: ginger for one cup is 7.5 g, shown `8 g`.
   - Millilitres: first round to the nearest 10 ml. Under 1000 ml, show that (`750 ml`). From 1000 ml up, divide it by 1000 and round to one decimal place, dropping a `.0`: 1000 ml is `1 l`, 1250 ml `1.3 l`, 1500 ml `1.5 l`, 3000 ml `3 l`.
-  - Counts (pears, cinnamon sticks, lemons) and spoons: to the nearest half, never below ½, written as `½`, `1`, `1½`, `2`: a cinnamon stick for three cups is 0.75, shown `1`. A spoon amount keeps its unit: `1½ tbsp`.
+  - Counts (pears, cinnamon sticks, lemons) and spoons: to the nearest half, never below ½, written as `½`, `1`, `1½`, `2`: a cinnamon stick for three cups is 0.75, shown `1`. A spoon amount keeps its unit: `1½ tbsp`. The lemon then shows `½` from one to five cups, `1` from six to nine and `1½` from ten to twelve; that is intended.
 - Only the amounts change. The names, the asides and the label line under the title stay as they are.
 - At one cup the minus button is disabled, and at twelve the plus button, each with `focusableWhenDisabled` as the layout notes say, so this page makes the `data-disabled:` edit in `button.tsx`.
 - The other links need no behavior.

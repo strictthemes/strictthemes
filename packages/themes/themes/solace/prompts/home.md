@@ -1,14 +1,14 @@
 ---
 page: therapy practice home page
 title: Home
-description: the home page of a private therapy practice of one therapist, with a quiet opening, what people bring as a short list, how it starts in three steps, the therapist in brief with a round portrait, the fee in one line and one action.
+description: the home page of a private therapy practice of one therapist, with a quiet opening, what people bring as a short list, how it starts in three steps, the therapist in brief with a round portrait, the fee in one sentence and one action.
 order: 1
 checks:
   - "The `<h1>` is the page's only `text-display` text, from `md` up, its phrase time to think is an `<em>` in the italic, and no heading or text on the page is bold."
   - "The page has exactly one default (indigo) button, Request a first session, a link to /first-session inside the last card; the header and the opening hold no button."
   - "The three steps are an ordered list of three cards, each with a step number, a heading, a sentence or two and a label line: I reply within 2 working days, 20 minutes and Free, 50 minutes and £68."
   - "The portrait is a 72px round fill with the initials NE, with the img role and an aria-label, beside the name and a line of training; nothing else on the page is round."
-  - "The fee is one line in the heading font at `text-h1`, an `<h2>`, and it says 50 minutes and £68."
+  - "The fee is one sentence in the heading font at `text-h1`, an `<h2>`, and it says 50 minutes and £68."
   - "Sections are divided by 112px of space alone, with no hairline or fill between them, and no sentence on the page hurries the reader or promises a result."
 ---
 
@@ -88,7 +88,7 @@ These three are the page's only badges.
 A section in the grid, with its content in columns 1–8 (`md:col-span-8`):
 
 - A label line in `text-muted-foreground`: `Fees from 1 January 2027`, with only the date in a `<time dateTime="2027-01-01">`.
-- With `mt-4`, the fee in one line: an `<h2>` in `text-h1` (here, instead of the notes' `text-h2`), "A session is 50 minutes and costs £68".
+- With `mt-4`, the fee in one sentence: an `<h2>` in `text-h1` (here, instead of the notes' `text-h2`), "A session is 50 minutes and costs £68". It may wrap where the column is narrow.
 - With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "The first call is 20 minutes and free. I send one invoice a month, and there is no charge if you cancel with 48 hours' notice."
 - With `mt-7`, a `<p>` holding one link in running text: "Fees, paying and cancelling", to `/fees`.
 

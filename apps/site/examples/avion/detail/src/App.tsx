@@ -15,236 +15,195 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
+const SIGNED_IN = "Elena Varga"
+const NOW = { text: "11 Nov, 13:50", iso: "2026-11-11T13:50" }
+
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const navLink = cn(
-  "font-mono text-label text-muted-foreground uppercase transition-colors duration-150 hover:text-foreground",
+  "font-mono text-label uppercase text-muted-foreground transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const currentNavLink = cn(
+  "font-mono text-label uppercase text-foreground transition-colors duration-150",
   focusRing
 )
 const label = "font-mono text-label uppercase text-muted-foreground"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const smallFigure = "font-mono text-label text-muted-foreground tabular-nums"
+const panel = "rounded-xl border bg-card p-5"
+const rowsPanel = "overflow-hidden rounded-xl border bg-card"
+const headingRow = "flex min-h-7 flex-wrap items-center justify-between gap-3"
 const buttonText = "px-5 font-mono text-label uppercase"
 
-const SIGNED_IN = "Tomas Reyes"
-const SHIPMENT_ID = "NG-48213"
-// The sample's "now": 11 Nov, 13:50.
-const NOW = { iso: "2026-11-11T13:50", text: "11 Nov, 13:50" }
-
-const navItems = [
+const NAV = [
   { label: "Overview", href: "/" },
   { label: "Shipments", href: "/shipments", current: true },
   { label: "Depots", href: "/depots" },
   { label: "Reports", href: "/reports" },
 ]
 
-type Stamp = { iso: string; text: string }
+type Stamp = { text: string; iso: string }
 
-type Step = {
-  name: string
-  reached?: Stamp
-  expected?: Stamp
-}
-
-const steps: Step[] = [
-  {
-    name: "Booked",
-    reached: { iso: "2026-11-10T15:22", text: "10 Nov, 15:22" },
-  },
-  {
-    name: "Collected",
-    reached: { iso: "2026-11-10T17:05", text: "10 Nov, 17:05" },
-  },
-  {
-    name: "At depot",
-    reached: { iso: "2026-11-10T21:48", text: "10 Nov, 21:48" },
-  },
+const STEPS: { name: string; at: Stamp }[] = [
+  { name: "Booked", at: { text: "10 Nov, 15:22", iso: "2026-11-10T15:22" } },
+  { name: "Collected", at: { text: "10 Nov, 17:05", iso: "2026-11-10T17:05" } },
+  { name: "At depot", at: { text: "10 Nov, 21:48", iso: "2026-11-10T21:48" } },
   {
     name: "Out for delivery",
-    reached: { iso: "2026-11-11T08:40", text: "11 Nov, 08:40" },
+    at: { text: "11 Nov, 08:40", iso: "2026-11-11T08:40" },
   },
-  {
-    name: "Delivered",
-    expected: { iso: "2026-11-11T13:45", text: "11 Nov, 13:45" },
-  },
+  { name: "Delivered", at: { text: "11 Nov, 13:45", iso: "2026-11-11T13:45" } },
 ]
-const CURRENT_STEP = 3
+
+type Tone = "success" | "caution" | "failed" | "neutral"
 
 type TimelineEvent = {
   id: string
   at: Stamp
   text: string
   by: string
-  state?: { word: string; dot: string }
+  state?: { tone: Tone; word: string }
 }
 
-const initialEvents: TimelineEvent[] = [
+const EVENTS: TimelineEvent[] = [
   {
-    id: "e6",
-    at: { iso: "2026-11-11T11:32", text: "11 Nov, 11:32" },
-    text: "The A614 is closed at Fernley after a collision, so the van is taking the diversion through Kelham Lane and will miss the 12:00 slot.",
-    by: "Marcus Hale, driver",
-    state: { word: "Delayed", dot: "bg-tertiary" },
-  },
-  {
-    id: "e5",
-    at: { iso: "2026-11-11T08:40", text: "11 Nov, 08:40" },
-    text: "Loaded onto van 14 and left Ashby Cross depot on route AC-07.",
-    by: "Marcus Hale, driver",
-  },
-  {
-    id: "e4",
-    at: { iso: "2026-11-11T06:15", text: "11 Nov, 06:15" },
-    text: "Sorted to delivery route AC-07, stop 9 of 23.",
+    id: "delay",
+    at: { text: "11 Nov, 11:32", iso: "2026-11-11T11:32" },
+    text: "A road closure on the A61 at Killinghall sent the van on a diversion, so delivery is now expected at 13:45.",
     by: "Route planner",
+    state: { tone: "caution", word: "Delayed" },
   },
   {
-    id: "e3",
-    at: { iso: "2026-11-10T21:48", text: "10 Nov, 21:48" },
-    text: "Arrived at Ashby Cross depot and scanned in at bay 3.",
-    by: "Depot scanner, Ashby Cross",
+    id: "out",
+    at: { text: "11 Nov, 08:40", iso: "2026-11-11T08:40" },
+    text: "Loaded onto van LE-17 and left the Leeds East depot for the Harrogate round.",
+    by: "Marcus Obi",
   },
   {
-    id: "e2",
-    at: { iso: "2026-11-10T17:05", text: "10 Nov, 17:05" },
-    text: "Collected from the sender's warehouse, one parcel of 12.40 kg.",
-    by: "Lena Ortiz, driver",
+    id: "sorted",
+    at: { text: "11 Nov, 06:15", iso: "2026-11-11T06:15" },
+    text: "Sorted onto the morning Harrogate route.",
+    by: "Sorting line 2, Leeds East",
   },
   {
-    id: "e1",
-    at: { iso: "2026-11-10T15:22", text: "10 Nov, 15:22" },
-    text: "Shipment booked through the customer portal for next-day delivery.",
-    by: "Hollowmere Home Goods",
-  },
-]
-
-const items = [
-  {
-    sku: "KT-1180",
-    description: "Stainless steel kettle, 1.7 l",
-    quantity: 2,
-    unitKg: 1.4,
+    id: "depot",
+    at: { text: "10 Nov, 21:48", iso: "2026-11-10T21:48" },
+    text: "Arrived at the Leeds East depot and scanned in with all four items.",
+    by: "Inbound scanner, Leeds East",
   },
   {
-    sku: "MG-0425",
-    description: "Stoneware mug set of four",
-    quantity: 3,
-    unitKg: 2.1,
+    id: "collected",
+    at: { text: "10 Nov, 17:05", iso: "2026-11-10T17:05" },
+    text: "Collected from the sender's warehouse in Wakefield.",
+    by: "Dana Price",
   },
   {
-    sku: "TL-3302",
-    description: "Linen tea towels, pack of three",
-    quantity: 4,
-    unitKg: 0.35,
-  },
-  {
-    sku: "CB-0917",
-    description: "Oak chopping board, large",
-    quantity: 1,
-    unitKg: 1.9,
+    id: "booked",
+    at: { text: "10 Nov, 15:22", iso: "2026-11-10T15:22" },
+    text: "Booked online by the sender for next-day delivery.",
+    by: "Halden Garden Supplies",
   },
 ]
-const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0)
-const totalKg = items.reduce(
-  (sum, item) => sum + item.quantity * item.unitKg,
-  0
-)
-const kg = (value: number) => value.toFixed(2)
 
-type Note = { id: string; text: string; by: string; at: Stamp }
+const ITEMS = [
+  { sku: "HGS-2041", description: "Glazed planter, 30 cm", quantity: 6, unitKg: 2.4 },
+  { sku: "HGS-1187", description: "Seed tray, pack of 5", quantity: 10, unitKg: 0.35 },
+  { sku: "HGS-3310", description: "Watering can, 10 l", quantity: 4, unitKg: 0.9 },
+  { sku: "HGS-0952", description: "Peat-free compost, 20 l", quantity: 3, unitKg: 8.5 },
+]
+const lineKg = (item: (typeof ITEMS)[number]) =>
+  Math.round(item.quantity * item.unitKg * 10) / 10
+const TOTAL_QUANTITY = ITEMS.reduce((sum, item) => sum + item.quantity, 0)
+const TOTAL_KG = ITEMS.reduce((sum, item) => sum + lineKg(item), 0)
+const kg = (value: number) => value.toFixed(1)
 
-const initialNotes: Note[] = [
+type Note = { id: number; text: string; by: string; at: Stamp }
+
+const INITIAL_NOTES: Note[] = [
   {
-    id: "n2",
-    text: "Customer asked us to leave it with the neighbour at number 14 if nobody answers.",
-    by: "Dev Ahuja",
-    at: { iso: "2026-11-11T11:48", text: "11 Nov, 11:48" },
-  },
-  {
-    id: "n1",
-    text: "Called the recipient to confirm the new window. They are home until 17:00.",
+    id: 2,
+    text: "Customer asked for the parcels to go to the side gate if the front desk is closed.",
     by: "Priya Nair",
-    at: { iso: "2026-11-11T09:12", text: "11 Nov, 09:12" },
+    at: { text: "11 Nov, 09:12", iso: "2026-11-11T09:12" },
+  },
+  {
+    id: 1,
+    text: "Compost bags rewrapped at the depot after one split in the cage.",
+    by: "Owen Clarke",
+    at: { text: "10 Nov, 22:05", iso: "2026-11-10T22:05" },
   },
 ]
 
-function State({ dot, word }: { dot: string; word: string }) {
+const DOT: Record<Tone, string> = {
+  success: "bg-success",
+  caution: "bg-tertiary",
+  failed: "bg-destructive",
+  neutral: "bg-muted-foreground",
+}
+
+function State({ tone, word }: { tone: Tone; word: string }) {
   return (
     <span className="inline-flex items-center gap-2">
       <span
         aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", dot)}
+        className={cn("size-2 shrink-0 rounded-full", DOT[tone])}
       />
       <span className="text-body text-foreground">{word}</span>
     </span>
   )
 }
 
-function PanelHeading({
-  children,
-  aside,
-}: {
-  children: React.ReactNode
-  aside?: React.ReactNode
-}) {
+function StampTime({ at, className }: { at: Stamp; className?: string }) {
   return (
-    <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
-      <h2 className={label}>{children}</h2>
-      {aside}
-    </div>
+    <time dateTime={at.iso} className={className}>
+      {at.text}
+    </time>
   )
 }
 
 export function App() {
   const [menuOpen, setMenuOpen] = React.useState(false)
   const [delivered, setDelivered] = React.useState(false)
-  const [events, setEvents] = React.useState(initialEvents)
-  const [notes, setNotes] = React.useState(initialNotes)
-  const [draft, setDraft] = React.useState("")
+  const [notes, setNotes] = React.useState<Note[]>(INITIAL_NOTES)
+  const [noteText, setNoteText] = React.useState("")
   const [noteError, setNoteError] = React.useState(false)
-  const [status, setStatus] = React.useState("")
   const menuButtonRef = React.useRef<HTMLButtonElement>(null)
   const noteRef = React.useRef<HTMLTextAreaElement>(null)
 
-  function onHeaderKeyDown(event: React.KeyboardEvent) {
+  const events: TimelineEvent[] = delivered
+    ? [
+        {
+          id: "delivered",
+          at: NOW,
+          text: "Delivered to Ripley Court Garden Centre and signed for at the front desk.",
+          by: SIGNED_IN,
+          state: { tone: "success", word: "Delivered" },
+        },
+        ...EVENTS,
+      ]
+    : EVENTS
+
+  function onHeaderKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (menuOpen && event.key === "Escape") {
       setMenuOpen(false)
       menuButtonRef.current?.focus()
     }
   }
 
-  function markDelivered() {
-    if (delivered) return
-    setDelivered(true)
-    setEvents((current) => [
-      {
-        id: "e7",
-        at: NOW,
-        text: "Delivered to the recipient at the front door and signed for.",
-        by: SIGNED_IN,
-        state: { word: "Delivered", dot: "bg-success" },
-      },
-      ...current,
-    ])
-    setStatus(`Shipment ${SHIPMENT_ID} marked as delivered.`)
-  }
-
   function addNote(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const text = draft.trim()
+    const text = noteText.trim()
     if (!text) {
       setNoteError(true)
       noteRef.current?.focus()
       return
     }
     setNotes((current) => [
-      { id: `n${Date.now()}`, text, by: SIGNED_IN, at: NOW },
+      { id: Date.now(), text, by: SIGNED_IN, at: NOW },
       ...current,
     ])
-    setDraft("")
-    setNoteError(false)
+    setNoteText("")
   }
-
-  const currentStep = delivered ? -1 : CURRENT_STEP
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
@@ -253,60 +212,59 @@ export function App() {
           <a
             href="/"
             className={cn(
-              "font-heading text-h2 transition-colors duration-150",
+              "font-heading text-h2 text-foreground transition-colors duration-150",
               focusRing
             )}
           >
             Northgate
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-5">
-              {navItems.map((item) => (
-                <li key={item.href}>
+            <ul className="flex items-center gap-5">
+              {NAV.map((link) => (
+                <li key={link.href}>
                   <a
-                    href={item.href}
-                    aria-current={item.current ? "true" : undefined}
-                    className={cn(navLink, item.current && "text-foreground")}
+                    href={link.href}
+                    aria-current={link.current ? "true" : undefined}
+                    className={link.current ? currentNavLink : navLink}
                   >
-                    {item.label}
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <p className={cn(smallFigure, "ml-auto hidden md:block")}>
+          <span className={cn("ml-auto hidden md:block", smallFigure)}>
             {SIGNED_IN}
-          </p>
+          </span>
           <Button
             ref={menuButtonRef}
             variant="outline"
-            className={cn(buttonText, "ml-auto md:hidden")}
+            className={cn("ml-auto md:hidden", buttonText)}
             aria-expanded={menuOpen}
-            aria-controls="main-menu"
+            aria-controls="mobile-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="main-menu"
+          id="mobile-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t md:hidden"
         >
-          <ul className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
-            {navItems.map((item) => (
-              <li key={item.href}>
+          <ul className="mx-auto max-w-[1280px] px-3 py-2">
+            {NAV.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={item.href}
-                  aria-current={item.current ? "true" : undefined}
+                  href={link.href}
+                  aria-current={link.current ? "true" : undefined}
                   className={cn(
-                    navLink,
                     "block py-2",
-                    item.current && "text-foreground"
+                    link.current ? currentNavLink : navLink
                   )}
                 >
-                  {item.label}
+                  {link.label}
                 </a>
               </li>
             ))}
@@ -315,39 +273,44 @@ export function App() {
       </header>
 
       <main className="mx-auto grid max-w-[1280px] grid-cols-1 gap-5 px-3 py-5 md:grid-cols-12 md:px-5">
-        {/* Page header */}
         <div className="md:col-span-12">
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2">
-            <a href="/shipments" className={navLink}>
-              Shipments
-            </a>
-            <span
-              aria-hidden="true"
-              className="font-mono text-label text-muted-foreground"
-            >
-              /
-            </span>
-            <span
-              aria-current="page"
-              className="font-mono text-label text-foreground tabular-nums"
-            >
-              {SHIPMENT_ID}
-            </span>
+          <nav aria-label="Breadcrumb">
+            <ol className="flex flex-wrap items-center gap-2">
+              <li>
+                <a href="/shipments" className={navLink}>
+                  Shipments
+                </a>
+              </li>
+              <li
+                aria-hidden="true"
+                className="font-mono text-label text-muted-foreground"
+              >
+                /
+              </li>
+              <li>
+                <span
+                  aria-current="page"
+                  className="font-mono text-label text-foreground tabular-nums"
+                >
+                  NG-48213
+                </span>
+              </li>
+            </ol>
           </nav>
           <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-h1">
-                Shipment <span className="font-mono">{SHIPMENT_ID}</span>
+                Shipment <span className="font-mono">NG-48213</span>
               </h1>
               {delivered ? (
-                <State dot="bg-success" word="Delivered" />
+                <State tone="success" word="Delivered" />
               ) : (
-                <State dot="bg-muted-foreground" word="Out for delivery" />
+                <State tone="neutral" word="Out for delivery" />
               )}
               {!delivered && (
                 <Badge
                   variant="outline"
-                  className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
+                  className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label uppercase text-tertiary-foreground"
                 >
                   Delayed
                 </Badge>
@@ -364,90 +327,71 @@ export function App() {
                 className={buttonText}
                 disabled={delivered}
                 focusableWhenDisabled
-                onClick={markDelivered}
+                onClick={() => setDelivered(true)}
               >
                 Mark as delivered
               </Button>
             </div>
           </div>
           <div role="status" className="sr-only">
-            {status}
+            {delivered ? "Shipment NG-48213 marked as delivered." : ""}
           </div>
         </div>
 
-        {/* Main column */}
         <div className="flex flex-col gap-5 md:col-span-12 lg:col-span-8">
-          <section className="rounded-xl border bg-card p-5">
-            <PanelHeading>Progress</PanelHeading>
+          <section aria-labelledby="progress-heading" className={panel}>
+            <div className={headingRow}>
+              <h2 id="progress-heading" className={label}>
+                Progress
+              </h2>
+            </div>
             <ol className="mt-3 grid gap-3 md:grid-cols-5">
-              {steps.map((step, index) => {
-                const isLast = index === steps.length - 1
-                const done = delivered || index < CURRENT_STEP
-                const current = index === currentStep
-                const reached = delivered && isLast ? NOW : step.reached
+              {STEPS.map((step, index) => {
+                const status = delivered
+                  ? "done"
+                  : index < 3
+                    ? "done"
+                    : index === 3
+                      ? "current"
+                      : "next"
+                const at =
+                  delivered && index === STEPS.length - 1 ? NOW : step.at
                 return (
                   <li
                     key={step.name}
-                    aria-current={current ? "step" : undefined}
+                    aria-current={status === "current" ? "step" : undefined}
                     className="flex gap-3 md:flex-col md:gap-2"
                   >
                     <span
                       aria-hidden="true"
                       className={cn(
                         "flex size-5 shrink-0 items-center justify-center rounded-sm border",
-                        done &&
+                        status === "done" &&
                           "border-secondary bg-secondary text-secondary-foreground",
-                        current && "border-primary bg-primary",
-                        !done && !current && "border-muted-foreground"
+                        status === "current" && "border-primary bg-primary",
+                        status === "next" && "border-muted-foreground"
                       )}
                     >
-                      {done && (
-                        <Check
-                          className="size-4"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        />
+                      {status === "done" && (
+                        <Check className="size-4" strokeWidth={1.5} />
                       )}
                     </span>
-                    <div>
+                    <div className="min-w-0">
                       <p className="font-sans text-body font-medium">
                         {step.name}
                         <span className="sr-only">
-                          {done
+                          {status === "done"
                             ? ", Done"
-                            : current
+                            : status === "current"
                               ? ", Current"
                               : ", To come"}
                         </span>
                       </p>
-                      {done || current ? (
-                        reached && (
-                          <time
-                            dateTime={reached.iso}
-                            className={cn(
-                              smallFigure,
-                              "block whitespace-nowrap"
-                            )}
-                          >
-                            {reached.text}
-                          </time>
-                        )
-                      ) : (
-                        <>
-                          <p className={label}>Expected</p>
-                          {step.expected && (
-                            <time
-                              dateTime={step.expected.iso}
-                              className={cn(
-                                smallFigure,
-                                "block whitespace-nowrap"
-                              )}
-                            >
-                              {step.expected.text}
-                            </time>
-                          )}
-                        </>
-                      )}
+                      {status === "next" && <p className={label}>Expected</p>}
+                      <StampTime
+                        at={at}
+                        className={cn("block whitespace-nowrap", smallFigure)}
+                      />
                     </div>
                   </li>
                 )
@@ -455,68 +399,69 @@ export function App() {
             </ol>
           </section>
 
-          <section className="overflow-hidden rounded-xl border bg-card">
+          <section aria-labelledby="timeline-heading" className={rowsPanel}>
             <div className="border-b px-5 pt-5 pb-3">
-              <PanelHeading>Timeline</PanelHeading>
+              <div className={headingRow}>
+                <h2 id="timeline-heading" className={label}>
+                  Timeline
+                </h2>
+              </div>
             </div>
             <ol>
-              {events.map((event, index) => (
+              {events.map((event) => (
                 <li
                   key={event.id}
-                  className={cn(
-                    "flex flex-col px-5 py-3 md:flex-row md:items-baseline md:gap-5",
-                    index > 0 && "border-t"
-                  )}
+                  className="flex flex-col border-t px-5 py-3 first:border-t-0 md:flex-row md:items-baseline md:gap-5"
                 >
-                  <time
-                    dateTime={event.at.iso}
-                    className={cn(smallFigure, "block md:w-32 md:shrink-0")}
-                  >
-                    {event.at.text}
-                  </time>
+                  <StampTime
+                    at={event.at}
+                    className={cn("md:w-32 md:shrink-0", smallFigure)}
+                  />
                   <div className="mt-1 min-w-0 md:mt-0">
                     {event.state && (
                       <div className="mb-1">
-                        <State dot={event.state.dot} word={event.state.word} />
+                        <State {...event.state} />
                       </div>
                     )}
                     <p className="text-body">{event.text}</p>
-                    <p className={cn(smallFigure, "mt-1")}>{event.by}</p>
+                    <p className={cn("mt-1", smallFigure)}>{event.by}</p>
                   </div>
                 </li>
               ))}
             </ol>
           </section>
 
-          <section className="flex-1 overflow-hidden rounded-xl border bg-card">
+          <section
+            aria-labelledby="items-heading"
+            className={cn("flex-1", rowsPanel)}
+          >
             <div className="border-b px-5 pt-5 pb-3">
-              <PanelHeading
-                aside={
-                  <p className={smallFigure}>
-                    {items.length} {items.length === 1 ? "item" : "items"}
-                  </p>
-                }
-              >
-                Items
-              </PanelHeading>
+              <div className={headingRow}>
+                <h2 id="items-heading" className={label}>
+                  Items
+                </h2>
+                <span className={smallFigure}>
+                  {ITEMS.length} {ITEMS.length === 1 ? "item" : "items"}
+                </span>
+              </div>
             </div>
             <Table label="Items" className="text-body">
               <TableHeader>
                 <TableRow>
-                  <TableHead className={cn(label, "px-5")}>SKU</TableHead>
-                  <TableHead className={cn(label, "px-5")}>
+                  <TableHead className={cn("px-5", label)}>SKU</TableHead>
+                  <TableHead className={cn("px-5", label)}>
                     Description
                   </TableHead>
-                  <TableHead className={cn(label, "px-5 text-right")}>
+                  <TableHead className={cn("px-5 text-right", label)}>
                     Quantity
                   </TableHead>
-                  <TableHead className={cn(label, "px-5 text-right")}>
+                  <TableHead className={cn("px-5 text-right", label)}>
                     Weight <span className="normal-case">(kg)</span>
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.map((item) => (
+                {ITEMS.map((item) => (
                   <TableRow key={item.sku}>
                     <TableCell className="px-5 py-2 font-mono tabular-nums">
                       {item.sku}
@@ -528,7 +473,7 @@ export function App() {
                       {item.quantity}
                     </TableCell>
                     <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                      {kg(item.quantity * item.unitKg)}
+                      {kg(lineKg(item))}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -538,10 +483,10 @@ export function App() {
                   <TableCell className="px-5 py-2">Total</TableCell>
                   <TableCell className="px-5 py-2" />
                   <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                    {totalQuantity}
+                    {TOTAL_QUANTITY}
                   </TableCell>
                   <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                    {kg(totalKg)}
+                    {kg(TOTAL_KG)}
                   </TableCell>
                 </TableRow>
               </TableFooter>
@@ -549,86 +494,97 @@ export function App() {
           </section>
         </div>
 
-        {/* Side column */}
         <div className="flex flex-col gap-5 md:col-span-12 lg:col-span-4">
-          <section className="rounded-xl border bg-card p-5">
-            <PanelHeading>Details</PanelHeading>
+          <section aria-labelledby="details-heading" className={panel}>
+            <div className={headingRow}>
+              <h2 id="details-heading" className={label}>
+                Details
+              </h2>
+            </div>
             <dl className="mt-3">
               {[
-                { term: "Customer", value: "Hollowmere Home Goods" },
+                { term: "Customer", value: "Ripley Court Garden Centre" },
                 { term: "Service", value: "Next day, before 12:00" },
-                { term: "Depot", value: "Ashby Cross" },
+                { term: "Depot", value: "Leeds East" },
                 {
                   term: "Weight",
                   value: (
                     <span className="font-mono tabular-nums">
-                      {kg(totalKg)} kg
+                      {kg(TOTAL_KG)} kg
                     </span>
                   ),
                 },
                 {
                   term: "Booked",
                   value: (
-                    <time
-                      dateTime="2026-11-10T15:22"
+                    <StampTime
+                      at={STEPS[0].at}
                       className="font-mono tabular-nums"
-                    >
-                      10 Nov, 15:22
-                    </time>
+                    />
                   ),
                 },
                 {
                   term: "Due",
                   value: (
-                    <time
-                      dateTime="2026-11-11T12:00"
+                    <StampTime
+                      at={{ text: "11 Nov, 12:00", iso: "2026-11-11T12:00" }}
                       className="font-mono tabular-nums"
-                    >
-                      11 Nov, 12:00
-                    </time>
+                    />
                   ),
                 },
-              ].map((row, index) => (
+              ].map((row) => (
                 <div
                   key={row.term}
-                  className={cn(
-                    "flex items-baseline justify-between gap-3 py-2",
-                    index > 0 && "border-t"
-                  )}
+                  className="flex items-baseline justify-between gap-3 border-t py-2 first:border-t-0"
                 >
                   <dt className={label}>{row.term}</dt>
-                  <dd className="text-right text-body">{row.value}</dd>
+                  <dd className="text-right text-body text-foreground">
+                    {row.value}
+                  </dd>
                 </div>
               ))}
             </dl>
           </section>
 
-          <section className="rounded-xl border bg-card p-5">
-            <PanelHeading>Addresses</PanelHeading>
+          <section aria-labelledby="addresses-heading" className={panel}>
+            <div className={headingRow}>
+              <h2 id="addresses-heading" className={label}>
+                Addresses
+              </h2>
+            </div>
             <div className="mt-3">
               <div>
                 <h3 className={label}>From</h3>
                 <address className="mt-1 text-body not-italic">
-                  <span className="block">Hollowmere Home Goods</span>
-                  <span className="block">
-                    Unit 6, Brackenfield Trading Estate
-                  </span>
-                  <span className="block">DE55 7RT Alfreton</span>
+                  Halden Garden Supplies
+                  <br />
+                  Unit 4, Calder Park
+                  <br />
+                  WF2 7AB Wakefield
                 </address>
               </div>
               <div className="mt-5 border-t pt-5">
                 <h3 className={label}>To</h3>
                 <address className="mt-1 text-body not-italic">
-                  <span className="block">Joanna Whitlock</span>
-                  <span className="block">12 Rowan Close</span>
-                  <span className="block">NG22 8QH Kelham</span>
+                  Ripley Court Garden Centre
+                  <br />
+                  18 Station Parade
+                  <br />
+                  HG1 1TE Harrogate
                 </address>
               </div>
             </div>
           </section>
 
-          <section className="flex-1 rounded-xl border bg-card p-5">
-            <PanelHeading>Notes</PanelHeading>
+          <section
+            aria-labelledby="notes-heading"
+            className={cn("flex-1", panel)}
+          >
+            <div className={headingRow}>
+              <h2 id="notes-heading" className={label}>
+                Notes
+              </h2>
+            </div>
             <form noValidate onSubmit={addNote} className="mt-3">
               <div className="flex flex-col gap-2">
                 <label htmlFor="note" className={label}>
@@ -637,9 +593,9 @@ export function App() {
                 <Textarea
                   ref={noteRef}
                   id="note"
-                  value={draft}
+                  value={noteText}
                   onChange={(event) => {
-                    setDraft(event.target.value)
+                    setNoteText(event.target.value)
                     setNoteError(false)
                   }}
                   aria-invalid={noteError || undefined}
@@ -653,9 +609,9 @@ export function App() {
                   className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
                 >
                   <CircleAlert
+                    aria-hidden="true"
                     className="size-4 shrink-0"
                     strokeWidth={1.5}
-                    aria-hidden="true"
                   />
                   Write a note first.
                 </p>
@@ -663,7 +619,7 @@ export function App() {
               <Button
                 type="submit"
                 variant="secondary"
-                className={cn(buttonText, "mt-3")}
+                className={cn("mt-3", buttonText)}
               >
                 Add note
               </Button>
@@ -672,9 +628,8 @@ export function App() {
               {notes.map((note) => (
                 <li key={note.id} className="border-t py-3 last:pb-0">
                   <p className="text-body wrap-break-word">{note.text}</p>
-                  <p className={cn(smallFigure, "mt-1")}>
-                    {note.by} ·{" "}
-                    <time dateTime={note.at.iso}>{note.at.text}</time>
+                  <p className={cn("mt-1", smallFigure)}>
+                    {note.by} · <StampTime at={note.at} />
                   </p>
                 </li>
               ))}

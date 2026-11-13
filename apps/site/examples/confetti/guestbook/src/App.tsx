@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState, type FormEvent } from "react"
-import { flushSync } from "react-dom"
 import { CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -7,7 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 
 type Message = {
-  id: string
+  id: number
   name: string
   initials: string
   relation: string | null
@@ -15,67 +14,70 @@ type Message = {
   text: string
 }
 
-const SAMPLE_MESSAGES: Message[] = [
+const INITIAL_MESSAGES: Message[] = [
   {
-    id: "m6",
+    id: 6,
     name: "Juno Pell",
     initials: "JP",
     relation: "Margot's daughter, aged 9",
     date: { iso: "2027-04-09", text: "9 April 2027" },
-    text: "I am going to dance every dance, even the slow ones. Rafe, you promised me the one with the arches, and I have not forgotten.",
+    text: "I am going to dance every single dance. Rafe, you promised me the one with the arches, and I have not forgotten.",
   },
   {
-    id: "m5",
+    id: 5,
     name: "Tobias Wren",
     initials: "TW",
     relation: "Your neighbour on Saltry Lane",
     date: { iso: "2027-04-01", text: "1 April 2027" },
-    text: "The croquet set is yours to borrow for the day, hoops and all. I hope your garden grows faster than mine ever has.",
+    text: "The croquet set is yours to borrow for the day, hoops and all. I wish you a garden that grows faster than mine.",
   },
   {
-    id: "m4",
+    id: 4,
     name: "Hester Quayle",
     initials: "HQ",
     relation: "Clem's friend from the library",
     date: { iso: "2027-03-24", text: "24 March 2027" },
-    text: "I still think of you reading recipes aloud at the issue desk on quiet afternoons. May the new kitchen hear plenty of them.",
+    text: "I still remember Clem reading recipes aloud at the issue desk on quiet afternoons. I hope your new kitchen hears plenty of them.",
   },
   {
-    id: "m3",
+    id: 3,
     name: "Dev Raman",
     initials: "DR",
     relation: "Rafe's flatmate at university",
     date: { iso: "2027-03-15", text: "15 March 2027" },
-    text: "I knew years ago that Rafe would marry someone who could out-walk him. I am very glad it is Clem.",
+    text: "I have known for years that Rafe would marry someone who could out-walk him. I am so glad it is Clem.",
   },
   {
-    id: "m2",
+    id: 2,
     name: "Ade Fairbrother",
     initials: "AF",
     relation: "Clem's cousin",
     date: { iso: "2027-03-09", text: "9 March 2027" },
-    text: "The family has waited a long time for a ceilidh. I have been practising in the kitchen, so stand well back.",
+    text: "The family has waited a long time for a ceilidh. I have been practising in the kitchen, so watch your toes.",
   },
   {
-    id: "m1",
+    id: 1,
     name: "Margot Pell",
     initials: "MP",
     relation: "Clem's godmother",
     date: { iso: "2027-03-02", text: "2 March 2027" },
-    text: "I held you at your christening, Clem, and now I get to see you married. I will try very hard not to cry at the barn.",
+    text: "I held you at your christening, Clem. I will try very hard not to cry at the barn, but I make no promises.",
   },
 ]
 
-const MESSAGE_MAX = 500
+const MAX_LENGTH = 500
+const EMAIL = "hello@clemandrafe.example"
 
-const focusOutline =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const navLinkClass =
+  "inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 hover:underline transition-colors duration-150 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLinkClass = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 hover:underline transition-colors duration-150 ${focusOutline}`
+const textLinkClass =
+  "text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const runningLinkClass = `text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150 ${focusOutline}`
+const codeFocusClass =
+  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
 
-const NAV_LINKS = [
+const NAV = [
   { label: "Reply", href: "/rsvp" },
   { label: "Gifts", href: "/gifts" },
   { label: "The day", href: "/day" },
@@ -84,35 +86,45 @@ const NAV_LINKS = [
 
 type Errors = { name?: string; message?: string }
 
-function initialsFrom(name: string) {
+function initialsOf(name: string) {
   return name
     .split(/\s+/)
     .filter(Boolean)
     .slice(0, 2)
-    .map((word) => Array.from(word)[0].toUpperCase())
+    .map((word) => word.charAt(0).toUpperCase())
     .join("")
 }
 
-function plural(n: number, one: string, many: string) {
+function countLabel(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`
 }
 
 export function App() {
-  const [messages, setMessages] = useState<Message[]>(SAMPLE_MESSAGES)
+  const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES)
   const [name, setName] = useState("")
   const [relation, setRelation] = useState("")
   const [text, setText] = useState("")
   const [errors, setErrors] = useState<Errors>({})
-  const [thanksName, setThanksName] = useState<string | null>(null)
-  const nextId = useRef(1)
+  const [sendCount, setSendCount] = useState(0)
+  const [thankedName, setThankedName] = useState<string | null>(null)
 
+  const nextId = useRef(INITIAL_MESSAGES.length + 1)
   const nameRef = useRef<HTMLInputElement>(null)
   const messageRef = useRef<HTMLTextAreaElement>(null)
   const thanksRef = useRef<HTMLHeadingElement>(null)
 
+  // After a send with errors has rendered, move focus to the first field with an error.
   useEffect(() => {
-    if (thanksName !== null) thanksRef.current?.focus()
-  }, [thanksName])
+    if (sendCount === 0) return
+    if (errors.name) nameRef.current?.focus()
+    else if (errors.message) messageRef.current?.focus()
+    // Only a new send moves focus, not an error line that goes away.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sendCount])
+
+  useEffect(() => {
+    if (thankedName) thanksRef.current?.focus()
+  }, [thankedName])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -120,33 +132,35 @@ export function App() {
     const trimmedRelation = relation.trim()
     const trimmedText = text.trim()
 
-    const next: Errors = {}
-    if (!trimmedName) next.name = "Write your name, so they know who it is from."
-    if (!trimmedText) next.message = "Write a message. A line or two is plenty."
+    const nextErrors: Errors = {}
+    if (!trimmedName)
+      nextErrors.name = "Write your name, so they know who it is from."
+    if (!trimmedText)
+      nextErrors.message = "Write a message. A line or two is plenty."
 
-    if (next.name || next.message) {
-      flushSync(() => setErrors(next))
-      if (next.name) nameRef.current?.focus()
-      else messageRef.current?.focus()
+    if (nextErrors.name || nextErrors.message) {
+      setErrors(nextErrors)
+      setSendCount((n) => n + 1)
       return
     }
 
-    setErrors({})
+    const id = nextId.current++
     setMessages((list) => [
       {
-        id: `new-${nextId.current++}`,
+        id,
         name: trimmedName,
-        initials: initialsFrom(trimmedName),
+        initials: initialsOf(trimmedName),
         relation: trimmedRelation || null,
         date: null,
         text: trimmedText,
       },
       ...list,
     ])
-    setThanksName(trimmedName)
+    setErrors({})
+    setThankedName(trimmedName)
   }
 
-  const charsLeft = MESSAGE_MAX - text.length
+  const charsLeft = MAX_LENGTH - text.length
 
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
@@ -154,13 +168,13 @@ export function App() {
         <div className="mx-auto flex max-w-[1088px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
           <a
             href="/"
-            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
+            className="inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             Clem &amp; Rafe
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
             <ul className="flex flex-wrap gap-x-6">
-              {NAV_LINKS.map((link) => (
+              {NAV.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -185,7 +199,10 @@ export function App() {
         >
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
-              <p className="font-mono text-label">For Clem and Rafe</p>
+              <p className="font-mono text-label tabular-nums">
+                <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
+                Little Saltry
+              </p>
               <h1 id="opening-heading" className="text-h1 md:text-display">
                 Leave us a few words
               </h1>
@@ -207,10 +224,10 @@ export function App() {
                 Messages
               </h2>
               <p className="font-mono text-label text-muted-foreground tabular-nums">
-                {plural(messages.length, "message", "messages")}
+                {countLabel(messages.length, "message", "messages")}
               </p>
             </div>
-            <ul className="flex list-none flex-col gap-6 p-0">
+            <ul className="flex flex-col gap-6">
               {messages.map((message) => (
                 <li
                   key={message.id}
@@ -227,7 +244,7 @@ export function App() {
                       <h3 className="text-body wrap-break-word">
                         {message.name}
                       </h3>
-                      <p className="font-mono text-label text-muted-foreground tabular-nums wrap-break-word">
+                      <p className="font-mono text-label wrap-break-word text-muted-foreground tabular-nums">
                         {message.relation && <>{message.relation} · </>}
                         {message.date ? (
                           <time dateTime={message.date.iso}>
@@ -258,7 +275,7 @@ export function App() {
               </p>
             </div>
             <div className="rounded-xl border border-border bg-card p-6">
-              {thanksName === null && (
+              {!thankedName && (
                 <form
                   noValidate
                   aria-label="Write in the guestbook"
@@ -268,14 +285,13 @@ export function App() {
                   <div className="flex flex-col gap-2">
                     <label
                       htmlFor="guest-name"
-                      className="block font-mono text-label text-foreground"
+                      className="block font-mono text-label"
                     >
                       Your name
                     </label>
                     <Input
-                      ref={nameRef}
                       id="guest-name"
-                      name="name"
+                      ref={nameRef}
                       autoComplete="name"
                       maxLength={60}
                       value={name}
@@ -296,9 +312,9 @@ export function App() {
                         className="flex items-start gap-2 font-mono text-label text-destructive"
                       >
                         <CircleAlert
-                          className="size-4 shrink-0"
-                          strokeWidth={1.5}
                           aria-hidden="true"
+                          strokeWidth={1.5}
+                          className="size-4 shrink-0"
                         />
                         <span>{errors.name}</span>
                       </p>
@@ -308,13 +324,12 @@ export function App() {
                   <div className="flex flex-col gap-2">
                     <label
                       htmlFor="guest-relation"
-                      className="block font-mono text-label text-foreground"
+                      className="block font-mono text-label"
                     >
                       How you know Clem and Rafe (optional)
                     </label>
                     <Input
                       id="guest-relation"
-                      name="relation"
                       autoComplete="off"
                       maxLength={60}
                       value={relation}
@@ -333,15 +348,14 @@ export function App() {
                   <div className="flex flex-col gap-2">
                     <label
                       htmlFor="guest-message"
-                      className="block font-mono text-label text-foreground"
+                      className="block font-mono text-label"
                     >
                       Your message
                     </label>
                     <Textarea
-                      ref={messageRef}
                       id="guest-message"
-                      name="message"
-                      maxLength={MESSAGE_MAX}
+                      ref={messageRef}
+                      maxLength={MAX_LENGTH}
                       value={text}
                       onChange={(event) => {
                         setText(event.target.value)
@@ -360,7 +374,7 @@ export function App() {
                       id="guest-message-count"
                       className="font-mono text-label text-muted-foreground tabular-nums"
                     >
-                      {plural(charsLeft, "character left", "characters left")}
+                      {countLabel(charsLeft, "character left", "characters left")}
                     </p>
                     {errors.message && (
                       <p
@@ -368,9 +382,9 @@ export function App() {
                         className="flex items-start gap-2 font-mono text-label text-destructive"
                       >
                         <CircleAlert
-                          className="size-4 shrink-0"
-                          strokeWidth={1.5}
                           aria-hidden="true"
+                          strokeWidth={1.5}
+                          className="size-4 shrink-0"
                         />
                         <span>{errors.message}</span>
                       </p>
@@ -386,14 +400,14 @@ export function App() {
                 </form>
               )}
               <div role="status">
-                {thanksName !== null && (
-                  <div className="flex flex-col gap-3 text-foreground">
+                {thankedName && (
+                  <div className="flex flex-col gap-3">
                     <h3
                       ref={thanksRef}
                       tabIndex={-1}
-                      className="text-h2 wrap-break-word focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+                      className={`text-h2 wrap-break-word ${codeFocusClass}`}
                     >
-                      Thank you, {thanksName}
+                      Thank you, {thankedName}
                     </h3>
                     <p className="text-body">
                       Your message is at the top of the guestbook.
@@ -425,17 +439,14 @@ export function App() {
         <div className="mx-auto flex max-w-[1088px] flex-col gap-3 px-6 py-10 md:flex-row md:items-center md:justify-between">
           <p className="font-heading text-h2">Clem &amp; Rafe</p>
           <div className="flex flex-col gap-2 md:items-end">
-            <p className="font-mono text-label text-muted-foreground">
+            <p className="font-mono text-label text-muted-foreground tabular-nums">
               <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
               Quillbrook Barn, Little Saltry
             </p>
-            <p className="font-mono text-label text-muted-foreground wrap-break-word">
+            <p className="font-mono text-label wrap-break-word text-muted-foreground">
               Questions:{" "}
-              <a
-                href="mailto:hello@clemandrafe.example"
-                className={runningLinkClass}
-              >
-                hello@clemandrafe.example
+              <a href={`mailto:${EMAIL}`} className={textLinkClass}>
+                {EMAIL}
               </a>
             </p>
           </div>

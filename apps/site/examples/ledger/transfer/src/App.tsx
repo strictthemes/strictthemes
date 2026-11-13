@@ -12,20 +12,21 @@ import {
 } from "@/components/ui/select"
 import { DatePicker } from "@/date-picker"
 import {
-  amountInWords,
   formatLongDate,
   formatMoney,
   formatShortDate,
   isoDate,
-  sameDay,
-} from "@/lib/format"
+  isSameDay,
+  moneyInWords,
+} from "@/format"
 import { cn } from "@/lib/utils"
 
-// The sample's today, fixed: never the device clock.
+// The sample's today: a fixed date, never the device clock.
 const TODAY = new Date(2026, 10, 27)
 const LATEST = new Date(2027, 0, 26)
-const LIMIT = 1_000_000 // pence: £10,000.00
+const LIMIT = 1_000_000 // £10,000.00 in pence
 
+const CONTAINER = "mx-auto w-full max-w-[1200px] px-4 md:px-6"
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const CODE_FOCUS =
@@ -34,7 +35,6 @@ const LABEL = "font-mono text-label uppercase text-muted-foreground"
 const SMALL = "font-mono text-label tabular-nums text-muted-foreground"
 const BUTTON = "px-4 font-mono text-label uppercase"
 const TEXT_LINK = `text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${FOCUS}`
-const CONTAINER = "mx-auto w-full max-w-[1200px] px-4 md:px-6"
 
 const NAV = [
   { label: "Overview", href: "/" },
@@ -45,36 +45,28 @@ const NAV = [
 ]
 const CURRENT = "/payment"
 
-type Account = {
-  value: string
-  label: string
-  inSentence: string
-  balance: number
-}
-
-const ACCOUNTS: Account[] = [
-  {
-    value: "current",
+type AccountId = "current" | "reserve"
+const ACCOUNTS: Record<
+  AccountId,
+  { label: string; inSentence: string; balance: number }
+> = {
+  current: {
     label: "Current account · ending 4417",
     inSentence: "the current account",
     balance: 4_821_356,
   },
-  {
-    value: "reserve",
+  reserve: {
     label: "Tax reserve · ending 8830",
     inSentence: "the tax reserve",
     balance: 1_369_071,
   },
-]
-
-type Payee = {
-  value: string
-  label: string
-  sortCode: string
-  account: string
 }
+const ACCOUNT_ITEMS = (Object.keys(ACCOUNTS) as AccountId[]).map((value) => ({
+  value,
+  label: ACCOUNTS[value].label,
+}))
 
-const PAYEES: Payee[] = [
+const PAYEES = [
   {
     value: "copperleaf",
     label: "Copperleaf Paper Mill",
@@ -100,70 +92,69 @@ const PAYEES: Payee[] = [
     account: "92054718",
   },
 ]
+const PAYEE_ITEMS = PAYEES.map(({ value, label }) => ({ value, label }))
 
-const accountItems = ACCOUNTS.map(({ value, label }) => ({ value, label }))
-const payeeItems = PAYEES.map(({ value, label }) => ({ value, label }))
+function payeeDetails(value: string) {
+  const payee = PAYEES.find((p) => p.value === value)
+  return payee ? `Sort code ${payee.sortCode} · Account ${payee.account}` : ""
+}
 
-const findAccount = (value: string) =>
-  ACCOUNTS.find((a) => a.value === value) ?? ACCOUNTS[0]
-const findPayee = (value: string | null) =>
-  PAYEES.find((p) => p.value === value)
-const payeeDetails = (p: Payee) =>
-  `Sort code ${p.sortCode} · Account ${p.account}`
-
-type Field = "payee" | "amount" | "reference"
-type Errors = Partial<Record<Field, string>>
-
-/** Pence from what was typed, or null when it is not an amount. */
+/** Parses an amount to pence, or returns null when it is not one. */
 function parseAmount(raw: string): number | null {
-  const cleaned = raw.replace(/[\s,]/g, "").replace(/^£/, "")
-  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(cleaned)
-  if (!match) return null
-  const pence = Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"))
-  return Number.isSafeInteger(pence) ? pence : null
+  const cleaned = raw.trim().replace(/^£/, "").replace(/[\s,]/g, "")
+  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return null
+  const [pounds, pence = ""] = cleaned.split(".")
+  return Number(pounds) * 100 + Number(pence.padEnd(2, "0"))
 }
 
-type Payment = {
-  account: Account
-  payee: Payee
-  pence: number
-  reference: string
-  date: Date
-}
+type Errors = { payee?: string; amount?: string; reference?: string }
+type Step = "details" | "review" | "done"
+type Sent = { amount: number; payee: string; from: AccountId; date: Date }
 
-type Step = "form" | "review" | "done"
-type FocusTarget = "from" | "words" | "heading" | Field
-
-const HEADINGS: Record<Step, string> = {
-  form: "Payment details",
-  review: "Check the payment",
-  done: "Payment recorded",
-}
-const STEPS: Record<Step, string> = {
-  form: "Step 1 of 3 · Details",
+const STEP_LABEL: Record<Step, string> = {
+  details: "Step 1 of 3 · Details",
   review: "Step 2 of 3 · Review",
   done: "Step 3 of 3 · Done",
 }
+const HEADING: Record<Step, string> = {
+  details: "Payment details",
+  review: "Check the payment",
+  done: "Payment recorded",
+}
 
-function ErrorLine({ id, children }: { id: string; children: string }) {
+function ErrorLine({
+  id,
+  children,
+}: {
+  id: string
+  children: React.ReactNode
+}) {
   return (
-    <p id={id} className="flex items-start gap-2 font-mono text-label text-destructive">
-      <CircleAlert aria-hidden="true" strokeWidth={1.5} className="size-4 shrink-0" />
+    <p
+      id={id}
+      className="flex items-start gap-2 font-mono text-label text-destructive"
+    >
+      <CircleAlert
+        className="size-4 shrink-0"
+        strokeWidth={1.5}
+        aria-hidden="true"
+      />
       <span>{children}</span>
     </p>
   )
 }
 
-function describedBy(...ids: (string | false | undefined)[]) {
-  return ids.filter(Boolean).join(" ") || undefined
+function describedBy(...ids: (string | false | null | undefined)[]) {
+  const list = ids.filter(Boolean).join(" ")
+  return list || undefined
 }
 
 function Header() {
   const [open, setOpen] = React.useState(false)
   const buttonRef = React.useRef<HTMLButtonElement>(null)
 
-  const links = (mobile: boolean) =>
-    NAV.map((link) => {
+  function links(mobile: boolean) {
+    return NAV.map((link) => {
       const current = link.href === CURRENT
       return (
         <li key={link.href}>
@@ -184,6 +175,7 @@ function Header() {
         </li>
       )
     })
+  }
 
   return (
     <header
@@ -196,26 +188,34 @@ function Header() {
       }}
     >
       <div className={cn(CONTAINER, "flex items-center gap-6 py-4")}>
-        <a href="/" className={cn("font-heading text-h2 text-foreground", FOCUS)}>
+        <a
+          href="/"
+          className={cn(
+            "font-heading text-h2 text-foreground transition-colors duration-150",
+            FOCUS
+          )}
+        >
           Fairhold
         </a>
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex gap-6">{links(false)}</ul>
         </nav>
-        <p className={cn(SMALL, "ml-auto hidden md:block")}>Hollis &amp; Vane</p>
+        <p className={cn(SMALL, "ml-auto hidden md:block")}>
+          Hollis &amp; Vane
+        </p>
         <Button
           ref={buttonRef}
           variant="outline"
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
           className={cn(BUTTON, "ml-auto md:hidden")}
+          aria-expanded={open}
+          aria-controls="menu-nav"
+          onClick={() => setOpen((value) => !value)}
         >
           Menu
         </Button>
       </div>
       <nav
-        id="mobile-nav"
+        id="menu-nav"
         aria-label="Main"
         hidden={!open}
         className="border-t border-border md:hidden"
@@ -229,111 +229,114 @@ function Header() {
 }
 
 function PaymentSheet() {
-  const [step, setStep] = React.useState<Step>("form")
-  const [from, setFrom] = React.useState(ACCOUNTS[0].value)
+  const [step, setStep] = React.useState<Step>("details")
+  const [from, setFrom] = React.useState<AccountId>("current")
   const [payee, setPayee] = React.useState<string | null>(null)
   const [amount, setAmount] = React.useState("")
   const [reference, setReference] = React.useState("")
-  const [date, setDate] = React.useState(TODAY)
+  const [date, setDate] = React.useState<Date>(TODAY)
   const [errors, setErrors] = React.useState<Errors>({})
-  const [review, setReview] = React.useState<Payment | null>(null)
-  const [sent, setSent] = React.useState<Payment | null>(null)
-  const [focus, setFocus] = React.useState<{ target: FocusTarget } | null>(null)
+  const [sent, setSent] = React.useState<Sent | null>(null)
 
-  const headingRef = React.useRef<HTMLHeadingElement>(null)
   const fromRef = React.useRef<HTMLButtonElement>(null)
   const payeeRef = React.useRef<HTMLButtonElement>(null)
   const amountRef = React.useRef<HTMLInputElement>(null)
   const referenceRef = React.useRef<HTMLInputElement>(null)
+  const headingRef = React.useRef<HTMLHeadingElement>(null)
   const wordsRef = React.useRef<HTMLParagraphElement>(null)
+  const pendingFocus = React.useRef<React.RefObject<HTMLElement | null> | null>(
+    null
+  )
 
   React.useEffect(() => {
-    if (!focus) return
-    const targets: Record<FocusTarget, React.RefObject<HTMLElement | null>> = {
-      from: fromRef,
-      payee: payeeRef,
-      amount: amountRef,
-      reference: referenceRef,
-      words: wordsRef,
-      heading: headingRef,
+    if (pendingFocus.current) {
+      pendingFocus.current.current?.focus()
+      pendingFocus.current = null
     }
-    targets[focus.target].current?.focus()
-  }, [focus])
+  })
 
-  const account = findAccount(from)
-  const chosenPayee = findPayee(payee)
+  const account = ACCOUNTS[from]
+  const pence = parseAmount(amount) ?? 0
+  const trimmedReference = reference.trim()
+  const chosenPayee = PAYEES.find((p) => p.value === payee)
 
-  const clearError = (...fields: Field[]) =>
+  function clearError(field: keyof Errors) {
     setErrors((current) => {
-      if (!fields.some((f) => current[f])) return current
+      if (!current[field]) return current
       const next = { ...current }
-      for (const f of fields) delete next[f]
+      delete next[field]
       return next
     })
+  }
 
-  function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const typedAmount = amount.trim()
-    const typedReference = reference.trim()
-    setAmount(typedAmount)
-    setReference(typedReference)
+  function check(): Errors {
+    const found: Errors = {}
+    if (!payee) found.payee = "Choose who to pay."
 
-    const next: Errors = {}
-    if (!chosenPayee) next.payee = "Choose who to pay."
-
-    const pence = parseAmount(typedAmount)
-    if (!typedAmount) next.amount = "Enter an amount."
-    else if (pence === null || pence === 0)
-      next.amount = "Enter an amount in pounds and pence, such as 240.50."
-    else if (pence > account.balance)
-      next.amount = `That is more than the ${formatMoney(account.balance)} available in this account.`
-    else if (pence > LIMIT)
-      next.amount = "The most you can send in one payment is £10,000.00."
-
-    if (!typedReference) next.reference = "Enter a reference the payee will recognise."
-    else if (typedReference.length > 18 || !/^[A-Za-z0-9 ]+$/.test(typedReference))
-      next.reference = "Use up to 18 letters, numbers and spaces."
-
-    setErrors(next)
-    const first = (["payee", "amount", "reference"] as Field[]).find((f) => next[f])
-    if (first) {
-      setFocus({ target: first })
-      return
+    if (!amount.trim()) {
+      found.amount = "Enter an amount."
+    } else {
+      const value = parseAmount(amount)
+      if (value === null || value === 0) {
+        found.amount = "Enter an amount in pounds and pence, such as 240.50."
+      } else if (value > account.balance) {
+        found.amount = `That is more than the ${formatMoney(account.balance)} available in this account.`
+      } else if (value > LIMIT) {
+        found.amount = "The most you can send in one payment is £10,000.00."
+      }
     }
-    setReview({
-      account,
-      payee: chosenPayee!,
-      pence: pence!,
-      reference: typedReference,
-      date,
-    })
-    setStep("review")
-    setFocus({ target: "words" })
+
+    if (!trimmedReference) {
+      found.reference = "Enter a reference the payee will recognise."
+    } else if (
+      trimmedReference.length > 18 ||
+      !/^[A-Za-z0-9 ]+$/.test(trimmedReference)
+    ) {
+      found.reference = "Use up to 18 letters, numbers and spaces."
+    }
+    return found
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const found = check()
+    setErrors(found)
+    if (found.payee) payeeRef.current?.focus()
+    else if (found.amount) amountRef.current?.focus()
+    else if (found.reference) referenceRef.current?.focus()
+    else {
+      pendingFocus.current = wordsRef
+      setStep("review")
+    }
   }
 
   function changeDetails() {
-    setStep("form")
-    setFocus({ target: "from" })
+    pendingFocus.current = fromRef
+    setStep("details")
   }
 
-  function send() {
-    setSent(review)
-    setReview(null)
+  function sendPayment() {
+    if (!payee) return
+    setSent({ amount: pence, payee, from, date })
+    pendingFocus.current = headingRef
     setStep("done")
-    setFocus({ target: "heading" })
   }
 
-  function startAgain() {
+  function makeAnother() {
     setSent(null)
-    setFrom(ACCOUNTS[0].value)
+    setFrom("current")
     setPayee(null)
     setAmount("")
     setReference("")
     setDate(TODAY)
     setErrors({})
-    setStep("form")
-    setFocus({ target: "from" })
+    pendingFocus.current = fromRef
+    setStep("details")
   }
+
+  const sentPayee = sent
+    ? PAYEES.find((p) => p.value === sent.payee)
+    : undefined
 
   return (
     <section
@@ -347,40 +350,48 @@ function PaymentSheet() {
           tabIndex={-1}
           className={cn(LABEL, CODE_FOCUS)}
         >
-          {HEADINGS[step]}
+          {HEADING[step]}
         </h2>
-        <p className={SMALL}>{STEPS[step]}</p>
+        <p className={SMALL}>{STEP_LABEL[step]}</p>
       </div>
 
       <div>
-        {step === "form" && (
-          <form noValidate onSubmit={submit} className="flex flex-col gap-4">
+        {step === "details" && (
+          <form
+            noValidate
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4"
+          >
             <div className="flex max-w-md flex-col gap-3">
-              <label id="from-label" htmlFor="from" className={cn("block", LABEL)}>
+              <label
+                id="from-label"
+                htmlFor="from"
+                className={cn(LABEL, "block")}
+              >
                 From account
               </label>
               <div className="flex flex-col gap-2">
                 <Select
-                  items={accountItems}
+                  items={ACCOUNT_ITEMS}
                   value={from}
                   onValueChange={(value) => {
                     if (value === null) return
-                    setFrom(value)
+                    setFrom(value as AccountId)
                     clearError("amount")
                   }}
                 >
                   <SelectTrigger
-                    id="from"
                     ref={fromRef}
+                    id="from"
                     aria-labelledby="from-label"
                     aria-describedby="from-help"
                   >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {ACCOUNTS.map((a) => (
-                      <SelectItem key={a.value} value={a.value}>
-                        {a.label}
+                    {ACCOUNT_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -392,58 +403,66 @@ function PaymentSheet() {
             </div>
 
             <div className="flex max-w-md flex-col gap-3">
-              <label id="payee-label" htmlFor="payee" className={cn("block", LABEL)}>
+              <label
+                id="payee-label"
+                htmlFor="payee"
+                className={cn(LABEL, "block")}
+              >
                 Payee
               </label>
               <div className="flex flex-col gap-2">
                 <Select
-                  items={payeeItems}
+                  items={PAYEE_ITEMS}
                   value={payee}
                   onValueChange={(value) => {
                     if (value === null) return
-                    setPayee(value)
+                    setPayee(value as string)
                     clearError("payee")
                   }}
                 >
                   <SelectTrigger
-                    id="payee"
                     ref={payeeRef}
+                    id="payee"
                     aria-labelledby="payee-label"
-                    aria-invalid={errors.payee ? true : undefined}
                     aria-describedby={describedBy(
-                      chosenPayee && "payee-help",
+                      payee && "payee-help",
                       errors.payee && "payee-error"
                     )}
+                    aria-invalid={errors.payee ? true : undefined}
                   >
                     <SelectValue placeholder="Choose a payee" />
                   </SelectTrigger>
                   <SelectContent>
-                    {PAYEES.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                        {p.label}
+                    {PAYEE_ITEMS.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {chosenPayee && (
+                {payee && (
                   <p id="payee-help" className={SMALL}>
-                    {payeeDetails(chosenPayee)}
+                    {payeeDetails(payee)}
                   </p>
                 )}
-                {errors.payee && <ErrorLine id="payee-error">{errors.payee}</ErrorLine>}
+                {errors.payee && (
+                  <ErrorLine id="payee-error">{errors.payee}</ErrorLine>
+                )}
               </div>
             </div>
 
             <div className="flex max-w-md flex-col gap-3">
-              <label htmlFor="amount" className={cn("block", LABEL)}>
+              <label htmlFor="amount" className={cn(LABEL, "block")}>
                 Amount
               </label>
               <div className="flex flex-col gap-2">
                 <div className="flex w-48 items-center gap-2">
-                  <span className={cn(SMALL, "text-foreground")}>£</span>
+                  <span className="font-mono text-label text-foreground tabular-nums">
+                    £
+                  </span>
                   <Input
-                    id="amount"
                     ref={amountRef}
+                    id="amount"
                     inputMode="decimal"
                     autoComplete="off"
                     value={amount}
@@ -451,40 +470,42 @@ function PaymentSheet() {
                       setAmount(event.target.value)
                       clearError("amount")
                     }}
-                    aria-invalid={errors.amount ? true : undefined}
                     aria-describedby={describedBy(
                       "amount-help",
                       errors.amount && "amount-error"
                     )}
+                    aria-invalid={errors.amount ? true : undefined}
                     className="px-2 text-right font-mono text-body tabular-nums md:text-body"
                   />
                 </div>
                 <p id="amount-help" className={SMALL}>
                   Up to £10,000.00 a payment.
                 </p>
-                {errors.amount && <ErrorLine id="amount-error">{errors.amount}</ErrorLine>}
+                {errors.amount && (
+                  <ErrorLine id="amount-error">{errors.amount}</ErrorLine>
+                )}
               </div>
             </div>
 
             <div className="flex max-w-md flex-col gap-3">
-              <label htmlFor="reference" className={cn("block", LABEL)}>
+              <label htmlFor="reference" className={cn(LABEL, "block")}>
                 Reference
               </label>
               <div className="flex flex-col gap-2">
                 <Input
-                  id="reference"
                   ref={referenceRef}
+                  id="reference"
                   autoComplete="off"
                   value={reference}
                   onChange={(event) => {
                     setReference(event.target.value)
                     clearError("reference")
                   }}
-                  aria-invalid={errors.reference ? true : undefined}
                   aria-describedby={describedBy(
                     "reference-help",
                     errors.reference && "reference-error"
                   )}
+                  aria-invalid={errors.reference ? true : undefined}
                   className="px-2 text-body md:text-body"
                 />
                 <p id="reference-help" className={SMALL}>
@@ -497,20 +518,24 @@ function PaymentSheet() {
             </div>
 
             <div className="flex max-w-md flex-col gap-3">
-              <label id="payon-label" htmlFor="payon" className={cn("block", LABEL)}>
+              <label
+                id="pay-on-label"
+                htmlFor="pay-on"
+                className={cn(LABEL, "block")}
+              >
                 Pay on
               </label>
               <div className="flex flex-col gap-2">
                 <DatePicker
-                  id="payon"
-                  labelId="payon-label"
-                  describedBy="payon-help"
+                  id="pay-on"
+                  labelId="pay-on-label"
+                  describedBy="pay-on-help"
                   value={date}
                   onChange={setDate}
                   today={TODAY}
                   latest={LATEST}
                 />
-                <p id="payon-help" className={SMALL}>
+                <p id="pay-on-help" className={SMALL}>
                   Today, or a later day up to and including 26 January 2027.
                 </p>
               </div>
@@ -520,93 +545,81 @@ function PaymentSheet() {
               <Button type="submit" className={BUTTON}>
                 Review payment
               </Button>
-              <a href="/" className={cn(buttonVariants({ variant: "outline" }), BUTTON)}>
+              <a
+                href="/"
+                className={cn(buttonVariants({ variant: "outline" }), BUTTON)}
+              >
                 Cancel
               </a>
             </div>
           </form>
         )}
 
-        {step === "review" && review && (
+        {step === "review" && chosenPayee && (
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-1">
               <p className={LABEL}>You are sending</p>
-              <p className="font-heading text-h1 tabular-nums text-foreground">
-                {formatMoney(review.pence)}
+              <p className="font-heading text-h1 text-foreground tabular-nums">
+                {formatMoney(pence)}
               </p>
               <p
                 ref={wordsRef}
                 tabIndex={-1}
                 className={cn("max-w-lg text-body text-foreground", CODE_FOCUS)}
               >
-                {amountInWords(review.pence)}
+                {moneyInWords(pence)}
               </p>
             </div>
 
             <dl>
-              {[
-                {
-                  term: "From",
-                  detail: <span className="text-body">{review.account.label}</span>,
-                },
-                {
-                  term: "To",
-                  detail: (
-                    <span className="flex flex-col items-end gap-1">
-                      <span className="text-body">{review.payee.label}</span>
-                      <span className={SMALL}>{payeeDetails(review.payee)}</span>
-                    </span>
-                  ),
-                },
-                {
-                  term: "Reference",
-                  detail: (
-                    <span className="font-mono wrap-break-word">{review.reference}</span>
-                  ),
-                },
-                {
-                  term: "Pay on",
-                  detail: (
-                    <span className="font-mono tabular-nums">
-                      {sameDay(review.date, TODAY) && "Today, "}
-                      <time dateTime={isoDate(review.date)}>
-                        {formatShortDate(review.date)}
-                      </time>
-                    </span>
-                  ),
-                },
-                {
-                  term: "Balance after",
-                  detail: (
-                    <span className="font-mono tabular-nums">
-                      {formatMoney(review.account.balance - review.pence)}
-                    </span>
-                  ),
-                },
-              ].map((row, index) => (
-                <div
-                  key={row.term}
-                  className={cn(
-                    "flex items-baseline justify-between gap-3 py-2",
-                    index > 0 && "border-t border-border"
-                  )}
-                >
-                  <dt className={LABEL}>{row.term}</dt>
-                  <dd className="min-w-0 text-right">{row.detail}</dd>
-                </div>
-              ))}
+              <div className="flex items-baseline justify-between gap-3 py-2">
+                <dt className={LABEL}>From</dt>
+                <dd className="text-right text-body">{account.label}</dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
+                <dt className={LABEL}>To</dt>
+                <dd className="flex flex-col items-end gap-1 text-right">
+                  <span className="text-body">{chosenPayee.label}</span>
+                  <span className={SMALL}>
+                    {payeeDetails(chosenPayee.value)}
+                  </span>
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
+                <dt className={LABEL}>Reference</dt>
+                <dd className="min-w-0 text-right font-mono wrap-break-word">
+                  {trimmedReference}
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
+                <dt className={LABEL}>Pay on</dt>
+                <dd className="text-right font-mono tabular-nums">
+                  {isSameDay(date, TODAY) && "Today, "}
+                  <time dateTime={isoDate(date)}>{formatShortDate(date)}</time>
+                </dd>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
+                <dt className={LABEL}>Balance after</dt>
+                <dd className="text-right font-mono tabular-nums">
+                  {formatMoney(account.balance - pence)}
+                </dd>
+              </div>
             </dl>
 
             <p className="max-w-lg text-body text-foreground">
-              Check the payee's details. A payment cannot be called back once it is
-              sent.
+              Check the payee&apos;s details. A payment cannot be called back
+              once it is sent.
             </p>
 
             <div className="flex flex-wrap gap-2">
-              <Button className={BUTTON} onClick={send}>
+              <Button className={BUTTON} onClick={sendPayment}>
                 Send payment
               </Button>
-              <Button variant="outline" className={BUTTON} onClick={changeDetails}>
+              <Button
+                variant="outline"
+                className={BUTTON}
+                onClick={changeDetails}
+              >
                 Change details
               </Button>
             </div>
@@ -614,13 +627,14 @@ function PaymentSheet() {
         )}
 
         <div role="status">
-          {sent && (
+          {sent && sentPayee && (
             <div className="flex flex-col gap-3">
-              <p className="font-heading text-h2 tabular-nums">
-                {formatMoney(sent.pence)} to {sent.payee.label}
+              <p className="font-heading text-h2 text-foreground tabular-nums">
+                {formatMoney(sent.amount)} to {sentPayee.label}
               </p>
               <p className="max-w-lg text-body text-foreground">
-                From {sent.account.inSentence}, on {formatLongDate(sent.date)}.
+                From {ACCOUNTS[sent.from].inSentence}, on{" "}
+                {formatLongDate(sent.date)}.
               </p>
               <p className="max-w-lg text-body text-foreground">
                 This is a demo: no money left the account and nothing was sent
@@ -632,7 +646,11 @@ function PaymentSheet() {
 
         {sent && (
           <div className="mt-6 flex flex-wrap items-center gap-2">
-            <Button variant="secondary" className={BUTTON} onClick={startAgain}>
+            <Button
+              variant="secondary"
+              className={BUTTON}
+              onClick={makeAnother}
+            >
               Make another payment
             </Button>
             <a href="/" className={TEXT_LINK}>
@@ -657,16 +675,12 @@ function GoodToKnow() {
         </h2>
       </div>
       <ul>
-        <li className="px-6 py-3">
-          <p className="max-w-lg text-body text-foreground">
-            Payments for today go out within two hours. Payments for a later day go
-            out at 06:00 on that day.
-          </p>
+        <li className="px-6 py-3 text-body text-foreground">
+          Payments for today go out within two hours. Payments for a later day
+          go out at 06:00 on that day.
         </li>
-        <li className="border-t border-border px-6 py-3">
-          <p className="max-w-lg text-body text-foreground">
-            You can send up to £10,000.00 in one payment.
-          </p>
+        <li className="border-t border-border px-6 py-3 text-body text-foreground">
+          You can send up to £10,000.00 in one payment.
         </li>
       </ul>
     </section>

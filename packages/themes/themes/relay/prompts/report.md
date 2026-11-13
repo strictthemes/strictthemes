@@ -40,7 +40,7 @@ The label `MATCH REPORT · DIVISION ONE`, then the `<h1>` "Achebe double sinks O
 A `<section>` that is a scoreboard band, with the classes of the Scoreboards note, named by an `<h2>` "Final score" that is `sr-only`, and laid out as `flex flex-col gap-5`. Every label on the band is `text-ice`. After the `<h2>`:
 
 - A row with `flex items-center justify-between gap-3`: the label `KESTREL VALLEY LEAGUE · DIVISION ONE`, and the badge "Final". This is the page's one badge.
-- The match row from the Scoreboards note: Wendmoor FC with the crest `W`, the score `3–1`, Otterby Town with the crest `OT`. Under each name, a `<ul>` with `flex flex-col gap-1` of that side's scorers, each a label: `ACHEBE 23', 84'` and `BRANDVOLD 58' (PEN)` for Wendmoor FC; `PENHALE 41'` for Otterby Town. A scorer's line may wrap on a phone.
+- The match row from the Scoreboards note, with the score in `text-h1 md:text-display` and no `lg:` or `xl:` size: this band never splits into halves, so the score keeps its full size. Wendmoor FC with the crest `W`, the score `3–1`, Otterby Town with the crest `OT`. Under each name, a `<ul>` with `flex flex-col gap-1` of that side's scorers, each a label: `ACHEBE 23', 84'` and `BRANDVOLD 58' (PEN)` for Wendmoor FC; `PENHALE 41'` for Otterby Town. A scorer's line may wrap on a phone.
 - A stack with `gap-1` of two label lines, each centered with `text-center`: `SAT 5 JUN 2027 · 15:00 · MILLRACE PARK`, the date a `<time>`; then `HALF-TIME 1–1 · ATTENDANCE 212`.
 
 ### 4. Report and timeline
@@ -67,7 +67,7 @@ The seven events of the sample make seven rows. Two more mark the halves and hav
 
 ### 5. Line-ups
 
-A `<section>` named by its `<h2>` "Line-ups", laid out as `flex flex-col gap-5`: the `<h2>`, then a grid row of two cards with rows, six columns each from `lg` up, Wendmoor FC first. Each card has, in this order:
+A `<section>` named by its `<h2>` "Line-ups", laid out as `flex flex-col gap-5`: the `<h2>`, then a grid row of two cards with rows, six columns each from `lg` up, Wendmoor FC first. Each card is a `<div>` with the classes of the Cards with rows note; its `<h3>` heads it, so its lists need no `aria-label`. Each card has, in this order:
 
 - A first row with `flex items-center justify-between gap-3`: on the left, in a `flex items-center gap-3`, the club's crest (`size-8`) and its name in an `<h3>` as the Headings note sets a smaller heading; on the right the formation as a label, `4-4-2` or `4-5-1`.
 - An `<ol>` with `role="list"` of the eleven starters. Each is a row with `flex items-baseline gap-3` and, here, `px-5 py-2` in place of the note's row padding: the shirt number, a label with `w-5 shrink-0 tabular-nums`; the name in `text-body` with `min-w-0 flex-1`; and, where the player has one, a note as a label with `text-right`.
@@ -110,7 +110,7 @@ Substitutes: "14 Ben Iredale (on 62' for Vasik), 15 Hal Sweeting (on 75' for Tho
 
 A `<section>` named by its `<h2>` "Match figures", laid out as `flex flex-col gap-5`: the `<h2>`, then a grid row with two items.
 
-**The figures,** eight columns from `lg` up: a card. It holds a `<dl>` with `flex flex-col gap-5` and, after it, one line of small print: "Figures were recorded by the club. Referee: M. Garside."
+**The figures,** eight columns from `lg` up: a card. It holds a `<dl>` with `flex flex-col gap-5`, laid out as below and not as the Description lists note's rows, and, after it, a `<p>` of small print: "Figures were recorded by the club. Referee: M. Garside."
 
 Each figure is a `<div>` with `flex flex-col gap-2`: a `<dt>`, the figure's name as a label, then two `<dd>` elements, Wendmoor FC's first. A `<dd>` is `flex items-center gap-3` with three parts:
 
@@ -120,7 +120,7 @@ Each figure is a `<div>` with `flex flex-col gap-2`: a `<dt>`, the figure's name
 
 The five figures, in this order: "Possession", `56%` and `44%`; "Shots", `14` and `9`; "Shots on target", `7` and `3`; "Corners", `6` and `4`; "Fouls", `9` and `13`. A possession bar is as wide as its percent. Any other bar is the figure's share of the larger of the two, so the larger is 100%: 9 shots against 14 is 64.3%. The widths are worked out in code. The two clubs are told apart by their names; the two bar colors only help.
 
-**Next match,** four columns from `lg` up: an ice panel, an `<aside>` named by its `<h2>` "Next match" in `text-h2`. It holds a stack with `gap-1` of the kick-off time, `15:00`, a figure in `text-h1`, and the label `SAT 12 JUN · CASTLE MEADOW · AWAY`; then a `<p>` with `font-heading text-body font-bold uppercase`, "Castlebrook United v Wendmoor FC"; then a `<p>` in `text-body`: "First against third. A win takes Wendmoor above the leaders with seven matches left." Nothing on the panel has a text color class, and nothing on it is a link.
+**Next match,** four columns from `lg` up: an ice panel, an `<aside>` named by its `<h2>` "Next match" in `text-h2`. It holds a stack with `gap-1` of the kick-off time, `15:00`, a figure in `text-h1` in a `<time>` with `dateTime="2027-06-12T15:00"`, and the label `SAT 12 JUN · CASTLE MEADOW · AWAY`, its date a `<time>`; then a `<p>` with `font-heading text-body font-bold uppercase`, "Castlebrook United v Wendmoor FC"; then a `<p>` in `text-body`: "First against third. A win takes Wendmoor above the leaders with seven matches left." Nothing on the panel has a text color class, and nothing on it is a link.
 
 ### 7. Footer
 

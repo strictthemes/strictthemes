@@ -34,12 +34,12 @@ No page header row on this page. The first panel has no label heading. It holds:
 A panel with rows. Heading: `Systems`, and at the right end of the heading row the label `Last 30 days`. Six rows, one per system. Each row is:
 
 - A row with the system's name as an `<h3>` in `text-body font-medium`, and at the right end its state.
-- With `mt-3`, the uptime bar: 30 segments in a row with `gap-px`, each `h-6 flex-1 rounded-sm`. A day that was fully up is `bg-success`, a day with slow service `bg-tertiary`, a day with an outage `bg-destructive`. The bar has `role="img"` and an `aria-label` such as "99.2% uptime over 30 days. Slow on 2 days, down on 1 day."
-- With `mt-2`, a line `grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3`, in this order: the label `30 days ago` at the left; the uptime percentage as a small figure, followed in the same figure by the days that were slow or down, in words, where there were any (`99.91% · 1 day down`); and the label `Today`, right-aligned (`text-right`). At 375px the figure does not fit between the two labels, so below `md` it is `order-last col-span-2` and stands on its own line under them, left-aligned; from `md` up it is `md:order-none md:col-span-1 md:text-center`, in the middle column. A slow day counts as up: only a down day lowers the percentage.
+- With `mt-3`, the uptime bar: 30 segments in a row with `gap-px`, each `h-6 flex-1 rounded-sm`. A day that was fully up is `bg-success`, a day with slow service `bg-tertiary`, a day with an outage `bg-destructive`. The bar has `role="img"` and an `aria-label` such as "99.91% uptime over 30 days. Slow on 2 days, down on 1 day."
+- With `mt-2`, a line `grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3`, in this order: the label `30 days ago` at the left; the uptime percentage as a small figure, followed in the same figure by the days that were slow or down, in words, where there were any (`99.91% · 1 day down`); and the label `Today`, right-aligned (`text-right`). At 375px the figure does not fit between the two labels, so below `md` it is `order-last col-span-2` and stands on its own line under them, left-aligned; from `md` up it is `md:order-none md:col-span-1 md:text-center`, in the middle column. A slow day counts as up: only a down day lowers the percentage, by its minutes of outage over the 30 days' minutes, to two decimals (38 min gives `99.91%`). A system with no outage reads `100%`.
 
 Five systems are "Operational" with a success dot. Label printing is "Degraded" with a caution dot. Across the six bars, most days are fully up, three or four are slow and one is down.
 
-The panel ends with a legend, after the list of systems and not an item of it: a `<div>` with the rows' `px-5 py-3` and 1px top border, `flex flex-wrap gap-5`, holding three pairs, each `inline-flex items-center gap-2`, of a `size-3 rounded-sm` square with `aria-hidden="true"` and a label, `Up`, `Slow` and `Down`. This is the one place where the three state colors fill more than a dot, and the legend is what keeps them from standing alone; the Charts note does not apply to these bars.
+The panel ends with a legend, after the list of systems and not an item of it: a `<div>` with the rows' `px-5 py-3` and 1px top border, `flex flex-wrap gap-5`, holding three pairs, each `inline-flex items-center gap-2`, of a `size-3 rounded-sm` square with `aria-hidden="true"` and a label in `text-muted-foreground`, `Up`, `Slow` and `Down`. This is the one place where the three state colors fill more than a dot, and the legend is what keeps them from standing alone; the Charts note does not apply to these bars.
 
 ### 4. Planned maintenance
 
@@ -61,10 +61,10 @@ These three panels use an `<h3>` in place of the usual label heading. Its row ke
 
 ### 7. Footer
 
-Not a panel: a `<footer>` in the container, a row with `pb-5` holding two labels, the company's name and year at the left (`Northgate Parcels Ltd, 2026`) and the time zone all times are shown in at the right (`All times UTC`; every `dateTime` then ends in `Z`).
+Not a panel: a `<footer>` in the container, a row with `pb-5` holding two labels, the company's name and year at the left (`Northgate Parcels Ltd, 2026`) and the time zone all times are shown in at the right (`All times UTC`; every `dateTime` that holds a time then ends in `Z`; an incident's date alone is `2026-11-04`).
 
 ### Behavior
 
 - An empty or malformed address shows the error line: "Enter your email address." or "Enter an email address such as name@example.com." A good one replaces the form with a confirmation in `text-body`: a check icon in `text-success` and "Subscribed. We will write when something changes." The helper text, inside the form, goes with it: the form and the empty `role="status"` element share the one wrapper with `mt-5`.
-- "Get updates" scrolls to the panel and moves focus to the email field, or to the confirmation once the form is gone. A link to `#updates` cannot do both on its own: handle its click in code (`preventDefault`, then `scrollIntoView`, then `focus` with `preventScroll`).
+- "Get updates" scrolls to the panel and moves focus to the email field, or, once the form is gone, to the `role="status"` element, which has `tabIndex={-1}`. A link to `#updates` cannot do both on its own: handle its click in code (`preventDefault`, then `scrollIntoView`, then `focus` with `preventScroll`).
 - No button on this page gets `focusableWhenDisabled`, so `components/ui/button.tsx` needs no `data-disabled:` classes.

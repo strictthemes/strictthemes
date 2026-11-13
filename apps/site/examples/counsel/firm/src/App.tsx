@@ -4,25 +4,25 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-// A link in running text.
-const textLink = cn(
-  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focusRing
+const quietLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focus
 )
 
-// A link in the header or footer, and a name or title that is a link.
-const plainLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
+const textLink = cn(
+  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
+  focus
+)
+
+const onwardLink = cn(
+  "inline-flex items-center gap-2 font-mono text-label uppercase",
+  textLink
 )
 
 const label = "font-mono text-label uppercase"
-
-const sectionDivider = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
 
 const navLinks = [
   { label: "Practice", href: "/practice/commercial-disputes" },
@@ -35,41 +35,29 @@ const practiceAreas = [
   {
     name: "Corporate",
     href: "#",
-    summary:
-      "Sales and purchases of companies, investment rounds and the shareholder agreements that follow them.",
+    text: "We act on the sale and purchase of companies, on new investment and on the agreements between shareholders.",
   },
   {
     name: "Commercial disputes",
     href: "/practice/commercial-disputes",
-    summary:
-      "Contract and supply claims, warranty claims after a sale, and urgent court orders when a business cannot wait.",
+    text: "We bring and defend contract and supply claims, warranty claims after a sale, and applications for urgent court orders.",
     badge: "Ranked 2026",
   },
   {
     name: "Employment",
     href: "#",
-    summary:
-      "Contracts of employment, restrictive covenants, team moves between competitors and tribunal claims.",
+    text: "We draft contracts and restrictive covenants, advise on teams moving between firms, and act in tribunal claims.",
   },
   {
     name: "Real estate",
     href: "#",
-    summary:
-      "Leases, development sites and the property side of a company sale or purchase.",
+    text: "We handle leases and development sites, and the property side of a company sale.",
   },
   {
     name: "Private client",
     href: "#",
-    summary:
-      "Wills, trusts and succession planning for business owners and the families who will inherit the business.",
+    text: "We prepare wills, trusts and succession plans for the owners of businesses and their families.",
   },
-]
-
-const figures = [
-  { term: "Founded", value: <time dateTime="1952">1952</time> },
-  { term: "Partners", value: "14" },
-  { term: "Lawyers", value: "86" },
-  { term: "Transactions advised on in 2025", value: "£310m" },
 ]
 
 const matters = [
@@ -77,29 +65,22 @@ const matters = [
     year: "2026",
     area: "Corporate",
     name: "Sale of Corran Marine",
-    summary:
-      "Advised the founders of a boatbuilder on the sale of the company to a Dutch shipping group.",
+    text: "We advised the founders of a boatbuilder on its sale to a Dutch shipping group.",
     value: "£48m",
   },
   {
     year: "2026",
     area: "Commercial disputes",
     name: "Estley Mills v Brandreth Engineering",
-    summary:
-      "Won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification.",
+    text: "We won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification.",
     value: "£6.2m",
   },
   {
     year: "2026",
     area: "Real estate",
     name: "Wexcombe University, Quay Street",
-    summary:
-      "Acted for the university on the 25-year lease of its new research building on Quay Street.",
-    value: (
-      <>
-        11,000 <span className="normal-case">m²</span>
-      </>
-    ),
+    text: "We acted for the university on the 25-year lease of its new research building.",
+    value: "11,000 m²",
   },
 ]
 
@@ -110,7 +91,7 @@ const partners = [
     role: "Managing partner · Corporate",
     href: "#",
     portrait:
-      "Helena Marsh in a charcoal jacket, seated at the head of a meeting table.",
+      "Helena Marsh in a navy jacket, seated at the head of a meeting room table.",
   },
   {
     name: "David Achterberg",
@@ -118,7 +99,7 @@ const partners = [
     role: "Head of commercial disputes",
     href: "#",
     portrait:
-      "David Achterberg in a navy suit, standing beside shelves of case files.",
+      "David Achterberg in a grey suit, standing beside shelves of law reports.",
   },
   {
     name: "Priya Raman",
@@ -126,7 +107,7 @@ const partners = [
     role: "Partner · Employment",
     href: "#",
     portrait:
-      "Priya Raman in a grey blazer, at her desk by a window over Chancery Row.",
+      "Priya Raman in a dark blazer, on the stairs of the firm's Chancery Row office.",
   },
   {
     name: "Ruth Calloway",
@@ -138,30 +119,21 @@ const partners = [
   },
 ]
 
-function OnwardLink({ href, children }: { href: string; children: string }) {
-  return (
-    <a
-      href={href}
-      className={cn(label, textLink, "inline-flex items-center gap-2")}
-    >
-      {children}
-      <ArrowRight className="size-4" strokeWidth={1.5} aria-hidden="true" />
-    </a>
-  )
-}
+const sectionDivider =
+  "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
 
 export function App() {
   return (
     <div className="mx-auto max-w-[1200px] px-4 text-body md:px-8">
       <header className="flex flex-col items-start gap-4 border-b border-border py-8 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", plainLink)}>
+        <a href="/" className={cn("font-heading text-h2", quietLink)}>
           Harrow &amp; Vane
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 md:gap-x-8">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className={cn(label, plainLink)}>
+                <a href={link.href} className={cn(label, quietLink)}>
                   {link.label}
                 </a>
               </li>
@@ -171,8 +143,13 @@ export function App() {
       </header>
 
       <main>
-        <section className={cn("mt-14 md:mt-28", grid)}>
-          <p className={cn(label, "text-muted-foreground md:col-span-12")}>
+        <section className="mt-14 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-8">
+          <p
+            className={cn(
+              label,
+              "text-muted-foreground tabular-nums md:col-span-12"
+            )}
+          >
             Commercial lawyers · Wexcombe, since{" "}
             <time dateTime="1952">1952</time>
           </p>
@@ -181,23 +158,36 @@ export function App() {
           </h1>
           <p className="mt-8 max-w-xl md:col-span-7 md:col-start-1">
             We advise owner-managed companies, their boards and the families
-            behind them, from a single office in Wexcombe. A partner reads every
-            matter we take on, and stays with it to the end.
+            behind them, from a single office in Wexcombe. A partner reads
+            every matter we take on, and stays with it to the end.
           </p>
           <p className="mt-8 md:col-span-7 md:col-start-1">
-            <OnwardLink href="#practice-areas">Our practice areas</OnwardLink>
+            <a href="#practice-areas" className={onwardLink}>
+              Our practice areas
+              <ArrowRight
+                className="size-4"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+            </a>
           </p>
         </section>
 
-        <section id="practice-areas" className={cn(sectionDivider, grid)}>
+        <section
+          id="practice-areas"
+          className={cn(
+            sectionDivider,
+            "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+          )}
+        >
           <div className="md:col-span-4">
             <h2 className="text-h2">Practice areas</h2>
-            <p className="mt-4">
+            <p className="mt-4 max-w-xl">
               Five teams, each led by partners who have practised in Wexcombe
               for most of their careers.
             </p>
           </div>
-          <ul className="mt-8 list-none border-b border-border p-0 md:col-span-8 md:col-start-5 md:mt-0">
+          <ul className="mt-8 border-b border-border md:col-span-8 md:col-start-5 md:mt-0">
             {practiceAreas.map((area) => (
               <li
                 key={area.name}
@@ -205,49 +195,68 @@ export function App() {
               >
                 <div className="md:col-span-3">
                   <h3 className="text-h2">
-                    <a href={area.href} className={plainLink}>
+                    <a href={area.href} className={quietLink}>
                       {area.name}
                     </a>
                   </h3>
                   {area.badge && (
                     <p className="mt-2">
-                      <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
+                      <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase tabular-nums">
                         {area.badge}
                       </Badge>
                     </p>
                   )}
                 </div>
                 <p className="mt-2 max-w-xl md:col-span-5 md:mt-0">
-                  {area.summary}
+                  {area.text}
                 </p>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className={cn(sectionDivider, grid)}>
+        <section
+          className={cn(
+            sectionDivider,
+            "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+          )}
+        >
           <h2 className="text-h2 md:col-span-4">The firm in figures</h2>
           <dl className="mt-8 grid grid-cols-2 gap-x-4 md:col-span-12 md:col-start-1 md:grid-cols-4 md:gap-x-8">
-            {figures.map((figure, index) => (
-              <div
-                key={figure.term}
-                className={cn(
-                  "flex flex-col-reverse border-t border-border pt-4",
-                  index >= 2 && "mt-8 md:mt-0"
-                )}
+            <div className="flex flex-col-reverse border-t border-border pt-4">
+              <dt className={cn(label, "mt-2 text-muted-foreground")}>
+                Founded
+              </dt>
+              <dd className="font-heading text-h1 tabular-nums">
+                <time dateTime="1952">1952</time>
+              </dd>
+            </div>
+            <div className="flex flex-col-reverse border-t border-border pt-4">
+              <dt className={cn(label, "mt-2 text-muted-foreground")}>
+                Partners
+              </dt>
+              <dd className="font-heading text-h1 tabular-nums">14</dd>
+            </div>
+            <div className="mt-8 flex flex-col-reverse border-t border-border pt-4 md:mt-0">
+              <dt className={cn(label, "mt-2 text-muted-foreground")}>
+                Lawyers
+              </dt>
+              <dd className="font-heading text-h1 tabular-nums">86</dd>
+            </div>
+            <div className="mt-8 flex flex-col-reverse border-t border-border pt-4 md:mt-0">
+              <dt
+                className={cn(label, "mt-2 text-muted-foreground tabular-nums")}
               >
-                <dt className={cn(label, "mt-2 text-muted-foreground")}>
-                  {figure.term}
-                </dt>
-                <dd className="font-heading text-h1">{figure.value}</dd>
-              </div>
-            ))}
+                Transactions advised on in 2025
+              </dt>
+              <dd className="font-heading text-h1 tabular-nums">£310m</dd>
+            </div>
           </dl>
         </section>
 
         <section className={sectionDivider}>
           <h2 className="text-h2">Recent matters</h2>
-          <ul className="mt-8 list-none border-b border-border p-0">
+          <ul className="mt-8 border-b border-border">
             {matters.map((matter) => (
               <li
                 key={matter.name}
@@ -264,14 +273,9 @@ export function App() {
                 </p>
                 <div className="mt-2 md:col-span-7 md:mt-0">
                   <h3 className="text-h2">{matter.name}</h3>
-                  <p className="mt-2 max-w-xl">{matter.summary}</p>
+                  <p className="mt-2 max-w-xl">{matter.text}</p>
                 </div>
-                <p
-                  className={cn(
-                    label,
-                    "mt-2 text-foreground tabular-nums md:col-span-2 md:mt-0 md:text-right"
-                  )}
-                >
+                <p className="mt-2 font-mono text-label text-foreground tabular-nums md:col-span-2 md:mt-0 md:text-right">
                   {matter.value}
                 </p>
               </li>
@@ -283,43 +287,55 @@ export function App() {
           <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2">
             <h2 className="text-h2">Partners</h2>
             <p>
-              <OnwardLink href="#">All 14 partners</OnwardLink>
+              <a href="#" className={cn(onwardLink, "tabular-nums")}>
+                All 14 partners
+                <ArrowRight
+                  className="size-4"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+              </a>
             </p>
           </div>
-          <ul className="mt-8 grid list-none grid-cols-2 gap-x-4 gap-y-8 p-0 md:grid-cols-4 md:gap-x-8">
-            {partners.map((partner) => (
-              <li key={partner.name}>
+          <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-8">
+            {partners.map((person) => (
+              <li key={person.name}>
                 <div
                   role="img"
-                  aria-label={partner.portrait}
+                  aria-label={person.portrait}
                   className="flex aspect-3/4 w-full items-end rounded-xl border border-border bg-card p-4"
                 >
                   <span
                     aria-hidden="true"
                     className="font-heading text-h1 text-muted-foreground"
                   >
-                    {partner.initials}
+                    {person.initials}
                   </span>
                 </div>
                 <h3 className="mt-4 text-h2">
-                  <a href={partner.href} className={plainLink}>
-                    {partner.name}
+                  <a href={person.href} className={quietLink}>
+                    {person.name}
                   </a>
                 </h3>
                 <p className={cn(label, "mt-2 text-muted-foreground")}>
-                  {partner.role}
+                  {person.role}
                 </p>
               </li>
             ))}
           </ul>
         </section>
 
-        <section className={cn(sectionDivider, grid)}>
+        <section
+          className={cn(
+            sectionDivider,
+            "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+          )}
+        >
           <div className="md:col-span-7">
             <h2 className="text-h2">Talk to a partner</h2>
             <p className="mt-4 max-w-xl">
-              Tell us briefly what the matter is and who is involved. A partner
-              in the right team will reply within one working day.
+              Tell us briefly what the matter is about. A partner in the right
+              team will reply within one working day.
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
               <a
@@ -331,7 +347,7 @@ export function App() {
               >
                 Make an enquiry
               </a>
-              <p className={cn(label, "text-foreground")}>
+              <p className={cn(label, "text-foreground tabular-nums")}>
                 Or call{" "}
                 <a href="tel:01632960214" className={textLink}>
                   01632 960 214
@@ -343,26 +359,29 @@ export function App() {
       </main>
 
       <footer className="mt-14 border-t border-border py-8 md:mt-28">
-        <div className={grid}>
+        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-8">
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Harrow &amp; Vane LLP</p>
             <address
-              className={cn(label, "mt-2 text-muted-foreground not-italic")}
+              className={cn(
+                label,
+                "mt-2 text-muted-foreground not-italic tabular-nums"
+              )}
             >
               <p>4 Chancery Row</p>
               <p>Wexcombe WX1 2LN</p>
             </address>
           </div>
           <div className="mt-8 md:col-span-4 md:col-start-5 md:mt-0">
-            <p className={label}>
-              <a href="tel:01632960214" className={plainLink}>
+            <p className={cn(label, "tabular-nums")}>
+              <a href="tel:01632960214" className={quietLink}>
                 01632 960 214
               </a>
             </p>
             <p className={cn(label, "mt-2 wrap-anywhere")}>
               <a
                 href="mailto:enquiries@harrowvane.example"
-                className={cn(plainLink, "normal-case")}
+                className={cn("normal-case", quietLink)}
               >
                 enquiries@harrowvane.example
               </a>
@@ -373,9 +392,9 @@ export function App() {
             className="mt-8 md:col-span-4 md:col-start-9 md:mt-0"
           >
             <ul>
-              {navLinks.map((link, index) => (
-                <li key={link.href} className={cn(index > 0 && "mt-2")}>
-                  <a href={link.href} className={cn(label, plainLink)}>
+              {navLinks.map((link, i) => (
+                <li key={link.href} className={i > 0 ? "mt-2" : undefined}>
+                  <a href={link.href} className={cn(label, quietLink)}>
                     {link.label}
                   </a>
                 </li>
@@ -383,7 +402,7 @@ export function App() {
             </ul>
           </nav>
         </div>
-        <p className={cn(label, "mt-8 text-muted-foreground")}>
+        <p className={cn(label, "mt-8 text-muted-foreground tabular-nums")}>
           © 2026 Harrow &amp; Vane LLP · Registered in England and Wales
         </p>
       </footer>

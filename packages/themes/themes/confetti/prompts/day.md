@@ -61,7 +61,7 @@ A section of parts side by side, from the layout notes, with its `aria-labelledb
 
 ### 5. Where to stay
 
-A full-width section with its `aria-labelledby` pointing at the `<h2>`. It opens with a `flex flex-col gap-3` holding the `<h2>` "Where to stay" and one paragraph in `text-body` with `max-w-xl`: "Little Saltry is small, so book early. We have held the rooms at the inn until 1 May 2027.", the date a `<time dateTime="2027-05-01">`. Then, in the section's `gap-6`, a grid of three cards from the layout notes, each `md:col-span-4`, stacked below `md` in this order. Each card, in its `gap-3`:
+A full-width section with its `aria-labelledby` pointing at the `<h2>`. It opens with a `flex flex-col gap-3` holding the `<h2>` "Where to stay" and one paragraph in `text-body` with `max-w-xl`: "Little Saltry is small, so book early. We have held the rooms at the inn until 1 May 2027.", the date a `<time dateTime="2027-05-01">`. Then, in the section's `gap-6`, a grid of three cards from the layout notes, each `md:col-span-4`, stacked below `md` in this order: a `<ul>` that carries the grid classes, each card a `<li>`. Each card, in its `gap-3`:
 
 - A `flex flex-col gap-2` with a label in `text-muted-foreground` and the place's name as an `<h3>` in `text-h2`.
 - One or two sentences in `text-body`.
@@ -76,7 +76,7 @@ The three places:
 
 ### 6. Questions and answers
 
-A section in the centered column from the layout notes, with an `<h2>` "Questions and answers", then in the column's `gap-6` an `<Accordion multiple>` (add it with `npx shadcn@latest add accordion`) with six items, any number open at once (without `multiple`, Base UI opens one at a time), all closed when the page opens. Questions word for word, answers in one to three short sentences:
+A section in the centered column from the layout notes, with an `<h2>` "Questions and answers", then in the column's `gap-6` an `<Accordion multiple>` (add it with `npx shadcn@latest add accordion`) with six items, any number open at once (without `multiple`, Base UI opens one at a time), all closed when the page opens. Questions word for word, answers in one to three short sentences, each answer one `<p>` with `max-w-xl` inside the `AccordionContent`:
 
 1. "Can we bring our children?": yes, if they are named on your invitation. There is a children's plate at dinner and a quiet room off the barn with blankets and books.
 2. "Is the barn step-free?": the barn, the toilets and the lawn are; the orchard is on a gentle slope with a mown path.
@@ -85,7 +85,7 @@ A section in the centered column from the layout notes, with an `<h2>` "Question
 5. "Can the kitchen cook around an allergy?": yes. Tell us in the note when you reply, and the kitchen plans a plate for you. "When you reply" is a link in running text to `/rsvp`.
 6. "When does it end?": the band stops at 23:15 and the last minibus leaves at 23:30. Brunch on Sunday is for anyone still around.
 
-The stock `Accordion` is off the type scale and its trigger is under 44px. In `components/ui/accordion.tsx`: on the trigger, replace `items-start` with `items-center`, its stock vertical padding with `py-3` and its small text size with `font-sans text-body` (the questions read as body text, unlike the timeline's `<h3>` titles in the heading font), and add `min-h-11 gap-3` (its `font-medium` stays); on the content, replace the small text size with `text-body`, and on its inner element the stock bottom padding with `pb-3` (its `pt-0` stays) and `[&_a]:underline-offset-3` with `[&_a]:underline-offset-4`, the offset of a link in running text. Every item has its 1px line under it, the last one too: on the item, replace the stock `not-last:border-b` with `border-b border-border`. Both chevron icons get `strokeWidth={1.5}`. The trigger keeps its stock corner, which only shows in its focus outline, and its ring classes are replaced as the rules say.
+The stock `Accordion` is off the type scale and its trigger is under 44px. In `components/ui/accordion.tsx`: on the trigger, replace `items-start` with `items-center`, its stock vertical padding with `py-3` and its small text size with `font-sans text-body` (the questions read as body text, unlike the timeline's `<h3>` titles in the heading font), and add `min-h-11 gap-3` (its `font-medium` stays); on the content, replace the small text size with `text-body`, and on its inner element the stock bottom padding with `pb-3` (its `pt-0` stays) and `[&_a]:underline-offset-3` with `[&_a]:underline-offset-4`, the offset of a link in running text, and its stock 16px margin between paragraphs, which is off the spacing scale, with `[&_p:not(:last-child)]:mb-3`. Every item has its 1px line under it, the last one too: on the item, replace the stock `not-last:border-b` with `border-b border-border`. Both chevron icons get `strokeWidth={1.5}`. The trigger keeps its stock corner, which only shows in its focus outline, and its ring classes are replaced as the rules say.
 
 ### 7. Footer
 

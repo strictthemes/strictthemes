@@ -11,14 +11,14 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-const container = "mx-auto max-w-[720px] px-4 md:px-6"
-
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const container = "mx-auto max-w-[720px] px-4 md:px-6"
 
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
+  focusRing
 )
 
 const listLink = cn(textLink, "inline-block py-2")
@@ -36,10 +36,6 @@ const prices = [
   { fuel: "Hybrid", first: "£72", second: "£108" },
   { fuel: "Fully electric", first: "£30", second: "£45" },
 ]
-
-const headCell =
-  "h-auto px-4 py-2 font-bold whitespace-normal text-foreground first:pl-0 last:pr-0"
-const bodyCell = "px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0"
 
 const footerLinks = [
   "Accessibility",
@@ -65,12 +61,12 @@ function SectionHeading({ index }: { index: number }) {
 
 export function App() {
   return (
-    <div className="bg-background text-body text-foreground">
+    <div className="min-h-svh bg-background text-body text-foreground">
       <a
         href="#main"
         className={cn(
           "sr-only text-primary underline underline-offset-4 focus-visible:not-sr-only focus-visible:block focus-visible:px-4 focus-visible:py-2",
-          focusOutline
+          focusRing
         )}
       >
         Skip to main content
@@ -86,8 +82,8 @@ export function App() {
           <a
             href="/"
             className={cn(
-              "font-heading text-h2 text-foreground no-underline underline-offset-4 hover:underline",
-              focusOutline
+              "font-heading text-h2 text-foreground no-underline underline-offset-4 transition-colors duration-150 hover:underline",
+              focusRing
             )}
           >
             Callowmere Council
@@ -95,8 +91,8 @@ export function App() {
           <a
             href="#"
             className={cn(
-              "text-body font-bold text-foreground no-underline underline-offset-4 hover:underline",
-              focusOutline
+              "text-body font-bold text-foreground no-underline underline-offset-4 transition-colors duration-150 hover:underline",
+              focusRing
             )}
           >
             Apply for a resident's parking permit
@@ -110,11 +106,11 @@ export function App() {
           Resident parking permits: who can get one and what it costs
         </h1>
         <p className="mt-6">
-          A resident parking permit lets you park on the streets near your home
-          in a permit zone. This page is for people who live in Callowmere and
-          want to know if they can get one and what it will cost.
+          A resident's parking permit lets you park your vehicle in the permit
+          zone where you live. This page is for anyone who lives in a permit
+          zone and wants to know if they can get one and what it costs.
         </p>
-        <p className="mt-4 font-mono text-label text-muted-foreground">
+        <p className="mt-4 font-mono text-label text-muted-foreground tabular-nums">
           Updated <time dateTime="2026-11-04">4 November 2026</time>
         </p>
 
@@ -128,7 +124,7 @@ export function App() {
           >
             Contents
           </h2>
-          <ul className="mt-2 list-none p-0">
+          <ul className="mt-2">
             {sections.map((section) => (
               <li key={section.id}>
                 <a href={`#${section.id}`} className={listLink}>
@@ -167,8 +163,8 @@ export function App() {
 
         <SectionHeading index={1} />
         <p className="mt-4">
-          The price depends on what the vehicle runs on, and on whether it is
-          the first or the second permit at your address.
+          The price depends on what the vehicle runs on and on whether it is the
+          first or the second permit at your address.
         </p>
         <h3 className="mt-6 text-body font-bold">
           Prices for a 12-month permit
@@ -180,11 +176,13 @@ export function App() {
           >
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className={headCell}>Vehicle runs on</TableHead>
-                <TableHead className={cn(headCell, "text-right tabular-nums")}>
+                <TableHead className="h-auto px-4 py-2 font-bold whitespace-normal text-foreground first:pl-0 last:pr-0">
+                  Vehicle runs on
+                </TableHead>
+                <TableHead className="h-auto px-4 py-2 text-right font-bold whitespace-normal text-foreground first:pl-0 last:pr-0">
                   First permit
                 </TableHead>
-                <TableHead className={cn(headCell, "text-right tabular-nums")}>
+                <TableHead className="h-auto px-4 py-2 text-right font-bold whitespace-normal text-foreground first:pl-0 last:pr-0">
                   Second permit
                 </TableHead>
               </TableRow>
@@ -192,15 +190,13 @@ export function App() {
             <TableBody>
               {prices.map((row) => (
                 <TableRow key={row.fuel} className="hover:bg-transparent">
-                  <TableCell className={bodyCell}>{row.fuel}</TableCell>
-                  <TableCell
-                    className={cn(bodyCell, "text-right tabular-nums")}
-                  >
+                  <TableCell className="px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0">
+                    {row.fuel}
+                  </TableCell>
+                  <TableCell className="px-4 py-2 text-right align-top whitespace-normal tabular-nums first:pl-0 last:pr-0">
                     {row.first}
                   </TableCell>
-                  <TableCell
-                    className={cn(bodyCell, "text-right tabular-nums")}
-                  >
+                  <TableCell className="px-4 py-2 text-right align-top whitespace-normal tabular-nums first:pl-0 last:pr-0">
                     {row.second}
                   </TableCell>
                 </TableRow>
@@ -246,8 +242,8 @@ export function App() {
           </li>
         </ul>
         <p className="mt-4">
-          For a company car, you will also need a letter from your employer that
-          says you are the main driver.
+          For a company car, you also need a letter from your employer that says
+          you are the main driver.
         </p>
         <p className="mt-10">
           <a
@@ -267,7 +263,7 @@ export function App() {
           A permit lasts 12 months from the start date you choose.
         </p>
         <p className="mt-4">
-          We send you a reminder email 4 weeks before your permit ends. You
+          We will email you a reminder 4 weeks before your permit ends. You
           renew online in the same way you applied.
         </p>
 
@@ -275,15 +271,15 @@ export function App() {
         <p className="mt-4">Tell us if one of these happens:</p>
         <ul className="mt-4 list-disc pl-6">
           <li>
-            You change vehicle. Update the registration number online, which is
-            free.
+            You change your vehicle. Update the registration number online, at
+            no cost.
           </li>
           <li className="mt-2">
-            You move house. Cancel your permit and you get back the full months
-            left, less a £10 fee.
+            You move house. Cancel your permit and we will pay back the full
+            months left, less a £10 fee.
           </li>
           <li className="mt-2">
-            You sell the vehicle and do not replace it. Cancel your permit in
+            You sell your vehicle and do not replace it. Cancel your permit in
             the same way.
           </li>
         </ul>
@@ -295,7 +291,7 @@ export function App() {
           <h2 id="related-heading" className="text-h2">
             Related
           </h2>
-          <ul className="mt-4 list-none p-0">
+          <ul className="mt-4">
             {relatedLinks.map((label) => (
               <li key={label}>
                 <a href="#" className={listLink}>
@@ -310,7 +306,7 @@ export function App() {
       <footer className="border-t border-border bg-card">
         <div className={cn(container, "py-10")}>
           <nav aria-label="Footer">
-            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+            <ul className="flex flex-wrap gap-x-6">
               {footerLinks.map((label) => (
                 <li key={label}>
                   <a href="#" className={listLink}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react"
-import type { FormEvent, KeyboardEvent } from "react"
+import type { FormEvent, KeyboardEvent, ReactNode } from "react"
 import { Check, CircleAlert, Minus, Plus } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -11,28 +11,24 @@ const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const codeFocusOutline =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const labelClass = "font-mono text-label font-bold uppercase text-foreground"
-const buttonText = "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
-const panel = "flex flex-col rounded-xl border border-border bg-card p-5"
-const navLink = cn(
-  "font-mono text-label font-bold text-foreground uppercase underline-offset-4 hover:underline",
-  focusOutline
-)
-const currentLink = "underline decoration-2 underline-offset-4"
-const errorLine = "flex items-start gap-2 font-mono text-label text-destructive"
+const label = "font-mono text-label font-bold uppercase text-foreground"
 const smallPrint = "font-mono text-label text-muted-foreground"
+const buttonText = "h-auto px-5 py-2 font-mono text-label font-bold uppercase"
+const navLink = cn(label, "underline-offset-4 hover:underline", focusOutline)
+const currentLink = "underline decoration-2 underline-offset-4"
+const panel = "flex flex-col gap-5 rounded-xl border border-border bg-card p-5"
 
-type TicketId = "weekend" | "friday" | "saturday" | "under18"
+type TicketId = "weekend" | "friday" | "saturday" | "under-18"
 
 type Ticket = {
   id: TicketId
   name: string
   price: number
-  includes: [string, string, string]
+  includes: string[]
   soldOut?: boolean
 }
 
-const TICKETS: Ticket[] = [
+const tickets: Ticket[] = [
   {
     id: "weekend",
     name: "Weekend",
@@ -61,7 +57,7 @@ const TICKETS: Ticket[] = [
     soldOut: true,
   },
   {
-    id: "under18",
+    id: "under-18",
     name: "Under 18 weekend",
     price: 59,
     includes: [
@@ -74,36 +70,36 @@ const TICKETS: Ticket[] = [
 
 const MAX_QUANTITY = 8
 
-const EMPTY_QUANTITIES: Record<TicketId, number> = {
+const emptyQuantities: Record<TicketId, number> = {
   weekend: 0,
   friday: 0,
   saturday: 0,
-  under18: 0,
+  "under-18": 0,
 }
 
-const NAV = [
-  { label: "Line-up", href: "/line-up" },
-  { label: "Tickets", href: "/tickets", current: true },
-  { label: "Info", href: "/info" },
+const navItems = [
+  { href: "/line-up", text: "Line-up" },
+  { href: "/tickets", text: "Tickets" },
+  { href: "/info", text: "Info" },
 ]
 
 function euros(amount: number) {
   return `€${amount.toLocaleString("en-US")}`
 }
 
-function ticketWord(count: number) {
-  return count === 1 ? "ticket" : "tickets"
+function isValidEmail(value: string) {
+  if (/\s/.test(value)) return false
+  const parts = value.split("@")
+  if (parts.length !== 2) return false
+  const [local, domain] = parts
+  if (local.length < 1) return false
+  for (let i = 1; i < domain.length - 1; i++) {
+    if (domain[i] === ".") return true
+  }
+  return false
 }
 
-function isEmail(value: string) {
-  const at = value.indexOf("@")
-  if (at < 1) return false
-  const domain = value.slice(at + 1)
-  if (domain.includes("@")) return false
-  return /[^.]\.[^.]/.test(domain)
-}
-
-function FestivalDates() {
+function DateRange() {
   return (
     <>
       <time dateTime="2026-12-04">4</time>–
@@ -112,23 +108,30 @@ function FestivalDates() {
   )
 }
 
-type Errors = { name?: string; email?: string; tickets?: string }
+function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
+  return (
+    <p
+      id={id}
+      className="flex items-start gap-2 font-mono text-label text-destructive"
+    >
+      <CircleAlert className="size-4 shrink-0" aria-hidden="true" />
+      <span>{children}</span>
+    </p>
+  )
+}
 
-type Order = { count: number; total: number; email: string }
+function SiteHeader() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
-function Header() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-
-  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (open && event.key === "Escape") {
-      setOpen(false)
-      menuButton.current?.focus()
-    }
+  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButtonRef.current?.focus()
   }
 
   return (
-    <header className="border-b border-border" onKeyDown={onKeyDown}>
+    <header className="border-b border-border" onKeyDown={handleKeyDown}>
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-8 gap-y-3 px-3 py-3 md:px-5">
         <a
           href="/"
@@ -140,26 +143,29 @@ function Header() {
           Tremor Days
         </a>
         <nav aria-label="Main" className="hidden gap-5 md:flex">
-          {NAV.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              aria-current={link.current ? "page" : undefined}
-              className={cn(navLink, link.current && currentLink)}
-            >
-              {link.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const current = item.href === "/tickets"
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={current ? "page" : undefined}
+                className={cn(navLink, current && currentLink)}
+              >
+                {item.text}
+              </a>
+            )
+          })}
         </nav>
-        <p className={cn(labelClass, "ml-auto hidden tabular-nums md:block")}>
-          <FestivalDates />
+        <p className={cn(label, "ml-auto hidden tabular-nums md:block")}>
+          <DateRange />
         </p>
         <Button
-          ref={menuButton}
+          ref={menuButtonRef}
           variant="outline"
-          aria-expanded={open}
+          aria-expanded={menuOpen}
           aria-controls="mobile-menu"
-          onClick={() => setOpen((value) => !value)}
+          onClick={() => setMenuOpen((open) => !open)}
           className={cn(buttonText, "ml-auto md:hidden")}
         >
           Menu
@@ -168,27 +174,30 @@ function Header() {
       <nav
         id="mobile-menu"
         aria-label="Main"
-        hidden={!open}
+        hidden={!menuOpen}
         className="border-t border-border md:hidden"
       >
         <div className="mx-auto max-w-[1200px] px-3 py-2 md:px-5">
-          {NAV.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              aria-current={link.current ? "page" : undefined}
-              className={cn(navLink, "block py-2", link.current && currentLink)}
-            >
-              {link.label}
-            </a>
-          ))}
+          {navItems.map((item) => {
+            const current = item.href === "/tickets"
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={current ? "page" : undefined}
+                className={cn(navLink, "block py-2", current && currentLink)}
+              >
+                {item.text}
+              </a>
+            )
+          })}
         </div>
       </nav>
     </header>
   )
 }
 
-function Footer() {
+function SiteFooter() {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto flex max-w-[1200px] flex-col gap-3 px-3 py-8 md:px-5">
@@ -196,94 +205,100 @@ function Footer() {
         <p className="text-body">
           A two-day music and design festival at Varsby Docks.
         </p>
-        <p className={cn(labelClass, "tabular-nums")}>
-          Varsby Docks · <FestivalDates /> · © 2026 Tremor Days
+        <p className={cn(label, "tabular-nums")}>
+          Varsby Docks · <DateRange /> · © 2026 Tremor Days
         </p>
       </div>
     </footer>
   )
 }
 
+type Confirmation = { count: number; total: number; email: string }
+
 export function App() {
   const [quantities, setQuantities] =
-    useState<Record<TicketId, number>>(EMPTY_QUANTITIES)
+    useState<Record<TicketId, number>>(emptyQuantities)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [errors, setErrors] = useState<Errors>({})
-  const [order, setOrder] = useState<Order | null>(null)
+  const [nameError, setNameError] = useState(false)
+  const [emailError, setEmailError] = useState(false)
+  const [ticketError, setTicketError] = useState(false)
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
 
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const weekendPlusRef = useRef<HTMLButtonElement>(null)
   const messageRef = useRef<HTMLParagraphElement>(null)
-  const focusNameNext = useRef(false)
+  const focusNameAfterReset = useRef(false)
 
-  const lines = TICKETS.filter((ticket) => quantities[ticket.id] > 0).map(
-    (ticket) => ({
+  const lines = tickets
+    .filter((ticket) => quantities[ticket.id] > 0)
+    .map((ticket) => ({
       ticket,
       quantity: quantities[ticket.id],
       amount: quantities[ticket.id] * ticket.price,
-    })
-  )
+    }))
   const count = lines.reduce((sum, line) => sum + line.quantity, 0)
   const total = lines.reduce((sum, line) => sum + line.amount, 0)
 
   useEffect(() => {
-    if (order) {
+    if (confirmation) {
       messageRef.current?.focus()
-    } else if (focusNameNext.current) {
-      focusNameNext.current = false
+    } else if (focusNameAfterReset.current) {
+      focusNameAfterReset.current = false
       nameRef.current?.focus()
     }
-  }, [order])
+  }, [confirmation])
 
-  function change(id: TicketId, step: number) {
+  function changeQuantity(id: TicketId, step: number) {
     const next = Math.min(MAX_QUANTITY, Math.max(0, quantities[id] + step))
     setQuantities({ ...quantities, [id]: next })
-    if (next > 0 && errors.tickets) {
-      setErrors({ ...errors, tickets: undefined })
-    }
+    if (next > 0) setTicketError(false)
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const trimmedName = name.trim()
     const trimmedEmail = email.trim()
-    const next: Errors = {}
-    if (!trimmedName) next.name = "Enter your name."
-    if (!isEmail(trimmedEmail))
-      next.email = "Enter an email address, like ada@example.com."
-    if (count === 0) next.tickets = "Choose at least one ticket first."
-    setErrors(next)
+    const badName = trimmedName === ""
+    const badEmail = !isValidEmail(trimmedEmail)
+    const badTickets = count === 0
 
-    if (next.name) nameRef.current?.focus()
-    else if (next.email) emailRef.current?.focus()
-    else if (next.tickets) weekendPlusRef.current?.focus()
-    else {
-      setName(trimmedName)
-      setEmail(trimmedEmail)
-      setOrder({ count, total, email: trimmedEmail })
+    setNameError(badName)
+    setEmailError(badEmail)
+    setTicketError(badTickets)
+
+    if (badName) {
+      nameRef.current?.focus()
+    } else if (badEmail) {
+      emailRef.current?.focus()
+    } else if (badTickets) {
+      weekendPlusRef.current?.focus()
+    } else {
+      setConfirmation({ count, total, email: trimmedEmail })
     }
   }
 
   function startNewOrder() {
-    setQuantities(EMPTY_QUANTITIES)
+    setQuantities(emptyQuantities)
     setName("")
     setEmail("")
-    setErrors({})
-    setOrder(null)
-    focusNameNext.current = true
+    setNameError(false)
+    setEmailError(false)
+    setTicketError(false)
+    focusNameAfterReset.current = true
+    setConfirmation(null)
   }
 
   return (
     <div className="min-h-screen bg-background font-sans text-body text-foreground">
-      <Header />
+      <SiteHeader />
 
       <main className="mx-auto flex max-w-[1200px] flex-col gap-16 px-3 py-8 md:px-5 md:py-16">
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-2">
-            <p className={cn(labelClass, "tabular-nums")}>
-              Tremor Days · <FestivalDates />
+            <p className={cn(label, "tabular-nums")}>
+              Tremor Days · <DateRange />
             </p>
             <h1 className="text-h1 md:text-display">Tickets</h1>
           </div>
@@ -297,11 +312,11 @@ export function App() {
           <h2 className="sr-only">Your order</h2>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
             <ul className="flex flex-col gap-5 md:col-span-7">
-              {TICKETS.map((ticket) => {
+              {tickets.map((ticket) => {
                 const quantity = quantities[ticket.id]
                 const isWeekend = ticket.id === "weekend"
                 return (
-                  <li key={ticket.id} className={cn(panel, "gap-5")}>
+                  <li key={ticket.id} className={panel}>
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <h3 className="text-h2">{ticket.name}</h3>
                       {ticket.soldOut && (
@@ -314,81 +329,92 @@ export function App() {
                       <p className="font-heading text-h1 tabular-nums">
                         {euros(ticket.price)}
                       </p>
-                      <p className={labelClass}>Per person</p>
+                      <p className={label}>Per person</p>
                     </div>
                     <ul className="flex flex-col gap-3">
-                      {ticket.includes.map((line) => (
-                        <li key={line} className="flex items-start gap-2">
+                      {ticket.includes.map((item) => (
+                        <li
+                          key={item}
+                          className="flex items-start gap-2 text-body"
+                        >
                           <Check
-                            aria-hidden="true"
                             className="mt-1 size-4 shrink-0"
+                            aria-hidden="true"
                           />
-                          <span>{line}</span>
+                          <span>{item}</span>
                         </li>
                       ))}
                     </ul>
                     <div className="flex items-center justify-between gap-3 border-t border-border pt-5">
-                      <p className={labelClass}>Quantity</p>
+                      <p className={label}>Quantity</p>
                       <div
                         role="group"
                         aria-label={`${ticket.name} tickets`}
                         className="flex items-center gap-3"
                       >
                         {ticket.soldOut ? (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            aria-label={`One fewer ${ticket.name} ticket`}
-                            disabled
-                          >
-                            <Minus aria-hidden="true" className="size-4" />
-                          </Button>
+                          <>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled
+                              aria-label={`One fewer ${ticket.name} ticket`}
+                            >
+                              <Minus aria-hidden="true" />
+                            </Button>
+                            <p
+                              aria-live="polite"
+                              className="flex w-8 justify-center font-heading text-h2 tabular-nums"
+                            >
+                              0
+                            </p>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              disabled
+                              aria-label={`One more ${ticket.name} ticket`}
+                            >
+                              <Plus aria-hidden="true" />
+                            </Button>
+                          </>
                         ) : (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            aria-label={`One fewer ${ticket.name} ticket`}
-                            focusableWhenDisabled
-                            disabled={quantity === 0 || order !== null}
-                            onClick={() => change(ticket.id, -1)}
-                          >
-                            <Minus aria-hidden="true" className="size-4" />
-                          </Button>
-                        )}
-                        <p
-                          aria-live="polite"
-                          className="flex w-8 justify-center font-heading text-h2 tabular-nums"
-                        >
-                          {quantity}
-                        </p>
-                        {ticket.soldOut ? (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            aria-label={`One more ${ticket.name} ticket`}
-                            disabled
-                          >
-                            <Plus aria-hidden="true" className="size-4" />
-                          </Button>
-                        ) : (
-                          <Button
-                            ref={isWeekend ? weekendPlusRef : undefined}
-                            variant="outline"
-                            size="icon"
-                            aria-label={`One more ${ticket.name} ticket`}
-                            aria-describedby={
-                              isWeekend && errors.tickets
-                                ? "tickets-error"
-                                : undefined
-                            }
-                            focusableWhenDisabled
-                            disabled={
-                              quantity >= MAX_QUANTITY || order !== null
-                            }
-                            onClick={() => change(ticket.id, 1)}
-                          >
-                            <Plus aria-hidden="true" className="size-4" />
-                          </Button>
+                          <>
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              focusableWhenDisabled
+                              disabled={confirmation !== null || quantity <= 0}
+                              aria-label={`One fewer ${ticket.name} ticket`}
+                              onClick={() => changeQuantity(ticket.id, -1)}
+                            >
+                              <Minus aria-hidden="true" />
+                            </Button>
+                            <p
+                              aria-live="polite"
+                              className="flex w-8 justify-center font-heading text-h2 tabular-nums"
+                            >
+                              {quantity}
+                            </p>
+                            <Button
+                              ref={isWeekend ? weekendPlusRef : undefined}
+                              variant="outline"
+                              size="icon"
+                              focusableWhenDisabled
+                              disabled={
+                                confirmation !== null ||
+                                quantity >= MAX_QUANTITY
+                              }
+                              aria-label={`One more ${ticket.name} ticket`}
+                              aria-describedby={
+                                isWeekend && ticketError
+                                  ? "ticket-error"
+                                  : undefined
+                              }
+                              onClick={() => changeQuantity(ticket.id, 1)}
+                            >
+                              <Plus aria-hidden="true" />
+                            </Button>
+                          </>
                         )}
                       </div>
                     </div>
@@ -398,7 +424,7 @@ export function App() {
             </ul>
 
             <div className="flex flex-col gap-5 md:col-span-5">
-              <div className={cn(panel, "gap-5")}>
+              <div className={panel}>
                 <h3 className="text-h2">Summary</h3>
                 {lines.length > 0 ? (
                   <ul className="flex flex-col gap-3">
@@ -407,7 +433,7 @@ export function App() {
                         key={line.ticket.id}
                         className="flex items-baseline justify-between gap-3"
                       >
-                        <span>
+                        <span className="text-body">
                           {line.quantity} × {line.ticket.name}
                         </span>
                         <span className="font-mono tabular-nums">
@@ -420,7 +446,7 @@ export function App() {
                   <p className="text-body">No tickets chosen yet.</p>
                 )}
                 <div className="flex items-baseline justify-between gap-3 border-t border-border pt-5">
-                  <p className={labelClass}>Total</p>
+                  <p className={label}>Total</p>
                   <p className="font-heading text-h1 tabular-nums">
                     {euros(total)}
                   </p>
@@ -430,20 +456,17 @@ export function App() {
                 </p>
               </div>
 
-              <div className={cn(panel, "gap-5")}>
+              <div className={panel}>
                 <h3 className="text-h2">Your details</h3>
                 <div>
-                  {!order && (
+                  {!confirmation && (
                     <form
                       noValidate
-                      onSubmit={onSubmit}
+                      onSubmit={handleSubmit}
                       className="flex flex-col gap-5"
                     >
                       <div className="flex flex-col gap-2">
-                        <label
-                          htmlFor="name"
-                          className={cn(labelClass, "block")}
-                        >
+                        <label htmlFor="name" className={cn(label, "block")}>
                           Name
                         </label>
                         <Input
@@ -454,31 +477,23 @@ export function App() {
                           value={name}
                           onChange={(event) => {
                             setName(event.target.value)
-                            if (errors.name)
-                              setErrors({ ...errors, name: undefined })
+                            setNameError(false)
                           }}
-                          aria-invalid={errors.name ? true : undefined}
+                          aria-invalid={nameError || undefined}
                           aria-describedby={
-                            errors.name ? "name-error" : undefined
+                            nameError ? "name-error" : undefined
                           }
                           className="h-auto px-3 py-2 text-body md:text-body"
                         />
-                        {errors.name && (
-                          <p id="name-error" className={errorLine}>
-                            <CircleAlert
-                              aria-hidden="true"
-                              className="size-4 shrink-0"
-                            />
-                            <span>{errors.name}</span>
-                          </p>
+                        {nameError && (
+                          <ErrorLine id="name-error">
+                            Enter your name.
+                          </ErrorLine>
                         )}
                       </div>
 
                       <div className="flex flex-col gap-2">
-                        <label
-                          htmlFor="email"
-                          className={cn(labelClass, "block")}
-                        >
+                        <label htmlFor="email" className={cn(label, "block")}>
                           Email
                         </label>
                         <Input
@@ -490,28 +505,21 @@ export function App() {
                           value={email}
                           onChange={(event) => {
                             setEmail(event.target.value)
-                            if (errors.email)
-                              setErrors({ ...errors, email: undefined })
+                            setEmailError(false)
                           }}
-                          aria-invalid={errors.email ? true : undefined}
+                          aria-invalid={emailError || undefined}
                           aria-describedby={
-                            errors.email
-                              ? "email-help email-error"
-                              : "email-help"
+                            emailError ? "email-help email-error" : "email-help"
                           }
                           className="h-auto px-3 py-2 text-body md:text-body"
                         />
                         <p id="email-help" className={smallPrint}>
                           We would send the tickets here.
                         </p>
-                        {errors.email && (
-                          <p id="email-error" className={errorLine}>
-                            <CircleAlert
-                              aria-hidden="true"
-                              className="size-4 shrink-0"
-                            />
-                            <span>{errors.email}</span>
-                          </p>
+                        {emailError && (
+                          <ErrorLine id="email-error">
+                            Enter an email address, like ada@example.com.
+                          </ErrorLine>
                         )}
                       </div>
 
@@ -519,27 +527,23 @@ export function App() {
                         <Button
                           type="submit"
                           aria-describedby={
-                            errors.tickets ? "tickets-error" : undefined
+                            ticketError ? "ticket-error" : undefined
                           }
                           className={cn(buttonText, "w-full")}
                         >
                           Reserve tickets
                         </Button>
-                        {errors.tickets && (
-                          <p id="tickets-error" className={errorLine}>
-                            <CircleAlert
-                              aria-hidden="true"
-                              className="size-4 shrink-0"
-                            />
-                            <span>{errors.tickets}</span>
-                          </p>
+                        {ticketError && (
+                          <ErrorLine id="ticket-error">
+                            Choose at least one ticket first.
+                          </ErrorLine>
                         )}
                       </div>
                     </form>
                   )}
 
                   <div role="status">
-                    {order && (
+                    {confirmation && (
                       <div className="flex flex-col gap-3">
                         <p
                           ref={messageRef}
@@ -550,23 +554,24 @@ export function App() {
                           )}
                         >
                           <Check
-                            aria-hidden="true"
                             className="mt-1 size-4 shrink-0"
+                            aria-hidden="true"
                           />
                           <span>
-                            Reserved: {order.count} {ticketWord(order.count)},{" "}
-                            {euros(order.total)}.
+                            Reserved: {confirmation.count}{" "}
+                            {confirmation.count === 1 ? "ticket" : "tickets"},{" "}
+                            {euros(confirmation.total)}.
                           </span>
                         </p>
                         <p className="text-body wrap-break-word">
-                          Tickets would go to {order.email}. This is a demo, so
-                          nothing was charged or sent.
+                          Tickets would go to {confirmation.email}. This is a
+                          demo, so nothing was charged or sent.
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {order && (
+                  {confirmation && (
                     <div className="pt-3">
                       <Button
                         variant="outline"
@@ -584,7 +589,7 @@ export function App() {
         </section>
       </main>
 
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

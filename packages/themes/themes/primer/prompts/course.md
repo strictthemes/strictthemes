@@ -4,7 +4,7 @@ title: Course
 description: one course of an online school, with an opening that has the title, the facts and one action to start, a drawn chart, what you will learn, the syllabus as modules that open and close with their lessons inside, the teacher, and a panel with the price and the action.
 order: 2
 checks:
-  - "The opening has one default button, Start the course, and the only other default button is in the price panel, far below it and never on screen with it."
+  - "The opening has one default button, Start the course, and the only other default button is in the price panel, far below it, with the learning list and the syllabus between them."
   - "The syllabus is an accordion of three modules that open and close with the keyboard, the first open at the start, and every lesson in it has its number, its title and its length."
   - "The picture is drawn from plain elements with `role=img` and an `aria-label`, its bars are azure with the figure written above each, and no image file is loaded."
   - "The figures agree: 3, 4 and 3 lessons make 10, and 45, 65 and 50 minutes make 2 h 40 min."
@@ -82,7 +82,7 @@ A grid from the layout notes, with two cards that are sections.
 
 **The price.** `lg:col-span-5`. The `<h2>` "What it costs"; then a `flex flex-col gap-2`: a small figure, `Included in Plus`; the key figure's row from the layout notes, `$18` with `a month` beside it; and a small figure, `or $180 a year, which is two months free`. Then a `<ul>` with `flex flex-col gap-2 border-t border-border pt-5`, each `<li>` a `flex items-start gap-2` in `text-body` with the `Check` icon (`mt-1 shrink-0`, `aria-hidden="true"`): "All 10 lessons of this course", "The other 8 courses too", "A certificate when you finish". Then, with `mt-auto`, a `flex flex-col items-start gap-3`: an `<a href="#">` styled as a default button with `w-full`, "Start the course", and a text link, "Compare the plans", to `/plans`.
 
-This is the second default button on the page. It is far below the opening and never on screen with it.
+This is the second default button on the page. It is far below the opening, with what you will learn and the syllabus between them.
 
 ### 7. Footer
 
@@ -91,5 +91,5 @@ The footer from the layout notes.
 ### Behavior
 
 - The accordion opens and closes each module on click, Enter and Space, as it ships. More than one module may be open, and all three may be closed.
-- The bars of the picture get their heights from the two values and each chart's axis, in code, so another pair of values draws right.
+- The bars of the picture get their heights from the two values and each chart's axis, in code, so another pair of values draws right, as long as each axis ends above the higher value, as both do here: a bar at the axis end would push its figure out of the plot.
 - Every link and both buttons need no behavior beyond their `href`. The page has no other state.

@@ -80,7 +80,7 @@ Every part is one column, in this order: the opening, the note about emergencies
 - **Sending:** check the form in code, in this order, and show one error per field or group, the first that applies, as the Errors note says:
   - Name, empty or only spaces: "Write your name. A first name is enough."
   - Email address, empty: "Write your email address, so that I can reply." Malformed: "Check the email address. It needs an @ and a domain, like name@example.com."
-  - Phone number, empty while By phone is chosen: "Write a phone number, or choose By email below." Not empty, but once its spaces are taken out it is not 10 to 15 digits with at most one `+` in front: "Check the phone number. It needs 10 to 15 digits. You can also leave it empty."
+  - Phone number, empty while By phone is chosen: "Write a phone number, or choose By email below." Not empty, but once its spaces, hyphens, dots and brackets are taken out it is not 10 to 15 digits with at most one `+` in front: "Check the phone number. It needs 10 to 15 digits. You can also leave it empty."
   - How to reply, none chosen: "Choose email or phone."
   - In person or online, none chosen: "Choose one of the three. Either is fine."
   - Times, none ticked: "Tick at least one time. You can tick them all."

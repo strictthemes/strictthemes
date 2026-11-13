@@ -58,7 +58,7 @@ function AccordionContent({
     >
       <div
         className={cn(
-          "h-(--accordion-panel-height) pt-0 pb-3 data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+          "h-(--accordion-panel-height) pt-0 pb-3 data-ending-style:h-0 data-starting-style:h-0 [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-3",
           className
         )}
       >

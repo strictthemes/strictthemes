@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
+// The sample's today: a fixed date, never the device clock.
 const TODAY = new Date(2026, 10, 12)
 const EARLIEST_DELIVERY = new Date(2026, 10, 16)
 
@@ -34,21 +35,23 @@ const TEXT_LINK = cn(
   FOCUS
 )
 const LABEL = "font-mono text-label text-muted-foreground"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const BUTTON_TEXT = "px-4 font-mono text-label"
+const SMALL = "font-mono text-label tabular-nums text-muted-foreground"
+const BUTTON = "px-4 font-mono text-label"
+const HEAD = "px-4 font-mono text-label text-muted-foreground"
+const CELL = "px-4 py-2"
 
-const NAV_LINKS = [
+const NAV = [
   { label: "Catalogue", href: "/catalogue" },
   { label: "Compare", href: "/compare" },
   { label: "Downloads", href: "/downloads" },
   { label: "Quote", href: "/quote" },
 ]
-const CURRENT_NAV = "/quote"
+const CURRENT = "/quote"
 
 type Line = {
   part: string
-  href: string
   description: string
+  href: string
   // Price per bearing in pence for 1–49, 50–249, 250–999 and 1,000 and over.
   breaks: [number, number, number, number]
   quantity: string
@@ -57,22 +60,22 @@ type Line = {
 const INITIAL_LINES: Line[] = [
   {
     part: "TVL-2047-RS",
-    href: "/part",
     description: "Deep groove ball bearing, 20 × 47 × 14 mm, rubber seals",
+    href: "/part",
     breaks: [294, 261, 228, 197],
     quantity: "250",
   },
   {
     part: "TVL-2552-RS",
-    href: "#",
     description: "Deep groove ball bearing, 25 × 52 × 15 mm, rubber seals",
+    href: "#",
     breaks: [346, 307, 268, 232],
     quantity: "100",
   },
   {
     part: "TVL-3572-ZZ",
-    href: "#",
     description: "Deep groove ball bearing, 35 × 72 × 17 mm, metal shields",
+    href: "#",
     breaks: [652, 579, 505, 437],
     quantity: "40",
   },
@@ -84,47 +87,46 @@ const DELIVERY_ITEMS = [
   { value: "collect", label: "Collect from Brigholt" },
 ]
 
-type TextField =
-  "company" | "name" | "email" | "phone" | "address" | "town" | "postcode"
+type FieldName =
+  | "company"
+  | "name"
+  | "email"
+  | "phone"
+  | "address"
+  | "town"
+  | "postcode"
+  | "requiredBy"
 
-type Details = Record<TextField, string>
+type Fields = Record<Exclude<FieldName, "requiredBy">, string>
 
-const EMPTY_DETAILS: Details = {
-  company: "",
-  name: "",
-  email: "",
-  phone: "",
-  address: "",
-  town: "",
-  postcode: "",
-}
-
-type Errors = Record<string, string>
-
-type Confirmation = {
-  lines: number
-  subtotal: number
-  email: string
+const FIELD_IDS: Record<FieldName, string> = {
+  company: "company",
+  name: "name",
+  email: "email",
+  phone: "phone",
+  address: "address",
+  town: "town",
+  postcode: "postcode",
+  requiredBy: "required-by",
 }
 
 function parseQuantity(raw: string): number | null {
   const cleaned = raw.trim().replace(/,/g, "")
   if (!/^\d+$/.test(cleaned)) return null
-  const value = Number(cleaned)
-  return value >= 1 && value <= 10000 ? value : null
+  const n = Number(cleaned)
+  return n >= 1 && n <= 10000 ? n : null
 }
 
-function unitPrice(line: Line): number {
-  const quantity = parseQuantity(line.quantity)
-  if (quantity === null || quantity < 50) return line.breaks[0]
-  if (quantity < 250) return line.breaks[1]
-  if (quantity < 1000) return line.breaks[2]
+function unitPence(line: Line, qty: number | null): number {
+  if (qty === null || qty < 50) return line.breaks[0]
+  if (qty < 250) return line.breaks[1]
+  if (qty < 1000) return line.breaks[2]
   return line.breaks[3]
 }
 
-function lineTotal(line: Line): number {
-  const quantity = parseQuantity(line.quantity)
-  return quantity === null ? 0 : quantity * unitPrice(line)
+function linePence(line: Line): number {
+  const qty = parseQuantity(line.quantity)
+  return qty === null ? 0 : qty * unitPence(line, qty)
 }
 
 function formatPence(pence: number): string {
@@ -133,57 +135,13 @@ function formatPence(pence: number): string {
   return `${pounds.toLocaleString("en-GB")}.${rest}`
 }
 
-function qtyId(part: string) {
+function quantityId(part: string) {
   return `qty-${part}`
 }
 
-function validate(lines: Line[], details: Details, requiredBy?: Date) {
-  const errors: Errors = {}
-  for (const line of lines) {
-    if (parseQuantity(line.quantity) === null) {
-      errors[qtyId(line.part)] = "Enter a whole number from 1 to 10,000."
-    }
-  }
-  if (!details.company) errors.company = "Enter your company's name."
-  if (!details.name) errors.name = "Enter your name."
-  if (!details.email) {
-    errors.email = "Enter your email address."
-  } else {
-    const parts = details.email.split("@")
-    if (parts.length !== 2 || !parts[0] || !parts[1].includes(".")) {
-      errors.email = "Enter an email address such as buyer@pellam.example."
-    }
-  }
-  if (
-    details.phone &&
-    !/^\+?\d{10,15}$/.test(details.phone.replace(/ /g, ""))
-  ) {
-    errors.phone = "Enter a phone number of 10 to 15 digits, or leave it empty."
-  }
-  if (!details.address) errors.address = "Enter the delivery address."
-  if (!details.town) errors.town = "Enter the town."
-  if (!/^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i.test(details.postcode)) {
-    errors.postcode = "Enter a postcode such as AC7 1RT."
-  }
-  if (!requiredBy) {
-    errors.requiredBy = "Enter a date."
-  } else if (requiredBy < EARLIEST_DELIVERY) {
-    errors.requiredBy =
-      "Choose 16 November 2026 or later. We need two working days."
-  }
-  return errors
+function lineCount(n: number) {
+  return `${n} ${n === 1 ? "line" : "lines"}`
 }
-
-const FIELD_ORDER = [
-  "company",
-  "name",
-  "email",
-  "phone",
-  "address",
-  "town",
-  "postcode",
-  "requiredBy",
-]
 
 function ErrorLine({
   id,
@@ -212,241 +170,254 @@ function ErrorLine({
   )
 }
 
-function describedBy(...ids: (string | false | undefined)[]) {
-  const list = ids.filter(Boolean).join(" ")
-  return list || undefined
-}
-
-function Header() {
-  const [menuOpen, setMenuOpen] = React.useState(false)
-  const menuButton = React.useRef<HTMLButtonElement>(null)
-
-  function onKeyDown(event: React.KeyboardEvent) {
-    if (menuOpen && event.key === "Escape") {
-      setMenuOpen(false)
-      menuButton.current?.focus()
-    }
-  }
-
-  function navLinkClass(current: boolean) {
-    return cn(
-      "font-mono text-label transition-colors duration-150",
-      current
-        ? "text-foreground underline underline-offset-4"
-        : "text-muted-foreground hover:text-foreground",
-      FOCUS
-    )
-  }
-
-  return (
-    <header className="border-b border-border bg-card" onKeyDown={onKeyDown}>
-      <div className="mx-auto flex w-full max-w-[1280px] items-center gap-6 px-4 py-3">
-        <a
-          href="/catalogue"
-          className={cn("font-heading text-h2 text-foreground", FOCUS)}
-        >
-          Torvale
-        </a>
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex gap-6">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.href === CURRENT_NAV ? "page" : undefined}
-                  className={navLinkClass(link.href === CURRENT_NAV)}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <p className={cn("ml-auto hidden md:block", SMALL_FIGURE)}>
-          Sales 01632 960 418
-        </p>
-        <Button
-          ref={menuButton}
-          variant="secondary"
-          className={cn("ml-auto md:hidden", BUTTON_TEXT)}
-          aria-expanded={menuOpen}
-          aria-controls="mobile-nav"
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          Menu
-        </Button>
-      </div>
-      <nav
-        id="mobile-nav"
-        aria-label="Main"
-        hidden={!menuOpen}
-        className="border-t border-border md:hidden"
-      >
-        <div className="mx-auto w-full max-w-[1280px] px-4">
-          <ul className="py-2">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.href === CURRENT_NAV ? "page" : undefined}
-                  className={cn(
-                    "block py-2",
-                    navLinkClass(link.href === CURRENT_NAV)
-                  )}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </nav>
-    </header>
-  )
-}
-
-type FieldProps = {
-  id: string
-  label: string
-  error?: string
-  helper?: string
-  className?: string
-  inputWrapperClassName?: string
-} & Omit<React.ComponentProps<typeof Input>, "id" | "className">
-
-function TextInputField({
-  id,
-  label,
-  error,
-  helper,
-  className,
-  inputWrapperClassName,
-  ...inputProps
-}: FieldProps) {
-  const helperId = helper ? `${id}-help` : undefined
-  const errorId = error ? `${id}-error` : undefined
-  const input = (
-    <Input
-      id={id}
-      className="px-2 text-body md:text-body"
-      aria-invalid={error ? true : undefined}
-      aria-describedby={describedBy(helperId, errorId)}
-      {...inputProps}
-    />
-  )
-  return (
-    <div className={cn("flex flex-col gap-3", className)}>
-      <label htmlFor={id} className={cn("block", LABEL)}>
-        {label}
-      </label>
-      <div className="flex flex-col gap-2">
-        {inputWrapperClassName ? (
-          <div className={inputWrapperClassName}>{input}</div>
-        ) : (
-          input
-        )}
-        {helper && (
-          <p id={helperId} className={SMALL_FIGURE}>
-            {helper}
-          </p>
-        )}
-        {error && <ErrorLine id={`${id}-error`}>{error}</ErrorLine>}
-      </div>
-    </div>
-  )
-}
+type Sent = { lines: number; subtotal: number; email: string }
 
 export function App() {
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+
   const [lines, setLines] = React.useState<Line[]>(INITIAL_LINES)
-  const [details, setDetails] = React.useState<Details>(EMPTY_DETAILS)
+  const [fields, setFields] = React.useState<Fields>({
+    company: "",
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    town: "",
+    postcode: "",
+  })
   const [delivery, setDelivery] = React.useState("standard")
   const [requiredBy, setRequiredBy] = React.useState<Date | undefined>()
-  const [errors, setErrors] = React.useState<Errors>({})
-  const [focusRequest, setFocusRequest] = React.useState<{ id: string } | null>(
-    null
-  )
-  const [confirmation, setConfirmation] = React.useState<Confirmation | null>(
-    null
-  )
-  const confirmationHeading = React.useRef<HTMLHeadingElement>(null)
+  const [errors, setErrors] = React.useState<Record<string, string>>({})
+  const [focusRequest, setFocusRequest] = React.useState<{
+    id: string
+    n: number
+  } | null>(null)
+  const [sent, setSent] = React.useState<Sent | null>(null)
+  const confirmationRef = React.useRef<HTMLHeadingElement>(null)
 
-  const subtotal = lines.reduce((sum, line) => sum + lineTotal(line), 0)
+  const subtotal = lines.reduce((sum, line) => sum + linePence(line), 0)
 
+  // Focus moves only once the error lines (or the next line) are rendered.
   React.useEffect(() => {
     if (focusRequest) document.getElementById(focusRequest.id)?.focus()
   }, [focusRequest])
 
   React.useEffect(() => {
-    if (confirmation) confirmationHeading.current?.focus()
-  }, [confirmation])
+    if (sent) confirmationRef.current?.focus()
+  }, [sent])
+
+  function requestFocus(id: string) {
+    setFocusRequest((prev) => ({ id, n: (prev?.n ?? 0) + 1 }))
+  }
 
   function clearError(key: string) {
-    setErrors((current) => {
-      if (!(key in current)) return current
-      const next = { ...current }
+    setErrors((prev) => {
+      if (!(key in prev)) return prev
+      const next = { ...prev }
       delete next[key]
       return next
     })
   }
 
-  function setQuantity(part: string, quantity: string) {
-    setLines((current) =>
-      current.map((line) => (line.part === part ? { ...line, quantity } : line))
+  function setQuantity(part: string, value: string) {
+    setLines((prev) =>
+      prev.map((line) =>
+        line.part === part ? { ...line, quantity: value } : line
+      )
     )
-    clearError(qtyId(part))
+    clearError(quantityId(part))
   }
 
-  function removeLine(part: string) {
-    const index = lines.findIndex((line) => line.part === part)
-    const next = lines.filter((line) => line.part !== part)
+  function removeLine(index: number) {
+    const removed = lines[index]
+    const next = lines.filter((_, i) => i !== index)
+    const target = next[Math.min(index, next.length - 1)]
     setLines(next)
-    clearError(qtyId(part))
-    const target = next[index] ?? next[index - 1]
-    if (target) setFocusRequest({ id: qtyId(target.part) })
+    clearError(quantityId(removed.part))
+    if (target) {
+      requestFocus(quantityId(target.part))
+    }
   }
 
-  function setDetail(field: TextField, value: string) {
-    setDetails((current) => ({ ...current, [field]: value }))
-    clearError(field)
+  function setField(name: keyof Fields, value: string) {
+    setFields((prev) => ({ ...prev, [name]: value }))
+    clearError(name)
   }
 
-  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function validate(): Record<string, string> {
+    const e: Record<string, string> = {}
+    for (const line of lines) {
+      if (parseQuantity(line.quantity) === null) {
+        e[quantityId(line.part)] = "Enter a whole number from 1 to 10,000."
+      }
+    }
+    const f = {
+      company: fields.company.trim(),
+      name: fields.name.trim(),
+      email: fields.email.trim(),
+      phone: fields.phone.trim(),
+      address: fields.address.trim(),
+      town: fields.town.trim(),
+      postcode: fields.postcode.trim().toUpperCase(),
+    }
+    if (!f.company) e.company = "Enter your company's name."
+    if (!f.name) e.name = "Enter your name."
+    if (!f.email) e.email = "Enter your email address."
+    else if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email))
+      e.email = "Enter an email address such as buyer@pellam.example."
+    if (f.phone && !/^\+?\d{10,15}$/.test(f.phone.replace(/\s/g, "")))
+      e.phone = "Enter a phone number of 10 to 15 digits, or leave it empty."
+    if (!f.address) e.address = "Enter the delivery address."
+    if (!f.town) e.town = "Enter the town."
+    if (!/^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/.test(f.postcode))
+      e.postcode = "Enter a postcode such as AC7 1RT."
+    if (!requiredBy) e.requiredBy = "Enter a date."
+    else if (requiredBy < EARLIEST_DELIVERY)
+      e.requiredBy =
+        "Choose 16 November 2026 or later. We need two working days."
+    return e
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const trimmedLines = lines.map((line) => ({
-      ...line,
-      quantity: line.quantity.trim(),
-    }))
-    const trimmed = Object.fromEntries(
-      Object.entries(details).map(([key, value]) => [key, value.trim()])
-    ) as Details
-    setLines(trimmedLines)
-    setDetails(trimmed)
-
-    const found = validate(trimmedLines, trimmed, requiredBy)
-    setErrors(found)
+    const e = validate()
+    setErrors(e)
     const order = [
-      ...trimmedLines.map((line) => qtyId(line.part)),
-      ...FIELD_ORDER,
+      ...lines.map((line) => quantityId(line.part)),
+      ...(Object.keys(FIELD_IDS) as FieldName[]),
     ]
-    const first = order.find((key) => key in found)
+    const first = order.find((key) => key in e)
     if (first) {
-      setFocusRequest({ id: first === "requiredBy" ? "required-by" : first })
+      const id =
+        first in FIELD_IDS ? FIELD_IDS[first as FieldName] : first
+      requestFocus(id)
       return
     }
-    setConfirmation({
-      lines: trimmedLines.length,
-      subtotal: trimmedLines.reduce((sum, line) => sum + lineTotal(line), 0),
-      email: trimmed.email,
+    setSent({
+      lines: lines.length,
+      subtotal,
+      email: fields.email.trim(),
     })
   }
 
-  const count = `${lines.length} ${lines.length === 1 ? "line" : "lines"}`
-  const headCell = cn("px-4", LABEL)
-  const bodyCell = "px-4 py-2"
+  function errorId(key: string) {
+    return `${FIELD_IDS[key as FieldName] ?? key}-error`
+  }
+
+  function textField(
+    name: keyof Fields,
+    label: string,
+    props: React.ComponentProps<typeof Input>,
+    options: { wide?: boolean; narrow?: boolean } = {}
+  ) {
+    const id = FIELD_IDS[name]
+    const error = errors[name]
+    const input = (
+      <Input
+        id={id}
+        value={fields[name]}
+        onChange={(e) => setField(name, e.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errorId(name) : undefined}
+        className="px-2 text-body md:text-body"
+        {...props}
+      />
+    )
+    return (
+      <div
+        className={cn("flex flex-col gap-3", options.wide && "md:col-span-2")}
+      >
+        <label htmlFor={id} className={cn("block", LABEL)}>
+          {label}
+        </label>
+        <div className="flex flex-col gap-2">
+          {options.narrow ? <div className="w-32">{input}</div> : input}
+          {error && <ErrorLine id={errorId(name)}>{error}</ErrorLine>}
+        </div>
+      </div>
+    )
+  }
+
+  function navLink(item: (typeof NAV)[number], extra?: string) {
+    const current = item.href === CURRENT
+    return (
+      <a
+        href={item.href}
+        aria-current={current ? "page" : undefined}
+        className={cn(
+          "font-mono text-label transition-colors duration-150",
+          current
+            ? "text-foreground underline underline-offset-4"
+            : "text-muted-foreground hover:text-foreground",
+          FOCUS,
+          extra
+        )}
+      >
+        {item.label}
+      </a>
+    )
+  }
+
+  const requiredByError = errors.requiredBy
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <Header />
+      <header
+        className="border-b border-border bg-card"
+        onKeyDown={(e) => {
+          if (menuOpen && e.key === "Escape") {
+            setMenuOpen(false)
+            menuButtonRef.current?.focus()
+          }
+        }}
+      >
+        <div className="mx-auto flex w-full max-w-[1280px] items-center gap-6 px-4 py-3">
+          <a
+            href="/catalogue"
+            className={cn(
+              "font-heading text-h2 text-foreground transition-colors duration-150",
+              FOCUS
+            )}
+          >
+            Torvale
+          </a>
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex gap-6">
+              {NAV.map((item) => (
+                <li key={item.href}>{navLink(item)}</li>
+              ))}
+            </ul>
+          </nav>
+          <p className={cn("ml-auto hidden md:block", SMALL)}>
+            Sales 01632 960 418
+          </p>
+          <Button
+            ref={menuButtonRef}
+            variant="secondary"
+            className={cn("ml-auto md:hidden", BUTTON)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            Menu
+          </Button>
+        </div>
+        <nav
+          id="mobile-nav"
+          aria-label="Main"
+          hidden={!menuOpen}
+          className="border-t border-border md:hidden"
+        >
+          <div className="mx-auto w-full max-w-[1280px] px-4">
+            <ul className="py-2">
+              {NAV.map((item) => (
+                <li key={item.href}>{navLink(item, "block py-2")}</li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </header>
 
       <main className="flex-1 py-6">
         <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-6 px-4">
@@ -458,62 +429,61 @@ export function App() {
           </div>
 
           <div>
-            {!confirmation && (
+            {!sent && (
               <form
                 noValidate
-                onSubmit={onSubmit}
+                onSubmit={handleSubmit}
                 className="flex flex-col gap-4"
               >
                 <div className="overflow-hidden rounded-xl border border-border bg-card">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
                     <h2 className="text-h2">Lines</h2>
-                    <p aria-live="polite" className={SMALL_FIGURE}>
-                      {count}
+                    <p aria-live="polite" className={SMALL}>
+                      {lineCount(lines.length)}
                     </p>
                   </div>
                   <Table label="Lines" className="text-body">
                     <TableHeader>
                       <TableRow>
-                        <TableHead className={headCell}>Part number</TableHead>
-                        <TableHead className={cn(headCell, "min-w-48")}>
+                        <TableHead className={HEAD}>Part number</TableHead>
+                        <TableHead className={cn(HEAD, "min-w-48")}>
                           Description
                         </TableHead>
-                        <TableHead className={cn(headCell, "text-right")}>
+                        <TableHead className={cn(HEAD, "text-right")}>
                           Quantity
                         </TableHead>
-                        <TableHead className={cn(headCell, "text-right")}>
+                        <TableHead className={cn(HEAD, "text-right")}>
                           Unit price (£)
                         </TableHead>
-                        <TableHead className={cn(headCell, "text-right")}>
+                        <TableHead className={cn(HEAD, "text-right")}>
                           Line total (£)
                         </TableHead>
-                        <TableHead className={headCell}>
+                        <TableHead className={HEAD}>
                           <span className="sr-only">Action</span>
                         </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {lines.map((line) => {
-                        const id = qtyId(line.part)
+                      {lines.map((line, index) => {
+                        const qty = parseQuantity(line.quantity)
+                        const id = quantityId(line.part)
                         const error = errors[id]
                         return (
                           <TableRow key={line.part}>
-                            <TableCell className={bodyCell}>
+                            <TableCell className={CELL}>
                               <a
                                 href={line.href}
-                                className={cn("font-mono text-body", TEXT_LINK)}
+                                className={cn(TEXT_LINK, "font-mono text-body")}
                               >
                                 {line.part}
                               </a>
                             </TableCell>
-                            <TableCell
-                              className={cn(bodyCell, "whitespace-normal")}
-                            >
+                            <TableCell className={cn(CELL, "whitespace-normal")}>
                               {line.description}
                             </TableCell>
                             <TableCell
                               className={cn(
-                                bodyCell,
+                                CELL,
                                 "text-right whitespace-normal"
                               )}
                             >
@@ -522,13 +492,13 @@ export function App() {
                                   id={id}
                                   inputMode="numeric"
                                   aria-label={`Quantity of ${line.part}`}
+                                  value={line.quantity}
+                                  onChange={(e) =>
+                                    setQuantity(line.part, e.target.value)
+                                  }
                                   aria-invalid={error ? true : undefined}
                                   aria-describedby={
                                     error ? `${id}-error` : undefined
-                                  }
-                                  value={line.quantity}
-                                  onChange={(event) =>
-                                    setQuantity(line.part, event.target.value)
                                   }
                                   className="w-24 px-2 text-right font-mono text-body tabular-nums md:text-body"
                                 />
@@ -544,27 +514,27 @@ export function App() {
                             </TableCell>
                             <TableCell
                               className={cn(
-                                bodyCell,
+                                CELL,
                                 "text-right font-mono tabular-nums"
                               )}
                             >
-                              {formatPence(unitPrice(line))}
+                              {formatPence(unitPence(line, qty))}
                             </TableCell>
                             <TableCell
                               className={cn(
-                                bodyCell,
+                                CELL,
                                 "text-right font-mono tabular-nums"
                               )}
                             >
-                              {formatPence(lineTotal(line))}
+                              {formatPence(linePence(line))}
                             </TableCell>
-                            <TableCell className={bodyCell}>
+                            <TableCell className={CELL}>
                               <Button
                                 variant="secondary"
-                                className={BUTTON_TEXT}
+                                className={BUTTON}
                                 aria-label={`Remove ${line.part}`}
                                 disabled={lines.length === 1}
-                                onClick={() => removeLine(line.part)}
+                                onClick={() => removeLine(index)}
                               >
                                 Remove
                               </Button>
@@ -577,19 +547,19 @@ export function App() {
                       <TableRow className="hover:bg-transparent">
                         <TableCell
                           colSpan={4}
-                          className={cn(bodyCell, "text-right", LABEL)}
+                          className={cn(CELL, LABEL, "text-right")}
                         >
                           Subtotal, excluding VAT
                         </TableCell>
                         <TableCell
                           className={cn(
-                            bodyCell,
+                            CELL,
                             "text-right font-heading text-h2 tabular-nums"
                           )}
                         >
                           {formatPence(subtotal)}
                         </TableCell>
-                        <TableCell className={bodyCell} />
+                        <TableCell className={CELL} />
                       </TableRow>
                     </TableFooter>
                   </Table>
@@ -601,49 +571,21 @@ export function App() {
                       <h2 className="text-h2">Company and delivery</h2>
                     </div>
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <TextInputField
-                        id="company"
-                        label="Company"
-                        autoComplete="organization"
-                        className="md:col-span-2"
-                        value={details.company}
-                        error={errors.company}
-                        onChange={(event) =>
-                          setDetail("company", event.target.value)
-                        }
-                      />
-                      <TextInputField
-                        id="name"
-                        label="Your name"
-                        autoComplete="name"
-                        value={details.name}
-                        error={errors.name}
-                        onChange={(event) =>
-                          setDetail("name", event.target.value)
-                        }
-                      />
-                      <TextInputField
-                        id="email"
-                        label="Email"
-                        type="email"
-                        autoComplete="email"
-                        value={details.email}
-                        error={errors.email}
-                        onChange={(event) =>
-                          setDetail("email", event.target.value)
-                        }
-                      />
-                      <TextInputField
-                        id="phone"
-                        label="Phone (optional)"
-                        type="tel"
-                        autoComplete="tel"
-                        value={details.phone}
-                        error={errors.phone}
-                        onChange={(event) =>
-                          setDetail("phone", event.target.value)
-                        }
-                      />
+                      {textField(
+                        "company",
+                        "Company",
+                        { autoComplete: "organization" },
+                        { wide: true }
+                      )}
+                      {textField("name", "Your name", { autoComplete: "name" })}
+                      {textField("email", "Email", {
+                        type: "email",
+                        autoComplete: "email",
+                      })}
+                      {textField("phone", "Phone (optional)", {
+                        type: "tel",
+                        autoComplete: "tel",
+                      })}
                       <div className="flex flex-col gap-3">
                         <label
                           id="delivery-label"
@@ -676,38 +618,21 @@ export function App() {
                           </Select>
                         </div>
                       </div>
-                      <TextInputField
-                        id="address"
-                        label="Delivery address"
-                        autoComplete="street-address"
-                        className="md:col-span-2"
-                        value={details.address}
-                        error={errors.address}
-                        onChange={(event) =>
-                          setDetail("address", event.target.value)
-                        }
-                      />
-                      <TextInputField
-                        id="town"
-                        label="Town"
-                        autoComplete="address-level2"
-                        value={details.town}
-                        error={errors.town}
-                        onChange={(event) =>
-                          setDetail("town", event.target.value)
-                        }
-                      />
-                      <TextInputField
-                        id="postcode"
-                        label="Postcode"
-                        autoComplete="postal-code"
-                        inputWrapperClassName="w-32"
-                        value={details.postcode}
-                        error={errors.postcode}
-                        onChange={(event) =>
-                          setDetail("postcode", event.target.value)
-                        }
-                      />
+                      {textField(
+                        "address",
+                        "Delivery address",
+                        { autoComplete: "street-address" },
+                        { wide: true }
+                      )}
+                      {textField("town", "Town", {
+                        autoComplete: "address-level2",
+                      })}
+                      {textField(
+                        "postcode",
+                        "Postcode",
+                        { autoComplete: "postal-code" },
+                        { narrow: true }
+                      )}
                       <div className="flex flex-col gap-3">
                         <label
                           id="required-by-label"
@@ -721,33 +646,34 @@ export function App() {
                             id="required-by"
                             labelId="required-by-label"
                             value={requiredBy}
-                            onValueChange={(value) => {
-                              setRequiredBy(value)
+                            onValueChange={(date) => {
+                              setRequiredBy(date)
                               clearError("requiredBy")
                             }}
                             today={TODAY}
-                            aria-invalid={errors.requiredBy ? true : undefined}
-                            aria-describedby={describedBy(
-                              "required-by-help",
-                              errors.requiredBy && "required-by-error"
-                            )}
+                            aria-invalid={requiredByError ? true : undefined}
+                            aria-describedby={
+                              requiredByError
+                                ? "required-by-helper required-by-error"
+                                : "required-by-helper"
+                            }
                           />
-                          <p id="required-by-help" className={SMALL_FIGURE}>
+                          <p id="required-by-helper" className={SMALL}>
                             Monday 16 November 2026 or later.
                           </p>
-                          {errors.requiredBy && (
+                          {requiredByError && (
                             <ErrorLine id="required-by-error">
-                              {errors.requiredBy}
+                              {requiredByError}
                             </ErrorLine>
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
-                      <Button type="submit" className={BUTTON_TEXT}>
+                      <Button type="submit" className={BUTTON}>
                         Request a quote
                       </Button>
-                      <p className={SMALL_FIGURE}>
+                      <p className={SMALL}>
                         We reply by 17:00 on the next working day.
                       </p>
                     </div>
@@ -758,29 +684,27 @@ export function App() {
                       <h2 className="text-h2">How quotes work</h2>
                     </div>
                     <ul>
-                      {[
-                        "Prices hold for 30 days from the date on the quote.",
-                        "Delivery is priced in the quote. Standard delivery is free on orders over £500.00.",
-                        "Orders placed by 15:00 on a working day leave Brigholt the same day.",
-                      ].map((text) => (
-                        <li
-                          key={text}
-                          className="border-t border-border px-4 py-3 text-body first:border-t-0"
-                        >
-                          {text}
-                        </li>
-                      ))}
+                      <li className="px-4 py-3 text-body">
+                        Prices hold for 30 days from the date on the quote.
+                      </li>
+                      <li className="border-t border-border px-4 py-3 text-body">
+                        Delivery is priced in the quote. Standard delivery is
+                        free on orders over £500.00.
+                      </li>
+                      <li className="border-t border-border px-4 py-3 text-body">
+                        Orders placed by 15:00 on a working day leave Brigholt
+                        the same day.
+                      </li>
                     </ul>
                   </div>
                 </div>
               </form>
             )}
-
             <div role="status">
-              {confirmation && (
+              {sent && (
                 <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4">
                   <h2
-                    ref={confirmationHeading}
+                    ref={confirmationRef}
                     tabIndex={-1}
                     className={cn("text-h2", FOCUS_CODE)}
                   >
@@ -788,34 +712,37 @@ export function App() {
                   </h2>
                   <dl className="w-full max-w-md">
                     {[
-                      { term: "Reference", value: "TQ-26-04173" },
-                      { term: "Lines", value: String(confirmation.lines) },
-                      {
-                        term: "Subtotal, excluding VAT",
-                        value: `£${formatPence(confirmation.subtotal)}`,
-                      },
-                      {
-                        term: "Reply by",
-                        value: (
-                          <time dateTime="2026-11-13T17:00">
-                            17:00, 13 Nov 2026
-                          </time>
-                        ),
-                      },
-                    ].map((row) => (
+                      ["Reference", "TQ-26-04173"],
+                      ["Lines", String(sent.lines)],
+                      [
+                        "Subtotal, excluding VAT",
+                        `£${formatPence(sent.subtotal)}`,
+                      ],
+                    ].map(([term, value], i) => (
                       <div
-                        key={row.term}
-                        className="flex items-baseline justify-between gap-3 border-t border-border py-2 first:border-t-0"
+                        key={term}
+                        className={cn(
+                          "flex items-baseline justify-between gap-3 py-2",
+                          i > 0 && "border-t border-border"
+                        )}
                       >
-                        <dt className={LABEL}>{row.term}</dt>
+                        <dt className={LABEL}>{term}</dt>
                         <dd className="text-right font-mono tabular-nums">
-                          {row.value}
+                          {value}
                         </dd>
                       </div>
                     ))}
+                    <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
+                      <dt className={LABEL}>Reply by</dt>
+                      <dd className="text-right font-mono tabular-nums">
+                        <time dateTime="2026-11-13T17:00">
+                          17:00, 13 Nov 2026
+                        </time>
+                      </dd>
+                    </div>
                   </dl>
                   <p className="max-w-lg text-body wrap-break-word">
-                    We will send the quote to {confirmation.email}, from
+                    We will send the quote to {sent.email}, from
                     sales@torvale.example.
                   </p>
                   <p className="max-w-lg text-body">
@@ -825,7 +752,7 @@ export function App() {
                     href="/catalogue"
                     className={cn(
                       buttonVariants({ variant: "secondary" }),
-                      BUTTON_TEXT,
+                      BUTTON,
                       "self-start"
                     )}
                   >
@@ -840,9 +767,9 @@ export function App() {
 
       <footer className="border-t border-border">
         <div className="mx-auto w-full max-w-[1280px] px-4 py-6">
-          <p className={SMALL_FIGURE}>
-            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
-            nothing is sold or sent.
+          <p className={SMALL}>
+            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A
+            demo: nothing is sold or sent.
           </p>
         </div>
       </footer>

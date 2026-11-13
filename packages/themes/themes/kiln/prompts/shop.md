@@ -24,13 +24,13 @@ The header from the layout notes. "Shop" is the current page. The basket holds 3
 The first section of `<main>`, a 12-column grid with `md:items-center`.
 
 - Columns 1–5: a label in `text-muted-foreground`, "Hand-thrown in Bramwick"; with `mt-2` the `<h1>` in `text-h1`, and `lg:text-display` from `lg` up, so it fits a phone and the narrow column of a tablet: "Stoneware for every day, made by two people"; with `mt-4` one paragraph of two sentences on what the studio makes; with `mt-6` a block element holding a link styled as the default button, "Shop tableware", to `/tableware`. This is the page's first terracotta button.
-- Columns 7–12: one piece and a lot of clay around it. A `<figure>` with a picture in `aspect-4/5`, as the Pictures note says, showing a tall jug in Ash glaze: the piece is drawn pale, `h-1/2 w-2/5 bg-glaze-pale border border-foreground/40` with square corners. Its `aria-label` is "Tall jug in ash glaze, seen from the side". The caption: "Tall jug, ash glaze, £64.00", the caption muted and the price in a `<span>` in `tabular-nums text-foreground`, as the Prices note says.
+- Columns 7–12: one piece and a lot of clay around it. A `<figure>` with a picture in `aspect-4/5`, as the Pictures note says, showing a tall jug in Ash glaze: the piece is drawn pale, `h-1/2 w-2/5 bg-glaze-pale border border-foreground/60` with square corners. Its `aria-label` is "Tall jug in ash glaze, seen from the side". The caption: "Tall jug, ash glaze, £64.00", the caption muted and the price in a `<span>` in `tabular-nums text-foreground`, as the Prices note says.
 
 Below `md` the figure comes under the text: give its column `mt-10 md:mt-0`.
 
 ### 3. About the studio
 
-A `<section>` with the `aria-label` "About the studio", a 12-column grid. Columns 1–8: one sentence as a `<p>` in `font-heading text-h2`; it is set large, not as body text, so here, instead of the Measure note's `max-w-lg`, it fills the eight columns. For example "Every piece is thrown, trimmed and glazed by hand in a converted dairy at the edge of Bramwick, and no two come out of the kiln the same." Then with `mt-4` a block element holding a text link in running-text style, "Read about the studio", to `/studio`.
+A `<section>` with the `aria-label` "About the studio", a 12-column grid. Columns 1–8 are one element holding a sentence and a link. The sentence is a `<p>` in `font-heading text-h2`; it is set large, not as body text, so here, instead of the Measure note's `max-w-lg`, it fills the eight columns. For example "Every piece is thrown, trimmed and glazed by hand in a converted dairy at the edge of Bramwick, and no two come out of the kiln the same." Under it, in the same column element, with `mt-4`, a block element holding a text link in running-text style, "Read about the studio", to `/studio`.
 
 ### 4. New from the kiln
 

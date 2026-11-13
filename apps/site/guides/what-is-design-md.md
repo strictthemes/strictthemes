@@ -157,7 +157,7 @@ We ran one script over all 23 themes in the repo. It parses each file with `lint
 | Corner sizes | 3 | 1 | 3 |
 | Components | 6 | 6 | 6 |
 | Words of prose | 521 | 414 | 664 |
-| Lines in the file | 184 | 177 | 191 |
+| Lines in the file | 185 | 177 | 191 |
 
 Three things to take from it:
 

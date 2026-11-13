@@ -10,7 +10,7 @@ checks:
   - There is no sidebar, and the links to the previous and the next chapter are in a `<nav>` with a label.
 ---
 
-Sample chapter, if the user gave none: chapter 3, "Writing things down", of "A Handbook for Small Teams", a guide for teams of five to fifteen people. The chapter argues that a decision is not made until it is written where the team can find it, and shows how. Write 700 to 900 words of running text yourself, plain and specific, in the paragraphs of four `<h2>` sections, the sentence that introduces the steps included; only those paragraphs count, not the headings or the steps; the standfirst, the aside, "In short", the table, the steps, the template and the quote come on top of that.
+Sample chapter, if the user gave none: chapter 3, "Writing things down", of "A Handbook for Small Teams", a guide for teams of five to fifteen people. The chapter argues that a decision is not made until it is written where the team can find it, and shows how. Write the chapter yourself, plain and specific, in four `<h2>` sections. The paragraphs of those sections hold 700 to 900 words, the sentence that introduces the steps included. Nothing else counts toward that number: not the headings, the standfirst, the steps, the table, the aside, the template, the quote or "In short".
 
 Build these parts in order. An `<article>` wraps the chapter opening, the list of sections, the body and "In short".
 

@@ -37,7 +37,7 @@ The header from the layout notes, with "Departures" as the current page; its lin
 
 ### 2. Opening
 
-The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-cols-12`): a label, `Harrowmouth · HRW · Berths 1–4`, then with `mt-2` the `<h1>` "Departures from Harrowmouth" in `text-h1`, then with `mt-3` one sentence: the board follows the ships, and a berth can change up to 20 minutes before a sailing. Then with `mt-3` a label line in `text-foreground`: `Friday 18 December 2026 · Updated 07:48`, the date and the time each in a `<time>`.
+The first section, with `pt-8`, in columns 1–8 of a grid (`grid grid-cols-1 gap-5 md:grid-cols-12`): a label, `Harrowmouth · HRW · Berths 1–4`, then with `mt-2` the `<h1>` "Departures from Harrowmouth" in `text-h1`, then with `mt-3` one sentence: the board follows the ships, and a berth can change up to 20 minutes before a sailing. Then with `mt-3` a label line in `text-foreground`: `Friday 18 December 2026 · Updated 07:48`, the date and the time each in a `<time>`.
 
 ### 3. Notice
 
@@ -52,7 +52,7 @@ A section with `mt-16`, in columns 1–8 of a grid: a card that is a nested `<se
 
 A section with `mt-16`: an `<h2>` "Departures board", then with `mt-3` one sentence: check-in closes 30 minutes before a sailing for foot passengers and 45 minutes before with a vehicle. Then with `mt-5` the board card: a card that holds a table, so `overflow-hidden rounded-xl border bg-card` with no padding, holding two parts.
 
-**The filter**, a `<div>` with `border-b p-5`: a label `<p>` with an `id`, "Destination", in `font-mono text-label text-foreground`, then with `mt-2` a button group as the layout notes describe, named by that label with `aria-labelledby`: "All", "Port Ellery", "Brindle Ness", "Wrenholm", "Tollan Quay", with "All" chosen. Then with `mt-3` a `<p>` with `role="status"`, a label in `text-muted-foreground`, that says how many rows are shown: `Showing 11 sailings`, `Showing 5 sailings to Port Ellery`, `Showing 3 sailings to Brindle Ness`, `Showing 2 sailings to Wrenholm`, `Showing 2 sailings to Tollan Quay`, and at one row `Showing 1 sailing to …`. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
+**The filter**, a `<div>` with `border-b p-5`: a label `<p>` with an `id`, "Destination", in `font-mono text-label text-foreground`, then with `mt-2` a button group as the layout notes describe, named by that label with `aria-labelledby`: "All", "Port Ellery", "Brindle Ness", "Wrenholm", "Tollan Quay", with "All" chosen. Then with `mt-3` a `<p>` with `role="status"`, a label in `text-muted-foreground`, that says how many rows are shown: `Showing 11 sailings`, `Showing 5 sailings for Port Ellery`, `Showing 3 sailings for Brindle Ness`, `Showing 2 sailings for Wrenholm`, `Showing 2 sailings for Tollan Quay`, and at one row `Showing 1 sailing for …` ("for", since a sailing that only calls at the port counts too). Unlike the confirmations in the layout notes, it holds its first text from the start: it is a count that changes, not a message that replaces a form.
 
 **The table**, the shadcn `Table` as the layout notes describe (add it with `npx shadcn@latest add table badge` if missing), with `label="Departures board"`, directly under the filter's rule and touching the card's other three edges. Five columns, each header cell with `scope="col"`: Time, Destination, Ship, Berth, State. One row per sailing, in the order of the sample. In each row:
 
@@ -66,7 +66,7 @@ The cells keep the stock `whitespace-nowrap`, so the table is wider than a phone
 
 ### 5. At the port
 
-A section with `mt-16`, as a grid (`grid gap-5 md:grid-cols-12 md:items-start`):
+A section with `mt-16`, as a grid (`grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7: an `<h2>` "At the port", then with `mt-5` a description list as the layout notes describe, on the page, not in a card, with five rows: Address (an `<address className="not-italic">` with three block `<span>`s, `Harbour Road`, `Harrowmouth`, `HW1 4QS`); Check-in desk (`Opens 05:45`, a label in `text-foreground` with the time in a `<time>`); Foot passengers (`Desk closes 30 min before`, a label in `text-foreground`); Vehicles (`Lane closes 45 min before`, a label in `text-foreground`); Parking (`Long stay · £8.00 a day`, a label in `text-foreground`).
 - In columns 9–12: a card with a label `Sailing another day?`, then with `mt-2` an `<h3>` in `text-h2`, "Book a crossing", then with `mt-3` one sentence: fares are lowest a few weeks ahead, and dogs and bicycles can be added when booking. Then with `mt-5`, in a `<div>`, the page's one default button: an `<a>` styled as a button, "Search sailings", that goes to `/`.

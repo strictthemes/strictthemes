@@ -22,9 +22,8 @@ const TEXT_LINK = cn(
 const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
 const LABEL = "font-mono text-label text-muted-foreground"
 const PANEL = "rounded-xl border border-border bg-card p-4"
-const ROWS_PANEL = "overflow-hidden rounded-xl border border-border bg-card"
-const CONTAINER = "mx-auto w-full max-w-[1280px] px-4"
-const BUTTON = "px-4 font-mono text-label"
+const PANEL_ROWS = "overflow-hidden rounded-xl border border-border bg-card"
+const HEADING_ROW = "flex flex-wrap items-center justify-between gap-3"
 
 const NAV_LINKS = [
   { label: "Catalogue", href: "/catalogue" },
@@ -36,88 +35,160 @@ const CURRENT_SECTION = "/catalogue"
 
 const PART = {
   number: "TVL-2047-RS",
-  // Dimensions in millimetres.
-  bore: 20,
-  outside: 47,
-  width: 14,
-  stock: 1240,
-  store: "Brigholt",
-  leadDays: 10,
+  boreMm: 20,
+  outsideMm: 47,
+  widthMm: 14,
+  inStock: 1240,
 }
 
 // Drawing scale: pixels per millimetre.
 const SCALE = 4
 
-// Unit prices in pence, per bearing.
-const PRICE_BREAKS = [
+const MAX_QUANTITY = 10000
+
+type PriceBreak = { min: number; max: number | null; pence: number }
+
+const PRICE_BREAKS: PriceBreak[] = [
   { min: 1, max: 49, pence: 294 },
   { min: 50, max: 249, pence: 261 },
   { min: 250, max: 999, pence: 228 },
   { min: 1000, max: null, pence: 197 },
-] as const
+]
 
-const MAX_QUANTITY = 10000
-
-type SpecRow = {
+const SPECIFICATION: {
   property: string
-  symbol?: string
+  symbol: string
   value: string
   figure: boolean
-  unit?: string
-}
-
-const SPEC: SpecRow[] = [
-  { property: "Bore diameter", symbol: "d", value: "20", figure: true, unit: "mm" },
-  { property: "Outside diameter", symbol: "D", value: "47", figure: true, unit: "mm" },
+  unit: string
+}[] = [
+  {
+    property: "Bore diameter",
+    symbol: "d",
+    value: "20",
+    figure: true,
+    unit: "mm",
+  },
+  {
+    property: "Outside diameter",
+    symbol: "D",
+    value: "47",
+    figure: true,
+    unit: "mm",
+  },
   { property: "Width", symbol: "B", value: "14", figure: true, unit: "mm" },
-  { property: "Dynamic load rating", symbol: "C", value: "13.40", figure: true, unit: "kN" },
-  { property: "Static load rating", symbol: "C0", value: "6.55", figure: true, unit: "kN" },
-  { property: "Limiting speed", value: "13,000", figure: true, unit: "r/min" },
-  { property: "Mass", value: "0.103", figure: true, unit: "kg" },
-  { property: "Operating temperature", value: "−30 to +110", figure: true, unit: "°C" },
-  { property: "Seals", value: "Two rubber seals, RS", figure: false },
-  { property: "Cage", value: "Pressed steel", figure: false },
-  { property: "Ring material", value: "Chrome steel, 100Cr6", figure: false },
-  { property: "Grease", value: "Lithium, 20% fill", figure: false },
-  { property: "Radial clearance", value: "CN, normal", figure: false },
-  { property: "Precision class", value: "P0, normal", figure: false },
+  {
+    property: "Dynamic load rating",
+    symbol: "C",
+    value: "13.40",
+    figure: true,
+    unit: "kN",
+  },
+  {
+    property: "Static load rating",
+    symbol: "C0",
+    value: "6.55",
+    figure: true,
+    unit: "kN",
+  },
+  {
+    property: "Limiting speed",
+    symbol: "",
+    value: "13,000",
+    figure: true,
+    unit: "r/min",
+  },
+  { property: "Mass", symbol: "", value: "0.103", figure: true, unit: "kg" },
+  {
+    property: "Operating temperature",
+    symbol: "",
+    value: "−30 to +110",
+    figure: true,
+    unit: "°C",
+  },
+  {
+    property: "Seals",
+    symbol: "",
+    value: "Two rubber seals, RS",
+    figure: false,
+    unit: "",
+  },
+  {
+    property: "Cage",
+    symbol: "",
+    value: "Pressed steel",
+    figure: false,
+    unit: "",
+  },
+  {
+    property: "Ring material",
+    symbol: "",
+    value: "Chrome steel, 100Cr6",
+    figure: false,
+    unit: "",
+  },
+  {
+    property: "Grease",
+    symbol: "",
+    value: "Lithium, 20% fill",
+    figure: false,
+    unit: "",
+  },
+  {
+    property: "Radial clearance",
+    symbol: "",
+    value: "CN, normal",
+    figure: false,
+    unit: "",
+  },
+  {
+    property: "Precision class",
+    symbol: "",
+    value: "P0, normal",
+    figure: false,
+    unit: "",
+  },
 ]
 
 const DOCUMENTS = [
   { title: "Data sheet, TVL-2047-RS", meta: "PDF · Rev C · 0.84 MB" },
   { title: "3D model, TVL-2047-RS", meta: "STEP · Rev C · 1.62 MB" },
-  { title: "Certificate of conformity, 2026", meta: "PDF · Rev A · 0.21 MB" },
+  {
+    title: "Certificate of conformity, 2026",
+    meta: "PDF · Rev A · 0.21 MB",
+  },
 ]
 
 function formatCount(n: number) {
   return n.toLocaleString("en-GB")
 }
 
+// Pence to "1,137.80", without floating-point sums.
 function formatPence(pence: number) {
   const pounds = Math.floor(pence / 100)
   const rest = String(pence % 100).padStart(2, "0")
-  return `${pounds.toLocaleString("en-GB")}.${rest}`
+  return `${formatCount(pounds)}.${rest}`
 }
 
-function rangeLabel(min: number, max: number | null) {
-  return max === null
-    ? `${formatCount(min)} and over`
-    : `${formatCount(min)} to ${formatCount(max)}`
+function formatRange(b: PriceBreak) {
+  return b.max === null
+    ? `${formatCount(b.min)} and over`
+    : `${formatCount(b.min)} to ${formatCount(b.max)}`
 }
 
 type Parsed =
-  | { kind: "empty" }
-  | { kind: "invalid" }
-  | { kind: "valid"; quantity: number }
+  { ok: true; quantity: number } | { ok: false; error: "empty" | "invalid" }
 
 function parseQuantity(raw: string): Parsed {
   const trimmed = raw.trim()
-  if (trimmed === "") return { kind: "empty" }
+  if (trimmed === "") return { ok: false, error: "empty" }
   const digits = trimmed.replace(/,/g, "")
-  if (!/^\d+$/.test(digits)) return { kind: "invalid" }
+  if (!/^\d+$/.test(digits)) return { ok: false, error: "invalid" }
   const quantity = Number(digits)
-  if (quantity < 1 || quantity > MAX_QUANTITY) return { kind: "invalid" }
-  return { kind: "valid", quantity }
+  if (quantity < 1 || quantity > MAX_QUANTITY) {
+    return { ok: false, error: "invalid" }
+  }
+  return { ok: true, quantity }
 }
 
 function breakFor(quantity: number) {
@@ -127,38 +198,29 @@ function breakFor(quantity: number) {
 }
 
 function Header() {
-  const [open, setOpen] = React.useState(false)
+  const [menuOpen, setMenuOpen] = React.useState(false)
   const menuButton = React.useRef<HTMLButtonElement>(null)
 
-  function onKeyDown(event: React.KeyboardEvent) {
-    if (!open || event.key !== "Escape") return
-    setOpen(false)
-    menuButton.current?.focus()
+  function navLinkClass(href: string) {
+    return cn(
+      "font-mono text-label transition-colors duration-150",
+      FOCUS,
+      href === CURRENT_SECTION
+        ? "text-foreground underline underline-offset-4"
+        : "text-muted-foreground hover:text-foreground"
+    )
   }
 
-  function navLink(link: (typeof NAV_LINKS)[number], block = false) {
-    const current = link.href === CURRENT_SECTION
-    return (
-      <a
-        href={link.href}
-        aria-current={current ? "true" : undefined}
-        className={cn(
-          "font-mono text-label transition-colors duration-150",
-          FOCUS,
-          block && "block py-2",
-          current
-            ? "text-foreground underline underline-offset-4"
-            : "text-muted-foreground hover:text-foreground"
-        )}
-      >
-        {link.label}
-      </a>
-    )
+  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (menuOpen && event.key === "Escape") {
+      setMenuOpen(false)
+      menuButton.current?.focus()
+    }
   }
 
   return (
     <header className="border-b border-border bg-card" onKeyDown={onKeyDown}>
-      <div className={cn(CONTAINER, "flex items-center gap-6 py-3")}>
+      <div className="mx-auto flex w-full max-w-[1280px] items-center gap-6 px-4 py-3">
         <a
           href="/catalogue"
           className={cn(
@@ -171,20 +233,30 @@ function Header() {
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex gap-6">
             {NAV_LINKS.map((link) => (
-              <li key={link.href}>{navLink(link)}</li>
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  aria-current={
+                    link.href === CURRENT_SECTION ? "true" : undefined
+                  }
+                  className={navLinkClass(link.href)}
+                >
+                  {link.label}
+                </a>
+              </li>
             ))}
           </ul>
         </nav>
-        <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
+        <p className={cn("ml-auto hidden md:block", SMALL_FIGURE)}>
           Sales 01632 960 418
         </p>
         <Button
           ref={menuButton}
           variant="secondary"
-          className={cn(BUTTON, "ml-auto md:hidden")}
-          aria-expanded={open}
+          className="ml-auto px-4 font-mono text-label md:hidden"
+          aria-expanded={menuOpen}
           aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => setMenuOpen((open) => !open)}
         >
           Menu
         </Button>
@@ -192,13 +264,23 @@ function Header() {
       <nav
         id="mobile-nav"
         aria-label="Main"
-        hidden={!open}
+        hidden={!menuOpen}
         className="border-t border-border md:hidden"
       >
-        <div className={CONTAINER}>
+        <div className="mx-auto w-full max-w-[1280px] px-4">
           <ul className="py-2">
             {NAV_LINKS.map((link) => (
-              <li key={link.href}>{navLink(link, true)}</li>
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  aria-current={
+                    link.href === CURRENT_SECTION ? "true" : undefined
+                  }
+                  className={cn(navLinkClass(link.href), "block py-2")}
+                >
+                  {link.label}
+                </a>
+              </li>
             ))}
           </ul>
         </div>
@@ -208,54 +290,51 @@ function Header() {
 }
 
 function PageHeader() {
+  const crumbLink = cn(
+    "text-muted-foreground underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+    FOCUS
+  )
+  const action = cn(
+    buttonVariants({ variant: "secondary" }),
+    "px-4 font-mono text-label"
+  )
   return (
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex flex-col gap-1">
         <nav aria-label="Breadcrumb">
           <ol className="flex flex-wrap items-center gap-2 font-mono text-label">
-            {[
-              { label: "Catalogue", href: "/catalogue" },
-              { label: "Deep groove", href: "/catalogue" },
-            ].map((step) => (
-              <li key={step.label} className="flex items-center gap-2">
-                <a
-                  href={step.href}
-                  className={cn(
-                    "text-muted-foreground underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                    FOCUS
-                  )}
-                >
-                  {step.label}
-                </a>
-                <span aria-hidden="true" className="text-muted-foreground">
-                  /
-                </span>
-              </li>
-            ))}
-            <li>
-              <span aria-current="page" className="text-foreground">
-                {PART.number}
+            <li className="flex items-center gap-2">
+              <a href="/catalogue" className={crumbLink}>
+                Catalogue
+              </a>
+              <span aria-hidden="true" className="text-muted-foreground">
+                /
               </span>
+            </li>
+            <li className="flex items-center gap-2">
+              <a href="/catalogue" className={crumbLink}>
+                Deep groove
+              </a>
+              <span aria-hidden="true" className="text-muted-foreground">
+                /
+              </span>
+            </li>
+            <li className="text-foreground" aria-current="page">
+              {PART.number}
             </li>
           </ol>
         </nav>
         <h1 className="font-mono text-h1">{PART.number}</h1>
-        <p className="max-w-lg text-body text-foreground">
-          Deep groove ball bearing, {PART.bore} × {PART.outside} ×{" "}
-          {PART.width} mm, two rubber seals
+        <p className="text-body">
+          Deep groove ball bearing, {PART.boreMm} × {PART.outsideMm} ×{" "}
+          {PART.widthMm} mm, two rubber seals
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
-        <a
-          href="/compare"
-          className={cn(buttonVariants({ variant: "secondary" }), BUTTON)}
-        >
+        <a href="/compare" className={action}>
           Compare
         </a>
-        <a
-          href="/downloads"
-          className={cn(buttonVariants({ variant: "secondary" }), BUTTON)}
-        >
+        <a href="/downloads" className={action}>
           Data sheet
         </a>
       </div>
@@ -263,16 +342,17 @@ function PageHeader() {
   )
 }
 
-function Drawing() {
-  const height = PART.outside * SCALE
-  const boreHeight = PART.bore * SCALE
-  const width = PART.width * SCALE
-  const boreInset = ((PART.outside - PART.bore) / 2) * SCALE
+function DrawingPanel() {
+  const D = PART.outsideMm * SCALE
+  const d = PART.boreMm * SCALE
+  const B = PART.widthMm * SCALE
+  // Offset inside the body's 1px border, so the line meets the bracket's end.
+  const boreOffset = ((PART.outsideMm - PART.boreMm) / 2) * SCALE - 1
   const dimLabel = "font-mono text-label tabular-nums text-foreground"
 
   return (
     <div className={cn(PANEL, "flex flex-col gap-4 lg:col-span-5")}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className={HEADING_ROW}>
         <h2 className="text-h2">Drawing</h2>
         <p className={SMALL_FIGURE}>Dimensions in mm</p>
       </div>
@@ -281,110 +361,106 @@ function Drawing() {
           aria-hidden="true"
           className="flex items-start justify-center gap-2 py-6"
         >
-          <div className="flex items-center gap-2" style={{ height }}>
-            <span className={dimLabel}>d {PART.bore}</span>
+          <div className="flex items-center gap-2" style={{ height: D }}>
+            <span className={dimLabel}>d {PART.boreMm}</span>
             <div
               className="w-2 border-y border-l border-foreground"
-              style={{ height: boreHeight }}
+              style={{ height: d }}
             />
           </div>
           <div className="flex flex-col items-center gap-2">
             <div
               className="relative border border-foreground"
-              style={{ width, height }}
+              style={{ width: B, height: D }}
             >
               <div
                 className="absolute inset-x-0 border-t border-dashed border-foreground"
-                style={{ top: boreInset }}
+                style={{ top: boreOffset }}
               />
               <div
                 className="absolute inset-x-0 border-t border-dashed border-foreground"
-                style={{ bottom: boreInset }}
+                style={{ bottom: boreOffset }}
               />
             </div>
             <div className="h-2 self-stretch border-x border-b border-foreground" />
-            <span className={dimLabel}>B {PART.width}</span>
+            <span className={dimLabel}>B {PART.widthMm}</span>
           </div>
-          <div className="flex gap-2" style={{ height }}>
+          <div className="flex gap-2" style={{ height: D }}>
             <div className="w-2 self-stretch border-y border-r border-foreground" />
             <span className={cn(dimLabel, "self-center")}>
-              D {PART.outside}
+              D {PART.outsideMm}
             </span>
           </div>
         </div>
         <figcaption className={SMALL_FIGURE}>
-          Side view of {PART.number}. Bore d {PART.bore} mm, outside diameter
-          D {PART.outside} mm, width B {PART.width} mm. The dashed lines show
-          the bore.
+          Side view of {PART.number}. Bore d {PART.boreMm} mm, outside diameter
+          D {PART.outsideMm} mm, width B {PART.widthMm} mm. The dashed lines
+          show the bore.
         </figcaption>
       </figure>
     </div>
   )
 }
 
-function PriceAndStock() {
-  const [value, setValue] = React.useState("1")
+function PriceStockPanel() {
+  const [quantityText, setQuantityText] = React.useState("1")
   const [error, setError] = React.useState<string | null>(null)
-  const [focusTick, setFocusTick] = React.useState(0)
+  const [errorKey, setErrorKey] = React.useState(0)
   const [confirmation, setConfirmation] = React.useState<{
     quantity: number
     pence: number
   } | null>(null)
   const inputRef = React.useRef<HTMLInputElement>(null)
 
-  React.useEffect(() => {
-    if (focusTick > 0) inputRef.current?.focus()
-  }, [focusTick])
+  const parsed = parseQuantity(quantityText)
+  const applies = parsed.ok ? breakFor(parsed.quantity) : null
 
-  const parsed = parseQuantity(value)
-  const quantity = parsed.kind === "valid" ? parsed.quantity : null
-  const applies = quantity === null ? null : breakFor(quantity)
-  const total = quantity !== null && applies ? quantity * applies.pence : 0
+  React.useEffect(() => {
+    if (errorKey > 0) inputRef.current?.focus()
+  }, [errorKey])
 
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const result = parseQuantity(value)
-    if (result.kind !== "valid") {
+    if (!parsed.ok) {
       setError(
-        result.kind === "empty"
+        parsed.error === "empty"
           ? "Enter a quantity."
-          : "Enter a whole number from 1 to 10,000."
+          : `Enter a whole number from 1 to ${formatCount(MAX_QUANTITY)}.`
       )
+      setErrorKey((k) => k + 1)
       setConfirmation(null)
-      setFocusTick((t) => t + 1)
       return
     }
     setError(null)
     setConfirmation({
-      quantity: result.quantity,
-      pence: breakFor(result.quantity).pence,
+      quantity: parsed.quantity,
+      pence: breakFor(parsed.quantity).pence,
     })
   }
 
-  const cellEdge = "px-4 first:pl-0 last:pr-0"
+  const headClass = cn("px-4 first:pl-0 last:pr-0", LABEL)
+  const cellClass = "px-4 py-2 first:pl-0 last:pr-0"
 
   return (
     <div className={cn(PANEL, "flex flex-col gap-4 lg:col-span-7")}>
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className={HEADING_ROW}>
         <h2 className="text-h2">Price and stock</h2>
       </div>
 
       <dl>
         <div className="flex items-baseline justify-between gap-3 py-2">
           <dt className={LABEL}>Stock</dt>
-          <dd className="text-right">
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                <span
-                  aria-hidden="true"
-                  className="size-2 shrink-0 rounded-full bg-success"
-                />
-                <span className="text-body text-foreground">In stock</span>
-              </span>
-              <span className={SMALL_FIGURE}>
-                {formatCount(PART.stock)} at {PART.store}
-              </span>
-            </div>
+          <dd className="flex flex-wrap items-center justify-end gap-2 text-right">
+            <span className="inline-flex items-center gap-2 whitespace-nowrap">
+              <span
+                aria-hidden="true"
+                className="size-2 shrink-0 rounded-full bg-success"
+              />
+              <span className="text-body text-foreground">In stock</span>
+            </span>
+            <span className={SMALL_FIGURE}>
+              {formatCount(PART.inStock)} at Brigholt
+            </span>
           </dd>
         </div>
         <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
@@ -395,9 +471,7 @@ function PriceAndStock() {
         </div>
         <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
           <dt className={LABEL}>Lead time beyond stock</dt>
-          <dd className="text-right text-body">
-            {PART.leadDays} working days
-          </dd>
+          <dd className="text-right text-body">10 working days</dd>
         </div>
       </dl>
 
@@ -406,42 +480,40 @@ function PriceAndStock() {
         <Table label="Price breaks" className="text-body">
           <TableHeader>
             <TableRow>
-              <TableHead className={cn(cellEdge, LABEL, "text-right")}>
+              <TableHead className={cn(headClass, "text-right")}>
                 Quantity
               </TableHead>
-              <TableHead className={cn(cellEdge, LABEL, "text-right")}>
+              <TableHead className={cn(headClass, "text-right")}>
                 Unit price (£)
               </TableHead>
-              <TableHead className={cn(cellEdge, LABEL)}>
-                Your quantity
-              </TableHead>
+              <TableHead className={headClass}>Your quantity</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {PRICE_BREAKS.map((b) => {
-              const on = applies === b
+              const marked = applies === b
               return (
                 <TableRow key={b.min}>
                   <TableCell
                     className={cn(
-                      cellEdge,
-                      "py-2 text-right font-mono tabular-nums",
-                      on && "font-bold"
+                      cellClass,
+                      "text-right font-mono tabular-nums",
+                      marked && "font-bold"
                     )}
                   >
-                    {rangeLabel(b.min, b.max)}
+                    {formatRange(b)}
                   </TableCell>
                   <TableCell
                     className={cn(
-                      cellEdge,
-                      "py-2 text-right font-mono tabular-nums",
-                      on && "font-bold"
+                      cellClass,
+                      "text-right font-mono tabular-nums",
+                      marked && "font-bold"
                     )}
                   >
                     {formatPence(b.pence)}
                   </TableCell>
-                  <TableCell className={cn(cellEdge, "py-2", on && "font-bold")}>
-                    {on ? "Applies" : null}
+                  <TableCell className={cn(cellClass, marked && "font-bold")}>
+                    {marked ? "Applies" : null}
                   </TableCell>
                 </TableRow>
               )
@@ -455,7 +527,7 @@ function PriceAndStock() {
           <div className="flex flex-col gap-2">
             <div className="flex flex-wrap items-end gap-3">
               <div className="flex w-32 flex-col gap-3">
-                <label htmlFor="quantity" className={cn(LABEL, "block")}>
+                <label htmlFor="quantity" className={cn("block", LABEL)}>
                   Quantity
                 </label>
                 <Input
@@ -464,9 +536,9 @@ function PriceAndStock() {
                   name="quantity"
                   inputMode="numeric"
                   autoComplete="off"
-                  value={value}
-                  onChange={(e) => {
-                    setValue(e.target.value)
+                  value={quantityText}
+                  onChange={(event) => {
+                    setQuantityText(event.target.value)
                     setError(null)
                   }}
                   aria-invalid={error ? true : undefined}
@@ -476,14 +548,14 @@ function PriceAndStock() {
                   className="px-2 text-right font-mono text-body tabular-nums md:text-body"
                 />
               </div>
-              <Button type="submit" className={BUTTON}>
+              <Button type="submit" className="px-4 font-mono text-label">
                 Add to quote
               </Button>
             </div>
             <div className="flex flex-col gap-2">
               <p id="quantity-help" className={SMALL_FIGURE}>
-                {formatCount(PART.stock)} in stock. Larger orders ship in{" "}
-                {PART.leadDays} working days.
+                {formatCount(PART.inStock)} in stock. Larger orders ship in 10
+                working days.
               </p>
               {error ? (
                 <p
@@ -492,10 +564,10 @@ function PriceAndStock() {
                 >
                   <CircleAlert
                     aria-hidden="true"
-                    strokeWidth={1.5}
                     className="size-4 shrink-0"
+                    strokeWidth={1.5}
                   />
-                  <span>{error}</span>
+                  {error}
                 </p>
               ) : null}
             </div>
@@ -503,12 +575,15 @@ function PriceAndStock() {
 
           <div className="flex flex-col gap-1">
             <p className={LABEL}>Line total</p>
-            <p className="font-heading text-h1 tabular-nums text-foreground">
-              £{formatPence(total)}
+            <p className="font-heading text-h1 tabular-nums">
+              £
+              {parsed.ok
+                ? formatPence(parsed.quantity * applies!.pence)
+                : "0.00"}
             </p>
             <p className={SMALL_FIGURE}>
-              {quantity !== null && applies
-                ? `${formatCount(quantity)} at £${formatPence(applies.pence)} each`
+              {parsed.ok
+                ? `${formatCount(parsed.quantity)} at £${formatPence(applies!.pence)} each`
                 : "Enter a quantity to see the price."}
             </p>
           </div>
@@ -519,8 +594,8 @@ function PriceAndStock() {
               <span className="flex h-lh shrink-0 items-center">
                 <Check
                   aria-hidden="true"
-                  strokeWidth={1.5}
                   className="size-4 text-success"
+                  strokeWidth={1.5}
                 />
               </span>
               <span>
@@ -540,45 +615,46 @@ function PriceAndStock() {
 }
 
 function Specification() {
-  const head = cn("px-4", LABEL)
-  const cell = "px-4 py-2"
-
+  const headClass = cn("px-4", LABEL)
+  const cellClass = "px-4 py-2"
   return (
     <section aria-labelledby="specification" className="flex flex-col gap-4">
       <h2 id="specification" className="text-h2">
         Specification
       </h2>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-        <div className={cn(ROWS_PANEL, "lg:col-span-8")}>
+        <div className={cn(PANEL_ROWS, "lg:col-span-8")}>
           <Table label="Specification table" className="text-body">
             <TableHeader>
               <TableRow>
-                <TableHead className={head}>Property</TableHead>
-                <TableHead className={head}>Symbol</TableHead>
-                <TableHead className={cn(head, "text-right")}>Value</TableHead>
-                <TableHead className={head}>Unit</TableHead>
+                <TableHead className={headClass}>Property</TableHead>
+                <TableHead className={headClass}>Symbol</TableHead>
+                <TableHead className={cn(headClass, "text-right")}>
+                  Value
+                </TableHead>
+                <TableHead className={headClass}>Unit</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {SPEC.map((row) => (
+              {SPECIFICATION.map((row) => (
                 <TableRow key={row.property}>
-                  <TableCell className={cn(cell, "text-body")}>
+                  <TableCell className={cn(cellClass, "text-body")}>
                     {row.property}
                   </TableCell>
-                  <TableCell className={cn(cell, "font-mono")}>
-                    {row.symbol ?? null}
+                  <TableCell className={cn(cellClass, "font-mono")}>
+                    {row.symbol}
                   </TableCell>
                   <TableCell
                     className={cn(
-                      cell,
+                      cellClass,
                       "text-right",
                       row.figure ? "font-mono tabular-nums" : "text-body"
                     )}
                   >
                     {row.value}
                   </TableCell>
-                  <TableCell className={cn(cell, "font-mono")}>
-                    {row.unit ?? null}
+                  <TableCell className={cn(cellClass, "font-mono")}>
+                    {row.unit}
                   </TableCell>
                 </TableRow>
               ))}
@@ -586,10 +662,13 @@ function Specification() {
           </Table>
         </div>
 
-        <div className={cn(ROWS_PANEL, "lg:col-span-4")}>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+        <div className={cn(PANEL_ROWS, "lg:col-span-4")}>
+          <div className={cn(HEADING_ROW, "border-b border-border px-4 py-3")}>
             <h3 className="text-h2">Documents</h3>
-            <a href="/downloads" className={cn(TEXT_LINK, "font-mono text-label")}>
+            <a
+              href="/downloads"
+              className={cn(TEXT_LINK, "font-mono text-label")}
+            >
               All documents
             </a>
           </div>
@@ -602,7 +681,7 @@ function Specification() {
                   i > 0 && "border-t border-border"
                 )}
               >
-                <a href="#" className={cn(TEXT_LINK, "self-start text-body")}>
+                <a href="#" className={cn(TEXT_LINK, "text-body")}>
                   {doc.title}
                 </a>
                 <p className={SMALL_FIGURE}>{doc.meta}</p>
@@ -620,19 +699,19 @@ export function App() {
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <Header />
       <main className="flex-1 py-6">
-        <div className={cn(CONTAINER, "flex flex-col gap-12")}>
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col gap-12 px-4">
           <div className="flex flex-col gap-6">
             <PageHeader />
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-              <Drawing />
-              <PriceAndStock />
+              <DrawingPanel />
+              <PriceStockPanel />
             </div>
           </div>
           <Specification />
         </div>
       </main>
       <footer className="border-t border-border">
-        <div className={cn(CONTAINER, "py-6")}>
+        <div className="mx-auto w-full max-w-[1280px] px-4 py-6">
           <p className={SMALL_FIGURE}>
             Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
             nothing is sold or sent.

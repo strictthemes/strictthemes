@@ -19,6 +19,8 @@ const textLink = cn(
 
 const card = "rounded-xl border border-border bg-card p-7"
 
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+
 const navItems = [
   { label: "Approach", href: "/approach" },
   { label: "About", href: "/about" },
@@ -29,36 +31,11 @@ const navItems = [
 const currentHref = "/fees"
 
 const sessions = [
-  {
-    name: "Introductory call",
-    how: "By phone or video",
-    length: "20 minutes",
-    fee: "Free",
-  },
-  {
-    name: "First session",
-    how: "In person or online",
-    length: "50 minutes",
-    fee: "£68",
-  },
-  {
-    name: "Weekly session",
-    how: "In person or online",
-    length: "50 minutes",
-    fee: "£68",
-  },
-  {
-    name: "Longer session",
-    how: "By arrangement",
-    length: "80 minutes",
-    fee: "£102",
-  },
-  {
-    name: "Reduced-fee session",
-    how: "Ask me when you write",
-    length: "50 minutes",
-    fee: "£42",
-  },
+  { name: "Introductory call", how: "By phone or video", length: "20 minutes", fee: "Free" },
+  { name: "First session", how: "In person or online", length: "50 minutes", fee: "£68" },
+  { name: "Weekly session", how: "In person or online", length: "50 minutes", fee: "£68" },
+  { name: "Longer session", how: "By arrangement", length: "80 minutes", fee: "£102" },
+  { name: "Reduced-fee session", how: "Ask me when you write", length: "50 minutes", fee: "£42" },
 ]
 
 const questions = [
@@ -145,39 +122,26 @@ export function App() {
       </header>
 
       <main>
-        {/* Opening */}
-        <section
-          aria-labelledby="page-title"
-          className="mt-12 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="opening-heading" className={cn(grid, "mt-12 md:mt-28")}>
           <p className="font-mono text-label text-muted-foreground tabular-nums md:col-span-12">
             Fees from <time dateTime="2027-01-01">1 January 2027</time>
           </p>
-          <h1
-            id="page-title"
-            className="mt-4 text-h1 md:col-span-9 md:text-display"
-          >
+          <h1 id="opening-heading" className="mt-4 text-h1 md:col-span-9 md:text-display">
             Fees, <em className="italic">said plainly</em>
           </h1>
           <p className="mt-7 max-w-xl text-body md:col-span-7 md:col-start-1">
-            Here is what a session costs, how to pay and how to cancel. If
-            something is not answered here, ask me. It is an ordinary question.
+            Here is what a session costs, how to pay and how to cancel. If something is not
+            answered here, ask me. It is an ordinary question.
           </p>
         </section>
 
-        {/* What sessions cost */}
-        <section
-          aria-labelledby="cost-title"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="cost-heading" className={cn(grid, "mt-28")}>
           <div className="md:col-span-7">
-            <h2 id="cost-title" className="text-h2">
+            <h2 id="cost-heading" className="text-h2">
               What sessions cost
             </h2>
             <table className="mt-7 w-full border-collapse border-b border-border text-left">
-              <caption className="sr-only">
-                Session types, with their length and fee
-              </caption>
+              <caption className="sr-only">Session types, with their length and fee</caption>
               <thead>
                 <tr>
                   <th
@@ -212,7 +176,7 @@ export function App() {
                         {s.how}
                       </span>
                     </th>
-                    <td className="py-4 pr-4 align-baseline font-mono text-label whitespace-nowrap text-foreground">
+                    <td className="py-4 pr-4 align-baseline font-mono text-label whitespace-nowrap text-foreground tabular-nums">
                       {s.length}
                     </td>
                     <td className="py-4 pr-0 text-right align-baseline font-mono text-label whitespace-nowrap text-foreground tabular-nums">
@@ -223,87 +187,62 @@ export function App() {
               </tbody>
             </table>
             <p className="mt-4 font-mono text-label text-muted-foreground">
-              Fees are reviewed each January. I tell you two months before any
-              change.
+              Fees are reviewed each January. I tell you two months before any change.
             </p>
           </div>
 
-          <div
-            className={cn(
-              card,
-              "mt-12 md:col-span-4 md:col-start-9 md:mt-0 md:self-start"
-            )}
-          >
+          <div className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0 md:self-start")}>
             <h3 className="text-h2">If the fee is a worry</h3>
             <p className="mt-4 text-body">
-              Say so when you write. I keep some sessions at £42 for people on a
-              low income, and I will tell you plainly whether I can offer one.
+              Say so when you write. I keep some sessions at £42 for people on a low income,
+              and I will tell you plainly whether I can offer one.
             </p>
           </div>
         </section>
 
-        {/* Cancelling and paying */}
-        <div className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
-          <section
-            aria-labelledby="cancel-title"
-            className={cn(card, "md:col-span-6")}
-          >
-            <p className="font-mono text-label text-muted-foreground">
+        <div className={cn(grid, "mt-28")}>
+          <section aria-labelledby="cancel-heading" className={cn(card, "md:col-span-6")}>
+            <p className="font-mono text-label text-muted-foreground tabular-nums">
               48 hours' notice
             </p>
-            <h2 id="cancel-title" className="mt-4 text-h2">
+            <h2 id="cancel-heading" className="mt-4 text-h2">
               How to cancel
             </h2>
-            <p className="mt-4 max-w-xl text-body">
-              Write to me at least 48 hours before your session, and there is
-              no charge.
+            <p className="mt-4 text-body">
+              Write to me at least 48 hours before your session, and there is no charge.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              Inside 48 hours I charge the full fee. I hold that time for you,
-              and I cannot offer it to someone else at short notice.
+            <p className="mt-4 text-body">
+              Inside 48 hours I charge the full fee. I hold that time for you, and I cannot
+              offer it to someone else at short notice.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              If I have to cancel, I tell you as early as I can, and you pay
-              nothing.
+            <p className="mt-4 text-body">
+              If I have to cancel, I tell you as early as I can, and you pay nothing.
             </p>
           </section>
-          <section
-            aria-labelledby="pay-title"
-            className={cn(card, "mt-4 md:col-span-6 md:mt-0")}
-          >
-            <p className="font-mono text-label text-muted-foreground">
-              One invoice a month
-            </p>
-            <h2 id="pay-title" className="mt-4 text-h2">
+          <section aria-labelledby="pay-heading" className={cn(card, "mt-4 md:col-span-6 md:mt-0")}>
+            <p className="font-mono text-label text-muted-foreground">One invoice a month</p>
+            <h2 id="pay-heading" className="mt-4 text-h2">
               How to pay
             </h2>
-            <p className="mt-4 max-w-xl text-body">
-              I send one invoice by email on the last Friday of each month, for
-              the sessions we had.
+            <p className="mt-4 text-body">
+              I send one invoice by email on the last Friday of each month, for the sessions we
+              had.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              You pay by bank transfer within 14 days. The details are on the
-              invoice.
+            <p className="mt-4 text-body">
+              You pay by bank transfer within 14 days. The details are on the invoice.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              I do not take cash or cards in the room. That keeps money out of
-              the session.
+            <p className="mt-4 text-body">
+              I do not take cash or cards in the room. That keeps money out of the session.
             </p>
           </section>
         </div>
 
-        {/* Questions */}
-        <section
-          aria-labelledby="questions-title"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="questions-heading" className={cn(grid, "mt-28")}>
           <div className="md:col-span-8">
-            <h2 id="questions-title" className="text-h2">
+            <h2 id="questions-heading" className="text-h2">
               Questions people ask
             </h2>
-            <p className="mt-4 max-w-xl text-body">
-              Eight of them. Open the ones you need.
-            </p>
+            <p className="mt-4 max-w-xl text-body">Eight of them. Open the ones you need.</p>
             <ul className="mt-7 list-none border-b border-border p-0">
               {questions.map((item, i) => {
                 const n = i + 1
@@ -311,7 +250,7 @@ export function App() {
                 const Icon = isOpen ? Minus : Plus
                 return (
                   <li key={n} className="border-t border-border">
-                    <h3>
+                    <h3 className="text-h2">
                       <button
                         type="button"
                         id={`question-${n}`}
@@ -324,11 +263,7 @@ export function App() {
                         )}
                       >
                         <span>{item.q}</span>
-                        <Icon
-                          className="size-4 shrink-0"
-                          strokeWidth={1.5}
-                          aria-hidden="true"
-                        />
+                        <Icon className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
                       </button>
                     </h3>
                     <div id={`answer-${n}`} hidden={!isOpen} className="pb-4">
@@ -341,26 +276,19 @@ export function App() {
           </div>
         </section>
 
-        {/* The one action */}
-        <section
-          aria-labelledby="start-title"
-          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
-        >
+        <section aria-labelledby="start-heading" className={cn(grid, "mt-28")}>
           <div className={cn(card, "md:col-span-7")}>
-            <h2 id="start-title" className="text-h2">
+            <h2 id="start-heading" className="text-h2">
               If you would like to start
             </h2>
             <p className="mt-4 max-w-xl text-body">
-              The button leads to a short form. The first call is free, and
-              nothing is charged until we have met for a first session.
+              The button leads to a short form. The first call is free, and nothing is charged
+              until we have met for a first session.
             </p>
             <div className="mt-7">
               <a
                 href="/first-session"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  "h-auto px-7 py-2 text-body"
-                )}
+                className={cn(buttonVariants({ variant: "default" }), "h-auto px-7 py-2 text-body")}
               >
                 Request a first session
               </a>
@@ -370,7 +298,7 @@ export function App() {
       </main>
 
       <footer className="mt-28 border-t border-border py-12">
-        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
+        <div className={grid}>
           <div className="md:col-span-7">
             <p className="font-heading text-h2">Nora Ellingham</p>
             <p className="mt-2 font-mono text-label text-muted-foreground">
@@ -379,31 +307,23 @@ export function App() {
             <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
-            <p className="mt-2 text-body">
-              <a
-                href="mailto:hello@ellingham.example"
-                className={cn(textLink, "wrap-break-word")}
-              >
+            <p className="mt-2 wrap-break-word">
+              <a href="mailto:hello@ellingham.example" className={textLink}>
                 hello@ellingham.example
               </a>
             </p>
           </div>
-          <nav
-            aria-label="Footer"
-            className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
-          >
+          <nav aria-label="Footer" className="mt-7 md:col-span-4 md:col-start-9 md:mt-0">
             <ul>
               <NavLinks />
             </ul>
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">
-          This practice is not an emergency service. In an emergency, call your
-          local emergency number or go to the nearest emergency department.
+          This practice is not an emergency service. In an emergency, call your local emergency
+          number or go to the nearest emergency department.
         </p>
-        <p className="mt-4 font-mono text-label text-muted-foreground">
-          © 2027 Nora Ellingham
-        </p>
+        <p className="mt-4 font-mono text-label text-muted-foreground">© 2027 Nora Ellingham</p>
       </footer>
     </div>
   )

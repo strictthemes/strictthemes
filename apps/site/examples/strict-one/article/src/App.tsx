@@ -1,4 +1,10 @@
-import * as React from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -35,119 +41,108 @@ const buttonClass = "rounded-sm px-4 font-mono text-label uppercase"
 const navItems = ["Articles", "Topics", "About"]
 
 const sections = [
-  {
-    id: "what-the-gradients-were-doing",
-    title: "What the gradients were doing",
-  },
-  {
-    id: "letting-hierarchy-do-the-work",
-    title: "Letting hierarchy do the work",
-  },
+  { id: "what-the-gradients-were-doing", title: "What the gradients were doing" },
+  { id: "hierarchy-does-the-same-job", title: "Hierarchy does the same job" },
   { id: "how-we-took-them-out", title: "How we took them out" },
-  { id: "what-changed-after", title: "What changed after" },
+  { id: "what-we-measured-afterwards", title: "What we measured afterwards" },
 ]
+
+const h2Class = "mt-16 scroll-mt-8 text-h2"
+
+const cardCode = `/* Before */
+.card {
+  background: linear-gradient(var(--primary), var(--chart-3));
+}
+
+/* After */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+}`
 
 const results = [
-  { measure: "Gradients in the product", before: "41", after: "0" },
-  { measure: "Color tokens in the theme", before: "64", after: "23" },
-  { measure: "Screens failing contrast", before: "9", after: "0" },
-  { measure: "Time to read the balance", before: "2.4 s", after: "1.6 s" },
-  { measure: "CSS for surfaces", before: "38 kB", after: "21 kB" },
+  { measure: "Gradient declarations", before: "212", after: "0" },
+  { measure: "CSS shipped", before: "148 KB", after: "121 KB" },
+  { measure: "Wrong-week bookings a month", before: "63", after: "19" },
+  { measure: "Median time to book a slot", before: "41 s", after: "33 s" },
 ]
-
-const codeSample = `.panel-header {
--  background-image: linear-gradient(
--    to right,
--    var(--primary),
--    var(--tertiary)
--  );
--  color: var(--primary-foreground);
-+  background-color: var(--card);
-+  border-bottom: 1px solid var(--border);
-+  color: var(--foreground);
-}`
 
 const readNext = [
   {
-    topic: "Design systems",
+    topic: "Design",
     minutes: 6,
-    title: "A type scale with five sizes, and why we stopped there",
+    title: "A type scale with only five sizes",
+  },
+  {
+    topic: "Systems",
+    minutes: 5,
+    title: "Retiring forty button variants",
   },
   {
     topic: "Accessibility",
-    minutes: 5,
-    title: "Checking contrast in dark mode before it ships",
-  },
-  {
-    topic: "Design systems",
-    minutes: 4,
-    title: "Naming tokens for the job they do, not the color they are",
+    minutes: 7,
+    title: "The contrast checks we run before every release",
   },
 ]
 
 function useActiveSection(ids: string[]) {
-  const [active, setActive] = React.useState(ids[0])
+  const [active, setActive] = useState(0)
 
-  React.useEffect(() => {
+  useEffect(() => {
     let frame = 0
 
     const update = () => {
       frame = 0
-      const headings = ids
-        .map((id) => document.getElementById(id))
-        .filter((el): el is HTMLElement => el !== null)
-      if (headings.length === 0) return
-
-      const line = window.innerHeight / 3
-      let current = headings[0].id
-      for (const heading of headings) {
-        if (heading.getBoundingClientRect().top <= line) {
-          current = heading.id
-        }
-      }
-
       const scrolledToEnd =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 2
       if (scrolledToEnd) {
-        current = headings[headings.length - 1].id
+        setActive(ids.length - 1)
+        return
       }
-
+      const line = window.innerHeight / 3
+      let current = 0
+      ids.forEach((id, index) => {
+        const heading = document.getElementById(id)
+        if (heading && heading.getBoundingClientRect().top <= line) {
+          current = index
+        }
+      })
       setActive(current)
     }
 
-    const schedule = () => {
-      if (frame === 0) frame = window.requestAnimationFrame(update)
+    const onScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update)
     }
 
     update()
-    window.addEventListener("scroll", schedule, { passive: true })
-    window.addEventListener("resize", schedule)
-    window.addEventListener("hashchange", schedule)
-
+    window.addEventListener("scroll", onScroll, { passive: true })
+    window.addEventListener("resize", onScroll)
     return () => {
-      window.removeEventListener("scroll", schedule)
-      window.removeEventListener("resize", schedule)
-      window.removeEventListener("hashchange", schedule)
-      if (frame !== 0) window.cancelAnimationFrame(frame)
+      window.removeEventListener("scroll", onScroll)
+      window.removeEventListener("resize", onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
     }
   }, [ids])
 
   return active
 }
 
-function SiteHeader() {
-  const [menuOpen, setMenuOpen] = React.useState(false)
-  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+const sectionIds = sections.map((section) => section.id)
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (!menuOpen || event.key !== "Escape") return
-    setMenuOpen(false)
-    menuButtonRef.current?.focus()
+function SiteHeader() {
+  const [open, setOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (open && event.key === "Escape") {
+      setOpen(false)
+      menuButton.current?.focus()
+    }
   }
 
   return (
-    <header className="border-b border-border" onKeyDown={handleKeyDown}>
+    <header className="border-b" onKeyDown={onKeyDown}>
       <div className={container}>
         <div className="flex flex-wrap items-center gap-4 py-4 md:gap-8">
           <a
@@ -157,63 +152,61 @@ function SiteHeader() {
               focusRing
             )}
           >
-            Tallyhouse Journal
+            Quiet Interface
           </a>
-          <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-8">
+          <div className="ml-auto flex items-center gap-4 md:gap-8">
+            <nav aria-label="Main" className="hidden md:block">
+              <ul className="flex gap-8">
+                {navItems.map((item) => (
+                  <li key={item}>
+                    <a href="#" className={navLink}>
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <a
+              href="#"
+              className={cn(buttonVariants({ variant: "outline" }), buttonClass)}
+            >
+              Subscribe
+            </a>
+            <Button
+              ref={menuButton}
+              variant="outline"
+              className={cn(buttonClass, "md:hidden")}
+              aria-expanded={open}
+              aria-controls="site-menu"
+              onClick={() => setOpen((value) => !value)}
+            >
+              Menu
+            </Button>
+          </div>
+        </div>
+        {open && (
+          <nav
+            id="site-menu"
+            aria-label="Main"
+            className="border-t py-2 md:hidden"
+          >
+            <ul>
               {navItems.map((item) => (
                 <li key={item}>
-                  <a href="#" className={navLink}>
+                  <a href="#" className={cn(navLink, "block py-2")}>
                     {item}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <div className="ml-auto flex items-center gap-4">
-            <Button
-              ref={menuButtonRef}
-              variant="outline"
-              className={cn(buttonClass, "md:hidden")}
-              aria-expanded={menuOpen}
-              aria-controls="site-menu"
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              Menu
-            </Button>
-            <a
-              href="#"
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                buttonClass
-              )}
-            >
-              Subscribe
-            </a>
-          </div>
-        </div>
-        <nav
-          id="site-menu"
-          aria-label="Main"
-          hidden={!menuOpen}
-          className="border-t border-border py-2 md:hidden"
-        >
-          <ul>
-            {navItems.map((item) => (
-              <li key={item}>
-                <a href="#" className={cn(navLink, "block py-2")}>
-                  {item}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        )}
       </div>
     </header>
   )
 }
 
-function TableOfContents({ active }: { active: string }) {
+function TableOfContents({ active }: { active: number }) {
   return (
     <nav
       aria-labelledby="toc-heading"
@@ -223,17 +216,17 @@ function TableOfContents({ active }: { active: string }) {
         On this page
       </h2>
       <ul className="flex flex-col gap-2">
-        {sections.map((section) => {
-          const isActive = section.id === active
+        {sections.map((section, index) => {
+          const current = index === active
           return (
             <li key={section.id}>
               <a
                 href={`#${section.id}`}
-                aria-current={isActive ? "location" : undefined}
+                aria-current={current ? "location" : undefined}
                 className={cn(
                   label,
                   "block border-l-2 pl-4 transition-colors duration-150",
-                  isActive
+                  current
                     ? "border-foreground text-foreground"
                     : "border-transparent text-muted-foreground hover:text-foreground",
                   focusRing
@@ -249,15 +242,6 @@ function TableOfContents({ active }: { active: string }) {
   )
 }
 
-function SectionHeading({ index }: { index: number }) {
-  const section = sections[index]
-  return (
-    <h2 id={section.id} className="mt-16 scroll-mt-8 text-h2">
-      {section.title}
-    </h2>
-  )
-}
-
 function Sketch({
   caption,
   description,
@@ -265,7 +249,7 @@ function Sketch({
 }: {
   caption: string
   description: string
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <div className="flex flex-col gap-2">
@@ -273,7 +257,7 @@ function Sketch({
       <div
         role="img"
         aria-label={description}
-        className="flex h-40 flex-col gap-2 rounded-sm border border-border bg-background p-2"
+        className="flex h-32 flex-col gap-2 rounded-none border bg-background p-2"
       >
         {children}
       </div>
@@ -281,351 +265,378 @@ function Sketch({
   )
 }
 
-function OverviewFigure() {
+function BeforeAfterFigure() {
   return (
     <figure className="my-8">
-      <div className="grid grid-cols-2 gap-8 rounded-md border border-border bg-card p-8">
+      <div className="grid grid-cols-2 gap-4 rounded-md border bg-card p-8">
         <Sketch
           caption="Before"
-          description="Sketch of the old account overview: a tall solid band across the top with the balance inside it, and three heavy filled blocks below."
+          description="Sketch of the old dashboard: a dark band across the top, and every card filled with a solid block of color so all of them look equally important."
         >
-          <div className="flex h-16 shrink-0 flex-col justify-end rounded-sm bg-foreground p-2">
-            <div className="h-2 w-1/2 bg-background" />
-          </div>
-          <div className="grid flex-1 grid-cols-3 gap-2">
-            <div className="rounded-sm bg-foreground" />
-            <div className="rounded-sm bg-foreground" />
-            <div className="rounded-sm bg-foreground" />
+          <div className="h-4 bg-foreground" />
+          <div className="grid flex-1 grid-cols-2 gap-2">
+            <div className="bg-foreground" />
+            <div className="bg-foreground" />
+            <div className="bg-foreground" />
+            <div className="bg-foreground" />
           </div>
         </Sketch>
         <Sketch
           caption="After"
-          description="Sketch of the new account overview: a large heavy balance on the plain background, one thin line under it, and a list of rows separated by thin lines."
+          description="Sketch of the new dashboard: one bold heading bar, then plain cards on the background, separated only by thin lines."
         >
-          <div className="mt-2 h-1 w-1/3 bg-foreground" />
-          <div className="h-4 w-3/4 bg-foreground" />
-          <div className="mt-2 border-t border-foreground" />
-          <div className="flex flex-col">
-            <div className="h-4 border-b border-border" />
-            <div className="h-4 border-b border-border" />
-            <div className="h-4 border-b border-border" />
+          <div className="h-2 w-2/3 bg-foreground" />
+          <div className="grid flex-1 grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1 border-t pt-1">
+              <div className="h-1 w-1/2 bg-foreground" />
+            </div>
+            <div className="flex flex-col gap-1 border-t pt-1">
+              <div className="h-1 w-1/2 bg-foreground" />
+            </div>
+            <div className="flex flex-col gap-1 border-t pt-1">
+              <div className="h-1 w-1/2 bg-foreground" />
+            </div>
+            <div className="flex flex-col gap-1 border-t pt-1">
+              <div className="h-1 w-1/2 bg-foreground" />
+            </div>
           </div>
         </Sketch>
       </div>
       <figcaption className={cn(label, "mt-2 text-muted-foreground")}>
-        Account overview, before and after the change
+        The weekly dashboard before and after the change
       </figcaption>
     </figure>
   )
 }
 
-function ArticlePage() {
-  const ids = React.useMemo(() => sections.map((section) => section.id), [])
-  const active = useActiveSection(ids)
-
+function ArticleBody() {
   return (
-    <article>
-      <header className={container}>
-        <div className="grid grid-cols-1 border-b border-foreground pt-16 pb-8 md:grid-cols-12 md:gap-x-8">
-          <p className={cn(label, "text-muted-foreground md:col-span-12")}>
-            Design · <time dateTime="2026-03-12">12 March 2026</time> · 4 min
-            read
-          </p>
-          <h1 className="mt-2 text-h1 md:col-span-10 md:text-display">
-            Why we removed every gradient from our product
-          </h1>
-          <p className="mt-4 font-sans text-h2 font-normal md:col-span-8">
-            We took 41 gradients out of Tallyhouse in six weeks. The product got
-            easier to read, and nobody asked for them back.
-          </p>
-          <p className={cn(label, "mt-4 text-muted-foreground md:col-span-12")}>
-            By Ines Varga, product designer
-          </p>
-        </div>
-      </header>
+    <div className="max-w-lg min-w-0 space-y-4 lg:col-span-8">
+      <p>
+        For three years, almost every surface in Tallow had a gradient on it.
+        The scheduling grid faded from blue to violet, the buttons glowed, and
+        each card on the dashboard sat on its own soft wash of color. None of it
+        was planned as a system. Each gradient arrived with a feature, and
+        nobody ever took one away.
+      </p>
+      <p>
+        Last spring we removed all of them in six weeks. This is an account of
+        why we did it, how we decided what should replace each one, and what
+        changed for the people who use the product every day.
+      </p>
 
-      <div className={container}>
-        <div className="grid grid-cols-1 gap-y-8 pt-8 pb-16 lg:grid-cols-12 lg:gap-x-8">
-          <TableOfContents active={active} />
+      <h2 id={sections[0].id} className={h2Class}>
+        {sections[0].title}
+      </h2>
+      <p>
+        We started with an audit. We took screenshots of the forty screens
+        people visit most and marked every gradient we found. There were 212 of
+        them. Then we asked a harder question about each one: what job does it
+        do for the reader?
+      </p>
+      <p>
+        Most of the answers were weak. A few gradients marked the selected item
+        in a list. Some tried to make a card feel clickable. Many did nothing
+        except fill space that would otherwise look empty. In the calendar view,
+        a faint gradient behind the current week was the only cue that told
+        people which week they were looking at, and it vanished on screens with
+        low contrast.
+      </p>
+      <p>
+        That last finding changed how we talked about the project. It stopped
+        being a question of taste. When an important signal lives in a
+        decoration, the signal is fragile, and anyone who sees color
+        differently, or who works on a dim office monitor, loses it.
+      </p>
 
-          <div className="max-w-lg space-y-4 lg:col-span-8 lg:col-start-4">
-            <p>
-              For three years, almost every surface in Tallyhouse had a gradient
-              on it. The sidebar faded from blue to violet, the main button
-              glowed from orange to red, and every empty state sat on a soft
-              wash of two colors. Last spring we removed all of them, 41 in
-              total, in six weeks. This is why we did it and what we learned
-              along the way.
-            </p>
-            <p>
-              Gradients were not the problem on their own. The problem was that
-              we used them to say something was important, and once everything
-              said that, nothing did.
-            </p>
-
-            <SectionHeading index={0} />
-            <p>
-              When we audited the product, we sorted every gradient by the job
-              it was meant to do. Most fell into three groups: marking the main
-              action, separating one region from another, and making an empty
-              screen feel less empty. A few had no job at all. They arrived in a
-              redesign and nobody remembered why.
-            </p>
-            <p>
-              Each of those jobs is real, but a gradient does all three badly.
-              It draws the eye without telling you where to look next. It
-              separates regions with a soft edge that disappears on a cheap
-              monitor or in bright sunlight. And it fills empty space with
-              something to look at instead of something to do.
-            </p>
-            <p>
-              We also found a cost we had not counted. Every gradient needed two
-              colors that worked together in light mode and again in dark mode,
-              and each pair had to keep its text readable from end to end. Our
-              designers spent hours checking the lightest point of a fade
-              against white labels. Nine of the 41 failed contrast somewhere
-              along their length.
-            </p>
-
-            <SectionHeading index={1} />
-            <p>
-              Our rule for the replacement was simple. If a gradient marked
-              importance, the replacement had to come from size, weight or
-              position. If it separated regions, a 1px border or a change of
-              surface would do it. If it decorated an empty screen, the screen
-              needed a sentence and a button instead.
-            </p>
-            <blockquote className="my-8 border-y border-border py-8 font-heading text-h1">
-              <p>
-                If everything glows, the one thing that matters has nowhere left
-                to stand.
-              </p>
-            </blockquote>
-            <p>
-              The account overview is the clearest example. Before, its header
-              was a tall band of color with the balance set in white on top.
-              After, the band is gone. The balance is set larger and heavier
-              than anything else on the page, the header sits on the plain
-              background, and a single line separates it from the transactions
-              below.
-            </p>
-            <OverviewFigure />
-            <p>
-              Nobody in our usability sessions noticed the band was missing.
-              What they did notice was that they found the balance faster. In
-              timed tasks, the median time to read the current balance dropped
-              from 2.4 seconds to 1.6.
-            </p>
-
-            <SectionHeading index={2} />
-            <p>
-              We did not want a big redesign, so we treated the removal as a
-              series of small changes that could ship behind a flag and be
-              rolled back. The process came down to four steps.
-            </p>
-            <ol className="my-8 list-decimal space-y-2 pl-4">
-              <li>
-                List every gradient in the codebase and the design files, with a
-                screenshot and the job it was doing.
-              </li>
-              <li>
-                Write the replacement for each job once, as a token or a
-                component, before touching any screen.
-              </li>
-              <li>
-                Swap screens one at a time, starting with the ones people use
-                most, and review each in light and dark mode.
-              </li>
-              <li>
-                Delete the old color pairs from the theme, so that nobody can
-                add a gradient back by accident.
-              </li>
-            </ol>
-            <p>
-              Most of the swaps were a few lines of CSS. The snippet below is a
-              typical one from the panel header, with the fade replaced by the
-              card surface and a border.
-            </p>
-            <pre
-              tabIndex={0}
-              role="region"
-              aria-label="Code: the panel header before and after"
-              className={cn(
-                "my-8 overflow-x-auto rounded-md border border-border bg-card p-4 font-mono text-body",
-                focusRing
-              )}
-            >
-              <code>{codeSample}</code>
-            </pre>
-            <p>
-              The last step mattered more than we expected. While the old color
-              pairs stayed in the theme, people kept reaching for them. Once
-              they were gone, the question of whether to use a gradient stopped
-              coming up in reviews. Our{" "}
-              <a href="#" className={textLink}>
-                notes on the theme file
-              </a>{" "}
-              explain how the tokens are named now.
-            </p>
-
-            <SectionHeading index={3} />
-            <p>
-              Six weeks after the last gradient went, we compared the product
-              against the numbers we had collected before we started. The table
-              below shows the ones we tracked.
-            </p>
-            <div className="my-8 grid gap-2">
-              <h3 className={cn(label, "text-foreground")}>
-                Results after six weeks
-              </h3>
-              <Table
-                label="Results after six weeks"
-                className="min-w-lg text-body"
-              >
-                <TableHeader>
-                  <TableRow>
-                    {["Measure", "Before", "After"].map((heading) => (
-                      <TableHead
-                        key={heading}
-                        scope="col"
-                        className={cn(
-                          label,
-                          "text-muted-foreground first:pl-0 last:pr-0"
-                        )}
-                      >
-                        {heading}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {results.map((row) => (
-                    <TableRow key={row.measure}>
-                      <TableCell className="first:pl-0 last:pr-0">
-                        {row.measure}
-                      </TableCell>
-                      <TableCell className="first:pl-0 last:pr-0">
-                        {row.before}
-                      </TableCell>
-                      <TableCell className="first:pl-0 last:pr-0">
-                        {row.after}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-            <p>
-              The product is also easier to change now. A new screen needs a
-              layout, type sizes from the scale and maybe one border. There is
-              no longer a step where someone picks two colors and hopes they
-              hold up in dark mode.
-            </p>
-            <p>
-              If you are thinking about doing the same, start with the audit.
-              Write down what each gradient is for. You will probably find that
-              the job is worth keeping and the gradient is not. We have
-              published our{" "}
-              <a href="#" className={textLink}>
-                audit template
-              </a>{" "}
-              if you want a head start.
-            </p>
-
-            <footer className="mt-16 border-t border-border pt-8">
-              <ul aria-label="Topics" className="flex flex-wrap gap-2">
-                {["Design", "Design systems", "Accessibility"].map((topic) => (
-                  <li key={topic}>
-                    <Badge
-                      variant="outline"
-                      className="h-auto rounded-none px-2 py-1 font-mono text-label uppercase"
-                    >
-                      {topic}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-4">
-                Ines Varga is a product designer at Tallyhouse, where she leads
-                the design system team. She writes about interfaces that get out
-                of the way.
-              </p>
-            </footer>
-          </div>
-        </div>
-      </div>
-    </article>
-  )
-}
-
-function ReadNext() {
-  return (
-    <section aria-labelledby="read-next-heading" className="pb-16">
-      <div className={container}>
-        <div className="grid grid-cols-1 gap-y-2 border-t border-foreground pt-4 md:grid-cols-12 md:gap-x-8">
-          <p className={cn(label, "text-muted-foreground md:col-span-3")}>
-            01 / Read next
-          </p>
-          <h2 id="read-next-heading" className="text-h1 md:col-span-9">
-            More on design systems
-          </h2>
-        </div>
-        <ul className="mt-8 grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-8">
-          {readNext.map((item) => (
-            <li
-              key={item.title}
-              className="flex flex-col gap-2 border-t border-border pt-4 md:col-span-4"
-            >
-              <p className={cn(label, "text-muted-foreground")}>
-                {item.topic} · {item.minutes} min read
-              </p>
-              <h3 className="text-h2">
-                <a
-                  href="#"
-                  className={cn(
-                    "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-                    focusRing
-                  )}
-                >
-                  {item.title}
-                </a>
-              </h3>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
-
-function SiteFooter() {
-  return (
-    <footer className="border-t border-border">
-      <div className={cn(container, "py-8")}>
-        <div className="flex flex-col gap-4">
-          <p className="font-heading text-h2">Tallyhouse Journal</p>
-          <p>
-            Notes from the people who design and build Tallyhouse, bookkeeping
-            for small businesses.
-          </p>
-        </div>
-        <p className={cn(label, "mt-8 text-muted-foreground")}>
-          © 2026 Tallyhouse Journal
+      <h2 id={sections[1].id} className={h2Class}>
+        {sections[1].title}
+      </h2>
+      <p>
+        Every gradient we found was trying to say one of three things: look here
+        first, these belong together, or you can press this. Type, spacing and
+        lines can say all three more clearly.
+      </p>
+      <blockquote className="my-8 border-y py-8 font-heading text-h1">
+        <p>
+          A gradient tells people something is important without telling them
+          why.
         </p>
+      </blockquote>
+      <p>
+        Look here first is a job for size and weight. We gave each screen one
+        heading that is clearly larger than everything else and let the body
+        text stay calm. These belong together is a job for spacing: related
+        items now sit 8 pixels apart and separate groups 32 pixels apart, so the
+        eye groups them before it reads them. You can press this is a job for
+        the button style and the link color, and we stopped spending that blue
+        anywhere else.
+      </p>
+      <BeforeAfterFigure />
+      <p>
+        The figure shows the dashboard that started the discussion. On the
+        left, every card competes for attention. On the right, the heading
+        leads and thin lines do the separating.
+      </p>
+
+      <h2 id={sections[2].id} className={h2Class}>
+        {sections[2].title}
+      </h2>
+      <p>
+        We did not remove everything at once. A large visual change can hide
+        real regressions, so we worked through the product in small passes that
+        we could ship and check each week.
+      </p>
+      <ol className="my-8 list-decimal space-y-2 pl-4">
+        <li>
+          We replaced every gradient in the style sheets with a flat surface or
+          background token, so no new screen could use one by accident.
+        </li>
+        <li>
+          We rebuilt the shared card, button and list components first, because
+          they appear on almost every screen.
+        </li>
+        <li>
+          We went screen by screen and fixed each place where a gradient had
+          been the only signal, usually by adding a border or a heading.
+        </li>
+        <li>
+          We ran the same contrast checks in light and dark mode before each
+          release and kept a list of everything that failed.
+        </li>
+      </ol>
+      <p>
+        The change to the card was the smallest one in the codebase and the
+        largest one on screen. Here is its style before and after, written with
+        our design tokens.
+      </p>
+      <pre
+        tabIndex={0}
+        role="region"
+        aria-label="Card style before and after"
+        className={cn(
+          "my-8 overflow-x-auto rounded-md border bg-card p-4 font-mono text-body",
+          focusRing
+        )}
+      >
+        <code>{cardCode}</code>
+      </pre>
+      <p>
+        The border did more than we expected. Without the gradient, cards
+        stopped floating above the page, and a single line made their edges
+        sharper than the old blend of colors ever did.
+      </p>
+
+      <h2 id={sections[3].id} className={h2Class}>
+        {sections[3].title}
+      </h2>
+      <p>
+        We compared the four weeks before the change with the four weeks after
+        it. We looked at support tickets, task times in usability sessions, and
+        the size of the style sheets we ship.
+      </p>
+      <div className="my-8 grid grid-cols-1 gap-2">
+        <h3 className={cn(label, "text-foreground")}>
+          Four weeks before and after
+        </h3>
+        <Table
+          label="Four weeks before and after"
+          className="min-w-lg text-body tabular-nums"
+        >
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                scope="col"
+                className={cn(label, "text-muted-foreground first:pl-0 last:pr-0")}
+              >
+                Measure
+              </TableHead>
+              <TableHead
+                scope="col"
+                className={cn(label, "text-muted-foreground first:pl-0 last:pr-0")}
+              >
+                Before
+              </TableHead>
+              <TableHead
+                scope="col"
+                className={cn(label, "text-muted-foreground first:pl-0 last:pr-0")}
+              >
+                After
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {results.map((row) => (
+              <TableRow key={row.measure}>
+                <TableCell className="first:pl-0 last:pr-0">
+                  {row.measure}
+                </TableCell>
+                <TableCell className="first:pl-0 last:pr-0">
+                  {row.before}
+                </TableCell>
+                <TableCell className="first:pl-0 last:pr-0">
+                  {row.after}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
-    </footer>
+      <p>
+        The drop in bookings made for the wrong week was the result we cared
+        about most. Once the current week had a heading and a border instead of
+        a faint tint, people stopped losing their place.
+      </p>
+      <p>
+        Not everyone liked the result at first. Some longtime customers wrote
+        to say the product felt plainer, and they were right. After a month,
+        most of those messages had stopped, and the requests we get now are
+        about features rather than about finding things on the screen.
+      </p>
+      <p>
+        If you are planning a similar change, start with the audit and the
+        question behind it. You may find, as we did, that most of your
+        decoration was doing a job that type and spacing do better. Our full
+        checklist is in the{" "}
+        <a href="#" className={textLink}>
+          design system notes
+        </a>
+        , and we have published the{" "}
+        <a href="#" className={textLink}>
+          contrast tests
+        </a>{" "}
+        we ran.
+      </p>
+
+      <footer className="mt-16 border-t pt-8">
+        <ul className="flex flex-wrap gap-2">
+          {["Design", "Design systems", "Accessibility", "Case study"].map(
+            (topic) => (
+              <li key={topic}>
+                <Badge
+                  variant="outline"
+                  className="h-auto rounded-none px-2 py-1 font-mono text-label uppercase"
+                >
+                  {topic}
+                </Badge>
+              </li>
+            )
+          )}
+        </ul>
+        <p className="mt-4">
+          Maren Ostby leads product design at Tallow, where she works on the
+          scheduling grid and the design system. She writes about the interface
+          details people only notice when they are wrong.
+        </p>
+      </footer>
+    </div>
   )
 }
 
 export function App() {
+  const active = useActiveSection(sectionIds)
+
   return (
-    <div className="min-h-svh bg-background text-body text-foreground">
+    <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <SiteHeader />
-      <main>
-        <ArticlePage />
-        <ReadNext />
+
+      <main className="flex-1">
+        <article>
+          <header className={cn(container, "pt-16")}>
+            <div className="grid grid-cols-1 border-b border-foreground pb-8 md:grid-cols-12 md:gap-x-8">
+              <p
+                className={cn(
+                  label,
+                  "text-muted-foreground tabular-nums md:col-span-12"
+                )}
+              >
+                Design · <time dateTime="2026-03-12">12 March 2026</time> · 4
+                min read
+              </p>
+              <h1 className="mt-2 text-h1 md:col-span-10 md:text-display">
+                Why we removed every gradient from our product
+              </h1>
+              <p className="mt-4 font-sans text-h2 font-normal md:col-span-8">
+                Our product had 212 gradients. We replaced every one with type,
+                spacing and thin lines, and people now find their way around it
+                faster.
+              </p>
+              <p
+                className={cn(
+                  label,
+                  "mt-4 text-muted-foreground md:col-span-12"
+                )}
+              >
+                Maren Ostby · Lead product designer, Tallow
+              </p>
+            </div>
+          </header>
+
+          <div className={cn(container, "pt-8 pb-16")}>
+            <div className="grid grid-cols-1 gap-y-8 lg:grid-cols-12 lg:gap-x-8">
+              <TableOfContents active={active} />
+              <ArticleBody />
+            </div>
+          </div>
+        </article>
+
+        <section aria-labelledby="read-next-heading" className="pb-16">
+          <div className={container}>
+            <div className="grid grid-cols-1 gap-y-2 border-t border-foreground pt-4 md:grid-cols-12 md:gap-x-8">
+              <p
+                className={cn(label, "text-muted-foreground md:col-span-3")}
+              >
+                01 / Read next
+              </p>
+              <h2 id="read-next-heading" className="text-h1 md:col-span-9">
+                More on design systems
+              </h2>
+            </div>
+            <ul className="mt-8 grid grid-cols-1 gap-y-8 md:grid-cols-12 md:gap-x-8">
+              {readNext.map((item) => (
+                <li
+                  key={item.title}
+                  className="flex flex-col gap-2 border-t pt-4 md:col-span-4"
+                >
+                  <p
+                    className={cn(
+                      label,
+                      "text-muted-foreground tabular-nums"
+                    )}
+                  >
+                    {item.topic} · {item.minutes} min read
+                  </p>
+                  <h3 className="text-h2">
+                    <a
+                      href="#"
+                      className={cn(
+                        "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+                        focusRing
+                      )}
+                    >
+                      {item.title}
+                    </a>
+                  </h3>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       </main>
-      <SiteFooter />
+
+      <footer className="border-t py-8">
+        <div className={container}>
+          <div className="flex flex-col gap-4">
+            <p className="font-heading text-h2">Quiet Interface</p>
+            <p>
+              Essays on product design, written by the people who ship it.
+            </p>
+          </div>
+          <p className={cn(label, "mt-8 text-muted-foreground")}>
+            © 2026 Quiet Interface
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

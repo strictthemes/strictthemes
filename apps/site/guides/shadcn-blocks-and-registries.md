@@ -63,7 +63,7 @@ The three words get mixed up, so here is the difference in what you receive:
 
 | File in the item | Type | Lines | Where it landed |
 |---|---|---|---|
-| `components/kiln-shop/page.tsx` | `registry:component` | 567 | `src/components/kiln-shop/page.tsx` (new) |
+| `components/kiln-shop/page.tsx` | `registry:component` | 572 | `src/components/kiln-shop/page.tsx` (new) |
 | `components/ui/badge.tsx` | `registry:ui` | 52 | `src/components/ui/badge.tsx` (new) |
 | `components/ui/input.tsx` | `registry:ui` | 20 | `src/components/ui/input.tsx` (new) |
 | `components/ui/button.tsx` | `registry:ui` | 58 | `src/components/ui/button.tsx` (overwritten) |
@@ -135,7 +135,7 @@ export default App
 
 ![The Kiln shop block rendered as the page in light mode: a clay-colored page with a large heading, a terracotta button and, in a framed picture, a pale block that stands for a jug in ash glaze](/guides/shadcn-blocks-and-registries/kiln-shop-light.png "The block as the page, straight after the install and the one-line change to App.tsx.")
 
-![The same page in dark mode: dark brown page, cream heading, a lighter orange button, and the jug still pale, because a glaze keeps its color](/guides/shadcn-blocks-and-registries/kiln-shop-dark.png "Dark mode needed no work. The 558 lines of the page contain no dark: class.")
+![The same page in dark mode: dark brown page, cream heading, a lighter orange button, and the jug still pale, because a glaze keeps its color](/guides/shadcn-blocks-and-registries/kiln-shop-dark.png "Dark mode needed no work. The 572 lines of the page contain no dark: class.")
 
 We then fetched the theme's `DESIGN.md` into the project root, built it, and ran Strict Check, which measures the rendered page against the theme:
 
@@ -146,16 +146,16 @@ npx -y @strictthemes/check@0.7.1 --dist dist
 ```
 ...
 Rendered pages: / in light and dark mode at 1280px and 375px, also on hover and focus
-  colors         834 checked  all on theme
+  colors         870 checked  all on theme
   spacing        524 checked  all on theme
-  typography    1734 checked  all on theme
+  typography    1914 checked  all on theme
   corners        122 checked  all on theme
-  contrast       362 checked  all on theme
-  tells          370 checked  all on theme
+  contrast       398 checked  all on theme
+  tells          406 checked  all on theme
   layout           4 checked  all on theme
   states          90 checked  all on theme
 
-Passed: 100% of 4422 measured values follow the theme. 0 errors, 0 warnings.
+Passed: 100% of 4432 measured values follow the theme. 0 errors, 0 warnings.
 ```
 
 That is the block untouched, with its made-up sample content. It says nothing about the page after you put your own content in: run it again then.

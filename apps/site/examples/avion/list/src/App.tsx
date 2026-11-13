@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from "react"
+import * as React from "react"
 import { flushSync } from "react-dom"
 import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react"
 
@@ -22,303 +22,299 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-type Status = "In transit" | "Delivered" | "Late" | "Held"
+type Status = "in-transit" | "delivered" | "late" | "held"
+type Depot = "leeds" | "york" | "hull" | "harrogate"
 
 type Shipment = {
   id: string
   customer: string
   destination: string
-  depot: string
+  depot: Depot
   status: Status
   weight: number
   value: number
-  updated: string // local date and time, "YYYY-MM-DDTHH:MM"
+  // ISO date and time, local, 24-hour clock
+  updated: string
 }
 
-const DEPOTS = [
-  "Leeds Kirkstall",
-  "York Clifton",
-  "Hull Marfleet",
-  "Harrogate Bilton",
+const DEPOTS: { value: Depot; label: string }[] = [
+  { value: "leeds", label: "Leeds Central" },
+  { value: "york", label: "York North" },
+  { value: "hull", label: "Hull Docks" },
+  { value: "harrogate", label: "Harrogate" },
 ]
+
+const DEPOT_ITEMS: { value: "all" | Depot; label: string }[] = [
+  { value: "all", label: "All depots" },
+  ...DEPOTS,
+]
+
+const DEPOT_LABEL: Record<Depot, string> = {
+  leeds: "Leeds Central",
+  york: "York North",
+  hull: "Hull Docks",
+  harrogate: "Harrogate",
+}
+
+const STATUS_CHOICES: { value: "all" | Status; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "in-transit", label: "In transit" },
+  { value: "delivered", label: "Delivered" },
+  { value: "late", label: "Late" },
+  { value: "held", label: "Held" },
+]
+
+const STATUS_LOOK: Record<Status, { label: string; dot: string }> = {
+  "in-transit": { label: "In transit", dot: "bg-muted-foreground" },
+  delivered: { label: "Delivered", dot: "bg-success" },
+  late: { label: "Late", dot: "bg-destructive" },
+  held: { label: "Held", dot: "bg-tertiary" },
+}
 
 const SHIPMENTS: Shipment[] = [
   {
     id: "NG-48213",
-    customer: "Brackenridge Tools",
-    destination: "Ripon",
-    depot: "Harrogate Bilton",
-    status: "In transit",
+    customer: "Halden & Pryce Joinery",
+    destination: "Wakefield",
+    depot: "leeds",
+    status: "in-transit",
     weight: 18.4,
     value: 1240,
     updated: "2026-11-13T09:42",
   },
   {
     id: "NG-48207",
-    customer: "Ouse Valley Florists",
-    destination: "Selby",
-    depot: "York Clifton",
-    status: "Delivered",
-    weight: 3.2,
-    value: 86.5,
+    customer: "Brightmoor Pharmacy",
+    destination: "Ilkley",
+    depot: "harrogate",
+    status: "delivered",
+    weight: 2.1,
+    value: 386.5,
     updated: "2026-11-13T08:15",
   },
   {
     id: "NG-48199",
-    customer: "Tanner & Hale Printers",
-    destination: "Wakefield",
-    depot: "Leeds Kirkstall",
-    status: "Late",
-    weight: 42.7,
-    value: 2315.8,
-    updated: "2026-11-12T17:58",
+    customer: "Calder Valley Bikes",
+    destination: "Hebden Bridge",
+    depot: "leeds",
+    status: "late",
+    weight: 24.8,
+    value: 2895,
+    updated: "2026-11-12T17:30",
   },
   {
     id: "NG-48194",
-    customer: "Humber Marine Supply",
-    destination: "Grimsby",
-    depot: "Hull Marfleet",
-    status: "Held",
-    weight: 64.0,
-    value: 4980,
-    updated: "2026-11-12T16:21",
+    customer: "Ouse Street Books",
+    destination: "Selby",
+    depot: "york",
+    status: "delivered",
+    weight: 6.3,
+    value: 212.4,
+    updated: "2026-11-12T16:05",
   },
   {
     id: "NG-48188",
-    customer: "Linton Bakehouse",
-    destination: "Wetherby",
-    depot: "Leeds Kirkstall",
-    status: "Delivered",
-    weight: 7.9,
-    value: 142.3,
-    updated: "2026-11-12T15:04",
+    customer: "Marram Coastal Supplies",
+    destination: "Bridlington",
+    depot: "hull",
+    status: "held",
+    weight: 41.0,
+    value: 3610,
+    updated: "2026-11-12T14:48",
   },
   {
-    id: "NG-48181",
-    customer: "Fieldfare Outdoor",
-    destination: "Skipton",
-    depot: "Harrogate Bilton",
-    status: "In transit",
-    weight: 12.5,
-    value: 689.99,
-    updated: "2026-11-12T13:37",
+    id: "NG-48182",
+    customer: "Tessaly Print Works",
+    destination: "Bradford",
+    depot: "leeds",
+    status: "in-transit",
+    weight: 12.7,
+    value: 845.2,
+    updated: "2026-11-12T13:20",
   },
   {
     id: "NG-48176",
-    customer: "Minster Lane Books",
-    destination: "Malton",
-    depot: "York Clifton",
-    status: "In transit",
-    weight: 9.1,
-    value: 214,
-    updated: "2026-11-12T11:50",
-  },
-  {
-    id: "NG-48170",
-    customer: "Calder Bike Works",
-    destination: "Halifax",
-    depot: "Leeds Kirkstall",
-    status: "Delivered",
-    weight: 21.3,
-    value: 1875,
-    updated: "2026-11-12T10:12",
-  },
-  {
-    id: "NG-48163",
-    customer: "Spurn Point Fisheries",
-    destination: "Withernsea",
-    depot: "Hull Marfleet",
-    status: "Late",
-    weight: 31.6,
-    value: 562.4,
-    updated: "2026-11-12T08:46",
-  },
-  {
-    id: "NG-48157",
-    customer: "Nidd Gorge Dairy",
+    customer: "Fenwick Garden Centre",
     destination: "Knaresborough",
-    depot: "Harrogate Bilton",
-    status: "Delivered",
-    weight: 15.0,
-    value: 318.75,
-    updated: "2026-11-11T18:20",
+    depot: "harrogate",
+    status: "in-transit",
+    weight: 33.5,
+    value: 1078,
+    updated: "2026-11-12T11:02",
   },
   {
-    id: "NG-48150",
-    customer: "Ashdown Electrical",
-    destination: "Pontefract",
-    depot: "Leeds Kirkstall",
-    status: "In transit",
-    weight: 27.8,
-    value: 3420,
-    updated: "2026-11-11T16:33",
+    id: "NG-48171",
+    customer: "Holloway Dental Lab",
+    destination: "Malton",
+    depot: "york",
+    status: "late",
+    weight: 1.4,
+    value: 560,
+    updated: "2026-11-12T09:37",
   },
   {
-    id: "NG-48144",
-    customer: "Wolds Farm Machinery",
-    destination: "Driffield",
-    depot: "Hull Marfleet",
-    status: "Held",
-    weight: 88.2,
-    value: 6150,
-    updated: "2026-11-11T15:09",
+    id: "NG-48165",
+    customer: "Saltgate Marine",
+    destination: "Grimsby",
+    depot: "hull",
+    status: "delivered",
+    weight: 58.2,
+    value: 4720,
+    updated: "2026-11-11T18:44",
   },
   {
-    id: "NG-48139",
-    customer: "Ouse Valley Florists",
-    destination: "Tadcaster",
-    depot: "York Clifton",
-    status: "Delivered",
-    weight: 2.4,
-    value: 54,
+    id: "NG-48160",
+    customer: "Wren & Abbot Tea Room",
+    destination: "Ripon",
+    depot: "harrogate",
+    status: "delivered",
+    weight: 4.9,
+    value: 148.75,
+    updated: "2026-11-11T16:21",
+  },
+  {
+    id: "NG-48154",
+    customer: "Kirkstall Audio",
+    destination: "Huddersfield",
+    depot: "leeds",
+    status: "held",
+    weight: 9.6,
+    value: 1985,
     updated: "2026-11-11T14:05",
   },
   {
-    id: "NG-48132",
-    customer: "Kestrel Lab Supplies",
-    destination: "Bradford",
-    depot: "Leeds Kirkstall",
-    status: "Late",
-    weight: 5.6,
-    value: 978.2,
+    id: "NG-48149",
+    customer: "Minster Fabrics",
+    destination: "Thirsk",
+    depot: "york",
+    status: "in-transit",
+    weight: 15.2,
+    value: 690,
     updated: "2026-11-11T12:48",
   },
   {
-    id: "NG-48126",
-    customer: "Pickering Pottery",
+    id: "NG-48143",
+    customer: "Humber Lab Services",
+    destination: "Beverley",
+    depot: "hull",
+    status: "in-transit",
+    weight: 3.8,
+    value: 1320.6,
+    updated: "2026-11-11T10:16",
+  },
+  {
+    id: "NG-48138",
+    customer: "Pennine Outdoor Co.",
+    destination: "Skipton",
+    depot: "leeds",
+    status: "delivered",
+    weight: 21.3,
+    value: 940,
+    updated: "2026-11-11T08:53",
+  },
+  {
+    id: "NG-48132",
+    customer: "Nidd Valley Cheese",
+    destination: "Pateley Bridge",
+    depot: "harrogate",
+    status: "late",
+    weight: 11.0,
+    value: 305.8,
+    updated: "2026-11-10T17:12",
+  },
+  {
+    id: "NG-48127",
+    customer: "Shambles Clockmakers",
     destination: "Pickering",
-    depot: "York Clifton",
-    status: "In transit",
-    weight: 19.7,
-    value: 436,
-    updated: "2026-11-11T11:02",
+    depot: "york",
+    status: "delivered",
+    weight: 7.5,
+    value: 2410,
+    updated: "2026-11-10T15:40",
   },
   {
     id: "NG-48121",
-    customer: "Beverley Saddlery",
-    destination: "Beverley",
-    depot: "Hull Marfleet",
-    status: "Delivered",
-    weight: 11.3,
-    value: 1290.5,
-    updated: "2026-11-11T09:27",
+    customer: "Eastfield Tiles",
+    destination: "Goole",
+    depot: "hull",
+    status: "in-transit",
+    weight: 64.9,
+    value: 1755,
+    updated: "2026-11-10T13:27",
   },
   {
-    id: "NG-48115",
-    customer: "Brackenridge Tools",
-    destination: "Thirsk",
-    depot: "Harrogate Bilton",
-    status: "Delivered",
-    weight: 24.9,
-    value: 1605,
-    updated: "2026-11-10T17:44",
+    id: "NG-48116",
+    customer: "Armley Office Supply",
+    destination: "Pudsey",
+    depot: "leeds",
+    status: "delivered",
+    weight: 13.1,
+    value: 418.3,
+    updated: "2026-11-10T11:09",
   },
   {
-    id: "NG-48108",
-    customer: "Aire Street Coffee",
-    destination: "Leeds",
-    depot: "Leeds Kirkstall",
-    status: "In transit",
-    weight: 6.8,
-    value: 128.4,
-    updated: "2026-11-10T16:10",
+    id: "NG-48110",
+    customer: "Valley Gardens Florist",
+    destination: "Wetherby",
+    depot: "harrogate",
+    status: "in-transit",
+    weight: 5.6,
+    value: 96.4,
+    updated: "2026-11-10T09:31",
   },
   {
-    id: "NG-48102",
-    customer: "Holderness Seeds",
-    destination: "Hornsea",
-    depot: "Hull Marfleet",
-    status: "In transit",
-    weight: 36.5,
-    value: 742.6,
-    updated: "2026-11-10T14:28",
+    id: "NG-48104",
+    customer: "Clifford Tower Games",
+    destination: "Tadcaster",
+    depot: "york",
+    status: "held",
+    weight: 8.2,
+    value: 1150,
+    updated: "2026-11-09T17:55",
   },
   {
-    id: "NG-48097",
-    customer: "Shambles Clockmakers",
-    destination: "York",
-    depot: "York Clifton",
-    status: "Held",
-    weight: 1.8,
-    value: 3890,
-    updated: "2026-11-10T12:53",
+    id: "NG-48099",
+    customer: "Spurn Point Brewing",
+    destination: "Withernsea",
+    depot: "hull",
+    status: "delivered",
+    weight: 47.6,
+    value: 1890.5,
+    updated: "2026-11-09T16:02",
   },
   {
-    id: "NG-48091",
-    customer: "Washburn Joinery",
-    destination: "Otley",
-    depot: "Harrogate Bilton",
-    status: "Late",
-    weight: 52.3,
-    value: 2240,
-    updated: "2026-11-10T11:16",
+    id: "NG-48093",
+    customer: "Roundhay Physio",
+    destination: "Harehills",
+    depot: "leeds",
+    status: "late",
+    weight: 2.9,
+    value: 275,
+    updated: "2026-11-09T14:18",
   },
   {
-    id: "NG-48084",
-    customer: "Kestrel Lab Supplies",
-    destination: "Huddersfield",
-    depot: "Leeds Kirkstall",
-    status: "Delivered",
-    weight: 4.2,
-    value: 615,
-    updated: "2026-11-10T09:39",
+    id: "NG-48088",
+    customer: "Bilton Hardware",
+    destination: "Boroughbridge",
+    depot: "harrogate",
+    status: "delivered",
+    weight: 29.7,
+    value: 664.9,
+    updated: "2026-11-09T11:46",
   },
   {
-    id: "NG-48078",
-    customer: "Derwent Textiles",
+    id: "NG-48082",
+    customer: "Micklegate Cycles",
     destination: "Easingwold",
-    depot: "York Clifton",
-    status: "Delivered",
-    weight: 13.6,
-    value: 507.25,
-    updated: "2026-11-09T16:57",
-  },
-  {
-    id: "NG-48071",
-    customer: "Fieldfare Outdoor",
-    destination: "Settle",
-    depot: "Harrogate Bilton",
-    status: "In transit",
-    weight: 8.4,
-    value: 399,
-    updated: "2026-11-09T14:31",
+    depot: "york",
+    status: "in-transit",
+    weight: 19.9,
+    value: 3240,
+    updated: "2026-11-09T09:05",
   },
 ]
 
-const TOTAL = SHIPMENTS.length
 const PAGE_SIZE = 10
-
-const STATUS_FILTERS = [
-  "All",
-  "In transit",
-  "Delivered",
-  "Late",
-  "Held",
-] as const
-type StatusFilter = (typeof STATUS_FILTERS)[number]
-
-const DEPOT_ITEMS = [
-  { value: "all", label: "All depots" },
-  ...DEPOTS.map((d) => ({ value: d, label: d })),
-]
-
-type SortKey = "id" | "customer" | "weight" | "value" | "updated"
-type Sort = { key: SortKey; dir: "asc" | "desc" }
-
-const STATUS_DOT: Record<Status, string> = {
-  "In transit": "bg-muted-foreground",
-  Delivered: "bg-success",
-  Late: "bg-destructive",
-  Held: "bg-tertiary",
-}
-
-const NAV = [
-  { label: "Overview", href: "/" },
-  { label: "Shipments", href: "/shipments" },
-  { label: "Depots", href: "/depots" },
-  { label: "Reports", href: "/reports" },
-]
-const CURRENT = "/shipments"
 
 const MONTHS = [
   "Jan",
@@ -335,6 +331,12 @@ const MONTHS = [
   "Dec",
 ]
 
+function formatUpdated(iso: string) {
+  const [date, time] = iso.split("T")
+  const [, month, day] = date.split("-")
+  return `${Number(day)} ${MONTHS[Number(month) - 1]}, ${time}`
+}
+
 const money = new Intl.NumberFormat("en-GB", {
   style: "currency",
   currency: "GBP",
@@ -342,96 +344,172 @@ const money = new Intl.NumberFormat("en-GB", {
   maximumFractionDigits: 2,
 })
 
-function formatUpdated(stamp: string) {
-  const [date, time] = stamp.split("T")
-  const [, month, day] = date.split("-").map(Number)
-  return `${day} ${MONTHS[month - 1]}, ${time}`
+type SortKey = "id" | "customer" | "weight" | "value" | "updated"
+type SortDir = "ascending" | "descending"
+
+function compare(a: Shipment, b: Shipment, key: SortKey) {
+  switch (key) {
+    case "id":
+      return a.id.localeCompare(b.id)
+    case "customer":
+      return a.customer.localeCompare(b.customer)
+    case "weight":
+      return a.weight - b.weight
+    case "value":
+      return a.value - b.value
+    case "updated":
+      return new Date(a.updated).getTime() - new Date(b.updated).getTime()
+  }
 }
 
-function plural(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
-}
+const NAV = [
+  { label: "Overview", href: "/" },
+  { label: "Shipments", href: "/shipments", current: true },
+  { label: "Depots", href: "/depots" },
+  { label: "Reports", href: "/reports" },
+]
 
-function filterRows(
-  rows: Shipment[],
-  search: string,
-  status: StatusFilter,
-  depot: string
-) {
-  const q = search.trim().toLowerCase()
-  return rows.filter(
-    (r) =>
-      (status === "All" || r.status === status) &&
-      (depot === "all" || r.depot === depot) &&
-      (q === "" ||
-        r.id.toLowerCase().includes(q) ||
-        r.customer.toLowerCase().includes(q) ||
-        r.destination.toLowerCase().includes(q))
-  )
-}
-
-function sortRows(rows: Shipment[], sort: Sort) {
-  const sign = sort.dir === "asc" ? 1 : -1
-  return [...rows].sort((a, b) => {
-    let diff: number
-    switch (sort.key) {
-      case "weight":
-      case "value":
-        diff = a[sort.key] - b[sort.key]
-        break
-      case "updated":
-        diff = new Date(a.updated).getTime() - new Date(b.updated).getTime()
-        break
-      default:
-        diff = a[sort.key].localeCompare(b[sort.key], "en-GB", {
-          numeric: true,
-        })
-    }
-    return diff * sign
-  })
-}
-
-function pageCount(n: number) {
-  return Math.max(1, Math.ceil(n / PAGE_SIZE))
-}
-
+const LABEL = "font-mono text-label uppercase"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const BUTTON_TEXT = "px-5 font-mono text-label uppercase"
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const LABEL = "font-mono text-label uppercase"
-const SMALL = "font-mono text-label tabular-nums text-muted-foreground"
-const BUTTON = "px-5 font-mono text-label uppercase"
+const TEXT_LINK = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  FOCUS
+)
+
+function NavLinks({
+  className,
+  linkClassName,
+}: {
+  className?: string
+  linkClassName?: string
+}) {
+  return (
+    <ul className={className}>
+      {NAV.map((item) => (
+        <li key={item.href}>
+          <a
+            href={item.href}
+            aria-current={item.current ? "page" : undefined}
+            className={cn(
+              LABEL,
+              "transition-colors duration-150",
+              FOCUS,
+              item.current
+                ? "text-foreground"
+                : "text-muted-foreground hover:text-foreground",
+              linkClassName
+            )}
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function SortHeader({
+  label,
+  column,
+  sortKey,
+  sortDir,
+  align = "left",
+  onSort,
+}: {
+  label: React.ReactNode
+  column: SortKey
+  sortKey: SortKey
+  sortDir: SortDir
+  align?: "left" | "right"
+  onSort: (key: SortKey) => void
+}) {
+  const sorted = sortKey === column
+  const Icon = !sorted
+    ? ArrowUpDown
+    : sortDir === "ascending"
+      ? ArrowUp
+      : ArrowDown
+  const icon = (
+    <Icon
+      aria-hidden="true"
+      strokeWidth={1.5}
+      className={cn("size-4", sorted && "text-foreground")}
+    />
+  )
+  return (
+    <TableHead
+      aria-sort={sorted ? sortDir : undefined}
+      className={cn(
+        "px-5 font-mono text-label text-muted-foreground uppercase",
+        align === "right" && "text-right"
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => onSort(column)}
+        className={cn(
+          "inline-flex items-center gap-1 font-mono text-label text-muted-foreground uppercase transition-colors duration-150 hover:text-foreground",
+          FOCUS
+        )}
+      >
+        {align === "right" && icon}
+        {label}
+        {align === "left" && icon}
+      </button>
+    </TableHead>
+  )
+}
 
 export function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [rows, setRows] = useState<Shipment[]>(SHIPMENTS)
-  const [search, setSearch] = useState("")
-  const [status, setStatus] = useState<StatusFilter>("All")
-  const [depot, setDepot] = useState("all")
-  const [sort, setSort] = useState<Sort>({ key: "updated", dir: "desc" })
-  const [page, setPage] = useState(1)
-  const [selected, setSelected] = useState<Set<string>>(() => new Set())
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const [rows, setRows] = React.useState<Shipment[]>(SHIPMENTS)
+  const [search, setSearch] = React.useState("")
+  const [status, setStatus] = React.useState<"all" | Status>("all")
+  const [depot, setDepot] = React.useState<"all" | Depot>("all")
+  const [sortKey, setSortKey] = React.useState<SortKey>("updated")
+  const [sortDir, setSortDir] = React.useState<SortDir>("descending")
+  const [page, setPage] = React.useState(1)
+  const [selected, setSelected] = React.useState<Set<string>>(() => new Set())
 
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
-  const searchRef = useRef<HTMLInputElement>(null)
-  const headerCheckboxRef = useRef<HTMLElement>(null)
-  const emptyClearRef = useRef<HTMLButtonElement>(null)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+  const searchRef = React.useRef<HTMLInputElement>(null)
+  const headerCheckboxRef = React.useRef<HTMLElement>(null)
+  const emptyClearRef = React.useRef<HTMLButtonElement>(null)
 
-  const filtered = useMemo(
-    () => sortRows(filterRows(rows, search, status, depot), sort),
-    [rows, search, status, depot, sort]
-  )
-  const pages = pageCount(filtered.length)
-  const pageRows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-  const first = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
-  const last = Math.min(page * PAGE_SIZE, filtered.length)
-  const range =
-    filtered.length === 0 ? "0 of 0" : `${first}–${last} of ${filtered.length}`
+  const matching = React.useMemo(() => {
+    const query = search.trim().toLowerCase()
+    const filtered = rows.filter((row) => {
+      if (status !== "all" && row.status !== status) return false
+      if (depot !== "all" && row.depot !== depot) return false
+      if (!query) return true
+      return (
+        row.id.toLowerCase().includes(query) ||
+        row.customer.toLowerCase().includes(query) ||
+        row.destination.toLowerCase().includes(query)
+      )
+    })
+    const dir = sortDir === "ascending" ? 1 : -1
+    return [...filtered].sort((a, b) => compare(a, b, sortKey) * dir)
+  }, [rows, search, status, depot, sortKey, sortDir])
 
-  const pageSelected = pageRows.filter((r) => selected.has(r.id)).length
-  const allOnPage = pageRows.length > 0 && pageSelected === pageRows.length
-  const someOnPage = pageSelected > 0 && !allOnPage
+  const total = matching.length
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
+  const currentPage = Math.min(page, pageCount)
+  const start = (currentPage - 1) * PAGE_SIZE
+  const pageRows = matching.slice(start, start + PAGE_SIZE)
 
-  const filtersAtRest = search === "" && status === "All" && depot === "all"
+  const selectedOnPage = pageRows.filter((row) => selected.has(row.id)).length
+  const allOnPage = pageRows.length > 0 && selectedOnPage === pageRows.length
+  const someOnPage = selectedOnPage > 0 && !allOnPage
+
+  const filtersActive = search !== "" || status !== "all" || depot !== "all"
+  const rangeLabel =
+    total === 0
+      ? "0 of 0"
+      : `${start + 1}–${start + pageRows.length} of ${total}`
 
   function resetForFilterChange() {
     setPage(1)
@@ -439,21 +517,20 @@ export function App() {
   }
 
   function clearFilters() {
-    flushSync(() => {
-      setSearch("")
-      setStatus("All")
-      setDepot("all")
-      resetForFilterChange()
-    })
+    setSearch("")
+    setStatus("all")
+    setDepot("all")
+    resetForFilterChange()
     searchRef.current?.focus()
   }
 
   function sortBy(key: SortKey) {
-    setSort((s) =>
-      s.key === key
-        ? { key, dir: s.dir === "asc" ? "desc" : "asc" }
-        : { key, dir: "asc" }
-    )
+    if (key === sortKey) {
+      setSortDir(sortDir === "ascending" ? "descending" : "ascending")
+    } else {
+      setSortKey(key)
+      setSortDir("ascending")
+    }
     setPage(1)
   }
 
@@ -469,102 +546,52 @@ export function App() {
   function togglePage() {
     setSelected((prev) => {
       const next = new Set(prev)
-      if (allOnPage) pageRows.forEach((r) => next.delete(r.id))
-      else pageRows.forEach((r) => next.add(r.id))
+      if (allOnPage) pageRows.forEach((row) => next.delete(row.id))
+      else pageRows.forEach((row) => next.add(row.id))
       return next
     })
   }
 
-  function markDelivered() {
-    const nextRows = rows.map((r) =>
-      selected.has(r.id) ? { ...r, status: "Delivered" as const } : r
-    )
-    const remaining = filterRows(nextRows, search, status, depot).length
-    flushSync(() => {
-      setRows(nextRows)
-      setSelected(new Set())
-      setPage((p) => Math.min(p, pageCount(remaining)))
-    })
+  function focusAfterSelectionAction(remaining: number) {
     if (remaining === 0) emptyClearRef.current?.focus()
     else headerCheckboxRef.current?.focus()
   }
 
+  function markDelivered() {
+    const nextRows = rows.map((row) =>
+      selected.has(row.id) ? { ...row, status: "delivered" as const } : row
+    )
+    const query = search.trim().toLowerCase()
+    const remaining = nextRows.filter((row) => {
+      if (status !== "all" && row.status !== status) return false
+      if (depot !== "all" && row.depot !== depot) return false
+      if (!query) return true
+      return (
+        row.id.toLowerCase().includes(query) ||
+        row.customer.toLowerCase().includes(query) ||
+        row.destination.toLowerCase().includes(query)
+      )
+    }).length
+    const lastPage = Math.max(1, Math.ceil(remaining / PAGE_SIZE))
+    flushSync(() => {
+      setRows(nextRows)
+      setSelected(new Set())
+      setPage(Math.min(currentPage, lastPage))
+    })
+    focusAfterSelectionAction(remaining)
+  }
+
   function clearSelection() {
     flushSync(() => setSelected(new Set()))
-    headerCheckboxRef.current?.focus()
-  }
-
-  function sortHeader(
-    key: SortKey,
-    label: ReactNode,
-    align: "left" | "right" = "left"
-  ) {
-    const active = sort.key === key
-    const Icon = !active
-      ? ArrowUpDown
-      : sort.dir === "asc"
-        ? ArrowUp
-        : ArrowDown
-    const icon = (
-      <Icon
-        aria-hidden="true"
-        strokeWidth={1.5}
-        className={cn("size-4", active && "text-foreground")}
-      />
-    )
-    return (
-      <TableHead
-        aria-sort={
-          active ? (sort.dir === "asc" ? "ascending" : "descending") : undefined
-        }
-        className={cn(
-          "px-5 font-mono text-label text-muted-foreground uppercase",
-          align === "right" && "text-right"
-        )}
-      >
-        <button
-          type="button"
-          onClick={() => sortBy(key)}
-          className={cn(
-            "inline-flex items-center gap-1 text-muted-foreground uppercase transition-colors duration-150 hover:text-foreground",
-            FOCUS
-          )}
-        >
-          {align === "right" && icon}
-          {label}
-          {align === "left" && icon}
-        </button>
-      </TableHead>
-    )
-  }
-
-  const navLink = (item: (typeof NAV)[number], block = false) => {
-    const current = item.href === CURRENT
-    return (
-      <a
-        href={item.href}
-        aria-current={current ? "page" : undefined}
-        className={cn(
-          LABEL,
-          "transition-colors duration-150",
-          FOCUS,
-          block && "block py-2",
-          current
-            ? "text-foreground"
-            : "text-muted-foreground hover:text-foreground"
-        )}
-      >
-        {item.label}
-      </a>
-    )
+    focusAfterSelectionAction(total)
   }
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header
         className="border-b bg-card"
-        onKeyDown={(e) => {
-          if (menuOpen && e.key === "Escape") {
+        onKeyDown={(event) => {
+          if (menuOpen && event.key === "Escape") {
             setMenuOpen(false)
             menuButtonRef.current?.focus()
           }
@@ -581,345 +608,364 @@ export function App() {
             Northgate
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-5">
-              {NAV.map((item) => (
-                <li key={item.href}>{navLink(item)}</li>
-              ))}
-            </ul>
+            <NavLinks className="flex items-center gap-5" />
           </nav>
-          <div className="ml-auto flex items-center">
-            <p className={cn(SMALL, "hidden md:block")}>Maren Holt</p>
+          <div className="ml-auto flex items-center gap-5">
+            <p className={cn(SMALL_FIGURE, "hidden md:block")}>
+              Priya Ashworth
+            </p>
             <Button
               ref={menuButtonRef}
               variant="outline"
-              className={cn(BUTTON, "md:hidden")}
+              className={cn(BUTTON_TEXT, "md:hidden")}
               aria-expanded={menuOpen}
-              aria-controls="main-menu"
-              onClick={() => setMenuOpen((o) => !o)}
+              aria-controls="mobile-nav"
+              onClick={() => setMenuOpen((open) => !open)}
             >
               Menu
             </Button>
           </div>
         </div>
         <nav
-          id="main-menu"
+          id="mobile-nav"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t md:hidden"
         >
-          <ul className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
-            {NAV.map((item) => (
-              <li key={item.href}>{navLink(item, true)}</li>
-            ))}
-          </ul>
+          <div className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
+            <NavLinks linkClassName="block py-2" />
+          </div>
         </nav>
       </header>
 
-      <main className="mx-auto max-w-[1280px] px-3 py-5 md:px-5">
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-          <div className="flex flex-wrap items-center justify-between gap-3 md:col-span-12">
-            <div className="flex items-baseline gap-3">
-              <h1 className="text-h1">Shipments</h1>
-              <p className={SMALL}>{plural(TOTAL, "shipment", "shipments")}</p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" className={BUTTON}>
-                Export
-              </Button>
-              <Button className={BUTTON}>New shipment</Button>
-            </div>
+      <main className="mx-auto grid max-w-[1280px] grid-cols-1 gap-5 px-3 py-5 md:grid-cols-12 md:px-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 md:col-span-12">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-h1">Shipments</h1>
+            <p className={SMALL_FIGURE}>
+              {SHIPMENTS.length}{" "}
+              {SHIPMENTS.length === 1 ? "shipment" : "shipments"}
+            </p>
           </div>
+          <div className="flex gap-2">
+            <Button variant="outline" className={BUTTON_TEXT}>
+              Export
+            </Button>
+            <Button className={BUTTON_TEXT}>New shipment</Button>
+          </div>
+        </div>
 
-          <div className="rounded-xl border bg-card p-5 md:col-span-12">
-            <div className="flex flex-wrap items-end gap-5">
-              <div className="flex w-full flex-col gap-2 md:w-64">
-                <label
-                  htmlFor="search"
-                  className={cn(LABEL, "text-muted-foreground")}
-                >
-                  Search
-                </label>
-                <Input
-                  ref={searchRef}
-                  id="search"
-                  type="search"
-                  placeholder="ID, customer or destination"
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value)
-                    resetForFilterChange()
-                  }}
-                  className="px-2 text-body md:text-body [&::-webkit-search-cancel-button]:appearance-none"
-                />
-              </div>
+        <div className="rounded-xl border bg-card p-5 md:col-span-12">
+          <div className="flex flex-wrap items-end gap-5">
+            <div className="flex w-full flex-col gap-2 md:w-64">
+              <label
+                htmlFor="search"
+                className={cn(LABEL, "text-muted-foreground")}
+              >
+                Search
+              </label>
+              <Input
+                ref={searchRef}
+                id="search"
+                type="search"
+                placeholder="ID, customer or destination"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value)
+                  resetForFilterChange()
+                }}
+                className="px-2 text-body md:text-body [&::-webkit-search-cancel-button]:appearance-none"
+              />
+            </div>
 
-              <div className="flex flex-col gap-2">
-                <p
-                  id="status-label"
-                  className={cn(LABEL, "text-muted-foreground")}
-                >
-                  Status
-                </p>
-                <div
-                  role="group"
-                  aria-labelledby="status-label"
-                  className="flex flex-wrap gap-1"
-                >
-                  {STATUS_FILTERS.map((s) => (
+            <div className="flex flex-col gap-2">
+              <p
+                id="status-label"
+                className={cn(LABEL, "text-muted-foreground")}
+              >
+                Status
+              </p>
+              <div
+                role="group"
+                aria-labelledby="status-label"
+                className="flex flex-wrap gap-1"
+              >
+                {STATUS_CHOICES.map((choice) => {
+                  const chosen = status === choice.value
+                  return (
                     <Button
-                      key={s}
-                      variant={status === s ? "secondary" : "outline"}
-                      aria-pressed={status === s}
-                      className={BUTTON}
+                      key={choice.value}
+                      variant={chosen ? "secondary" : "outline"}
+                      aria-pressed={chosen}
+                      className={BUTTON_TEXT}
                       onClick={() => {
-                        setStatus(s)
+                        setStatus(choice.value)
                         resetForFilterChange()
                       }}
                     >
-                      {s}
+                      {choice.label}
                     </Button>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
+            </div>
 
-              <div className="flex w-48 flex-col gap-2">
-                <label
-                  id="depot-label"
-                  htmlFor="depot"
-                  className={cn(LABEL, "text-muted-foreground")}
-                >
-                  Depot
-                </label>
-                <Select
-                  items={DEPOT_ITEMS}
-                  value={depot}
-                  onValueChange={(v) => {
-                    if (v === null) return
-                    setDepot(v)
-                    resetForFilterChange()
-                  }}
-                >
-                  <SelectTrigger id="depot" aria-labelledby="depot-label">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {DEPOT_ITEMS.map((d) => (
-                      <SelectItem key={d.value} value={d.value}>
-                        {d.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                variant="outline"
-                className={cn(BUTTON, "ml-auto")}
-                disabled={filtersAtRest}
-                onClick={clearFilters}
+            <div className="flex w-48 flex-col gap-2">
+              <label
+                id="depot-label"
+                htmlFor="depot-filter"
+                className={cn(LABEL, "text-muted-foreground")}
               >
-                Clear filters
-              </Button>
+                Depot
+              </label>
+              <Select
+                items={DEPOT_ITEMS}
+                value={depot}
+                onValueChange={(value) => {
+                  if (value === null) return
+                  setDepot(value)
+                  resetForFilterChange()
+                }}
+              >
+                <SelectTrigger id="depot-filter" aria-labelledby="depot-label">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DEPOT_ITEMS.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              variant="outline"
+              className={cn(BUTTON_TEXT, "ml-auto")}
+              disabled={!filtersActive}
+              onClick={clearFilters}
+            >
+              Clear filters
+            </Button>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border bg-card md:col-span-12">
+          <div className="border-b px-5 pt-5 pb-3">
+            <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
+              <h2 className={cn(LABEL, "text-muted-foreground")}>Results</h2>
+              <p
+                aria-live="polite"
+                className={cn(SMALL_FIGURE, selected.size > 0 && "sr-only")}
+              >
+                {rangeLabel}
+              </p>
+              {selected.size > 0 && (
+                <div className="flex flex-wrap items-center gap-3">
+                  <p className="text-body tabular-nums">
+                    {selected.size} selected
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="secondary"
+                      className={BUTTON_TEXT}
+                      onClick={markDelivered}
+                    >
+                      Mark as delivered
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className={BUTTON_TEXT}
+                      onClick={clearSelection}
+                    >
+                      Clear selection
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          <section
-            aria-labelledby="results-heading"
-            className="overflow-hidden rounded-xl border bg-card md:col-span-12"
-          >
-            <div className="border-b px-5 pt-5 pb-3">
-              <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-                <h2
-                  id="results-heading"
-                  className={cn(LABEL, "text-muted-foreground")}
-                >
-                  Results
-                </h2>
-                {selected.size > 0 && (
-                  <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-body">{selected.size} selected</p>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="secondary"
-                        className={BUTTON}
-                        onClick={markDelivered}
-                      >
-                        Mark as delivered
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className={BUTTON}
-                        onClick={clearSelection}
-                      >
-                        Clear selection
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                <p
-                  aria-live="polite"
-                  className={selected.size > 0 ? "sr-only" : SMALL}
-                >
-                  {range}
-                </p>
-              </div>
-            </div>
-
-            <Table label="Results" className="text-body">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="px-5">
-                    <Checkbox
-                      ref={headerCheckboxRef}
-                      className="rounded-sm"
-                      aria-label="Select all on this page"
-                      checked={allOnPage}
-                      indeterminate={someOnPage}
-                      disabled={pageRows.length === 0}
-                      onCheckedChange={togglePage}
-                    />
-                  </TableHead>
-                  {sortHeader("id", "ID")}
-                  {sortHeader("customer", "Customer")}
-                  <TableHead
-                    className={cn("px-5", LABEL, "text-muted-foreground")}
-                  >
-                    Destination
-                  </TableHead>
-                  <TableHead
-                    className={cn("px-5", LABEL, "text-muted-foreground")}
-                  >
-                    Depot
-                  </TableHead>
-                  <TableHead
-                    className={cn("px-5", LABEL, "text-muted-foreground")}
-                  >
-                    Status
-                  </TableHead>
-                  {sortHeader(
-                    "weight",
-                    <span>
+          <Table label="Results" className="text-body">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="px-5">
+                  <Checkbox
+                    ref={headerCheckboxRef}
+                    className="rounded-sm"
+                    aria-label="Select all on this page"
+                    checked={allOnPage}
+                    indeterminate={someOnPage}
+                    disabled={pageRows.length === 0}
+                    onCheckedChange={togglePage}
+                  />
+                </TableHead>
+                <SortHeader
+                  label="ID"
+                  column="id"
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={sortBy}
+                />
+                <SortHeader
+                  label="Customer"
+                  column="customer"
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={sortBy}
+                />
+                <TableHead className="px-5 font-mono text-label text-muted-foreground uppercase">
+                  Destination
+                </TableHead>
+                <TableHead className="px-5 font-mono text-label text-muted-foreground uppercase">
+                  Depot
+                </TableHead>
+                <TableHead className="px-5 font-mono text-label text-muted-foreground uppercase">
+                  Status
+                </TableHead>
+                <SortHeader
+                  label={
+                    <>
                       Weight <span className="normal-case">(kg)</span>
-                    </span>,
-                    "right"
-                  )}
-                  {sortHeader("value", "Value", "right")}
-                  {sortHeader("updated", "Updated", "right")}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pageRows.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={9}
-                      className="px-5 py-8 text-left whitespace-normal"
+                    </>
+                  }
+                  column="weight"
+                  align="right"
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={sortBy}
+                />
+                <SortHeader
+                  label="Value"
+                  column="value"
+                  align="right"
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={sortBy}
+                />
+                <SortHeader
+                  label="Updated"
+                  column="updated"
+                  align="right"
+                  sortKey={sortKey}
+                  sortDir={sortDir}
+                  onSort={sortBy}
+                />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pageRows.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={9}
+                    className="px-5 py-8 text-left whitespace-normal"
+                  >
+                    <p>No shipments match these filters.</p>
+                    <Button
+                      ref={emptyClearRef}
+                      variant="outline"
+                      className={cn(BUTTON_TEXT, "mt-3")}
+                      onClick={clearFilters}
                     >
-                      <p>No shipments match these filters.</p>
-                      <div className="mt-3">
-                        <Button
-                          ref={emptyClearRef}
-                          variant="outline"
-                          className={BUTTON}
-                          onClick={clearFilters}
+                      Clear filters
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ) : (
+                pageRows.map((row) => {
+                  const isSelected = selected.has(row.id)
+                  const look = STATUS_LOOK[row.status]
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={isSelected ? "selected" : undefined}
+                      className="data-[state=selected]:bg-secondary/10"
+                    >
+                      <TableCell className="px-5 py-2">
+                        <Checkbox
+                          className="rounded-sm"
+                          aria-label={`Select shipment ${row.id}`}
+                          checked={isSelected}
+                          onCheckedChange={(checked) =>
+                            toggleRow(row.id, checked)
+                          }
+                        />
+                      </TableCell>
+                      <TableCell className="px-5 py-2">
+                        <a
+                          href="#"
+                          className={cn(TEXT_LINK, "font-mono tabular-nums")}
                         >
-                          Clear filters
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  pageRows.map((r) => {
-                    const isSelected = selected.has(r.id)
-                    return (
-                      <TableRow
-                        key={r.id}
-                        data-state={isSelected ? "selected" : undefined}
-                        className="data-[state=selected]:bg-secondary/10"
-                      >
-                        <TableCell className="px-5 py-2">
-                          <Checkbox
-                            className="rounded-sm"
-                            aria-label={`Select shipment ${r.id}`}
-                            checked={isSelected}
-                            onCheckedChange={(c) => toggleRow(r.id, c)}
-                          />
-                        </TableCell>
-                        <TableCell className="px-5 py-2">
-                          <a
-                            href="#"
+                          {row.id}
+                        </a>
+                      </TableCell>
+                      <TableCell className="px-5 py-2">
+                        {row.customer}
+                      </TableCell>
+                      <TableCell className="px-5 py-2">
+                        {row.destination}
+                      </TableCell>
+                      <TableCell className="px-5 py-2">
+                        {DEPOT_LABEL[row.depot]}
+                      </TableCell>
+                      <TableCell className="px-5 py-2">
+                        <span className="inline-flex items-center gap-2">
+                          <span
+                            aria-hidden="true"
                             className={cn(
-                              "font-mono text-primary tabular-nums underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                              FOCUS
+                              "size-2 shrink-0 rounded-full",
+                              look.dot
                             )}
-                          >
-                            {r.id}
-                          </a>
-                        </TableCell>
-                        <TableCell className="px-5 py-2">
-                          {r.customer}
-                        </TableCell>
-                        <TableCell className="px-5 py-2">
-                          {r.destination}
-                        </TableCell>
-                        <TableCell className="px-5 py-2">{r.depot}</TableCell>
-                        <TableCell className="px-5 py-2">
-                          <span className="inline-flex items-center gap-2">
-                            <span
-                              aria-hidden="true"
-                              className={cn(
-                                "size-2 shrink-0 rounded-full",
-                                STATUS_DOT[r.status]
-                              )}
-                            />
-                            <span className="text-body text-foreground">
-                              {r.status}
-                            </span>
+                          />
+                          <span className="text-body text-foreground">
+                            {look.label}
                           </span>
-                        </TableCell>
-                        <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                          {r.weight.toFixed(1)}
-                        </TableCell>
-                        <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                          {money.format(r.value)}
-                        </TableCell>
-                        <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
-                          <time dateTime={r.updated}>
-                            {formatUpdated(r.updated)}
-                          </time>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })
-                )}
-              </TableBody>
-            </Table>
+                        </span>
+                      </TableCell>
+                      <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
+                        {row.weight.toFixed(1)}
+                      </TableCell>
+                      <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
+                        {money.format(row.value)}
+                      </TableCell>
+                      <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
+                        <time dateTime={row.updated}>
+                          {formatUpdated(row.updated)}
+                        </time>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })
+              )}
+            </TableBody>
+          </Table>
 
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3">
-              <p className={SMALL}>
-                Page {filtered.length === 0 ? 1 : page} of {pages}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  className={BUTTON}
-                  focusableWhenDisabled
-                  disabled={page <= 1 || filtered.length === 0}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                >
-                  Previous
-                </Button>
-                <Button
-                  variant="outline"
-                  className={BUTTON}
-                  focusableWhenDisabled
-                  disabled={page >= pages || filtered.length === 0}
-                  onClick={() => setPage((p) => Math.min(pages, p + 1))}
-                >
-                  Next
-                </Button>
-              </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3">
+            <p className={SMALL_FIGURE}>
+              Page {currentPage} of {pageCount}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className={BUTTON_TEXT}
+                focusableWhenDisabled
+                disabled={currentPage <= 1}
+                onClick={() => setPage(currentPage - 1)}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                className={BUTTON_TEXT}
+                focusableWhenDisabled
+                disabled={currentPage >= pageCount}
+                onClick={() => setPage(currentPage + 1)}
+              >
+                Next
+              </Button>
             </div>
-          </section>
+          </div>
         </div>
       </main>
     </div>

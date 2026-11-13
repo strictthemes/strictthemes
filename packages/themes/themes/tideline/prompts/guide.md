@@ -7,7 +7,7 @@ checks:
   - "The facts are a description list of six rows, among them parking, lifeguards, the best state of tide and hazards, each term a mono label over its value, and below md they come before the article."
   - "The article has five sections, each with its own h2, in this order: The beach, When to surf, Staying safe, Getting there and parking, After your surf; and no paragraph is wider than max-w-xl."
   - "The safety tip is the page's one coral block, it stands in the article's column on the sand, not in a card, and it holds a label, a heading and a paragraph and no link, button or icon."
-  - "The writer's avatar is a 44px circle with the initials TR, hidden from screen readers, beside the written name, and it is the only round thing on the page."
+  - "The writer's avatar is a 44px circle with the initials TR, hidden from screen readers, beside the written name, and it is the only round box on the page; the list's discs are marks, not boxes."
   - "Each of the two guide cards ends in a link whose words name its beach, and Book a lesson is the only default button on the page, on a card."
   - "The opening block element carries bg-lagoon text-lagoon-foreground and the safety tip element bg-coral text-coral-foreground, so their text stays deep-sea ink in dark mode, and nothing inside them has a text color class of its own."
 ---
@@ -26,7 +26,7 @@ A full-width section, with its `aria-labelledby` pointing at the `<h1>`. It hold
 
 **The block,** as the layout notes describe it. The block element itself carries `bg-lagoon text-lagoon-foreground`, the pair from the first layout note, so its text stays ink in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-4`: a heading group, the label `Beach guide · Tolven coast` over the `<h1>` "Pentarrow Sands" in `text-h1 md:text-display`, and one paragraph in `text-body` with `max-w-xl`: "A mile of west-facing sand with gentle, even waves: the best beach on this coast to learn on, and the one where our lessons run."
 
-**The writer's line,** a row on the sand, `flex items-center gap-4`: the avatar from the layout notes with the initials `TR`, then a `flex min-w-0 flex-col gap-2` holding the name as a `<p>` in `text-body font-bold text-foreground`, "Tamsin Rowe", and under it a small figure: `Head coach · Updated 3 June 2027 · 6 minute read`, the date a `<time dateTime="2027-06-03">`.
+**The writer's line,** a row on the sand, `flex items-center gap-4`: the avatar from the layout notes with the initials `TR`, then a `flex min-w-0 flex-col gap-2` holding the name as a `<p>` in `text-body font-bold text-foreground`, "Tamsin Rowe", and under it a small figure: `Head coach · Updated 3 June 2027 · 6 minute read`, the date a `<time dateTime="2027-06-03">`, in this short form with no weekday, as shown.
 
 ### 3. The facts and the article
 

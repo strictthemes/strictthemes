@@ -50,7 +50,7 @@ Under the last year: a `<p>` with `mt-12` that holds only the link "Older entrie
 
 ### 6. Sign-up
 
-In the reading column, with `mt-24`, a 1px top border and `pt-12`: an `<h2>` "Get the journal by email", then with `mt-4` one sentence, then a wrapper with `mt-6` that holds the form and its status element (see Confirmations in the notes). The form has a labelled email field ("Email address") and, in a `<div>` with `mt-4`, a `secondary` button "Subscribe". Under the button with `mt-4`, inside the form, a label line: how often the email comes and that leaving takes one click, e.g. `Every other Thursday · Leave with one click`.
+In the reading column, with `mt-24`, a 1px top border and `pt-12`: an `<h2>` "Get the journal by email", then with `mt-4` one sentence, then a wrapper with `mt-6` that holds the form and its status element (see Confirmations in the notes). The form has a labelled email field ("Email address") and, in a `<div>` with `mt-4`, a `secondary` button "Subscribe". Under the button with `mt-4`, inside the form, a label line: how often the email comes and that leaving takes one click. The email comes with each new entry, so its cadence is the one the introduction gives, e.g. `About once a month · Leave with one click`.
 
 ### 7. Footer
 

@@ -4,7 +4,7 @@ title: Home
 description: the home page of a surf school, with an opening block of color and one action to book, today's conditions as a strip of labelled figures, three lessons with their prices, and where to find the school.
 order: 1
 checks:
-  - "The opening is one coral block holding the page's only h1, one sentence and three facts, and it holds no link, button, field, badge or icon."
+  - "The opening is one coral block holding the page's only h1, a paragraph of two sentences and three facts, and it holds no link, button, field, badge or icon."
   - "Book a lesson is the only default button on the page, it is a link to /booking, and it stands on the sand right after the opening block, not on it."
   - "Today's conditions are a description list of four facts on a lagoon block (tide, swell, wind, water), each a label over a large figure in the heading font with its unit beside it."
   - "The opening block element carries bg-coral text-coral-foreground and the conditions block element bg-lagoon text-lagoon-foreground, so in dark mode their text is still deep-sea ink, and no element inside them has text-foreground, text-muted-foreground or text-primary."

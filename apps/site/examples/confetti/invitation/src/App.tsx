@@ -3,17 +3,21 @@ import { CalendarDays, MapPin, Shirt } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const container = "mx-auto max-w-[1088px] px-6"
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const container = "mx-auto max-w-[1088px] px-6"
+
 const navLink = cn(
   "inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
   focusOutline
 )
+
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusOutline
 )
+
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 
 const navItems = [
@@ -43,7 +47,7 @@ export function App() {
           <a
             href="/"
             className={cn(
-              "inline-flex h-11 items-center font-heading text-h2 text-foreground",
+              "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
               focusOutline
             )}
           >
@@ -64,15 +68,16 @@ export function App() {
       </header>
 
       <main className={cn(container, "flex flex-col gap-22 pt-10 pb-22")}>
-        {/* Opening */}
         <section
-          aria-labelledby="opening-heading"
+          aria-labelledby="opening-title"
           className="flex flex-col items-center gap-6 rounded-xl bg-blush p-6 text-center text-blush-foreground md:px-10 md:py-22"
         >
           <div className="flex flex-col items-center gap-3">
             <div className="flex flex-col items-center gap-2">
-              <p className="font-mono text-label">Together with their families</p>
-              <h1 id="opening-heading" className="text-h1 md:text-display">
+              <p className="font-mono text-label">
+                Together with their families
+              </p>
+              <h1 id="opening-title" className="text-h1 md:text-display">
                 Clem &amp; Rafe
               </h1>
             </div>
@@ -91,12 +96,11 @@ export function App() {
           </div>
         </section>
 
-        {/* When and where */}
         <section
-          aria-labelledby="when-where-heading"
+          aria-labelledby="when-where-title"
           className="flex flex-col gap-6"
         >
-          <h2 id="when-where-heading" className="text-h2">
+          <h2 id="when-where-title" className="text-h2">
             When and where
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
@@ -154,13 +158,12 @@ export function App() {
           </div>
         </section>
 
-        {/* A note from us */}
         <section
-          aria-labelledby="note-heading"
+          aria-labelledby="note-title"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col gap-6 md:col-span-8 md:col-start-3">
-            <h2 id="note-heading" className="text-h2">
+            <h2 id="note-title" className="text-h2">
               A note from us
             </h2>
             <div className="flex flex-col gap-3">
@@ -179,9 +182,8 @@ export function App() {
           </div>
         </section>
 
-        {/* The plan */}
         <section
-          aria-labelledby="plan-heading"
+          aria-labelledby="plan-title"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col gap-6 rounded-xl bg-mist p-6 text-mist-foreground md:col-span-8 md:col-start-3 md:p-10">
@@ -189,11 +191,11 @@ export function App() {
               <p className="font-mono text-label tabular-nums">
                 <time dateTime="2027-07-17">Saturday 17 July 2027</time>
               </p>
-              <h2 id="plan-heading" className="text-h2">
+              <h2 id="plan-title" className="text-h2">
                 The plan
               </h2>
             </div>
-            <ol className="flex list-none flex-col gap-3 p-0">
+            <ol className="flex flex-col gap-3">
               {plan.map((row) => (
                 <li key={row.time} className="flex items-baseline gap-6">
                   <time
@@ -209,14 +211,13 @@ export function App() {
           </div>
         </section>
 
-        {/* Reply */}
         <section
-          aria-labelledby="reply-heading"
+          aria-labelledby="reply-title"
           className="grid grid-cols-1 md:grid-cols-12"
         >
           <div className="flex flex-col items-center gap-6 rounded-xl border border-border bg-card p-6 text-center md:col-span-8 md:col-start-3">
             <div className="flex flex-col items-center gap-3">
-              <h2 id="reply-heading" className="text-h2">
+              <h2 id="reply-title" className="text-h2">
                 Can you come?
               </h2>
               <p className="max-w-xl text-body">
@@ -229,7 +230,8 @@ export function App() {
               href="/rsvp"
               className={cn(
                 buttonVariants({ variant: "default" }),
-                "h-11 w-full rounded-md px-6 font-mono text-label md:w-auto"
+                "h-11 rounded-md px-6 font-mono text-label",
+                "w-full md:w-auto"
               )}
             >
               Reply now
@@ -254,16 +256,13 @@ export function App() {
         >
           <p className="font-heading text-h2">Clem &amp; Rafe</p>
           <div className="flex flex-col gap-2 md:items-end">
-            <p className="font-mono text-label text-muted-foreground">
+            <p className="font-mono text-label text-muted-foreground tabular-nums">
               <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
               Quillbrook Barn, Little Saltry
             </p>
-            <p className="font-mono text-label text-muted-foreground">
+            <p className="font-mono text-label wrap-break-word text-muted-foreground">
               Questions:{" "}
-              <a
-                href="mailto:hello@clemandrafe.example"
-                className={cn(textLink, "wrap-break-word")}
-              >
+              <a href="mailto:hello@clemandrafe.example" className={textLink}>
                 hello@clemandrafe.example
               </a>
             </p>

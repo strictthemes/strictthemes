@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react"
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react"
 import { CircleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -10,43 +16,37 @@ import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const codeFocusRing =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const navLink = cn(
+
+const navLinkClass = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
-const textLink = cn(
+
+const textLinkClass = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
   focusRing
 )
-const card = "rounded-xl border border-border bg-card p-7"
-const labelLine = "font-mono text-label text-muted-foreground"
-const fieldLabel = "block text-body font-medium text-foreground"
-const fieldClass = "h-auto border-muted-foreground px-4 py-2 text-body md:text-body"
-const optionRow = "flex min-h-11 items-center gap-4"
-const optionLabel = "text-body text-foreground"
 
-const navItems = [
+const cardClass = "rounded-xl border border-border bg-card p-7"
+const labelClass = "block text-body font-medium text-foreground"
+const captionClass = "font-mono text-label text-muted-foreground"
+const fieldClass =
+  "mt-2 h-auto border-muted-foreground px-4 py-2 text-body md:text-body"
+
+const navLinks = [
   { label: "Approach", href: "/approach" },
   { label: "About", href: "/about" },
   { label: "Fees", href: "/fees" },
   { label: "First session", href: "/first-session" },
 ]
-const current = "/first-session"
+const currentHref = "/first-session"
 
 type Reply = "" | "email" | "phone"
 type Place = "" | "in-person" | "online" | "either"
 type TimeKey = "mornings" | "afternoons" | "evenings"
-type FieldKey =
-  | "name"
-  | "email"
-  | "phone"
-  | "reply"
-  | "place"
-  | "times"
-  | "consent"
-type Errors = Partial<Record<FieldKey, string>>
+type ErrorKey =
+  "name" | "email" | "phone" | "reply" | "place" | "times" | "consent"
+type Errors = Partial<Record<ErrorKey, string>>
 
 const timeOptions: { key: TimeKey; label: string }[] = [
   { key: "mornings", label: "Mornings, 09:00 to 12:00" },
@@ -54,19 +54,29 @@ const timeOptions: { key: TimeKey; label: string }[] = [
   { key: "evenings", label: "Wednesday evenings, 17:00 to 20:00" },
 ]
 
-const PHONE_MISSING = "Write a phone number, or choose By email below."
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const placeOptions: { value: Exclude<Place, "">; label: string }[] = [
+  { value: "in-person", label: "In person, in Larkmere" },
+  { value: "online", label: "Online, by video" },
+  { value: "either", label: "Either is fine" },
+]
 
-type Sent = { name: string; email: string; phone: string; reply: Reply }
-
-function ids(...values: (string | false | undefined)[]) {
-  const list = values.filter(Boolean)
-  return list.length ? list.join(" ") : undefined
-}
+const phoneMissing = "Write a phone number, or choose By email below."
+const errorOrder: ErrorKey[] = [
+  "name",
+  "email",
+  "phone",
+  "reply",
+  "place",
+  "times",
+  "consent",
+]
 
 function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <p id={id} className="mt-2 flex items-start gap-2 text-body text-destructive">
+    <p
+      id={id}
+      className="mt-2 flex items-start gap-2 text-body text-destructive"
+    >
       <CircleAlert
         className="mt-1 size-4 shrink-0"
         strokeWidth={1.5}
@@ -77,31 +87,12 @@ function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
   )
 }
 
-function Nav({ label, row }: { label: string; row: boolean }) {
-  return (
-    <nav
-      aria-label={label}
-      className={row ? "w-full md:ml-auto md:w-auto" : undefined}
-    >
-      <ul className={row ? "flex flex-wrap gap-x-4 md:gap-x-7" : undefined}>
-        {navItems.map((item) => {
-          const isCurrent = item.href === current
-          return (
-            <li key={item.href}>
-              <a
-                href={item.href}
-                aria-current={isCurrent ? "page" : undefined}
-                className={cn(navLink, isCurrent && "underline")}
-              >
-                {item.label}
-              </a>
-            </li>
-          )
-        })}
-      </ul>
-    </nav>
-  )
+function describedBy(...ids: (string | false | undefined)[]) {
+  const list = ids.filter(Boolean).join(" ")
+  return list || undefined
 }
+
+type Confirmation = { name: string; reply: Reply; email: string; phone: string }
 
 function RequestForm() {
   const [name, setName] = useState("")
@@ -117,8 +108,10 @@ function RequestForm() {
   const [message, setMessage] = useState("")
   const [consent, setConsent] = useState(false)
   const [errors, setErrors] = useState<Errors>({})
-  const [focusTarget, setFocusTarget] = useState<{ key: FieldKey } | null>(null)
-  const [sent, setSent] = useState<Sent | null>(null)
+  const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
+  const [focusRequest, setFocusRequest] = useState<{ key: ErrorKey } | null>(
+    null
+  )
 
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
@@ -127,10 +120,10 @@ function RequestForm() {
   const placeRef = useRef<HTMLButtonElement>(null)
   const timesRef = useRef<HTMLButtonElement>(null)
   const consentRef = useRef<HTMLButtonElement>(null)
-  const thanksRef = useRef<HTMLHeadingElement>(null)
+  const confirmationRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (!focusTarget) return
+    if (!focusRequest) return
     const refs = {
       name: nameRef,
       email: emailRef,
@@ -140,70 +133,79 @@ function RequestForm() {
       times: timesRef,
       consent: consentRef,
     }
-    refs[focusTarget.key].current?.focus()
-  }, [focusTarget])
+    refs[focusRequest.key].current?.focus()
+  }, [focusRequest])
 
   useEffect(() => {
-    if (sent) thanksRef.current?.focus()
-  }, [sent])
+    if (confirmation) confirmationRef.current?.focus()
+  }, [confirmation])
 
-  function clear(key: FieldKey) {
-    setErrors((prev) => {
-      if (!prev[key]) return prev
-      const next = { ...prev }
+  function clearError(key: ErrorKey) {
+    setErrors((current) => {
+      if (!current[key]) return current
+      const next = { ...current }
       delete next[key]
       return next
     })
   }
 
+  function validate(): Errors {
+    const next: Errors = {}
+    const trimmedEmail = email.trim()
+    const trimmedPhone = phone.trim()
+
+    if (!name.trim()) next.name = "Write your name. A first name is enough."
+
+    if (!trimmedEmail) {
+      next.email = "Write your email address, so that I can reply."
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      next.email =
+        "Check the email address. It needs an @ and a domain, like name@example.com."
+    }
+
+    if (!trimmedPhone) {
+      if (reply === "phone") next.phone = phoneMissing
+    } else if (!/^\+?\d{10,15}$/.test(trimmedPhone.replace(/[\s\-.()]/g, ""))) {
+      next.phone =
+        "Check the phone number. It needs 10 to 15 digits. You can also leave it empty."
+    }
+
+    if (!reply) next.reply = "Choose email or phone."
+    if (!place) next.place = "Choose one of the three. Either is fine."
+    if (!times.mornings && !times.afternoons && !times.evenings) {
+      next.times = "Tick at least one time. You can tick them all."
+    }
+    if (!consent) {
+      next.consent = "Tick the box, so that I may keep your details and reply."
+    }
+    return next
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const n = name.trim()
-    const e = email.trim()
-    const p = phone.trim()
-    const found: Errors = {}
-
-    if (!n) found.name = "Write your name. A first name is enough."
-
-    if (!e) found.email = "Write your email address, so that I can reply."
-    else if (!EMAIL_PATTERN.test(e))
-      found.email =
-        "Check the email address. It needs an @ and a domain, like name@example.com."
-
-    if (!p && reply === "phone") found.phone = PHONE_MISSING
-    else if (p && !/^\+?\d{10,15}$/.test(p.replace(/\s/g, "")))
-      found.phone =
-        "Check the phone number. It needs 10 to 15 digits. You can also leave it empty."
-
-    if (!reply) found.reply = "Choose email or phone."
-    if (!place) found.place = "Choose one of the three. Either is fine."
-    if (!times.mornings && !times.afternoons && !times.evenings)
-      found.times = "Tick at least one time. You can tick them all."
-    if (!consent)
-      found.consent = "Tick the box, so that I may keep your details and reply."
-
-    setErrors(found)
-    const order: FieldKey[] = [
-      "name",
-      "email",
-      "phone",
-      "reply",
-      "place",
-      "times",
-      "consent",
-    ]
-    const first = order.find((key) => found[key])
+    const next = validate()
+    setErrors(next)
+    const first = errorOrder.find((key) => next[key])
     if (first) {
-      setFocusTarget({ key: first })
+      setFocusRequest({ key: first })
       return
     }
-    setSent({ name: n, email: e, phone: p, reply })
+    setConfirmation({
+      name: name.trim(),
+      reply,
+      email: email.trim(),
+      phone: phone.trim(),
+    })
   }
 
   return (
-    <div className={cn(card, "mt-7")}>
-      {!sent && (
-        <form noValidate aria-labelledby="request-heading" onSubmit={handleSubmit}>
+    <div className={cn(cardClass, "mt-7")}>
+      {!confirmation && (
+        <form
+          noValidate
+          aria-labelledby="request-heading"
+          onSubmit={handleSubmit}
+        >
           <h2 id="request-heading" className="text-h2">
             Your request
           </h2>
@@ -213,10 +215,10 @@ function RequestForm() {
           </p>
 
           <div className="mt-7">
-            <label htmlFor="name" className={fieldLabel}>
+            <label htmlFor="name" className={labelClass}>
               Your name
             </label>
-            <p id="name-help" className={cn("mt-2", labelLine)}>
+            <p id="name-help" className={cn(captionClass, "mt-2")}>
               A first name is enough.
             </p>
             <Input
@@ -225,19 +227,24 @@ function RequestForm() {
               name="name"
               autoComplete="name"
               value={name}
-              onChange={(ev) => {
-                setName(ev.target.value)
-                clear("name")
+              onChange={(event) => {
+                setName(event.target.value)
+                clearError("name")
               }}
               aria-invalid={errors.name ? true : undefined}
-              aria-describedby={ids("name-help", errors.name && "name-error")}
-              className={cn("mt-2", fieldClass)}
+              aria-describedby={describedBy(
+                "name-help",
+                errors.name && "name-error"
+              )}
+              className={fieldClass}
             />
-            {errors.name && <ErrorLine id="name-error">{errors.name}</ErrorLine>}
+            {errors.name && (
+              <ErrorLine id="name-error">{errors.name}</ErrorLine>
+            )}
           </div>
 
           <div className="mt-7">
-            <label htmlFor="email" className={fieldLabel}>
+            <label htmlFor="email" className={labelClass}>
               Email address
             </label>
             <Input
@@ -247,13 +254,13 @@ function RequestForm() {
               type="email"
               autoComplete="email"
               value={email}
-              onChange={(ev) => {
-                setEmail(ev.target.value)
-                clear("email")
+              onChange={(event) => {
+                setEmail(event.target.value)
+                clearError("email")
               }}
               aria-invalid={errors.email ? true : undefined}
-              aria-describedby={ids(errors.email && "email-error")}
-              className={cn("mt-2", fieldClass)}
+              aria-describedby={describedBy(errors.email && "email-error")}
+              className={fieldClass}
             />
             {errors.email && (
               <ErrorLine id="email-error">{errors.email}</ErrorLine>
@@ -261,10 +268,10 @@ function RequestForm() {
           </div>
 
           <div className="mt-7">
-            <label htmlFor="phone" className={fieldLabel}>
+            <label htmlFor="phone" className={labelClass}>
               Phone number (optional)
             </label>
-            <p id="phone-help" className={cn("mt-2", labelLine)}>
+            <p id="phone-help" className={cn(captionClass, "mt-2")}>
               Only needed if you would like me to call.
             </p>
             <Input
@@ -274,13 +281,16 @@ function RequestForm() {
               type="tel"
               autoComplete="tel"
               value={phone}
-              onChange={(ev) => {
-                setPhone(ev.target.value)
-                clear("phone")
+              onChange={(event) => {
+                setPhone(event.target.value)
+                clearError("phone")
               }}
               aria-invalid={errors.phone ? true : undefined}
-              aria-describedby={ids("phone-help", errors.phone && "phone-error")}
-              className={cn("mt-2", fieldClass)}
+              aria-describedby={describedBy(
+                "phone-help",
+                errors.phone && "phone-error"
+              )}
+              className={fieldClass}
             />
             {errors.phone && (
               <ErrorLine id="phone-error">{errors.phone}</ErrorLine>
@@ -290,45 +300,56 @@ function RequestForm() {
           <div className="mt-7">
             <fieldset
               className="min-w-0"
-              aria-describedby={ids("reply-help", errors.reply && "reply-error")}
+              aria-describedby={describedBy(
+                "reply-help",
+                errors.reply && "reply-error"
+              )}
             >
-              <legend id="reply-legend" className={fieldLabel}>
+              <legend id="reply-legend" className={labelClass}>
                 How should I reply?
               </legend>
-              <p id="reply-help" className={cn("mt-2", labelLine)}>
+              <p id="reply-help" className={cn(captionClass, "mt-2")}>
                 If I call and you cannot answer, I leave no message.
               </p>
               <RadioGroup
                 name="reply"
                 value={reply}
                 onValueChange={(value) => {
-                  setReply(value as Reply)
-                  setErrors((prev) => {
-                    const next = { ...prev }
-                    delete next.reply
-                    if (value === "email" && next.phone === PHONE_MISSING)
-                      delete next.phone
-                    return next
-                  })
+                  const chosen = value as Reply
+                  setReply(chosen)
+                  clearError("reply")
+                  if (chosen === "email" && errors.phone === phoneMissing) {
+                    clearError("phone")
+                  }
                 }}
                 aria-labelledby="reply-legend"
                 aria-invalid={errors.reply ? true : undefined}
                 className="mt-2 gap-0"
               >
-                <div className={optionRow}>
+                <div className="flex min-h-11 items-center gap-4">
                   <RadioGroupItem
                     ref={replyRef}
                     value="email"
                     id="reply-email"
                     className="size-5"
                   />
-                  <label htmlFor="reply-email" className={optionLabel}>
+                  <label
+                    htmlFor="reply-email"
+                    className="text-body text-foreground"
+                  >
                     By email
                   </label>
                 </div>
-                <div className={optionRow}>
-                  <RadioGroupItem value="phone" id="reply-phone" className="size-5" />
-                  <label htmlFor="reply-phone" className={optionLabel}>
+                <div className="flex min-h-11 items-center gap-4">
+                  <RadioGroupItem
+                    value="phone"
+                    id="reply-phone"
+                    className="size-5"
+                  />
+                  <label
+                    htmlFor="reply-phone"
+                    className="text-body text-foreground"
+                  >
                     By phone
                   </label>
                 </div>
@@ -342,9 +363,9 @@ function RequestForm() {
           <div className="mt-7">
             <fieldset
               className="min-w-0"
-              aria-describedby={ids(errors.place && "place-error")}
+              aria-describedby={describedBy(errors.place && "place-error")}
             >
-              <legend id="place-legend" className={fieldLabel}>
+              <legend id="place-legend" className={labelClass}>
                 In person or online?
               </legend>
               <RadioGroup
@@ -352,43 +373,31 @@ function RequestForm() {
                 value={place}
                 onValueChange={(value) => {
                   setPlace(value as Place)
-                  clear("place")
+                  clearError("place")
                 }}
                 aria-labelledby="place-legend"
                 aria-invalid={errors.place ? true : undefined}
                 className="mt-2 gap-0"
               >
-                <div className={optionRow}>
-                  <RadioGroupItem
-                    ref={placeRef}
-                    value="in-person"
-                    id="place-in-person"
-                    className="size-5"
-                  />
-                  <label htmlFor="place-in-person" className={optionLabel}>
-                    In person, in Larkmere
-                  </label>
-                </div>
-                <div className={optionRow}>
-                  <RadioGroupItem
-                    value="online"
-                    id="place-online"
-                    className="size-5"
-                  />
-                  <label htmlFor="place-online" className={optionLabel}>
-                    Online, by video
-                  </label>
-                </div>
-                <div className={optionRow}>
-                  <RadioGroupItem
-                    value="either"
-                    id="place-either"
-                    className="size-5"
-                  />
-                  <label htmlFor="place-either" className={optionLabel}>
-                    Either is fine
-                  </label>
-                </div>
+                {placeOptions.map((option, index) => (
+                  <div
+                    key={option.value}
+                    className="flex min-h-11 items-center gap-4"
+                  >
+                    <RadioGroupItem
+                      ref={index === 0 ? placeRef : undefined}
+                      value={option.value}
+                      id={`place-${option.value}`}
+                      className="size-5"
+                    />
+                    <label
+                      htmlFor={`place-${option.value}`}
+                      className="text-body text-foreground"
+                    >
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
               </RadioGroup>
               {errors.place && (
                 <ErrorLine id="place-error">{errors.place}</ErrorLine>
@@ -399,40 +408,50 @@ function RequestForm() {
           <div className="mt-7">
             <fieldset
               className="min-w-0"
-              aria-describedby={ids("times-help", errors.times && "times-error")}
+              aria-describedby={describedBy(
+                "times-help",
+                errors.times && "times-error"
+              )}
             >
-              <legend className={fieldLabel}>Which times could suit you?</legend>
-              <p id="times-help" className={cn("mt-2", labelLine)}>
+              <legend className={labelClass}>
+                Which times could suit you?
+              </legend>
+              <p id="times-help" className={cn(captionClass, "mt-2")}>
                 Tick all that could work.
               </p>
-              {timeOptions.map((option, index) => (
-                <div
-                  key={option.key}
-                  className={cn(optionRow, index === 0 && "mt-2")}
-                >
-                  <Checkbox
-                    ref={index === 0 ? timesRef : undefined}
-                    id={`time-${option.key}`}
-                    name="times"
-                    value={option.key}
-                    checked={times[option.key]}
-                    onCheckedChange={(checked) => {
-                      setTimes((prev) => ({ ...prev, [option.key]: checked }))
-                      clear("times")
-                    }}
-                    aria-labelledby={`time-${option.key}-label`}
-                    aria-invalid={errors.times ? true : undefined}
-                    className="size-5"
-                  />
-                  <label
-                    id={`time-${option.key}-label`}
-                    htmlFor={`time-${option.key}`}
-                    className={optionLabel}
+              <div className="mt-2">
+                {timeOptions.map((option, index) => (
+                  <div
+                    key={option.key}
+                    className="flex min-h-11 items-center gap-4"
                   >
-                    {option.label}
-                  </label>
-                </div>
-              ))}
+                    <Checkbox
+                      ref={index === 0 ? timesRef : undefined}
+                      id={`time-${option.key}`}
+                      name="times"
+                      value={option.key}
+                      checked={times[option.key]}
+                      onCheckedChange={(checked) => {
+                        setTimes((current) => ({
+                          ...current,
+                          [option.key]: checked === true,
+                        }))
+                        clearError("times")
+                      }}
+                      aria-labelledby={`time-${option.key}-label`}
+                      aria-invalid={errors.times ? true : undefined}
+                      className="size-5"
+                    />
+                    <label
+                      id={`time-${option.key}-label`}
+                      htmlFor={`time-${option.key}`}
+                      className="text-body text-foreground"
+                    >
+                      {option.label}
+                    </label>
+                  </div>
+                ))}
+              </div>
               {errors.times && (
                 <ErrorLine id="times-error">{errors.times}</ErrorLine>
               )}
@@ -440,10 +459,10 @@ function RequestForm() {
           </div>
 
           <div className="mt-7">
-            <label htmlFor="message" className={fieldLabel}>
+            <label htmlFor="message" className={labelClass}>
               What brings you here? (optional)
             </label>
-            <p id="message-help" className={cn("mt-2", labelLine)}>
+            <p id="message-help" className={cn(captionClass, "mt-2")}>
               A sentence is enough. You can also leave this empty and tell me
               when we speak.
             </p>
@@ -452,9 +471,9 @@ function RequestForm() {
               name="message"
               maxLength={1000}
               value={message}
-              onChange={(ev) => setMessage(ev.target.value)}
+              onChange={(event) => setMessage(event.target.value)}
               aria-describedby="message-help"
-              className={cn("mt-2 min-h-32 resize-none", fieldClass)}
+              className={cn(fieldClass, "min-h-32 resize-none")}
             />
           </div>
 
@@ -466,12 +485,14 @@ function RequestForm() {
                 name="consent"
                 checked={consent}
                 onCheckedChange={(checked) => {
-                  setConsent(checked)
-                  clear("consent")
+                  setConsent(checked === true)
+                  clearError("consent")
                 }}
                 aria-labelledby="consent-label"
                 aria-invalid={errors.consent ? true : undefined}
-                aria-describedby={ids(errors.consent && "consent-error")}
+                aria-describedby={describedBy(
+                  errors.consent && "consent-error"
+                )}
                 className="mt-1 size-5"
               />
               <label
@@ -494,27 +515,32 @@ function RequestForm() {
           >
             Send my request
           </Button>
-          <p className={cn("mt-4", labelLine)}>
+          <p className={cn(captionClass, "mt-4")}>
             Nothing is booked or charged when you send this.
           </p>
         </form>
       )}
 
       <div role="status">
-        {sent && (
+        {confirmation && (
           <div>
             <h2
-              ref={thanksRef}
+              ref={confirmationRef}
               tabIndex={-1}
-              className={cn("text-h2 wrap-break-word", codeFocusRing)}
+              className="text-h2 wrap-break-word focus:outline-2 focus:outline-offset-2 focus:outline-ring focus:outline-solid"
             >
-              Thank you, {sent.name}. Your request is with me.
+              Thank you, {confirmation.name}. Your request is with me.
             </h2>
-            <p className="mt-4 max-w-xl text-body wrap-break-word">
-              {sent.reply === "phone"
-                ? `I will call ${sent.phone} within two working days. If I do not reach you, I will write to ${sent.email}.`
-                : `I will write to ${sent.email} within two working days.`}
-            </p>
+            {confirmation.reply === "phone" ? (
+              <p className="mt-4 max-w-xl text-body wrap-break-word">
+                I will call {confirmation.phone} within two working days. If I
+                do not reach you, I will write to {confirmation.email}.
+              </p>
+            ) : (
+              <p className="mt-4 max-w-xl text-body wrap-break-word">
+                I will write to {confirmation.email} within two working days.
+              </p>
+            )}
             <p className="mt-4 max-w-xl text-body">
               I will offer you one or two times for a call of 20 minutes. It is
               free, and nothing is booked until we have spoken.
@@ -525,9 +551,10 @@ function RequestForm() {
           </div>
         )}
       </div>
-      {sent && (
+
+      {confirmation && (
         <p className="mt-7">
-          <a href="/approach" className={textLink}>
+          <a href="/approach" className={textLinkClass}>
             Read how sessions work
           </a>
         </p>
@@ -536,10 +563,36 @@ function RequestForm() {
   )
 }
 
+function NavLinks() {
+  return navLinks.map((link) => {
+    const current = link.href === currentHref
+    return (
+      <li key={link.href}>
+        <a
+          href={link.href}
+          aria-current={current ? "page" : undefined}
+          className={cn(navLinkClass, current && "underline")}
+        >
+          {link.label}
+        </a>
+      </li>
+    )
+  })
+}
+
 const steps = [
-  { label: "Within 2 working days", text: "I reply, by email or by phone, as you chose." },
-  { label: "20 minutes · Free", text: "We speak, by phone or video. You can ask me anything." },
-  { label: "50 minutes · £68", text: "If we both wish, we arrange a first session." },
+  {
+    label: "Within 2 working days",
+    text: "I reply, by email or by phone, as you chose.",
+  },
+  {
+    label: "20 minutes · Free",
+    text: "We speak, by phone or video. You can ask me anything.",
+  },
+  {
+    label: "50 minutes · £68",
+    text: "If we both wish, we arrange a first session.",
+  },
 ]
 
 export function App() {
@@ -555,7 +608,11 @@ export function App() {
         >
           Nora Ellingham
         </a>
-        <Nav label="Main" row />
+        <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
+          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
+            <NavLinks />
+          </ul>
+        </nav>
       </header>
 
       <main>
@@ -563,7 +620,7 @@ export function App() {
           aria-labelledby="page-heading"
           className="mt-12 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-7"
         >
-          <p className={cn(labelLine, "md:col-span-12")}>
+          <p className="font-mono text-label text-muted-foreground tabular-nums md:col-span-12">
             First step · A call of 20 minutes · Free
           </p>
           <h1
@@ -583,7 +640,11 @@ export function App() {
           className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
         >
           <div className="md:col-span-7">
-            <div role="note" aria-labelledby="emergency-heading" className={card}>
+            <div
+              role="note"
+              aria-labelledby="emergency-heading"
+              className={cardClass}
+            >
               <h2 id="emergency-heading" className="text-h2">
                 This is not an emergency service
               </h2>
@@ -595,16 +656,19 @@ export function App() {
                 department.
               </p>
             </div>
+
             <RequestForm />
           </div>
 
           <div className="mt-12 md:col-span-4 md:col-start-9 md:mt-0">
             <h2 className="text-h2">What happens next</h2>
-            <ol className="mt-4 list-none border-b border-border p-0">
+            <ol className="mt-4 list-none border-b border-border">
               {steps.map((step) => (
                 <li key={step.label} className="border-t border-border py-4">
-                  <p className={labelLine}>{step.label}</p>
-                  <p className="mt-2 text-body">{step.text}</p>
+                  <p className="font-mono text-label text-muted-foreground tabular-nums">
+                    {step.label}
+                  </p>
+                  <p className="mt-2 max-w-xl text-body">{step.text}</p>
                 </li>
               ))}
             </ol>
@@ -629,27 +693,37 @@ export function App() {
         <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
           <div className="md:col-span-7">
             <p className="font-heading text-h2">Nora Ellingham</p>
-            <p className={cn("mt-2", labelLine)}>
+            <p className="mt-2 font-mono text-label text-muted-foreground">
               Registered psychotherapist · Larkmere and online
             </p>
             <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
-            <p className="mt-2">
-              <a href="mailto:hello@ellingham.example" className={textLink}>
+            <p className="mt-2 wrap-break-word">
+              <a
+                href="mailto:hello@ellingham.example"
+                className={textLinkClass}
+              >
                 hello@ellingham.example
               </a>
             </p>
           </div>
-          <div className="mt-7 md:col-span-4 md:col-start-9 md:mt-0">
-            <Nav label="Footer" row={false} />
-          </div>
+          <nav
+            aria-label="Footer"
+            className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
+          >
+            <ul>
+              <NavLinks />
+            </ul>
+          </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">
           This practice is not an emergency service. In an emergency, call your
           local emergency number or go to the nearest emergency department.
         </p>
-        <p className={cn("mt-4", labelLine)}>© 2027 Nora Ellingham</p>
+        <p className="mt-4 font-mono text-label text-muted-foreground tabular-nums">
+          © 2027 Nora Ellingham
+        </p>
       </footer>
     </div>
   )

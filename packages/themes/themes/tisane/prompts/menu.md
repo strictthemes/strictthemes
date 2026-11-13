@@ -27,7 +27,7 @@ The header from the layout notes, with "Menu" as the current page.
 
 ### 2. Opening
 
-The first section, with `pt-10`, in columns 1–8 of a grid (`grid gap-6 md:grid-cols-12`): a label, `Autumn menu · From 2 November 2026`, with the date in a `<time>`; then with `mt-2` the `<h1>` "Menu" in `text-h1`; then with `mt-4` one or two sentences: what is cooked here, and that the teas on the menu are also sold by weight at the counter.
+The first section, with `pt-10`, in columns 1–8 of a grid (`grid grid-cols-1 gap-6 md:grid-cols-12`): a label, `Autumn menu · From 2 November 2026`, with the date in a `<time>`; then with `mt-2` the `<h1>` "Menu" in `text-h1`; then with `mt-4` one or two sentences: what is cooked here, and that the teas on the menu are also sold by weight at the counter.
 
 ### 3. Filter
 
@@ -40,7 +40,7 @@ No button on this page disables itself, so it needs no `focusableWhenDisabled` a
 
 ### 4. The menu and the allergy note
 
-A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with `mt-18`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–8, the three menu sections, one after the other. Each is a `<section>` nested inside this grid item, so the notes' `mt-18` does not apply, with an `aria-labelledby` pointing at its heading. The first has no top margin, the other two `mt-10`. Each opens with an `<h2>` ("Teas", "Plates", "Cakes"), then with `mt-2` a label in `text-muted-foreground` that says how it is served (`A pot for one`, `Served 11:30–14:30`, `Baked each morning`), then with `mt-4` the list of items.
 - In columns 10–12, a card as an `<aside>` with the `aria-label` "Allergies": a label `Allergies`, then with `mt-2` two or three sentences: everything is made in one small kitchen that also uses nuts, gluten and milk, so a mark means the recipe has none, not that the kitchen is free of it; ask at the counter. On a phone the card comes after the three sections.
@@ -58,7 +58,7 @@ The Pear and ginger tea carries the page's one badge, "Seasonal", beside its nam
 
 ### 6. Closing line
 
-A section with `mt-18`, in columns 1–8 of a grid: one sentence in `text-body` that says a table can be booked, with a link in running text, "Book a table", that goes to `/booking`. This page has no default button.
+A section with `mt-18`, in columns 1–8 of a grid: one sentence in `text-body` that says a table can be booked, with the words "book a table" inside it, in lower case, as a link in running text that goes to `/booking`. This page has no default button.
 
 ### 7. Footer
 

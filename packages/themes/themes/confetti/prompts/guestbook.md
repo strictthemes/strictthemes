@@ -31,7 +31,7 @@ The header from the layout notes, with "Guestbook" as the current page; its link
 
 ### 2. Opening
 
-A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The `<section>` is the block element, and it carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `For Clem and Rafe`, and the `<h1>` "Leave us a few words" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "A memory, a wish or a piece of advice for the years ahead. We read every one, and we are keeping them all."
+A full-width section that is a pastel block in blush, as the layout notes describe it, with its `aria-labelledby` pointing at the `<h1>`. The `<section>` is the block element, and it carries `bg-blush text-blush-foreground`, the pair from the first layout note, so its text stays plum in dark mode; nothing inside it gets a text color class of its own. It holds one `flex flex-col gap-3`: a `flex flex-col gap-2` with a label, `Saturday 17 July 2027 · Little Saltry` (the date a `<time dateTime="2027-07-17">`), so the date and the place are near the top, and the `<h1>` "Leave us a few words" in `text-h1 md:text-display`; then one paragraph in `text-body` with `max-w-xl`: "A memory, a wish or a piece of advice for the years ahead. We read every one, and we are keeping them all."
 
 ### 3. Messages and the form
 
@@ -48,7 +48,7 @@ The cards have no other parts: no badge, no button, no reply link.
 
 1. **Name**: the label "Your name", an `Input` with `autoComplete="name"` and `maxLength={60}`.
 2. **How you know them**: the label "How you know Clem and Rafe (optional)", an `Input` with `autoComplete="off"` and `maxLength={60}`, and the helper text `Like "Rafe's cousin" or "the neighbours at number 4"`.
-3. **Message**: the label "Your message", a `Textarea` with `maxLength={500}`, and under it helper text that counts down: `500 characters left`, down to `1 character left` and `0 characters left`. Where an error shows, it comes after the count, and the field's `aria-describedby` names both.
+3. **Message**: the label "Your message", a `Textarea` with `maxLength={500}`, and under it helper text that counts down: `500 characters left`, down to `1 character left` and `0 characters left`. It counts the field's value as typed, untrimmed, as `maxLength` does, and it is not a live region: the field names it in `aria-describedby`. Where an error shows, it comes after the count, and the field's `aria-describedby` names both.
 
 The last item of the form is the page's one main action: the default `Button`, `type="submit"`, "Add my message", full width below `md` as the Forms note says. After the form, in the card, the empty `role="status"` element.
 
@@ -62,7 +62,7 @@ The footer from the layout notes.
 
 ### Behavior
 
-- Keep the messages in component state as a list of objects with an `id` (the React key, since two guests can share a name), a name, the initials, how they know the couple (or none), the date (or none, for a new one) and the text. The count reads from the list.
+- Keep the messages in component state as a list of objects with an `id` (the React key, since two guests can share a name; fixed for the six, a running number for each new one), a name, the initials, how they know the couple (or none), the date (or none, for a new one) and the text. The count reads from the list.
 - When the form is sent, check it in code:
   - Name: empty, or only spaces, gives "Write your name, so they know who it is from."
   - Message: empty, or only spaces, gives "Write a message. A line or two is plenty."

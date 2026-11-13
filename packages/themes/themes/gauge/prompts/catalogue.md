@@ -48,11 +48,11 @@ A grid row. The filters are a panel spanning three columns from `lg` up, full wi
 - **Bore:** a group labelled "Bore (mm)" with three checkboxes, "10 to 17", "20 to 30" and "35 to 45", all clear.
 - **Seals:** a group labelled "Seals" with two checkboxes, "Rubber seals, RS" and "Metal shields, ZZ", all clear.
 - **Stock:** a group labelled "Stock" with one checkbox, "In stock only", clear.
-- **Sort:** a field with the label "Sort by" and a `Select`, as the Selects note sets it, with four choices: "Bore, smallest first" (chosen), "Part number, A to Z", "Load rating, highest first" and "Unit price, lowest first". It is not a filter: it does not enable "Clear filters".
+- **Sort:** a field, not a `role="group"`: the field's `flex flex-col gap-3` stack plus the groups' `border-t border-border pt-4`, holding the label "Sort by" and a `Select`, as the Selects note sets it, with four choices: "Bore, smallest first" (chosen), "Part number, A to Z", "Load rating, highest first" and "Unit price, lowest first". It is not a filter: it does not enable "Clear filters".
 
 ### 4. Parts table
 
-The table is a panel with rows spanning nine columns from `lg` up, full width below. Its heading row holds the `<h2>` "Parts" and, at its right end, the count as a small figure in an element with `aria-live="polite"`: `12 parts` with no filter set, and the "of" form whenever a filter is set, even if every part matches: `4 of 12 parts` when filters leave four (`12 of 12 parts`, `1 of 12 parts`, `0 of 12 parts`).
+The table is a panel with rows spanning nine columns from `lg` up, full width below: a `<div>`, named by its `<h2>`, with `flex flex-col` beside the panel's classes, so that its note row (below) can sit at its foot when the filters are taller. Its heading row holds the `<h2>` "Parts" and, at its right end, the count as a small figure in an element with `aria-live="polite"`: `12 parts` with no filter set, and the "of" form whenever a filter is set, even if every part matches: `4 of 12 parts` when filters leave four (`12 of 12 parts`, `1 of 12 parts`, `0 of 12 parts`).
 
 The shadcn `Table` with the label "Parts", one row a part, and these columns, with these headers:
 
@@ -66,7 +66,7 @@ There is no column for the seals: the part number's suffix gives them. Keep the 
 
 When no part matches, the table's body is one row with one cell across all seven columns, with `px-4 py-12 whitespace-normal`: a stack with `gap-3` and `items-start` holding the sentence "No parts match these filters." in `text-body` and a `secondary` button "Clear filters".
 
-Under the table, inside the same panel, a row with `border-t border-border px-4 py-3` holding one small figure: "Unit prices are for 1 to 49 and exclude VAT. Price breaks for larger quantities are on each part's page."
+Under the table, inside the same panel, a row with `mt-auto border-t border-border px-4 py-3` holding one small figure (`mt-auto` is this page's one margin: when few parts match, the panel is stretched to the filters' height and the note stays at its foot): "Unit prices are for 1 to 49 and exclude VAT. Price breaks for larger quantities are on each part's page."
 
 ### Behavior
 

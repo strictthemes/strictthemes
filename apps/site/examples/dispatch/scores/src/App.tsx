@@ -11,21 +11,54 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-/* ------------------------------------------------------------------ */
-/* Sample data                                                         */
-/* ------------------------------------------------------------------ */
+/* ---------- Shared classes ---------- */
+
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label uppercase"
+const labelLink = cn(
+  label,
+  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+const currentLink = cn(
+  label,
+  "text-foreground underline decoration-2 underline-offset-4 transition-colors duration-150",
+  focusRing
+)
+const mastheadLink = cn(
+  "font-heading text-h2 text-foreground uppercase decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+const buttonClasses = "h-auto px-4 py-2 font-mono text-label uppercase"
+const container = "mx-auto max-w-[1280px] px-4 md:px-6"
+const sectionHead = "flex items-baseline justify-between gap-4 border-t-2 pt-2"
+const sectionName = "font-mono text-label text-foreground uppercase"
+
+/* ---------- Sample data ---------- */
+
+const sections = [
+  "News",
+  "Politics",
+  "City",
+  "Sport",
+  "Results",
+  "Business",
+  "Culture",
+  "Opinion",
+]
+const currentSection = "Results"
 
 type Competition = "coastal" | "cup" | "women"
+type Filter = "all" | Competition
 
-const COMPETITIONS: { id: Competition; name: string; short: string }[] = [
+const competitions: { id: Competition; name: string; short: string }[] = [
   { id: "coastal", name: "Coastal League", short: "Coastal League" },
   { id: "cup", name: "County Cup", short: "County Cup" },
   { id: "women", name: "Women's Coastal League", short: "Women's League" },
 ]
 
-type Filter = "all" | Competition
-
-const FILTERS: { id: Filter; label: string }[] = [
+const filters: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
   { id: "coastal", label: "Coastal League" },
   { id: "cup", label: "County Cup" },
@@ -50,9 +83,9 @@ type Result = {
   scorers?: string
 }
 
-const RESULTS: Result[] = [
+const results: Result[] = [
   {
-    id: "harriers-saltgate",
+    id: "pah-su",
     competition: "coastal",
     ground: "Harbour Road",
     home: "Port Avery Harriers",
@@ -63,203 +96,165 @@ const RESULTS: Result[] = [
     scorers: "Okonjo 12', 58' · Brandt 71'",
   },
   {
-    id: "westmere-holm",
+    id: "wa-dc",
     competition: "coastal",
     ground: "Westmere Park",
     home: "Westmere Athletic",
-    away: "Holm Bay",
+    away: "Dunmore City",
     homeScore: 0,
     awayScore: 0,
     state: { kind: "ft" },
   },
   {
-    id: "dunmore-calloway",
+    id: "bt-cr",
     competition: "coastal",
-    ground: "Mill Lane",
-    home: "Dunmore City",
+    ground: "Quarry Field",
+    home: "Brackwater Town",
     away: "Calloway Rovers",
     homeScore: 1,
     awayScore: 3,
     state: { kind: "ft" },
-    scorers: "Adeyemi 20', 64' · Kavanagh 33' · Rusk 88'",
+    scorers: "Pell 33' · Achebe 20', 64' · Lund 88'",
   },
   {
-    id: "brackwater-fenwick",
+    id: "fa-hb",
     competition: "coastal",
-    ground: "The Quayside",
-    home: "Brackwater Town",
-    away: "Fenwick Albion",
+    ground: "Albion Ground",
+    home: "Fenwick Albion",
+    away: "Holm Bay",
     homeScore: 1,
     awayScore: 1,
     state: { kind: "live", minute: 67 },
-    scorers: "Sorensen 9' · Mbeki 52'",
+    scorers: "Ferreira 9' · Diallo 52'",
   },
   {
-    id: "tollcross-ashby",
+    id: "kv-am",
     competition: "cup",
-    ground: "Station Park",
-    home: "Tollcross Rangers",
-    away: "Ashby Vale",
-    homeScore: 3,
-    awayScore: 2,
+    ground: "Vale Park",
+    home: "Kestrel Vale",
+    away: "Ashby Marsh",
+    homeScore: 2,
+    awayScore: 1,
     state: { kind: "aet" },
-    scorers: "Hallam 14', 107' · Quint 61' · Doyle 40', 78'",
+    scorers: "Hale 40', 108' · Corbin 77'",
   },
   {
-    id: "rookhaven-elmsford",
+    id: "rh-ef",
     competition: "cup",
-    ground: "Rook Street",
+    ground: "Mariner's Field",
     home: "Rookhaven",
     away: "Elmsford",
     homeScore: 1,
     awayScore: 1,
     state: { kind: "pens", home: 4, away: 3 },
-    scorers: "Farrow 55' · Ilesanmi 83'",
+    scorers: "Quist 55' · Bayo 81'",
   },
 ]
 
 type Fixture = {
   id: string
   competition: Competition
-  day: string
+  date: string
   time: string
   home: string
   away: string
   ground: string
 }
 
-const DAYS: { date: string; label: string }[] = [
+const days: { date: string; label: string }[] = [
   { date: "2026-11-12", label: "Thu 12 Nov" },
   { date: "2026-11-13", label: "Fri 13 Nov" },
   { date: "2026-11-14", label: "Sat 14 Nov" },
   { date: "2026-11-15", label: "Sun 15 Nov" },
 ]
 
-const FIXTURES: Fixture[] = [
+const fixtures: Fixture[] = [
   {
-    id: "kilnsea-orford",
+    id: "lq-sg",
     competition: "cup",
-    day: "2026-11-12",
-    time: "19:30",
-    home: "Kilnsea Wanderers",
-    away: "Orford Town",
-    ground: "Kiln Lane",
-  },
-  {
-    id: "marlow-linton",
-    competition: "cup",
-    day: "2026-11-12",
+    date: "2026-11-12",
     time: "19:45",
-    home: "Marlow Heath",
-    away: "Linton Rovers",
-    ground: "Beck Road",
+    home: "Linton Quay",
+    away: "Sorrel Green",
+    ground: "Quayside",
   },
   {
-    id: "dunmore-fenwick",
+    id: "tb-gt",
+    competition: "cup",
+    date: "2026-11-12",
+    time: "19:45",
+    home: "Thornbury",
+    away: "Greyhaven Town",
+    ground: "Hollins Lane",
+  },
+  {
+    id: "dc-fa",
     competition: "coastal",
-    day: "2026-11-14",
+    date: "2026-11-14",
     time: "15:00",
     home: "Dunmore City",
     away: "Fenwick Albion",
     ground: "Mill Lane",
   },
   {
-    id: "harriers-holm",
+    id: "su-wa",
     competition: "coastal",
-    day: "2026-11-14",
+    date: "2026-11-14",
     time: "15:00",
-    home: "Port Avery Harriers",
-    away: "Holm Bay",
-    ground: "Harbour Road",
-  },
-  {
-    id: "saltgate-brackwater",
-    competition: "coastal",
-    day: "2026-11-15",
-    time: "13:00",
     home: "Saltgate United",
-    away: "Brackwater Town",
+    away: "Westmere Athletic",
     ground: "The Saltings",
   },
   {
-    id: "calloway-westmere",
+    id: "hb-pah",
     competition: "coastal",
-    day: "2026-11-15",
+    date: "2026-11-15",
+    time: "13:00",
+    home: "Holm Bay",
+    away: "Port Avery Harriers",
+    ground: "Shore Road",
+  },
+  {
+    id: "cr-bt",
+    competition: "coastal",
+    date: "2026-11-15",
     time: "15:00",
     home: "Calloway Rovers",
-    away: "Westmere Athletic",
-    ground: "Rovers Park",
+    away: "Brackwater Town",
+    ground: "Bridge End",
   },
 ]
 
-/* The Coastal League table as it stood before today's matches. */
-const TABLE: {
+type Standing = {
   club: string
   w: number
   d: number
   l: number
   gd: number
-}[] = [
+}
+
+// The table before today's matches: twelve games each.
+const standings: Standing[] = [
   { club: "Port Avery Harriers", w: 8, d: 2, l: 2, gd: 14 },
-  { club: "Westmere Athletic", w: 7, d: 3, l: 2, gd: 9 },
-  { club: "Saltgate United", w: 6, d: 3, l: 3, gd: 5 },
-  { club: "Dunmore City", w: 5, d: 3, l: 4, gd: 2 },
-  { club: "Brackwater Town", w: 3, d: 4, l: 5, gd: -3 },
-  { club: "Calloway Rovers", w: 3, d: 3, l: 6, gd: -5 },
-  { club: "Fenwick Albion", w: 2, d: 4, l: 6, gd: -8 },
-  { club: "Holm Bay", w: 1, d: 4, l: 7, gd: -14 },
+  { club: "Saltgate United", w: 7, d: 3, l: 2, gd: 9 },
+  { club: "Calloway Rovers", w: 6, d: 3, l: 3, gd: 5 },
+  { club: "Dunmore City", w: 5, d: 4, l: 3, gd: 3 },
+  { club: "Westmere Athletic", w: 4, d: 4, l: 4, gd: 0 },
+  { club: "Fenwick Albion", w: 3, d: 3, l: 6, gd: -6 },
+  { club: "Brackwater Town", w: 2, d: 4, l: 6, gd: -8 },
+  { club: "Holm Bay", w: 1, d: 1, l: 10, gd: -17 },
 ]
+const homeClub = "Port Avery Harriers"
 
-const HOME_CLUB = "Port Avery Harriers"
+/* ---------- Helpers ---------- */
 
-const SECTIONS = [
-  "News",
-  "Politics",
-  "City",
-  "Sport",
-  "Results",
-  "Business",
-  "Culture",
-  "Opinion",
-]
-const CURRENT_SECTION = "Results"
-
-/* ------------------------------------------------------------------ */
-/* Helpers                                                             */
-/* ------------------------------------------------------------------ */
-
-const focusRing =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const labelLink = cn(
-  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-
-const mastheadLink = cn(
-  "font-heading text-foreground uppercase decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-
-const buttonClasses = "h-auto px-4 py-2 font-mono text-label uppercase"
-
-function competitionName(id: Competition) {
-  return COMPETITIONS.find((c) => c.id === id)!.name
-}
-
-function plural(n: number, word: string) {
-  return `${n} ${word}${n === 1 ? "" : "s"}`
-}
-
-function formatGd(gd: number) {
-  if (gd > 0) return `+${gd}`
-  if (gd < 0) return `−${Math.abs(gd)}`
-  return "0"
+function count(n: number, noun: string) {
+  return `${n} ${noun}${n === 1 ? "" : "s"}`
 }
 
 function ordinal(n: number) {
-  const rem100 = n % 100
-  if (rem100 >= 11 && rem100 <= 13) return `${n}th`
+  const tens = n % 100
+  if (tens >= 11 && tens <= 13) return `${n}th`
   switch (n % 10) {
     case 1:
       return `${n}st`
@@ -272,54 +267,67 @@ function ordinal(n: number) {
   }
 }
 
+function signed(n: number) {
+  if (n > 0) return `+${n}`
+  if (n < 0) return `−${Math.abs(n)}`
+  return "0"
+}
+
+function penaltyWords(r: Result) {
+  if (r.state.kind !== "pens") return ""
+  const homeWins = r.state.home > r.state.away
+  const winner = homeWins ? r.home : r.away
+  const hi = Math.max(r.state.home, r.state.away)
+  const lo = Math.min(r.state.home, r.state.away)
+  return `${winner} win ${hi}–${lo} on penalties`
+}
+
 function winnerOf(r: Result): "home" | "away" | null {
   if (r.state.kind === "live") return null
-  if (r.state.kind === "pens") {
+  if (r.state.kind === "pens")
     return r.state.home > r.state.away ? "home" : "away"
-  }
   if (r.homeScore === r.awayScore) return null
   return r.homeScore > r.awayScore ? "home" : "away"
 }
 
 function matchLabel(r: Result) {
-  const scores = `${r.home} ${r.homeScore}, ${r.away} ${r.awayScore}`
+  const score = `${r.home} ${r.homeScore}, ${r.away} ${r.awayScore}`
   switch (r.state.kind) {
     case "ft":
-      return `${scores}, full time`
+      return `${score}, full time`
     case "aet":
-      return `${scores}, after extra time`
+      return `${score}, after extra time`
+    case "pens":
+      return `${score}, ${penaltyWords(r)}`
     case "live":
-      return `${scores}, live, ${ordinal(r.state.minute)} minute`
-    case "pens": {
-      const homeWins = r.state.home > r.state.away
-      const winner = homeWins ? r.home : r.away
-      const hi = Math.max(r.state.home, r.state.away)
-      const lo = Math.min(r.state.home, r.state.away)
-      return `${scores}, ${winner} win ${hi}–${lo} on penalties`
-    }
+      return `${score}, live, ${ordinal(r.state.minute)} minute`
   }
 }
 
-/* ------------------------------------------------------------------ */
-/* Page parts                                                          */
-/* ------------------------------------------------------------------ */
+function shows(filter: Filter, competition: Competition) {
+  return filter === "all" || filter === competition
+}
 
-function Header() {
+/* ---------- Parts ---------- */
+
+function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
   function onKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (!menuOpen || event.key !== "Escape") return
     setMenuOpen(false)
-    menuButtonRef.current?.focus()
+    menuButton.current?.focus()
   }
 
   return (
     <header onKeyDown={onKeyDown}>
-      <div className="mx-auto max-w-[1280px] px-4 md:px-6">
+      <div className={container}>
         <div className="flex items-center justify-between gap-4 py-2">
-          <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
-            <time dateTime="2026-11-11">Wednesday 11 November 2026</time>
+          <p className={cn(label, "text-muted-foreground")}>
+            <time dateTime="2026-11-11" className="font-mono tabular-nums">
+              Wednesday 11 November 2026
+            </time>
           </p>
           <a
             href="#"
@@ -333,11 +341,11 @@ function Header() {
         </div>
 
         <div className="flex items-center justify-between gap-4 border-t-2 border-b py-4 md:border-b-0">
-          <a href="/" className={cn(mastheadLink, "text-h2")}>
+          <a href="/" className={mastheadLink}>
             The Port Avery Ledger
           </a>
           <Button
-            ref={menuButtonRef}
+            ref={menuButton}
             variant="outline"
             className={cn(buttonClasses, "md:hidden")}
             aria-expanded={menuOpen}
@@ -355,9 +363,18 @@ function Header() {
           className="border-b py-2 md:hidden"
         >
           <ul>
-            {SECTIONS.map((section) => (
-              <li key={section}>
-                <SectionLink name={section} className="block py-2" />
+            {sections.map((name) => (
+              <li key={name}>
+                <a
+                  href="#"
+                  aria-current={name === currentSection ? "page" : undefined}
+                  className={cn(
+                    name === currentSection ? currentLink : labelLink,
+                    "block py-2"
+                  )}
+                >
+                  {name}
+                </a>
               </li>
             ))}
           </ul>
@@ -365,51 +382,21 @@ function Header() {
 
         <nav aria-label="Sections" className="hidden border-y py-2 md:block">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {SECTIONS.map((section) => (
-              <li key={section}>
-                <SectionLink name={section} />
+            {sections.map((name) => (
+              <li key={name}>
+                <a
+                  href="#"
+                  aria-current={name === currentSection ? "page" : undefined}
+                  className={name === currentSection ? currentLink : labelLink}
+                >
+                  {name}
+                </a>
               </li>
             ))}
           </ul>
         </nav>
       </div>
     </header>
-  )
-}
-
-function SectionLink({
-  name,
-  className,
-}: {
-  name: string
-  className?: string
-}) {
-  const current = name === CURRENT_SECTION
-  return (
-    <a
-      href="#"
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        "font-mono text-label text-foreground uppercase transition-colors duration-150",
-        current
-          ? "underline decoration-2 underline-offset-4"
-          : "hover:underline",
-        focusRing,
-        className
-      )}
-    >
-      {name}
-    </a>
-  )
-}
-
-function SectionHead({ title, id }: { title: string; id?: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
-      <h2 id={id} className="font-mono text-label text-foreground uppercase">
-        {title}
-      </h2>
-    </div>
   )
 }
 
@@ -435,52 +422,49 @@ function MatchStateLabel({ state }: { state: MatchState }) {
     )
   }
   const text =
-    state.kind === "ft" ? "FT" : state.kind === "aet" ? "AET" : "PENS"
+    state.kind === "ft" ? "FT" : state.kind === "aet" ? "AET" : "Pens"
   return <span className="text-foreground">{text}</span>
 }
 
 function ScoreBox({ result }: { result: Result }) {
   const winner = winnerOf(result)
-  const rows = [
+  const sides = [
     { side: "home" as const, name: result.home, score: result.homeScore },
     { side: "away" as const, name: result.away, score: result.awayScore },
   ]
 
-  let pensLine: string | null = null
-  if (result.state.kind === "pens") {
-    const homeWins = result.state.home > result.state.away
-    const hi = Math.max(result.state.home, result.state.away)
-    const lo = Math.min(result.state.home, result.state.away)
-    pensLine = `${homeWins ? result.home : result.away} win ${hi}–${lo} on penalties`
-  }
-
   return (
     <article
       aria-label={matchLabel(result)}
-      className="flex flex-col gap-2 border bg-card p-4 md:p-6"
+      className="flex min-w-0 flex-col gap-2 border bg-card p-4 md:p-6"
     >
-      <div className="flex items-center justify-between gap-4 font-mono text-label uppercase tabular-nums">
+      <div
+        className={cn(
+          label,
+          "flex items-center justify-between gap-4 tabular-nums"
+        )}
+      >
         <span className="text-muted-foreground">{result.ground}</span>
         <MatchStateLabel state={result.state} />
       </div>
-      {rows.map((row) => (
-        <div
-          key={row.side}
-          className="flex items-baseline justify-between gap-4"
-        >
-          <span className={cn("text-body", winner === row.side && "font-bold")}>
-            {row.name}
+
+      {sides.map((s) => (
+        <div key={s.side} className="flex items-baseline justify-between gap-4">
+          <span className={cn("text-body", winner === s.side && "font-bold")}>
+            {s.name}
           </span>
-          <span className="font-mono text-h2 tabular-nums">{row.score}</span>
+          <span className="font-mono text-h2 tabular-nums">{s.score}</span>
         </div>
       ))}
-      {pensLine && (
-        <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
-          {pensLine}
+
+      {result.state.kind === "pens" && (
+        <p className={cn(label, "text-muted-foreground tabular-nums")}>
+          {penaltyWords(result)}
         </p>
       )}
+
       {result.scorers && (
-        <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+        <p className={cn(label, "text-muted-foreground tabular-nums")}>
           {result.scorers}
         </p>
       )}
@@ -488,190 +472,25 @@ function ScoreBox({ result }: { result: Result }) {
   )
 }
 
-function TodaysResults({ filter }: { filter: Filter }) {
-  const groups = COMPETITIONS.filter((c) => filter === "all" || c.id === filter)
-    .map((c) => ({
-      competition: c,
-      results: RESULTS.filter((r) => r.competition === c.id),
-    }))
-    .filter((g) => g.results.length > 0)
-
-  const chosen = COMPETITIONS.find((c) => c.id === filter)
-
-  return (
-    <section aria-labelledby="results-head" className="flex flex-col gap-4">
-      <SectionHead id="results-head" title="Today's results" />
-      {groups.length === 0 ? (
-        <p>{`No ${chosen ? chosen.short : ""} matches today.`}</p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          {groups.map((group) => (
-            <div key={group.competition.id} className="flex flex-col gap-2">
-              <h3 className="font-mono text-label text-foreground uppercase">
-                {group.competition.name}
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {group.results.map((result) => (
-                  <ScoreBox key={result.id} result={result} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  )
-}
-
-const TABLE_COLUMNS: {
-  key: string
-  abbr?: string
-  title?: string
-  numeric: boolean
-}[] = [
-  { key: "pos", abbr: "Pos", title: "Position", numeric: false },
-  { key: "club", numeric: false },
-  { key: "p", abbr: "P", title: "Played", numeric: true },
-  { key: "w", abbr: "W", title: "Won", numeric: true },
-  { key: "d", abbr: "D", title: "Drawn", numeric: true },
-  { key: "l", abbr: "L", title: "Lost", numeric: true },
-  { key: "gd", abbr: "GD", title: "Goal difference", numeric: true },
-  { key: "pts", abbr: "Pts", title: "Points", numeric: true },
-]
-
-function LeagueTable({ filter }: { filter: Filter }) {
-  const notFiltered = filter !== "all" && filter !== "coastal"
-  const numberCell = "text-right font-mono tabular-nums"
-
-  return (
-    <section
-      aria-labelledby="table-head"
-      className="flex min-w-0 flex-col gap-4 lg:col-span-8 lg:pr-6"
-    >
-      <SectionHead id="table-head" title="Coastal League table" />
-      <Table label="Coastal League table" className="min-w-lg text-body">
-        <TableHeader>
-          <TableRow>
-            {TABLE_COLUMNS.map((col) => (
-              <TableHead
-                key={col.key}
-                scope="col"
-                className={cn(
-                  "font-mono text-label text-muted-foreground uppercase",
-                  col.numeric && "text-right"
-                )}
-              >
-                {col.abbr ? <abbr title={col.title}>{col.abbr}</abbr> : "Club"}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {TABLE.map((row, index) => {
-            const played = row.w + row.d + row.l
-            const points = row.w * 3 + row.d
-            const isHome = row.club === HOME_CLUB
-            return (
-              <TableRow key={row.club}>
-                <TableCell className="font-mono tabular-nums">
-                  {index + 1}
-                </TableCell>
-                <TableCell className={cn(isHome && "font-bold")}>
-                  {row.club}
-                </TableCell>
-                <TableCell className={numberCell}>{played}</TableCell>
-                <TableCell className={numberCell}>{row.w}</TableCell>
-                <TableCell className={numberCell}>{row.d}</TableCell>
-                <TableCell className={numberCell}>{row.l}</TableCell>
-                <TableCell className={numberCell}>{formatGd(row.gd)}</TableCell>
-                <TableCell className={cn(numberCell, "font-bold")}>
-                  {points}
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-      <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
-        {`Top two go up · After 12 games · Before today${notFiltered ? " · Not filtered" : ""}`}
-      </p>
-    </section>
-  )
-}
-
-function Fixtures({ filter }: { filter: Filter }) {
-  const days = DAYS.map((day) => ({
-    ...day,
-    fixtures: FIXTURES.filter(
-      (f) =>
-        f.day === day.date && (filter === "all" || f.competition === filter)
-    ),
-  })).filter((day) => day.fixtures.length > 0)
-
-  return (
-    <section
-      aria-labelledby="fixtures-head"
-      className="flex flex-col gap-4 lg:col-span-4 lg:border-l lg:pl-6"
-    >
-      <SectionHead id="fixtures-head" title="Fixtures" />
-      {days.length === 0 ? (
-        <p>No fixtures in the next four days.</p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          {days.map((day) => (
-            <div key={day.date} className="flex flex-col gap-2">
-              <h3 className="font-mono text-label text-foreground uppercase tabular-nums">
-                <time dateTime={day.date}>{day.label}</time>
-              </h3>
-              <ul className="flex flex-col gap-4">
-                {day.fixtures.map((fixture, index) => (
-                  <li
-                    key={fixture.id}
-                    className={cn(
-                      "flex flex-col gap-1",
-                      index > 0 && "border-t pt-4"
-                    )}
-                  >
-                    <p>{`${fixture.home} v ${fixture.away}`}</p>
-                    <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
-                      <time dateTime={`${fixture.day}T${fixture.time}`}>
-                        {fixture.time}
-                      </time>
-                      {` · ${competitionName(fixture.competition)} · ${fixture.ground}`}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  )
-}
-
-function Footer() {
+function SiteFooter() {
   return (
     <footer>
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-4 border-t-2 px-4 py-6 md:px-6">
-        <a href="/" className={cn(mastheadLink, "self-start text-h2")}>
+      <div className={cn(container, "flex flex-col gap-4 border-t-2 py-6")}>
+        <a href="/" className={cn(mastheadLink, "self-start")}>
           The Port Avery Ledger
         </a>
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {SECTIONS.map((section) => (
-              <li key={section}>
-                <a
-                  href="#"
-                  className={cn(labelLink, "font-mono text-label uppercase")}
-                >
-                  {section}
+            {sections.map((name) => (
+              <li key={name}>
+                <a href="#" className={labelLink}>
+                  {name}
                 </a>
               </li>
             ))}
           </ul>
         </nav>
-        <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+        <p className={cn(label, "text-muted-foreground")}>
           © 2026 The Port Avery Ledger · Port Avery
         </p>
       </div>
@@ -679,62 +498,78 @@ function Footer() {
   )
 }
 
-/* ------------------------------------------------------------------ */
-/* Page                                                                */
-/* ------------------------------------------------------------------ */
+/* ---------- Page ---------- */
 
 export function App() {
   const [filter, setFilter] = useState<Filter>("all")
   const [status, setStatus] = useState("")
 
+  const shownResults = results.filter((r) => shows(filter, r.competition))
+  const shownFixtures = fixtures.filter((f) => shows(filter, f.competition))
+  const resultGroups = competitions
+    .map((c) => ({
+      competition: c,
+      results: shownResults.filter((r) => r.competition === c.id),
+    }))
+    .filter((g) => g.results.length > 0)
+  const fixtureDays = days
+    .map((d) => ({
+      day: d,
+      fixtures: shownFixtures.filter((f) => f.date === d.date),
+    }))
+    .filter((d) => d.fixtures.length > 0)
+
   function choose(next: Filter) {
     if (next === filter) return
+    const label = filters.find((f) => f.id === next)!.label
+    const r = results.filter((x) => shows(next, x.competition)).length
+    const f = fixtures.filter((x) => shows(next, x.competition)).length
     setFilter(next)
-    const results = RESULTS.filter(
-      (r) => next === "all" || r.competition === next
-    ).length
-    const fixtures = FIXTURES.filter(
-      (f) => next === "all" || f.competition === next
-    ).length
-    const label = FILTERS.find((f) => f.id === next)!.label
-    setStatus(
-      `${label}: ${plural(results, "result")}, ${plural(fixtures, "fixture")}.`
-    )
+    setStatus(`${label}: ${count(r, "result")}, ${count(f, "fixture")}.`)
   }
+
+  const chosenShort =
+    filter === "all" ? "" : competitions.find((c) => c.id === filter)!.short
+  const tableNote =
+    "Top two go up · After 12 games · Before today" +
+    (filter === "cup" || filter === "women" ? " · Not filtered" : "")
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <Header />
+      <SiteHeader />
 
       <main>
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 pt-6 pb-12 md:px-6">
+        <div className={cn(container, "flex flex-col gap-12 pt-6 pb-12")}>
+          {/* Page head */}
           <div className="flex flex-col gap-4">
-            <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
-              <p className="font-mono text-label text-foreground uppercase">
-                Sport
-              </p>
+            <div className={sectionHead}>
+              <p className={sectionName}>Sport</p>
             </div>
-            <h1 className="text-h1 uppercase md:text-display">Results</h1>
+            <h1 className="text-h1 text-foreground uppercase md:text-display">
+              Results
+            </h1>
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
-                <time dateTime="2026-11-11">Wednesday 11 November 2026</time>
+              <p className={cn(label, "text-muted-foreground")}>
+                <time dateTime="2026-11-11" className="font-mono tabular-nums">
+                  Wednesday 11 November 2026
+                </time>
               </p>
               <div
                 role="group"
                 aria-label="Competition"
                 className="flex flex-wrap gap-1"
               >
-                {FILTERS.map((option) => {
-                  const pressed = option.id === filter
+                {filters.map((f) => {
+                  const chosen = f.id === filter
                   return (
                     <Button
-                      key={option.id}
-                      variant={pressed ? "secondary" : "outline"}
-                      aria-pressed={pressed}
+                      key={f.id}
+                      variant={chosen ? "secondary" : "outline"}
+                      aria-pressed={chosen}
                       className={buttonClasses}
-                      onClick={() => choose(option.id)}
+                      onClick={() => choose(f.id)}
                     >
-                      {option.label}
+                      {f.label}
                     </Button>
                   )
                 })}
@@ -745,16 +580,176 @@ export function App() {
             </p>
           </div>
 
-          <TodaysResults filter={filter} />
+          {/* Today's results */}
+          <section className="flex flex-col gap-4">
+            <div className={sectionHead}>
+              <h2 className={sectionName}>Today's results</h2>
+            </div>
+            {resultGroups.length === 0 ? (
+              <p className="max-w-xl text-body">
+                {`No ${chosenShort} matches today.`}
+              </p>
+            ) : (
+              <div className="flex flex-col gap-6">
+                {resultGroups.map((g) => (
+                  <div key={g.competition.id} className="flex flex-col gap-2">
+                    <h3 className={sectionName}>{g.competition.name}</h3>
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {g.results.map((r) => (
+                        <ScoreBox key={r.id} result={r} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
 
+          {/* Table and fixtures */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
-            <LeagueTable filter={filter} />
-            <Fixtures filter={filter} />
+            <section className="flex min-w-0 flex-col gap-4 lg:col-span-8 lg:pr-6">
+              <div className={sectionHead}>
+                <h2 className={sectionName}>Coastal League table</h2>
+              </div>
+              <Table
+                label="Coastal League table"
+                className="min-w-lg text-body"
+              >
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className={cn(label, "text-muted-foreground")}>
+                      <abbr title="Position">Pos</abbr>
+                    </TableHead>
+                    <TableHead className={cn(label, "text-muted-foreground")}>
+                      Club
+                    </TableHead>
+                    {(
+                      [
+                        ["P", "Played"],
+                        ["W", "Won"],
+                        ["D", "Drawn"],
+                        ["L", "Lost"],
+                        ["GD", "Goal difference"],
+                        ["Pts", "Points"],
+                      ] as const
+                    ).map(([short, full]) => (
+                      <TableHead
+                        key={short}
+                        className={cn(
+                          label,
+                          "text-right text-muted-foreground"
+                        )}
+                      >
+                        <abbr title={full}>{short}</abbr>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {standings.map((s, i) => {
+                    const played = s.w + s.d + s.l
+                    const points = 3 * s.w + s.d
+                    return (
+                      <TableRow key={s.club}>
+                        <TableCell className="font-mono tabular-nums">
+                          {i + 1}
+                        </TableCell>
+                        <TableCell
+                          className={cn(s.club === homeClub && "font-bold")}
+                        >
+                          {s.club}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums">
+                          {played}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums">
+                          {s.w}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums">
+                          {s.d}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums">
+                          {s.l}
+                        </TableCell>
+                        <TableCell className="text-right font-mono tabular-nums">
+                          {signed(s.gd)}
+                        </TableCell>
+                        <TableCell className="text-right font-mono font-bold tabular-nums">
+                          {points}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+              <p className={cn(label, "text-muted-foreground tabular-nums")}>
+                {tableNote}
+              </p>
+            </section>
+
+            <section className="flex min-w-0 flex-col gap-4 lg:col-span-4 lg:border-l lg:pl-6">
+              <div className={sectionHead}>
+                <h2 className={sectionName}>Fixtures</h2>
+              </div>
+              {fixtureDays.length === 0 ? (
+                <p className="max-w-xl text-body">
+                  No fixtures in the next four days.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {fixtureDays.map(({ day, fixtures: list }) => (
+                    <div key={day.date} className="flex flex-col gap-2">
+                      <h3 className={sectionName}>
+                        <time
+                          dateTime={day.date}
+                          className="font-mono tabular-nums"
+                        >
+                          {day.label}
+                        </time>
+                      </h3>
+                      <ul className="flex flex-col gap-4">
+                        {list.map((f, i) => (
+                          <li
+                            key={f.id}
+                            className={cn(
+                              "flex flex-col gap-1",
+                              i > 0 && "border-t pt-4"
+                            )}
+                          >
+                            <p className="text-body">
+                              {f.home} v {f.away}
+                            </p>
+                            <p
+                              className={cn(
+                                label,
+                                "text-muted-foreground tabular-nums"
+                              )}
+                            >
+                              <time
+                                dateTime={`${f.date}T${f.time}`}
+                                className="font-mono tabular-nums"
+                              >
+                                {f.time}
+                              </time>
+                              {` · ${
+                                competitions.find(
+                                  (c) => c.id === f.competition
+                                )!.name
+                              } · ${f.ground}`}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
           </div>
         </div>
       </main>
 
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent } from "react"
+import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -14,42 +14,38 @@ import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
 const container = "mx-auto max-w-[1280px] px-3 md:px-6"
-
-const buttonClasses = "h-auto px-6 py-2 font-mono text-label uppercase"
-
+const label = "font-mono text-label uppercase"
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-2",
   focusRing
 )
-
 const navLink = cn(
-  "font-mono text-label text-foreground uppercase underline-offset-4 transition-colors duration-150 hover:underline",
+  label,
+  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
+const buttonClasses = "h-auto px-6 py-2 font-mono text-label uppercase"
+const sectionHeading = "text-h2 uppercase md:text-h1"
 
-const label = "font-mono text-label uppercase"
-
-const pages = [
+const links = [
   { name: "Game", href: "/" },
   { name: "Patch notes", href: "/patch" },
   { name: "Leaderboard", href: "/leaderboard" },
   { name: "Store", href: "/store" },
   { name: "Profile", href: "/player" },
 ]
+const currentHref = "/player"
 
-const currentPage = "/player"
+type HeatStep = "low" | "mid" | "high"
 
-type Heat = "low" | "mid" | "high"
-
-const heatFill: Record<Heat, string> = {
+const heatClass: Record<HeatStep, string> = {
   low: "bg-heat-low",
   mid: "bg-heat-mid",
   high: "bg-heat-high",
 }
 
-function heatForShare(percent: number): Heat {
+function heatFor(percent: number): HeatStep {
   if (percent >= 50) return "high"
   if (percent >= 20) return "mid"
   return "low"
@@ -61,7 +57,6 @@ const classes = [
   { id: "class-bulwark", name: "Bulwark", matches: 42, share: 11.0 },
   { id: "class-cinderblade", name: "Cinderblade", matches: 15, share: 3.9 },
 ]
-
 const totalMatches = 383
 
 type Match = {
@@ -161,51 +156,48 @@ const matches: Match[] = [
 const awards: {
   name: string
   rarity: string
-  heat: Heat
+  step: HeatStep
   text: string
   date: string
-  earned: string
+  dateLabel: string
 }[] = [
   {
     name: "Smoke and mirrors",
     rarity: "Legendary",
-    heat: "high",
-    text: "Heal 500,000 health as Mender in one season.",
+    step: "high",
+    text: "Heal 500,000 health as a Mender in a single season.",
     date: "2026-11-08",
-    earned: "Sun 8 Nov",
+    dateLabel: "Sun 8 Nov",
   },
   {
     name: "Top twenty",
     rarity: "Rare",
-    heat: "mid",
+    step: "mid",
     text: "Reach the global top 20 in Ranked Clash.",
     date: "2026-11-07",
-    earned: "Sat 7 Nov",
+    dateLabel: "Sat 7 Nov",
   },
   {
     name: "Last wall",
     rarity: "Rare",
-    heat: "mid",
-    text: "Win a round as the last Bulwark standing.",
+    step: "mid",
+    text: "Win a round as the last Bulwark standing on your team.",
     date: "2026-10-20",
-    earned: "Tue 20 Oct",
+    dateLabel: "Tue 20 Oct",
   },
   {
     name: "First light",
     rarity: "Common",
-    heat: "low",
-    text: "Win the first ranked match of a season.",
+    step: "low",
+    text: "Win your first ranked match of a season.",
     date: "2026-10-06",
-    earned: "Tue 6 Oct",
+    dateLabel: "Tue 6 Oct",
   },
 ]
 
-const seasonFigures = [
-  { term: "Rating", value: "2,418" },
-  { term: "Matches", value: "383" },
-  { term: "Wins", value: "212" },
-  { term: "Win rate", value: "55.4%" },
-]
+const headCell = cn(label, "px-3 text-muted-foreground first:pl-0 last:pr-0")
+const bodyCell = "px-3 py-2 first:pl-0 last:pr-0"
+const numberCell = cn(bodyCell, "text-right font-mono tabular-nums")
 
 function Meter({
   labelledBy,
@@ -214,7 +206,7 @@ function Meter({
   now,
   valueText,
   width,
-  heat,
+  step,
   className,
 }: {
   labelledBy: string
@@ -223,7 +215,7 @@ function Meter({
   now: number
   valueText: string
   width: string
-  heat: Heat
+  step: HeatStep
   className?: string
 }) {
   return (
@@ -236,25 +228,25 @@ function Meter({
       aria-labelledby={labelledBy}
       className={cn("h-3 w-full border border-border bg-muted", className)}
     >
-      <div className={cn("h-full", heatFill[heat])} style={{ width }} />
+      <div className={cn("h-full", heatClass[step])} style={{ width }} />
     </div>
   )
 }
 
-function RankMark({ heat }: { heat: Heat }) {
+function RankMark({ step }: { step: HeatStep }) {
   return (
     <span
       aria-hidden="true"
-      className={cn("size-3 shrink-0 rounded-sm", heatFill[heat])}
+      className={cn("size-3 shrink-0 rounded-sm", heatClass[step])}
     />
   )
 }
 
-function Header() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
+function SiteHeader() {
+  const [open, setOpen] = React.useState(false)
+  const menuButton = React.useRef<HTMLButtonElement>(null)
 
-  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (!open || event.key !== "Escape") return
     setOpen(false)
     menuButton.current?.focus()
@@ -263,10 +255,7 @@ function Header() {
   return (
     <header className="border-b border-border" onKeyDown={onKeyDown}>
       <div
-        className={cn(
-          container,
-          "flex items-center justify-between gap-6 py-3"
-        )}
+        className={cn(container, "flex items-center justify-between gap-6 py-3")}
       >
         <a
           href="/"
@@ -279,17 +268,17 @@ function Header() {
         </a>
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex gap-6">
-            {pages.map((page) => (
-              <li key={page.href}>
+            {links.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={page.href}
-                  aria-current={page.href === currentPage ? "page" : undefined}
+                  href={link.href}
+                  aria-current={link.href === currentHref ? "page" : undefined}
                   className={cn(
                     navLink,
-                    page.href === currentPage && "underline decoration-2"
+                    link.href === currentHref && "underline decoration-2"
                   )}
                 >
-                  {page.name}
+                  {link.name}
                 </a>
               </li>
             ))}
@@ -299,7 +288,7 @@ function Header() {
           ref={menuButton}
           variant="outline"
           aria-expanded={open}
-          aria-controls="mobile-menu"
+          aria-controls="menu-small"
           onClick={() => setOpen((value) => !value)}
           className={cn(buttonClasses, "md:hidden")}
         >
@@ -307,26 +296,26 @@ function Header() {
         </Button>
       </div>
       <nav
-        id="mobile-menu"
+        id="menu-small"
         aria-label="Main"
         hidden={!open}
         className="border-t border-border md:hidden"
       >
         <div className={cn(container, "py-2")}>
           <ul>
-            {pages.map((page) => (
-              <li key={page.href}>
+            {links.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={page.href}
-                  aria-current={page.href === currentPage ? "page" : undefined}
+                  href={link.href}
+                  aria-current={link.href === currentHref ? "page" : undefined}
                   onClick={() => setOpen(false)}
                   className={cn(
                     navLink,
                     "block py-2",
-                    page.href === currentPage && "underline decoration-2"
+                    link.href === currentHref && "underline decoration-2"
                   )}
                 >
-                  {page.name}
+                  {link.name}
                 </a>
               </li>
             ))}
@@ -366,7 +355,9 @@ function PlayerHead() {
                 </span>
               </p>
             </div>
-            <p className={cn(label, "mt-2 text-muted-foreground tabular-nums")}>
+            <p
+              className={cn(label, "mt-2 text-muted-foreground tabular-nums")}
+            >
               Joined <time dateTime="2025-03">Mar 2025</time>
             </p>
           </div>
@@ -381,28 +372,25 @@ function PlayerHead() {
         </div>
       </div>
       <div className="mt-12 md:col-span-4 md:col-start-9 md:mt-0">
-        <p
-          id="global-rank-label"
-          className={cn(label, "text-muted-foreground")}
-        >
+        <p id="rank-label" className={cn(label, "text-muted-foreground")}>
           Global rank
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <p
-            aria-describedby="global-rank-label"
+            aria-describedby="rank-label"
             className="font-mono text-h1 tabular-nums md:text-display"
           >
             18
           </p>
           <Badge
             variant="secondary"
-            className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
+            className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase tabular-nums"
           >
             Top 20
           </Badge>
         </div>
         <div className="mt-3 flex items-center gap-2">
-          <RankMark heat="low" />
+          <RankMark step="low" />
           <p className="text-body">Cinder</p>
         </div>
         <p className={cn(label, "mt-2 text-muted-foreground tabular-nums")}>
@@ -414,15 +402,21 @@ function PlayerHead() {
 }
 
 function SeasonFigures() {
+  const figures = [
+    { term: "Rating", value: "2,418" },
+    { term: "Matches", value: "383" },
+    { term: "Wins", value: "212" },
+    { term: "Win rate", value: "55.4%" },
+  ]
   return (
     <section className="mt-20">
-      <h2 className="text-h2 uppercase md:text-h1">Season 4</h2>
+      <h2 className={cn(sectionHeading, "tabular-nums")}>Season 4</h2>
       <p className="mt-3 max-w-xl">
-        These are Ranked Clash figures for Season 4: Dry Lightning, counted
-        since the season opened on Tuesday 6 October.
+        These are your Ranked Clash figures since Season 4: Dry Lightning
+        opened on Tuesday 6 October.
       </p>
       <dl className="mt-6 grid grid-cols-2 gap-x-6 md:grid-cols-4">
-        {seasonFigures.map((figure) => (
+        {figures.map((figure) => (
           <div key={figure.term} className="border-t border-border py-3">
             <dt className={cn(label, "text-muted-foreground")}>
               {figure.term}
@@ -438,44 +432,48 @@ function SeasonFigures() {
 }
 
 function ClassesAndPass() {
+  const passPercent = ((14 / 60) * 100).toFixed(1)
   return (
     <section className="mt-20 grid grid-cols-1 md:grid-cols-12 md:gap-x-6">
       <div className="md:col-span-7">
-        <h2 className="text-h2 uppercase md:text-h1">Classes</h2>
+        <h2 className={sectionHeading}>Classes</h2>
         <p className="mt-3 max-w-xl">
-          The share of this season&apos;s ranked matches Juno has played on each
+          The share of this season’s 383 ranked matches you played on each
           class.
         </p>
         <ul className="mt-6 border-b border-border">
-          {classes.map((item) => (
-            <li key={item.id} className="border-t border-border py-3">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                <h3 id={item.id} className="text-h2">
-                  {item.name}
-                </h3>
-                <p className={cn(label, "text-muted-foreground tabular-nums")}>
-                  {item.matches} matches · {item.share.toFixed(1)}%
-                </p>
-              </div>
-              <Meter
-                className="mt-2"
-                labelledBy={item.id}
-                min={0}
-                max={100}
-                now={item.share}
-                valueText={`${item.share.toFixed(1)}% of matches, ${item.matches} of ${totalMatches}`}
-                width={`${item.share.toFixed(1)}%`}
-                heat={heatForShare(item.share)}
-              />
-            </li>
-          ))}
+          {classes.map((item) => {
+            const share = item.share.toFixed(1)
+            return (
+              <li key={item.id} className="border-t border-border py-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                  <h3 id={item.id} className="text-h2">
+                    {item.name}
+                  </h3>
+                  <p
+                    className={cn(label, "text-muted-foreground tabular-nums")}
+                  >
+                    {item.matches} {item.matches === 1 ? "match" : "matches"}{" "}
+                    · {share}%
+                  </p>
+                </div>
+                <Meter
+                  className="mt-2"
+                  labelledBy={item.id}
+                  min={0}
+                  max={100}
+                  now={item.share}
+                  valueText={`${share}% of matches, ${item.matches} of ${totalMatches}`}
+                  width={`${share}%`}
+                  step={heatFor(item.share)}
+                />
+              </li>
+            )
+          })}
         </ul>
       </div>
       <div className="mt-12 rounded-xl border border-border bg-card p-6 md:col-span-4 md:col-start-9 md:mt-0 md:self-start">
-        <p
-          id="season-pass-label"
-          className={cn(label, "text-muted-foreground")}
-        >
+        <p id="pass-label" className={cn(label, "text-muted-foreground")}>
           Season pass
         </p>
         <p className="mt-2">
@@ -488,13 +486,13 @@ function ClassesAndPass() {
         </p>
         <Meter
           className="mt-6"
-          labelledBy="season-pass-label"
+          labelledBy="pass-label"
           min={0}
           max={60}
           now={14}
           valueText="Tier 14 of 60"
-          width="23.3%"
-          heat="mid"
+          width={`${passPercent}%`}
+          step="mid"
         />
         <p className="mt-3 text-body">
           46 tiers to go, and 61 days left in the season.
@@ -504,13 +502,10 @@ function ClassesAndPass() {
   )
 }
 
-const headClasses = cn(label, "px-3 text-muted-foreground first:pl-0 last:pr-0")
-const cellClasses = "px-3 py-2 first:pl-0 last:pr-0"
-
 function RecentMatches() {
   return (
     <section className="mt-20">
-      <h2 className="text-h2 uppercase md:text-h1">Recent matches</h2>
+      <h2 className={sectionHeading}>Recent matches</h2>
       <p className={cn(label, "mt-3 text-muted-foreground tabular-nums")}>
         Last 8 · 5 wins · 3 losses
       </p>
@@ -518,25 +513,25 @@ function RecentMatches() {
         <Table label="Recent matches" className="min-w-2xl text-body">
           <TableHeader>
             <TableRow>
-              <TableHead scope="col" className={headClasses}>
+              <TableHead scope="col" className={headCell}>
                 When
               </TableHead>
-              <TableHead scope="col" className={headClasses}>
+              <TableHead scope="col" className={headCell}>
                 Mode
               </TableHead>
-              <TableHead scope="col" className={headClasses}>
+              <TableHead scope="col" className={headCell}>
                 Class
               </TableHead>
-              <TableHead scope="col" className={headClasses}>
+              <TableHead scope="col" className={headCell}>
                 Result
               </TableHead>
-              <TableHead scope="col" className={cn(headClasses, "text-right")}>
+              <TableHead scope="col" className={cn(headCell, "text-right")}>
                 Rounds
               </TableHead>
-              <TableHead scope="col" className={cn(headClasses, "text-right")}>
+              <TableHead scope="col" className={cn(headCell, "text-right")}>
                 <abbr title="Kills, deaths and assists">K / D / A</abbr>
               </TableHead>
-              <TableHead scope="col" className={cn(headClasses, "text-right")}>
+              <TableHead scope="col" className={cn(headCell, "text-right")}>
                 Rating
               </TableHead>
             </TableRow>
@@ -544,39 +539,17 @@ function RecentMatches() {
           <TableBody>
             {matches.map((match) => (
               <TableRow key={match.date}>
-                <TableCell className={cellClasses}>
-                  <time
-                    dateTime={match.date}
-                    className="font-mono tabular-nums"
-                  >
+                <TableCell className={bodyCell}>
+                  <time dateTime={match.date} className="font-mono tabular-nums">
                     {match.when}
                   </time>
                 </TableCell>
-                <TableCell className={cellClasses}>{match.mode}</TableCell>
-                <TableCell className={cellClasses}>{match.className}</TableCell>
-                <TableCell className={cellClasses}>{match.result}</TableCell>
-                <TableCell
-                  className={cn(
-                    cellClasses,
-                    "text-right font-mono tabular-nums"
-                  )}
-                >
-                  {match.rounds}
-                </TableCell>
-                <TableCell
-                  className={cn(
-                    cellClasses,
-                    "text-right font-mono tabular-nums"
-                  )}
-                >
-                  {match.kda}
-                </TableCell>
-                <TableCell
-                  className={cn(
-                    cellClasses,
-                    "text-right font-mono tabular-nums"
-                  )}
-                >
+                <TableCell className={bodyCell}>{match.mode}</TableCell>
+                <TableCell className={bodyCell}>{match.className}</TableCell>
+                <TableCell className={bodyCell}>{match.result}</TableCell>
+                <TableCell className={numberCell}>{match.rounds}</TableCell>
+                <TableCell className={numberCell}>{match.kda}</TableCell>
+                <TableCell className={numberCell}>
                   {match.rating ?? (
                     <>
                       <span aria-hidden="true">—</span>
@@ -596,7 +569,7 @@ function RecentMatches() {
 function Awards() {
   return (
     <section className="mt-20">
-      <h2 className="text-h2 uppercase md:text-h1">Awards</h2>
+      <h2 className={sectionHeading}>Awards</h2>
       <p className={cn(label, "mt-3 text-muted-foreground tabular-nums")}>
         4 of 52 earned
       </p>
@@ -607,15 +580,17 @@ function Awards() {
             className="rounded-xl border border-border bg-card p-6"
           >
             <div className="flex items-center gap-2">
-              <RankMark heat={award.heat} />
+              <RankMark step={award.step} />
               <p className={cn(label, "text-muted-foreground")}>
                 {award.rarity}
               </p>
             </div>
             <h3 className="mt-2 text-h2">{award.name}</h3>
             <p className="mt-3">{award.text}</p>
-            <p className={cn(label, "mt-3 text-muted-foreground tabular-nums")}>
-              Earned <time dateTime={award.date}>{award.earned}</time>
+            <p
+              className={cn(label, "mt-3 text-muted-foreground tabular-nums")}
+            >
+              Earned <time dateTime={award.date}>{award.dateLabel}</time>
             </p>
           </li>
         ))}
@@ -624,7 +599,7 @@ function Awards() {
   )
 }
 
-function Footer() {
+function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-border py-12">
       <div className={container}>
@@ -635,11 +610,11 @@ function Footer() {
               A team arena game by Lowlight Games.
             </p>
           </div>
-          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 md:col-span-6 md:mt-0">
-            {pages.map((page) => (
-              <li key={page.href}>
-                <a href={page.href} className={cn(textLink, "text-body")}>
-                  {page.name}
+          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 md:col-span-6 md:col-start-7 md:mt-0">
+            {links.map((link) => (
+              <li key={link.href}>
+                <a href={link.href} className={cn(textLink, "text-body")}>
+                  {link.name}
                 </a>
               </li>
             ))}
@@ -656,7 +631,7 @@ function Footer() {
 export function App() {
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <Header />
+      <SiteHeader />
       <main className={cn(container, "pt-12")}>
         <PlayerHead />
         <SeasonFigures />
@@ -664,7 +639,7 @@ export function App() {
         <RecentMatches />
         <Awards />
       </main>
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

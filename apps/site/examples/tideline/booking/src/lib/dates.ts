@@ -7,6 +7,7 @@ const WEEKDAYS = [
   "Friday",
   "Saturday",
 ]
+
 const MONTHS = [
   "January",
   "February",
@@ -22,17 +23,16 @@ const MONTHS = [
   "December",
 ]
 
-/** "Saturday 19 June 2027": weekday, day, month in words, year, no comma. */
+/** "Saturday 19 June 2027", from the date's local day. */
 export function formatLongDate(date: Date) {
   return `${WEEKDAYS[date.getDay()]} ${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
 }
 
-/** "2027-06-19", from the local year, month and day. */
+/** "2027-06-19", from the date's local day (not UTC). */
 export function toDateTime(date: Date) {
-  const y = String(date.getFullYear()).padStart(4, "0")
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${date.getFullYear()}-${month}-${day}`
 }
 
 /** The start of today on the visitor's clock. */

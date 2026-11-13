@@ -62,7 +62,7 @@ A section in the grid, with its `aria-label` "How sessions work" (here, in place
 
 **"What a client said"** (`id="in-their-words"`)
 
-- A `<figure>` holding a `<blockquote>` and a `<figcaption>`. The `<blockquote>` has no border and no padding, and holds one `<p>` in `font-heading text-h2 italic`, with its quotation marks typed: "“I kept waiting to be told what was wrong with me. It took a few weeks to notice that nobody was going to, and that I could put things down in that room that I had carried everywhere else.”" The `<figcaption>`, with `mt-4`, is a caption from the layout notes: "A client, after a year of weekly sessions. Shared with permission, and changed to keep it private."
+- A `<figure>` holding a `<blockquote>` and a `<figcaption>`. The `<blockquote>` has no border and no padding, and holds one `<p>` in `font-heading text-h2 italic`, with its curly quotation marks typed in the `<p>` (the straight ones around them are this brief's, as everywhere): "“I kept waiting to be told what was wrong with me. It took a few weeks to notice that nobody was going to, and that I could put things down in that room that I had carried everywhere else.”" The `<figcaption>`, with `mt-4`, is a caption from the layout notes: "A client, after a year of weekly sessions. Shared with permission, and changed to keep it private."
 - "People say many different things about therapy. This is one of them, and it is not a promise of what it would be for you."
 
 **"What I do not offer"** (`id="not-offered"`)

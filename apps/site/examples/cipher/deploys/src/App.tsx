@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent, type ReactNode } from "react"
+import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,336 +20,46 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
+type State = "ready" | "building" | "queued" | "failed" | "canceled"
 type Environment = "production" | "preview"
-type DeployState = "ready" | "building" | "queued" | "failed" | "canceled"
 
 type Deployment = {
-  commit: string
+  hash: string
   message: string
   branch: string
-  state: DeployState
-  /** Seconds it ran; null while it has not finished. */
+  state: State
+  /** Seconds the run took; null while it has not finished. */
   duration: number | null
-  /** Local time, "2026-11-11T14:05". */
-  created: string
-  /** For a failed deployment, the error line. */
-  error?: string
+  /** Day of November 2026, hour and minute the deployment was created. */
+  created: [number, number, number]
+  /** For a failed deployment: the error line, without the word "error". */
+  reason?: string
 }
 
-// Newest first. The sample's today is 11 Nov 2026.
-const deployments: Deployment[] = [
-  {
-    commit: "a1d94e0",
-    message: "Raise the image cache lifetime to one day",
-    branch: "main",
-    state: "queued",
-    duration: null,
-    created: "2026-11-11T14:05",
-  },
-  {
-    commit: "7c2e5b9",
-    message: "Highlight matched terms in search results",
-    branch: "feat/search",
-    state: "building",
-    duration: null,
-    created: "2026-11-11T13:52",
-  },
-  {
-    commit: "8f3c2a1",
-    message: "Merge fix/cart-total: round totals after discounts",
-    branch: "main",
-    state: "ready",
-    duration: 161,
-    created: "2026-11-11T11:20",
-  },
-  {
-    commit: "3b6f0d2",
-    message: "Round the cart total after applying discounts",
-    branch: "fix/cart-total",
-    state: "ready",
-    duration: 115,
-    created: "2026-11-11T10:48",
-  },
-  {
-    commit: "e4a7c19",
-    message: "Apply discount codes before tax in the cart total",
-    branch: "fix/cart-total",
-    state: "failed",
-    duration: 72,
-    created: "2026-11-11T10:31",
-    error:
-      "src/cart/total.ts:41:9 Type 'string' is not assignable to type 'number'.",
-  },
-  {
-    commit: "92d1f7a",
-    message: "Bump vite to 8.2 and react to 19.3",
-    branch: "chore/deps",
-    state: "canceled",
-    duration: 47,
-    created: "2026-11-11T09:14",
-  },
-  {
-    commit: "5ce803b",
-    message: "Bump lucide-react to 1.72",
-    branch: "chore/deps",
-    state: "ready",
-    duration: 133,
-    created: "2026-11-10T17:40",
-  },
-  {
-    commit: "d07b6e4",
-    message: "Add a sitemap for product pages",
-    branch: "main",
-    state: "ready",
-    duration: 192,
-    created: "2026-11-10T16:22",
-  },
-  {
-    commit: "41f9ac8",
-    message: "Wait 200 ms after typing before searching",
-    branch: "feat/search",
-    state: "ready",
-    duration: 138,
-    created: "2026-11-10T15:05",
-  },
-  {
-    commit: "b8e2d53",
-    message: "Build the search index during the deploy",
-    branch: "feat/search",
-    state: "failed",
-    duration: 58,
-    created: "2026-11-10T14:47",
-    error:
-      "Cannot find module 'flexsearch' imported from scripts/build-index.ts",
-  },
-  {
-    commit: "6a3c0f1",
-    message: "Fix the broken returns link in the footer",
-    branch: "main",
-    state: "ready",
-    duration: 156,
-    created: "2026-11-10T11:30",
-  },
-  {
-    commit: "f19d7e2",
-    message: "Add a search page with an empty state",
-    branch: "feat/search",
-    state: "ready",
-    duration: 131,
-    created: "2026-11-10T10:02",
-  },
-  {
-    commit: "0e5b8c4",
-    message: "Serve hero images as WebP",
-    branch: "main",
-    state: "ready",
-    duration: 169,
-    created: "2026-11-09T18:15",
-  },
-  {
-    commit: "c73a1f6",
-    message: "Pin Node to 24 in the build image",
-    branch: "chore/deps",
-    state: "ready",
-    duration: 38,
-    created: "2026-11-09T16:40",
-  },
-  {
-    commit: "2d8e4b7",
-    message: "Show the stock count on product cards",
-    branch: "main",
-    state: "ready",
-    duration: 147,
-    created: "2026-11-09T15:12",
-  },
-  {
-    commit: "9a0f3c5",
-    message: "Add a failing test for discounted totals",
-    branch: "fix/cart-total",
-    state: "ready",
-    duration: 109,
-    created: "2026-11-09T13:58",
-  },
-  {
-    commit: "74b1e9d",
-    message: "Move the checkout button above the order summary",
-    branch: "main",
-    state: "ready",
-    duration: 153,
-    created: "2026-11-09T12:21",
-  },
-  {
-    commit: "e8c62a0",
-    message: "Add the search route behind a flag",
-    branch: "feat/search",
-    state: "ready",
-    duration: 125,
-    created: "2026-11-09T11:03",
-  },
-  {
-    commit: "1f4d7b3",
-    message: "Update the privacy policy page",
-    branch: "main",
-    state: "ready",
-    duration: 160,
-    created: "2026-11-09T10:10",
-  },
-  {
-    commit: "5b9e2c8",
-    message: "Set cache headers on static assets",
-    branch: "main",
-    state: "ready",
-    duration: 142,
-    created: "2026-11-09T09:02",
-  },
+const DEPLOYMENTS: Deployment[] = [
+  { hash: "4e7b9d0", message: "Add fuzzy matching to search suggestions", branch: "feat/search", state: "queued", duration: null, created: [11, 14, 52] },
+  { hash: "8f3c2a1", message: "Show the tax line on the cart summary", branch: "main", state: "building", duration: null, created: [11, 14, 41] },
+  { hash: "c91d4e7", message: "Round discounted line totals before summing them", branch: "fix/cart-total", state: "ready", duration: 64, created: [11, 13, 26] },
+  { hash: "2a6f0b3", message: "Bump vite to 8.2.1", branch: "chore/deps", state: "failed", duration: 52, created: [11, 11, 58], reason: "vite.config.ts: plugin react needs @vitejs/plugin-react 6, found 5.1.0" },
+  { hash: "e5b8c12", message: "Cache product images for a week", branch: "main", state: "ready", duration: 168, created: [11, 10, 15] },
+  { hash: "7d1e9a4", message: "Highlight matched words in search results", branch: "feat/search", state: "ready", duration: 72, created: [11, 9, 37] },
+  { hash: "b3c4f58", message: "Keep the cart open after removing an item", branch: "fix/cart-total", state: "canceled", duration: 41, created: [10, 17, 22] },
+  { hash: "91a0e6d", message: "Merge the first cart total fixes", branch: "main", state: "ready", duration: 192, created: [10, 16, 5] },
+  { hash: "0f2d7c9", message: "Show the currency on every line total", branch: "fix/cart-total", state: "ready", duration: 58, created: [10, 15, 11] },
+  { hash: "6c8b1e2", message: "Pin lucide-react to 1.72.0", branch: "chore/deps", state: "ready", duration: 38, created: [10, 13, 44] },
+  { hash: "d4e2a90", message: "Add a search box to the header", branch: "feat/search", state: "failed", duration: 89, created: [10, 11, 30], reason: "src/components/search-box.tsx(14,9): 'query' is possibly 'undefined'" },
+  { hash: "3b9f5d1", message: "Lay out the product grid with CSS grid", branch: "main", state: "ready", duration: 151, created: [10, 9, 52] },
+  { hash: "a7c3e64", message: "Index product names for search", branch: "feat/search", state: "ready", duration: 96, created: [9, 18, 8] },
+  { hash: "58e0b2f", message: "Update eslint to 10.1.0", branch: "chore/deps", state: "ready", duration: 44, created: [9, 16, 40] },
+  { hash: "f1d6a83", message: "Load reviews only when they scroll into view", branch: "main", state: "ready", duration: 125, created: [9, 15, 17] },
+  { hash: "2e4c7b5", message: "Add an empty search route", branch: "feat/search", state: "ready", duration: 68, created: [9, 13, 2] },
+  { hash: "9a5f1d0", message: "Fix the currency symbol on cart totals", branch: "fix/cart-total", state: "ready", duration: 49, created: [9, 11, 46] },
+  { hash: "c0b8e37", message: "Update the footer links", branch: "main", state: "ready", duration: 114, created: [9, 10, 21] },
+  { hash: "6f3a2c8", message: "Bump typescript to 6.0.2", branch: "chore/deps", state: "ready", duration: 40, created: [9, 9, 33] },
+  { hash: "1d7e4b6", message: "Compress the hero image", branch: "main", state: "ready", duration: 137, created: [9, 8, 50] },
 ]
 
-const environmentOf = (d: Deployment): Environment =>
-  d.branch === "main" ? "production" : "preview"
-
-const addressOf = (d: Deployment) =>
-  environmentOf(d) === "production"
-    ? "https://orrin.example"
-    : `https://${d.branch.replace(/\//g, "-")}.orrin-web.plinth.example`
-
-// The newest ready deployment to production is the one that is live.
-const liveCommit = deployments.find(
-  (d) => d.state === "ready" && environmentOf(d) === "production"
-)?.commit
-
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-]
-
-function formatCreated(created: string) {
-  const [date, time] = created.split("T")
-  const [year, month, day] = date.split("-").map(Number)
-  return `${day} ${months[month - 1]} ${year}, ${time}`
-}
-
-function formatDuration(seconds: number) {
-  const m = Math.floor(seconds / 60)
-  const s = seconds % 60
-  return m === 0 ? `${s}s` : `${m}m ${String(s).padStart(2, "0")}s`
-}
-
-const pad = (n: number) => String(n).padStart(2, "0")
-
-type LogLine = { time: string; dateTime: string; text: ReactNode }
-
-function buildLog(d: Deployment): LogLine[] {
-  const [date, time] = d.created.split("T")
-  const [hours, minutes] = time.split(":").map(Number)
-  const start = hours * 3600 + minutes * 60 + 4
-  const total = d.duration ?? 70
-  const env = environmentOf(d)
-
-  const at = (fraction: number, text: ReactNode): LogLine => {
-    const t = start + Math.round(total * fraction)
-    const clock = `${pad(Math.floor(t / 3600) % 24)}:${pad(Math.floor(t / 60) % 60)}:${pad(t % 60)}`
-    return { time: clock, dateTime: `${date}T${clock}`, text }
-  }
-
-  if (d.state === "queued") {
-    return [at(0, "queued behind 1 deployment")]
-  }
-
-  const opening = [
-    at(0, `cloning github.com/orrin/orrin-web at ${d.commit} (${d.branch})`),
-    at(0.02, "cloned in 1.4s"),
-    at(0.03, "using node 24.21.0, npm 11.4.0"),
-    at(0.04, "installing dependencies with npm ci"),
-    at(0.3, "added 412 packages in 16s"),
-    at(0.32, "building with vite build"),
-  ]
-
-  if (d.state === "building") {
-    return [...opening, at(0.6, "transformed 1,140 modules")]
-  }
-
-  if (d.state === "canceled") {
-    return [
-      ...opening,
-      at(0.7, "transformed 802 modules"),
-      at(0.98, "stopping the build"),
-      at(1, "canceled by mara.lind"),
-    ]
-  }
-
-  if (d.state === "failed") {
-    return [
-      ...opening,
-      at(0.85, "transformed 618 modules"),
-      at(
-        0.98,
-        <>
-          <span className="text-destructive">error</span> {d.error}
-        </>
-      ),
-      at(
-        1,
-        <>
-          <span className="text-destructive">failed</span>: build exited with
-          code 1
-        </>
-      ),
-    ]
-  }
-
-  return [
-    ...opening,
-    at(0.7, "transformed 1,284 modules"),
-    at(0.8, "built in 21s"),
-    at(0.82, `uploading 86 files to ${env}`),
-    at(0.97, "uploaded 4.1 MB in 3s"),
-    at(
-      1,
-      <>
-        <span className="text-success">ready</span> {addressOf(d)} in{" "}
-        {formatDuration(total)}
-      </>
-    ),
-  ]
-}
-
-const stateDot: Record<DeployState, string> = {
-  ready: "bg-success",
-  failed: "bg-destructive",
-  building: "bg-primary",
-  queued: "bg-muted-foreground",
-  canceled: "bg-muted-foreground",
-}
-
-function StateMark({ state }: { state: DeployState }) {
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span
-        aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", stateDot[state])}
-      />
-      {state}
-    </span>
-  )
-}
-
-type EnvFilter = "all" | Environment
-type StateFilter = "all" | DeployState
-type Filters = { branch: string; env: EnvFilter; state: StateFilter }
-
-const noFilters: Filters = { branch: "", env: "all", state: "all" }
-
-const stateItems: { value: StateFilter; label: string }[] = [
+const STATE_ITEMS = [
   { value: "all", label: "All states" },
   { value: "ready", label: "ready" },
   { value: "building", label: "building" },
@@ -358,55 +68,180 @@ const stateItems: { value: StateFilter; label: string }[] = [
   { value: "canceled", label: "canceled" },
 ]
 
-const envChoices: { value: EnvFilter; label: string }[] = [
+const ENVIRONMENTS = [
   { value: "all", label: "All" },
   { value: "production", label: "Production" },
   { value: "preview", label: "Preview" },
-]
+] as const
 
-function matches(d: Deployment, f: Filters) {
-  const query = f.branch.trim().toLowerCase()
-  if (query && !d.branch.toLowerCase().includes(query)) return false
-  if (f.env !== "all" && environmentOf(d) !== f.env) return false
-  if (f.state !== "all" && d.state !== f.state) return false
-  return true
-}
+type EnvFilter = (typeof ENVIRONMENTS)[number]["value"]
 
-const isFiltered = (f: Filters) =>
-  f.branch.trim() !== "" || f.env !== "all" || f.state !== "all"
-
-const focusOutline =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const focusOutlineInside =
+const FOCUS_INSIDE =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-const headerLink = cn(
-  "font-mono text-label text-muted-foreground transition-colors duration-150 hover:text-foreground",
-  focusOutline
+const BUTTON = "px-4 font-mono text-label"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const HEADER_LINK = cn(
+  "text-muted-foreground transition-colors duration-150 hover:text-foreground",
+  FOCUS
 )
-const currentLink = "text-foreground underline underline-offset-4"
-const textLink = cn(
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
-)
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-const buttonText = "px-4 font-mono text-label"
-const panel = "rounded-xl border border-border bg-card"
+const CURRENT_LINK = "text-foreground underline underline-offset-4"
 
-const navLinks = [
+const NAV_LINKS = [
   { label: "Deploys", href: "/deploys", current: true },
   { label: "Domains", href: "#", current: false },
   { label: "Logs", href: "#", current: false },
   { label: "Settings", href: "/settings/tokens", current: false },
 ]
 
-function ConsoleBar() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
-  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    if (!menuOpen || event.key !== "Escape") return
-    setMenuOpen(false)
-    menuButton.current?.focus()
+const pad = (n: number) => String(n).padStart(2, "0")
+
+function environmentOf(d: Deployment): Environment {
+  return d.branch === "main" ? "production" : "preview"
+}
+
+function addressOf(d: Deployment) {
+  return environmentOf(d) === "production"
+    ? "https://orrin.example"
+    : `https://${d.branch.replace(/\//g, "-")}.orrin-web.plinth.example`
+}
+
+function createdAt(d: Deployment, seconds = 0) {
+  const [day, hour, minute] = d.created
+  return new Date(Date.UTC(2026, 10, day, hour, minute, seconds))
+}
+
+function formatCreated(d: Deployment) {
+  const t = createdAt(d)
+  return {
+    text: `${t.getUTCDate()} ${MONTHS[t.getUTCMonth()]} ${t.getUTCFullYear()}, ${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`,
+    dateTime: `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}`,
+  }
+}
+
+function formatDuration(seconds: number) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return m > 0 ? `${m}m ${s}s` : `${s}s`
+}
+
+type LogLine = {
+  at: number
+  text: string
+  /** A first word set in a status color, e.g. "ready" or "error". */
+  word?: { text: string; className: string }
+}
+
+function logOf(d: Deployment): LogLine[] {
+  const env = environmentOf(d)
+  const run = d.duration ?? 0
+  const at = (f: number) => Math.round(run * f)
+  const clone: LogLine[] = [
+    { at: 0, text: `cloning orrin/orrin-web at ${d.hash} (${d.branch})` },
+    { at: at(0.04), text: `cloned ${d.hash} in ${Math.max(1, at(0.04))}s` },
+    { at: at(0.06), text: "installing dependencies with npm ci" },
+    { at: at(0.3), text: `added 412 packages in ${Math.max(1, at(0.3) - at(0.06))}s` },
+    { at: at(0.32), text: "running npm run build" },
+  ]
+
+  switch (d.state) {
+    case "queued":
+      return [{ at: 0, text: "queued behind 1 deployment" }]
+    case "building":
+      return [
+        { at: 0, text: `cloning orrin/orrin-web at ${d.hash} (${d.branch})` },
+        { at: 2, text: `cloned ${d.hash} in 2s` },
+        { at: 3, text: "installing dependencies with npm ci" },
+        { at: 31, text: "added 412 packages in 28s" },
+        { at: 33, text: "running npm run build" },
+        { at: 35, text: "vite v8.2.1 building for production" },
+        { at: 58, text: "transforming modules: 1,034 of 1,284" },
+      ]
+    case "ready":
+      return [
+        ...clone,
+        { at: at(0.34), text: "vite v8.2.1 building for production" },
+        { at: at(0.78), text: "built 1,284 modules into dist" },
+        { at: at(0.82), text: `uploading 46 files to ${env}` },
+        { at: at(0.96), text: "uploaded 46 files, 3.1 MB" },
+        {
+          at: run,
+          word: { text: "ready", className: "text-success" },
+          text: ` ${addressOf(d)} in ${formatDuration(run)}`,
+        },
+      ]
+    case "failed":
+      return [
+        ...clone,
+        { at: at(0.34), text: "checking types with tsc -b" },
+        {
+          at: at(0.96),
+          word: { text: "error", className: "text-destructive" },
+          text: ` ${d.reason ?? "the build stopped"}`,
+        },
+        { at: at(0.98), text: "found 1 error, nothing was uploaded" },
+        {
+          at: run,
+          word: { text: "failed", className: "text-destructive" },
+          text: ": build exited with code 1",
+        },
+      ]
+    case "canceled":
+      return [
+        ...clone,
+        { at: at(0.34), text: "vite v8.2.1 building for production" },
+        { at: at(0.98), text: "cancel requested, stopping the build" },
+        { at: run, text: "canceled by mara.lind" },
+      ]
+  }
+}
+
+function StateWord({ state }: { state: State }) {
+  const dot =
+    state === "ready"
+      ? "bg-success"
+      : state === "failed"
+        ? "bg-destructive"
+        : state === "building"
+          ? "bg-primary"
+          : "bg-muted-foreground"
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span aria-hidden="true" className={cn("size-2 shrink-0 rounded-full", dot)} />
+      {state}
+    </span>
+  )
+}
+
+function DurationCell({ d }: { d: Deployment }) {
+  if (d.duration === null) {
+    return (
+      <>
+        <span aria-hidden="true">—</span>
+        <span className="sr-only">{d.state === "queued" ? "not started" : "not finished"}</span>
+      </>
+    )
+  }
+  return <>{formatDuration(d.duration)}</>
+}
+
+/** The newest ready deployment to production: the one that serves orrin.example. */
+const LIVE_HASH = DEPLOYMENTS.find(
+  (d) => d.state === "ready" && environmentOf(d) === "production"
+)?.hash
+
+function ConsoleBar() {
+  const [open, setOpen] = React.useState(false)
+  const menuButton = React.useRef<HTMLButtonElement>(null)
+
+  function onKeyDown(e: React.KeyboardEvent) {
+    if (open && e.key === "Escape") {
+      setOpen(false)
+      menuButton.current?.focus()
+    }
   }
 
   return (
@@ -414,35 +249,36 @@ function ConsoleBar() {
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-6">
         <a
           href="/"
-          className={cn("font-heading text-h2 text-foreground", focusOutline)}
+          className={cn(
+            "font-heading text-h2 text-foreground transition-colors duration-150",
+            FOCUS
+          )}
         >
           plinth
         </a>
-        <p className={smallFigure}>orrin / orrin-web</p>
+        <p className={SMALL_FIGURE}>orrin / orrin-web</p>
         <nav aria-label="Main" className="hidden gap-6 md:flex">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((l) => (
             <a
-              key={link.label}
-              href={link.href}
-              aria-current={link.current ? "page" : undefined}
-              className={cn(headerLink, link.current && currentLink)}
+              key={l.label}
+              href={l.href}
+              aria-current={l.current ? "page" : undefined}
+              className={cn("font-mono text-label", HEADER_LINK, l.current && CURRENT_LINK)}
             >
-              {link.label}
+              {l.label}
             </a>
           ))}
         </nav>
-        <p
-          className={cn(smallFigure, "ml-auto hidden wrap-break-word md:block")}
-        >
+        <p className={cn("ml-auto hidden min-w-0 wrap-break-word md:block", SMALL_FIGURE)}>
           mara.lind@orrin.example
         </p>
         <Button
           ref={menuButton}
           variant="outline"
-          aria-expanded={menuOpen}
+          aria-expanded={open}
           aria-controls="console-menu"
-          onClick={() => setMenuOpen((open) => !open)}
-          className={cn(buttonText, "ml-auto md:hidden")}
+          className={cn("ml-auto md:hidden", BUTTON)}
+          onClick={() => setOpen((o) => !o)}
         >
           Menu
         </Button>
@@ -450,22 +286,18 @@ function ConsoleBar() {
       <nav
         id="console-menu"
         aria-label="Main"
-        hidden={!menuOpen}
+        hidden={!open}
         className="border-t border-border md:hidden"
       >
         <div className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((l) => (
             <a
-              key={link.label}
-              href={link.href}
-              aria-current={link.current ? "page" : undefined}
-              className={cn(
-                "block py-2",
-                headerLink,
-                link.current && currentLink
-              )}
+              key={l.label}
+              href={l.href}
+              aria-current={l.current ? "page" : undefined}
+              className={cn("block py-2 font-mono text-label", HEADER_LINK, l.current && CURRENT_LINK)}
             >
-              {link.label}
+              {l.label}
             </a>
           ))}
         </div>
@@ -475,30 +307,41 @@ function ConsoleBar() {
 }
 
 export function App() {
-  const [filters, setFilters] = useState<Filters>(noFilters)
-  const [selected, setSelected] = useState<string | null>("7c2e5b9")
-  const searchField = useRef<HTMLInputElement>(null)
+  const [query, setQuery] = React.useState("")
+  const [env, setEnv] = React.useState<EnvFilter>("all")
+  const [stateFilter, setStateFilter] = React.useState("all")
+  const [selectedHash, setSelectedHash] = React.useState<string | null>("8f3c2a1")
+  const searchRef = React.useRef<HTMLInputElement>(null)
 
-  const shown = deployments.filter((d) => matches(d, filters))
-  const filtered = isFiltered(filters)
-  const current = deployments.find((d) => d.commit === selected) ?? null
+  const term = query.trim().toLowerCase()
+  const filtersSet = term !== "" || env !== "all" || stateFilter !== "all"
 
-  // Keeps the selection on a row that is shown: when the selected row is
-  // filtered out, or rows show again after none did, the first row shown.
-  const updateFilters = (next: Filters) => {
-    setFilters(next)
-    const nextShown = deployments.filter((d) => matches(d, next))
-    if (!nextShown.some((d) => d.commit === selected)) {
-      setSelected(nextShown[0]?.commit ?? null)
-    }
+  const visible = DEPLOYMENTS.filter(
+    (d) =>
+      (term === "" || d.branch.toLowerCase().includes(term)) &&
+      (env === "all" || environmentOf(d) === env) &&
+      (stateFilter === "all" || d.state === stateFilter)
+  )
+
+  // Keep the selection on a row that is shown: else the first shown, or none.
+  const effectiveHash = visible.some((d) => d.hash === selectedHash)
+    ? selectedHash
+    : (visible[0]?.hash ?? null)
+  if (effectiveHash !== selectedHash) {
+    setSelectedHash(effectiveHash)
+  }
+  const selected = DEPLOYMENTS.find((d) => d.hash === effectiveHash) ?? null
+
+  function clearFilters() {
+    setQuery("")
+    setEnv("all")
+    setStateFilter("all")
+    searchRef.current?.focus()
   }
 
-  const clearFilters = () => {
-    updateFilters(noFilters)
-    searchField.current?.focus()
-  }
-
-  const log = current ? buildLog(current) : []
+  const count = filtersSet
+    ? `${visible.length} of ${DEPLOYMENTS.length}`
+    : `${DEPLOYMENTS.length} deployments`
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
@@ -508,65 +351,49 @@ export function App() {
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 md:grid-cols-12 md:px-6">
           <div className="flex flex-wrap items-center justify-between gap-3 md:col-span-12">
             <h1 className="text-h1">Deploys</h1>
-            <div className="flex items-center gap-2">
-              <Button className={buttonText}>Deploy main</Button>
+            <div className="flex gap-2">
+              <Button className={BUTTON}>Deploy main</Button>
             </div>
           </div>
 
           <div
-            className={cn(
-              panel,
-              "flex flex-wrap items-end gap-6 p-6 md:col-span-12"
-            )}
+            className="flex flex-wrap items-end gap-x-6 gap-y-4 rounded-xl border border-border bg-card p-6 md:col-span-12"
           >
             <div className="w-full md:w-64">
-              <label
-                htmlFor="branch-search"
-                className="block font-mono text-label text-foreground"
-              >
+              <label htmlFor="branch-search" className="block font-mono text-label text-foreground">
                 Branch
               </label>
               <Input
-                ref={searchField}
+                ref={searchRef}
                 id="branch-search"
                 type="search"
                 placeholder="main, feat/…"
-                value={filters.branch}
-                onChange={(event) =>
-                  updateFilters({ ...filters, branch: event.target.value })
-                }
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="mt-2 px-2 text-body md:text-body [&::-webkit-search-cancel-button]:appearance-none"
               />
             </div>
 
             <div>
-              <p
-                id="env-label"
-                className="font-mono text-label text-foreground"
-              >
+              <p id="environment-label" className="font-mono text-label text-foreground">
                 Environment
               </p>
               <div
                 role="group"
-                aria-labelledby="env-label"
+                aria-labelledby="environment-label"
                 className="mt-2 flex flex-wrap gap-2"
               >
-                {envChoices.map((choice) => {
-                  const pressed = filters.env === choice.value
-                  return (
-                    <Button
-                      key={choice.value}
-                      variant={pressed ? "secondary" : "outline"}
-                      aria-pressed={pressed}
-                      onClick={() =>
-                        updateFilters({ ...filters, env: choice.value })
-                      }
-                      className={buttonText}
-                    >
-                      {choice.label}
-                    </Button>
-                  )
-                })}
+                {ENVIRONMENTS.map((e) => (
+                  <Button
+                    key={e.value}
+                    variant={env === e.value ? "secondary" : "outline"}
+                    aria-pressed={env === e.value}
+                    className={BUTTON}
+                    onClick={() => setEnv(e.value)}
+                  >
+                    {e.label}
+                  </Button>
+                ))}
               </div>
             </div>
 
@@ -579,11 +406,10 @@ export function App() {
                 State
               </label>
               <Select
-                items={stateItems}
-                value={filters.state}
-                onValueChange={(value) => {
-                  if (value === null) return
-                  updateFilters({ ...filters, state: value as StateFilter })
+                items={STATE_ITEMS}
+                value={stateFilter}
+                onValueChange={(v) => {
+                  if (v !== null) setStateFilter(v)
                 }}
               >
                 <SelectTrigger
@@ -594,9 +420,9 @@ export function App() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="font-mono">
-                  {stateItems.map((item) => (
-                    <SelectItem key={item.value} value={item.value}>
-                      {item.label}
+                  {STATE_ITEMS.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -605,30 +431,20 @@ export function App() {
 
             <Button
               variant="outline"
-              disabled={!filtered}
+              className={cn("ml-auto", BUTTON)}
+              disabled={!filtersSet}
               onClick={clearFilters}
-              className={cn(buttonText, "ml-auto")}
             >
               Clear filters
             </Button>
           </div>
 
-          <section
-            aria-labelledby="deployments-heading"
-            className={cn(panel, "min-w-0 overflow-hidden md:col-span-12")}
-          >
+          <section className="min-w-0 overflow-hidden rounded-xl border border-border bg-card md:col-span-12">
             <div className="border-b border-border px-6 py-3">
               <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-                <h2
-                  id="deployments-heading"
-                  className="font-mono text-label text-muted-foreground"
-                >
-                  Deployments
-                </h2>
-                <p aria-live="polite" className={smallFigure}>
-                  {filtered
-                    ? `${shown.length} of ${deployments.length}`
-                    : `${deployments.length} ${deployments.length === 1 ? "deployment" : "deployments"}`}
+                <h2 className="font-mono text-label text-muted-foreground">Deployments</h2>
+                <p aria-live="polite" className={SMALL_FIGURE}>
+                  {count}
                 </p>
               </div>
             </div>
@@ -636,74 +452,71 @@ export function App() {
             <Table label="Deployments" className="min-w-4xl text-body">
               <TableHeader>
                 <TableRow>
-                  <TableHead className={headCell}>Commit</TableHead>
-                  <TableHead className={headCell}>Message</TableHead>
-                  <TableHead className={headCell}>Branch</TableHead>
-                  <TableHead className={headCell}>Environment</TableHead>
-                  <TableHead className={headCell}>State</TableHead>
-                  <TableHead className={cn(headCell, "text-right")}>
-                    Duration
-                  </TableHead>
-                  <TableHead className={cn(headCell, "text-right")}>
-                    Created
-                  </TableHead>
+                  {[
+                    ["Commit", ""],
+                    ["Message", ""],
+                    ["Branch", ""],
+                    ["Environment", ""],
+                    ["State", ""],
+                    ["Duration", "text-right"],
+                    ["Created", "text-right"],
+                  ].map(([label, align]) => (
+                    <TableHead
+                      key={label}
+                      className={cn(
+                        "px-3 font-mono text-label text-muted-foreground first:pl-6 last:pr-6",
+                        align
+                      )}
+                    >
+                      {label}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {shown.length === 0 ? (
+                {visible.length === 0 ? (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="px-6 py-6 whitespace-normal"
-                    >
+                    <TableCell colSpan={7} className="px-6 py-6 whitespace-normal">
                       <p>No deployments match these filters.</p>
-                      <Button
-                        variant="outline"
-                        onClick={clearFilters}
-                        className={cn(buttonText, "mt-3")}
-                      >
-                        Clear filters
-                      </Button>
+                      <div className="mt-3">
+                        <Button variant="outline" className={BUTTON} onClick={clearFilters}>
+                          Clear filters
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  shown.map((d) => {
-                    const isSelected = d.commit === selected
-                    const env = environmentOf(d)
+                  visible.map((d) => {
+                    const isSelected = d.hash === effectiveHash
+                    const created = formatCreated(d)
+                    const cell = "px-3 py-2 first:pl-6 last:pr-6"
                     return (
                       <TableRow
-                        key={d.commit}
+                        key={d.hash}
                         data-state={isSelected ? "selected" : undefined}
                         className="data-[state=selected]:bg-secondary/10"
                       >
-                        <TableCell className={bodyCell}>
+                        <TableCell className={cell}>
                           <button
                             type="button"
                             aria-pressed={isSelected}
-                            aria-label={`Show log of ${d.commit}`}
-                            onClick={() => setSelected(d.commit)}
+                            aria-label={`Show log of ${d.hash}`}
+                            onClick={() => setSelectedHash(d.hash)}
                             className={cn(
-                              textLink,
-                              "font-mono tabular-nums",
-                              isSelected &&
-                                "font-bold text-foreground no-underline"
+                              "font-mono tabular-nums text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+                              FOCUS,
+                              isSelected && "font-bold text-foreground no-underline"
                             )}
                           >
-                            {d.commit}
+                            {d.hash}
                           </button>
                         </TableCell>
-                        <TableCell
-                          className={cn(bodyCell, "whitespace-normal")}
-                        >
-                          {d.message}
-                        </TableCell>
-                        <TableCell className={cn(bodyCell, "font-mono")}>
-                          {d.branch}
-                        </TableCell>
-                        <TableCell className={bodyCell}>
+                        <TableCell className={cn(cell, "whitespace-normal")}>{d.message}</TableCell>
+                        <TableCell className={cn(cell, "font-mono")}>{d.branch}</TableCell>
+                        <TableCell className={cell}>
                           <span className="inline-flex items-center gap-2">
-                            {env}
-                            {d.commit === liveCommit && (
+                            {environmentOf(d)}
+                            {d.hash === LIVE_HASH && (
                               <Badge
                                 variant="outline"
                                 className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
@@ -713,37 +526,14 @@ export function App() {
                             )}
                           </span>
                         </TableCell>
-                        <TableCell className={bodyCell}>
-                          <StateMark state={d.state} />
+                        <TableCell className={cell}>
+                          <StateWord state={d.state} />
                         </TableCell>
-                        <TableCell
-                          className={cn(
-                            bodyCell,
-                            "text-right font-mono tabular-nums"
-                          )}
-                        >
-                          {d.duration !== null ? (
-                            formatDuration(d.duration)
-                          ) : (
-                            <>
-                              <span aria-hidden="true">—</span>
-                              <span className="sr-only">
-                                {d.state === "queued"
-                                  ? "not started"
-                                  : "not finished"}
-                              </span>
-                            </>
-                          )}
+                        <TableCell className={cn(cell, "text-right font-mono tabular-nums")}>
+                          <DurationCell d={d} />
                         </TableCell>
-                        <TableCell
-                          className={cn(
-                            bodyCell,
-                            "text-right font-mono tabular-nums"
-                          )}
-                        >
-                          <time dateTime={d.created}>
-                            {formatCreated(d.created)}
-                          </time>
+                        <TableCell className={cn(cell, "text-right font-mono tabular-nums")}>
+                          <time dateTime={created.dateTime}>{created.text}</time>
                         </TableCell>
                       </TableRow>
                     )
@@ -753,21 +543,13 @@ export function App() {
             </Table>
           </section>
 
-          <section
-            aria-labelledby="log-heading"
-            className={cn(panel, "min-w-0 overflow-hidden md:col-span-12")}
-          >
+          <section className="min-w-0 overflow-hidden rounded-xl border border-border bg-card md:col-span-12">
             <div className="border-b border-border px-6 py-3">
               <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-                <h2
-                  id="log-heading"
-                  className="font-mono text-label text-muted-foreground"
-                >
-                  Log
-                </h2>
-                <p className={smallFigure}>
-                  {current
-                    ? `${current.commit} · ${environmentOf(current)} · ${current.state}`
+                <h2 className="font-mono text-label text-muted-foreground">Log</h2>
+                <p className={SMALL_FIGURE}>
+                  {selected
+                    ? `${selected.hash} · ${environmentOf(selected)} · ${selected.state}`
                     : "No deployment selected"}
                 </p>
               </div>
@@ -775,22 +557,27 @@ export function App() {
             <div
               tabIndex={0}
               role="region"
-              aria-label={current ? `Log of ${current.commit}` : "Log"}
-              className={cn("max-h-96 overflow-auto py-3", focusOutlineInside)}
+              aria-label={selected ? `Log of ${selected.hash}` : "Log"}
+              className={cn("max-h-96 overflow-auto py-3", FOCUS_INSIDE)}
             >
-              {current ? (
-                <ol className="w-max min-w-full list-none p-0">
-                  {log.map((line, index) => (
-                    <li
-                      key={index}
-                      className="flex gap-3 px-6 font-mono text-label whitespace-pre"
-                    >
-                      <time dateTime={line.dateTime} className={smallFigure}>
-                        {line.time}
-                      </time>
-                      <span className="text-foreground">{line.text}</span>
-                    </li>
-                  ))}
+              {selected ? (
+                <ol className="w-max min-w-full">
+                  {logOf(selected).map((line, i) => {
+                    const t = createdAt(selected, line.at)
+                    const time = `${pad(t.getUTCHours())}:${pad(t.getUTCMinutes())}:${pad(t.getUTCSeconds())}`
+                    const dateTime = `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}T${time}`
+                    return (
+                      <li key={i} className="flex gap-3 px-6 font-mono text-label whitespace-pre">
+                        <time dateTime={dateTime} className={SMALL_FIGURE}>
+                          {time}
+                        </time>
+                        <span className="text-foreground">
+                          {line.word && <span className={line.word.className}>{line.word.text}</span>}
+                          {line.text}
+                        </span>
+                      </li>
+                    )
+                  })}
                 </ol>
               ) : (
                 <p className="px-6 text-body">
@@ -804,9 +591,5 @@ export function App() {
     </div>
   )
 }
-
-const headCell =
-  "px-3 font-mono text-label text-muted-foreground first:pl-6 last:pr-6"
-const bodyCell = "px-3 py-2 first:pl-6 last:pr-6"
 
 export default App

@@ -1,4 +1,4 @@
-import { useRef, useState, type KeyboardEvent, type ReactNode } from "react"
+import { useId, useRef, useState, type KeyboardEvent } from "react"
 import { ArrowDown, ArrowUp, Minus, Search } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -20,9 +20,13 @@ const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusRing
 )
-const labelClass = "font-mono text-label uppercase"
-const buttonClass = "px-5 font-mono text-label uppercase"
+const buttonText = "px-5 font-mono text-label uppercase"
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const panelHeadingRow =
+  "flex min-h-7 flex-wrap items-center justify-between gap-3"
+const panelHeading = "font-mono text-label text-muted-foreground uppercase"
+
+/* Navigation */
 
 const navLinks = [
   { label: "Overview", href: "/", current: true },
@@ -33,8 +37,7 @@ const navLinks = [
 
 function navLinkClass(current: boolean) {
   return cn(
-    labelClass,
-    "transition-colors duration-150",
+    "font-mono text-label uppercase transition-colors duration-150",
     focusRing,
     current ? "text-foreground" : "text-muted-foreground hover:text-foreground"
   )
@@ -43,16 +46,16 @@ function navLinkClass(current: boolean) {
 /* Key numbers */
 
 type Period = "today" | "7d" | "30d"
-type Trend = "up" | "down" | "flat"
-type Tone = "good" | "bad" | "neutral"
+type Trend = "better" | "worse" | "neutral"
+type Direction = "up" | "down" | "none"
 
 type KeyNumber = {
   label: string
   value: string
   unit?: string
   change: string
+  direction: Direction
   trend: Trend
-  tone: Tone
   badge?: string
 }
 
@@ -66,195 +69,191 @@ const inTransit: KeyNumber = {
   label: "In transit",
   value: "2,316",
   change: "Up 3% on this time yesterday",
-  trend: "up",
-  tone: "neutral",
+  direction: "up",
+  trend: "neutral",
 }
 
 const keyNumbers: Record<Period, KeyNumber[]> = {
   today: [
     {
       label: "Delivered",
-      value: "702",
+      value: "1,284",
       change: "Up 4% on yesterday",
-      trend: "up",
-      tone: "good",
+      direction: "up",
+      trend: "better",
     },
     inTransit,
     {
       label: "Late",
-      value: "18",
-      change: "Down 12% on yesterday",
-      trend: "down",
-      tone: "good",
+      value: "37",
+      change: "Up 9% on yesterday",
+      direction: "up",
+      trend: "worse",
       badge: "Check",
     },
     {
       label: "On-time rate",
-      value: "96.4",
+      value: "96.8",
       unit: "%",
       change: "Down 1 point on yesterday",
-      trend: "down",
-      tone: "bad",
+      direction: "down",
+      trend: "worse",
     },
   ],
   "7d": [
     {
       label: "Delivered",
-      value: "7,377",
+      value: "8,947",
       change: "Up 2% on last week",
-      trend: "up",
-      tone: "good",
+      direction: "up",
+      trend: "better",
     },
     inTransit,
     {
       label: "Late",
-      value: "164",
-      change: "Up 9% on last week",
-      trend: "up",
-      tone: "bad",
+      value: "291",
+      change: "Up 6% on last week",
+      direction: "up",
+      trend: "worse",
       badge: "Check",
     },
     {
       label: "On-time rate",
-      value: "95.8",
+      value: "96.7",
       unit: "%",
-      change: "Up 1 point on last week",
-      trend: "up",
-      tone: "good",
+      change: "No change on last week",
+      direction: "none",
+      trend: "neutral",
     },
   ],
   "30d": [
     {
       label: "Delivered",
-      value: "29,846",
+      value: "38,512",
       change: "Down 1% on previous 30 days",
-      trend: "down",
-      tone: "bad",
+      direction: "down",
+      trend: "worse",
     },
     inTransit,
     {
       label: "Late",
-      value: "611",
-      change: "Down 5% on previous 30 days",
-      trend: "down",
-      tone: "good",
+      value: "1,164",
+      change: "Down 3% on previous 30 days",
+      direction: "down",
+      trend: "better",
       badge: "Check",
     },
     {
       label: "On-time rate",
-      value: "96.1",
+      value: "97.0",
       unit: "%",
       change: "No change on previous 30 days",
-      trend: "flat",
-      tone: "neutral",
+      direction: "none",
+      trend: "neutral",
     },
   ],
 }
 
-const toneClass: Record<Tone, string> = {
-  good: "text-success",
-  bad: "text-destructive",
+const trendColor: Record<Trend, string> = {
+  better: "text-success",
+  worse: "text-destructive",
   neutral: "text-muted-foreground",
 }
 
-const trendIcon = { up: ArrowUp, down: ArrowDown, flat: Minus }
+function ChangeIcon({ direction }: { direction: Direction }) {
+  const Icon =
+    direction === "up" ? ArrowUp : direction === "down" ? ArrowDown : Minus
+  return <Icon aria-hidden="true" className="size-4" strokeWidth={1.5} />
+}
 
-/* Chart */
+/* Chart: the last 14 days, the last one is today so far */
 
 const chartTop = 1600
-const days = [
-  { date: "2026-10-31", label: "31 Oct", count: 842 },
-  { date: "2026-11-01", label: "1 Nov", count: 396 },
-  { date: "2026-11-02", label: "2 Nov", count: 1318 },
-  { date: "2026-11-03", label: "3 Nov", count: 1264 },
-  { date: "2026-11-04", label: "4 Nov", count: 1287 },
-  { date: "2026-11-05", label: "5 Nov", count: 1342 },
+const deliveriesPerDay = [
+  { date: "2026-10-31", label: "31 Oct", count: 1062 },
+  { date: "2026-11-01", label: "1 Nov", count: 874 },
+  { date: "2026-11-02", label: "2 Nov", count: 1218 },
+  { date: "2026-11-03", label: "3 Nov", count: 1347 },
+  { date: "2026-11-04", label: "4 Nov", count: 1295 },
+  { date: "2026-11-05", label: "5 Nov", count: 1381 },
   { date: "2026-11-06", label: "6 Nov", count: 1411 },
-  { date: "2026-11-07", label: "7 Nov", count: 905 },
-  { date: "2026-11-08", label: "8 Nov", count: 412 },
-  { date: "2026-11-09", label: "9 Nov", count: 1356 },
-  { date: "2026-11-10", label: "10 Nov", count: 1298 },
-  { date: "2026-11-11", label: "11 Nov", count: 1325 },
-  { date: "2026-11-12", label: "12 Nov", count: 1379 },
-  { date: "2026-11-13", label: "Today", count: 702 },
+  { date: "2026-11-07", label: "7 Nov", count: 1126 },
+  { date: "2026-11-08", label: "8 Nov", count: 903 },
+  { date: "2026-11-09", label: "9 Nov", count: 1254 },
+  { date: "2026-11-10", label: "10 Nov", count: 1322 },
+  { date: "2026-11-11", label: "11 Nov", count: 1368 },
+  { date: "2026-11-12", label: "12 Nov", count: 1309 },
+  { date: "2026-11-13", label: "Today", count: 1284 },
 ]
 
 /* Needs attention */
 
-type StateTone = "good" | "failed" | "caution" | "neutral"
+type StateKind = "good" | "failed" | "caution" | "neutral"
 
-const dotClass: Record<StateTone, string> = {
+const dotColor: Record<StateKind, string> = {
   good: "bg-success",
   failed: "bg-destructive",
   caution: "bg-tertiary",
   neutral: "bg-muted-foreground",
 }
 
-function State({ tone, word }: { tone: StateTone; word: string }) {
+function State({ kind, children }: { kind: StateKind; children: string }) {
   return (
     <span className="inline-flex items-center gap-2">
       <span
         aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", dotClass[tone])}
+        className={cn("size-2 shrink-0 rounded-full", dotColor[kind])}
       />
-      <span className="text-body text-foreground">{word}</span>
+      <span className="text-body text-foreground">{children}</span>
     </span>
   )
 }
 
 const attention: {
   id: string
-  tone: StateTone
-  word: string
+  kind: StateKind
+  state: string
   text: string
   time: string
 }[] = [
   {
-    id: "NG-40817",
-    tone: "failed",
-    word: "Failed",
-    text: "could not be delivered to 14 Harbour Row, Kettleford: nobody was in and there was no safe place. A second try is booked for tomorrow.",
-    time: "11:52",
+    id: "NG-48177",
+    kind: "failed",
+    state: "Failed",
+    text: "could not be delivered in Hollin Cross. No one was home and the customer has refused a safe place.",
+    time: "14:12",
   },
   {
-    id: "NG-40766",
-    tone: "caution",
-    word: "Delayed",
-    text: "is on van 12 out of Eastmoor, held up by roadworks on the ring road. Its 23 stops are running about 40 minutes late.",
-    time: "11:20",
+    id: "NG-48190",
+    kind: "caution",
+    state: "Delayed",
+    text: "is held at Millbrook depot after its van broke down on the ring road.",
+    time: "13:48",
   },
   {
-    id: "NG-40692",
-    tone: "caution",
-    word: "Delayed",
-    text: "is held at Ridgeway depot because its label is torn and the street name cannot be read. The sender has been asked to confirm it.",
-    time: "10:47",
+    id: "NG-48204",
+    kind: "caution",
+    state: "Delayed",
+    text: "missed the noon trunk to Carrow and now leaves on the 15:30 run.",
+    time: "13:20",
   },
   {
-    id: "NG-40655",
-    tone: "failed",
-    word: "Failed",
-    text: "was refused at the door by the customer and goes back to Calder depot on tonight's return run.",
-    time: "09:58",
+    id: "NG-48139",
+    kind: "failed",
+    state: "Failed",
+    text: "came back to Elmstead depot because the address has no house number.",
+    time: "11:05",
   },
 ]
 
 /* Recent shipments */
 
 type Status = "transit" | "delivered" | "late"
-type StatusFilter = "all" | Status
 
-const statusFilters: { value: StatusFilter; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "transit", label: "In transit" },
-  { value: "delivered", label: "Delivered" },
-  { value: "late", label: "Late" },
-]
-
-const statusState: Record<Status, { tone: StateTone; word: string }> = {
-  transit: { tone: "neutral", word: "In transit" },
-  delivered: { tone: "good", word: "Delivered" },
-  late: { tone: "failed", word: "Late" },
+const statusInfo: Record<Status, { label: string; kind: StateKind }> = {
+  transit: { label: "In transit", kind: "neutral" },
+  delivered: { label: "Delivered", kind: "good" },
+  late: { label: "Late", kind: "failed" },
 }
 
 const shipments: {
@@ -266,112 +265,103 @@ const shipments: {
   due: string
 }[] = [
   {
-    id: "NG-40842",
-    destination: "Wyncombe",
-    depot: "Calder",
+    id: "NG-48231",
+    destination: "Wexley",
+    depot: "Ashford Vale",
     status: "transit",
     weight: "2.4",
-    due: "14:30",
+    due: "16:30",
   },
   {
-    id: "NG-40839",
-    destination: "Brackenmoor",
-    depot: "Eastmoor",
+    id: "NG-48228",
+    destination: "Stannard Bay",
+    depot: "Carrow",
     status: "delivered",
     weight: "0.8",
+    due: "14:00",
+  },
+  {
+    id: "NG-48226",
+    destination: "Fernhill",
+    depot: "Millbrook",
+    status: "late",
+    weight: "12.6",
     due: "12:00",
   },
   {
-    id: "NG-40836",
-    destination: "Saltonby",
-    depot: "Ridgeway",
-    status: "late",
-    weight: "11.2",
-    due: "10:30",
-  },
-  {
-    id: "NG-40833",
-    destination: "Oxley Vale",
-    depot: "Corvale",
+    id: "NG-48222",
+    destination: "Larkmoor",
+    depot: "Elmstead",
     status: "transit",
-    weight: "5.6",
-    due: "16:00",
+    weight: "5.1",
+    due: "17:45",
   },
   {
-    id: "NG-40829",
-    destination: "Penmarsh",
-    depot: "Calder",
+    id: "NG-48219",
+    destination: "Oxwick",
+    depot: "Ashford Vale",
     status: "delivered",
     weight: "1.3",
+    due: "13:30",
+  },
+  {
+    id: "NG-48215",
+    destination: "Brindle Green",
+    depot: "Carrow",
+    status: "transit",
+    weight: "18.0",
+    due: "18:00",
+  },
+  {
+    id: "NG-48212",
+    destination: "Cawthorne Mill",
+    depot: "Millbrook",
+    status: "delivered",
+    weight: "3.7",
+    due: "12:30",
+  },
+  {
+    id: "NG-48209",
+    destination: "Redgate",
+    depot: "Elmstead",
+    status: "late",
+    weight: "0.5",
     due: "11:00",
   },
   {
-    id: "NG-40826",
-    destination: "Druthwick",
-    depot: "Eastmoor",
-    status: "transit",
-    weight: "18.0",
-    due: "17:30",
-  },
-  {
-    id: "NG-40821",
-    destination: "Cawley Green",
-    depot: "Ridgeway",
-    status: "late",
-    weight: "3.7",
-    due: "09:30",
-  },
-  {
-    id: "NG-40818",
-    destination: "Kettleford",
-    depot: "Corvale",
+    id: "NG-48207",
+    destination: "Pelham Down",
+    depot: "Ashford Vale",
     status: "delivered",
-    weight: "0.4",
-    due: "10:00",
-  },
-  {
-    id: "NG-40814",
-    destination: "Hollin Cross",
-    depot: "Calder",
-    status: "transit",
     weight: "7.9",
-    due: "15:00",
+    due: "10:30",
   },
   {
-    id: "NG-40811",
-    destination: "Fennick Bridge",
-    depot: "Eastmoor",
-    status: "delivered",
-    weight: "2.1",
-    due: "11:30",
+    id: "NG-48203",
+    destination: "Hollin Cross",
+    depot: "Carrow",
+    status: "transit",
+    weight: "26.2",
+    due: "17:00",
   },
 ]
 
-function PanelHeading({
-  id,
-  title,
-  children,
-}: {
-  id?: string
-  title: string
-  children?: ReactNode
-}) {
-  return (
-    <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
-      <h2 id={id} className={cn(labelClass, "text-muted-foreground")}>
-        {title}
-      </h2>
-      {children}
-    </div>
-  )
-}
+type Filter = "all" | Status
+
+const filters: { value: Filter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "transit", label: "In transit" },
+  { value: "delivered", label: "Delivered" },
+  { value: "late", label: "Late" },
+]
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [period, setPeriod] = useState<Period>("today")
-  const [status, setStatus] = useState<StatusFilter>("all")
+  const [filter, setFilter] = useState<Filter>("all")
   const [query, setQuery] = useState("")
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const chartHeadingId = useId()
 
   function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (menuOpen && event.key === "Escape") {
@@ -380,13 +370,13 @@ export function App() {
     }
   }
 
-  const needle = query.trim().toLowerCase()
-  const rows = shipments.filter(
+  const search = query.trim().toLowerCase()
+  const visibleShipments = shipments.filter(
     (s) =>
-      (status === "all" || s.status === status) &&
-      (needle === "" ||
-        s.id.toLowerCase().includes(needle) ||
-        s.destination.toLowerCase().includes(needle))
+      (filter === "all" || s.status === filter) &&
+      (search === "" ||
+        s.id.toLowerCase().includes(search) ||
+        s.destination.toLowerCase().includes(search))
   )
 
   return (
@@ -396,14 +386,14 @@ export function App() {
           <a
             href="/"
             className={cn(
-              "font-heading text-h2 text-foreground transition-colors duration-150",
+              "font-heading text-h2 transition-colors duration-150",
               focusRing
             )}
           >
             Northgate
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-5">
+            <ul className="flex items-center gap-5">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <a
@@ -417,33 +407,33 @@ export function App() {
               ))}
             </ul>
           </nav>
-          <span className={cn(smallFigure, "ml-auto hidden md:block")}>
+          <span className={cn("ml-auto hidden md:block", smallFigure)}>
             Maren Okafor
           </span>
           <Button
             ref={menuButtonRef}
             variant="outline"
-            className={cn(buttonClass, "ml-auto md:hidden")}
+            className={cn("ml-auto md:hidden", buttonText)}
             aria-expanded={menuOpen}
-            aria-controls="mobile-nav"
+            aria-controls="mobile-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-nav"
+          id="mobile-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t md:hidden"
         >
-          <ul className="mx-auto max-w-[1280px] px-3 py-2">
+          <ul className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
             {navLinks.map((link) => (
               <li key={link.href}>
                 <a
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
-                  className={cn(navLinkClass(link.current), "block py-2")}
+                  className={cn("block py-2", navLinkClass(link.current))}
                 >
                   {link.label}
                 </a>
@@ -467,57 +457,59 @@ export function App() {
                   key={p.value}
                   variant={period === p.value ? "secondary" : "outline"}
                   aria-pressed={period === p.value}
-                  className={buttonClass}
+                  className={buttonText}
                   onClick={() => setPeriod(p.value)}
                 >
                   {p.label}
                 </Button>
               ))}
             </div>
-            <Button className={buttonClass}>New shipment</Button>
+            <Button className={buttonText}>New shipment</Button>
           </div>
         </div>
 
-        {keyNumbers[period].map((k) => {
-          const Icon = trendIcon[k.trend]
-          return (
-            <section
-              key={k.label}
-              className="rounded-xl border bg-card p-5 md:col-span-6 lg:col-span-3"
+        {keyNumbers[period].map((item) => (
+          <section
+            key={item.label}
+            className="rounded-xl border bg-card p-5 md:col-span-6 lg:col-span-3"
+          >
+            <div className={panelHeadingRow}>
+              <h2 className={panelHeading}>{item.label}</h2>
+              {item.badge && (
+                <Badge
+                  variant="outline"
+                  className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
+                >
+                  {item.badge}
+                </Badge>
+              )}
+            </div>
+            <p className="mt-3 flex items-baseline gap-1">
+              <span className="font-heading text-h1 tabular-nums">
+                {item.value}
+              </span>
+              {item.unit && <span className={smallFigure}>{item.unit}</span>}
+            </p>
+            <p
+              className={cn(
+                "mt-2 flex items-center gap-2 font-mono text-label tabular-nums",
+                trendColor[item.trend]
+              )}
             >
-              <PanelHeading title={k.label}>
-                {k.badge && (
-                  <Badge
-                    variant="outline"
-                    className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
-                  >
-                    {k.badge}
-                  </Badge>
-                )}
-              </PanelHeading>
-              <div className="mt-3 flex items-baseline gap-1">
-                <span className="font-heading text-h1 tabular-nums">
-                  {k.value}
-                </span>
-                {k.unit && <span className={smallFigure}>{k.unit}</span>}
-              </div>
-              <p
-                className={cn(
-                  "mt-2 flex items-center gap-2 font-mono text-label",
-                  toneClass[k.tone]
-                )}
-              >
-                <Icon aria-hidden="true" className="size-4" strokeWidth={1.5} />
-                {k.change}
-              </p>
-            </section>
-          )
-        })}
+              <ChangeIcon direction={item.direction} />
+              {item.change}
+            </p>
+          </section>
+        ))}
 
         <section className="flex flex-col rounded-xl border bg-card p-5 md:col-span-12 lg:col-span-8">
-          <PanelHeading id="deliveries-heading" title="Deliveries per day" />
+          <div className={panelHeadingRow}>
+            <h2 id={chartHeadingId} className={panelHeading}>
+              Deliveries per day
+            </h2>
+          </div>
           <div className="sr-only">
-            <table aria-labelledby="deliveries-heading">
+            <table aria-labelledby={chartHeadingId}>
               <thead>
                 <tr>
                   <th scope="col">Day</th>
@@ -525,10 +517,10 @@ export function App() {
                 </tr>
               </thead>
               <tbody>
-                {days.map((d) => (
-                  <tr key={d.date}>
-                    <th scope="row">{d.label}</th>
-                    <td>{d.count.toLocaleString("en-GB")}</td>
+                {deliveriesPerDay.map((day) => (
+                  <tr key={day.date}>
+                    <td>{day.label}</td>
+                    <td>{day.count.toLocaleString("en-GB")}</td>
                   </tr>
                 ))}
               </tbody>
@@ -537,18 +529,18 @@ export function App() {
           <div aria-hidden="true" className="mt-3 flex flex-1 flex-col">
             <div className="flex min-h-48 flex-1 gap-2">
               <div className="relative w-12">
-                <span className={cn(smallFigure, "absolute top-0 right-0")}>
+                <span className={cn("absolute top-0 right-0", smallFigure)}>
                   1,600
                 </span>
                 <span
                   className={cn(
-                    smallFigure,
-                    "absolute top-1/2 right-0 -translate-y-1/2"
+                    "absolute top-1/2 right-0 -translate-y-1/2",
+                    smallFigure
                   )}
                 >
                   800
                 </span>
-                <span className={cn(smallFigure, "absolute right-0 bottom-0")}>
+                <span className={cn("absolute right-0 bottom-0", smallFigure)}>
                   0
                 </span>
               </div>
@@ -557,27 +549,28 @@ export function App() {
                 <div className="absolute inset-x-0 top-1/2 border-t border-border" />
                 <div className="absolute inset-x-0 bottom-0 border-t border-border" />
                 <div className="absolute inset-0 flex items-end gap-2">
-                  {days.map((d, i) => (
+                  {deliveriesPerDay.map((day, i) => (
                     <div
-                      key={d.date}
+                      key={day.date}
                       className={cn(
                         "flex-1",
-                        i === days.length - 1 ? "bg-primary" : "bg-secondary",
+                        i === deliveriesPerDay.length - 1
+                          ? "bg-primary"
+                          : "bg-secondary",
                         i < 7 && "hidden md:block"
                       )}
-                      style={{ height: `${(d.count / chartTop) * 100}%` }}
+                      style={{ height: `${(day.count / chartTop) * 100}%` }}
                     />
                   ))}
                 </div>
               </div>
             </div>
             <div className="mt-2 flex gap-2 pl-14">
-              {days.map((d, i) => {
-                const last = i === days.length - 1
-                const labelled = (days.length - 1 - i) % 2 === 0
+              {deliveriesPerDay.map((day, i) => {
+                const last = i === deliveriesPerDay.length - 1
                 return (
                   <div
-                    key={d.date}
+                    key={day.date}
                     className={cn(
                       "min-w-0 flex-1 text-center whitespace-nowrap",
                       smallFigure,
@@ -585,7 +578,12 @@ export function App() {
                       i < 7 && "hidden md:block"
                     )}
                   >
-                    {labelled && <time dateTime={d.date}>{d.label}</time>}
+                    {i % 2 === 1 &&
+                      (last ? (
+                        <time dateTime={day.date}>Today</time>
+                      ) : (
+                        <time dateTime={day.date}>{day.label}</time>
+                      ))}
                   </div>
                 )
               })}
@@ -595,19 +593,18 @@ export function App() {
 
         <section className="overflow-hidden rounded-xl border bg-card md:col-span-12 lg:col-span-4">
           <div className="border-b px-5 pt-5 pb-3">
-            <PanelHeading title="Needs attention" />
+            <div className={panelHeadingRow}>
+              <h2 className={panelHeading}>Needs attention</h2>
+            </div>
           </div>
           <ul>
-            {attention.map((item, i) => (
+            {attention.map((item) => (
               <li
                 key={item.id}
-                className={cn(
-                  "flex flex-col gap-1 px-5 py-3",
-                  i > 0 && "border-t"
-                )}
+                className="flex flex-col gap-1 px-5 py-3 not-first:border-t"
               >
                 <div>
-                  <State tone={item.tone} word={item.word} />
+                  <State kind={item.kind}>{item.state}</State>
                 </div>
                 <p className="max-w-md text-body">
                   <a href="#" className={textLink}>
@@ -628,7 +625,8 @@ export function App() {
 
         <section className="overflow-hidden rounded-xl border bg-card md:col-span-12">
           <div className="border-b px-5 pt-5 pb-3">
-            <PanelHeading title="Recent shipments">
+            <div className={panelHeadingRow}>
+              <h2 className={panelHeading}>Recent shipments</h2>
               <div className="flex flex-wrap items-center gap-3">
                 <div className="relative w-64">
                   <Search
@@ -641,7 +639,7 @@ export function App() {
                     aria-label="Search shipments"
                     placeholder="ID or destination"
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(event) => setQuery(event.target.value)}
                     className="px-2 pl-8 text-body md:text-body [&::-webkit-search-cancel-button]:appearance-none"
                   />
                 </div>
@@ -650,20 +648,20 @@ export function App() {
                   aria-label="Status"
                   className="flex flex-wrap gap-1"
                 >
-                  {statusFilters.map((f) => (
+                  {filters.map((f) => (
                     <Button
                       key={f.value}
-                      variant={status === f.value ? "secondary" : "outline"}
-                      aria-pressed={status === f.value}
-                      className={buttonClass}
-                      onClick={() => setStatus(f.value)}
+                      variant={filter === f.value ? "secondary" : "outline"}
+                      aria-pressed={filter === f.value}
+                      className={buttonText}
+                      onClick={() => setFilter(f.value)}
                     >
                       {f.label}
                     </Button>
                   ))}
                 </div>
               </div>
-            </PanelHeading>
+            </div>
           </div>
           <Table label="Recent shipments" className="text-body">
             <TableHeader>
@@ -689,7 +687,7 @@ export function App() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.length === 0 ? (
+              {visibleShipments.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={6}
@@ -699,12 +697,12 @@ export function App() {
                   </TableCell>
                 </TableRow>
               ) : (
-                rows.map((s) => (
+                visibleShipments.map((s) => (
                   <TableRow key={s.id}>
                     <TableCell className="px-5 py-2">
                       <a
                         href="#"
-                        className={cn(textLink, "font-mono tabular-nums")}
+                        className={cn("font-mono tabular-nums", textLink)}
                       >
                         {s.id}
                       </a>
@@ -712,10 +710,9 @@ export function App() {
                     <TableCell className="px-5 py-2">{s.destination}</TableCell>
                     <TableCell className="px-5 py-2">{s.depot}</TableCell>
                     <TableCell className="px-5 py-2">
-                      <State
-                        tone={statusState[s.status].tone}
-                        word={statusState[s.status].word}
-                      />
+                      <State kind={statusInfo[s.status].kind}>
+                        {statusInfo[s.status].label}
+                      </State>
                     </TableCell>
                     <TableCell className="px-5 py-2 text-right font-mono tabular-nums">
                       {s.weight}

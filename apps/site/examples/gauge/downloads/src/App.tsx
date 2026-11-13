@@ -13,7 +13,6 @@ import {
 import { cn } from "@/lib/utils"
 
 type DocType = "Data sheet" | "CAD file" | "Certificate"
-type Filter = "all" | DocType
 
 type Doc = {
   title: string
@@ -21,19 +20,18 @@ type Doc = {
   format: "PDF" | "STEP" | "DXF"
   revision: string
   date: string
-  dateTime: string
+  dateLabel: string
   sizeMb: string
 }
 
-// Newest first.
-const DOCUMENTS: Doc[] = [
+const documents: Doc[] = [
   {
     title: "TVL-2552-RS data sheet",
     type: "Data sheet",
     format: "PDF",
     revision: "Rev A",
-    date: "21 Oct 2026",
-    dateTime: "2026-10-21",
+    date: "2026-10-21",
+    dateLabel: "21 Oct 2026",
     sizeMb: "0.91",
   },
   {
@@ -41,8 +39,8 @@ const DOCUMENTS: Doc[] = [
     type: "CAD file",
     format: "STEP",
     revision: "Rev A",
-    date: "21 Oct 2026",
-    dateTime: "2026-10-21",
+    date: "2026-10-21",
+    dateLabel: "21 Oct 2026",
     sizeMb: "1.75",
   },
   {
@@ -50,8 +48,8 @@ const DOCUMENTS: Doc[] = [
     type: "Data sheet",
     format: "PDF",
     revision: "Rev D",
-    date: "2 Oct 2026",
-    dateTime: "2026-10-02",
+    date: "2026-10-02",
+    dateLabel: "2 Oct 2026",
     sizeMb: "2.40",
   },
   {
@@ -59,8 +57,8 @@ const DOCUMENTS: Doc[] = [
     type: "CAD file",
     format: "DXF",
     revision: "Rev D",
-    date: "2 Oct 2026",
-    dateTime: "2026-10-02",
+    date: "2026-10-02",
+    dateLabel: "2 Oct 2026",
     sizeMb: "0.36",
   },
   {
@@ -68,8 +66,8 @@ const DOCUMENTS: Doc[] = [
     type: "Certificate",
     format: "PDF",
     revision: "Rev B",
-    date: "28 Sep 2026",
-    dateTime: "2026-09-28",
+    date: "2026-09-28",
+    dateLabel: "28 Sep 2026",
     sizeMb: "0.29",
   },
   {
@@ -77,8 +75,8 @@ const DOCUMENTS: Doc[] = [
     type: "Data sheet",
     format: "PDF",
     revision: "Rev C",
-    date: "14 Sep 2026",
-    dateTime: "2026-09-14",
+    date: "2026-09-14",
+    dateLabel: "14 Sep 2026",
     sizeMb: "0.84",
   },
   {
@@ -86,8 +84,8 @@ const DOCUMENTS: Doc[] = [
     type: "CAD file",
     format: "STEP",
     revision: "Rev C",
-    date: "14 Sep 2026",
-    dateTime: "2026-09-14",
+    date: "2026-09-14",
+    dateLabel: "14 Sep 2026",
     sizeMb: "1.62",
   },
   {
@@ -95,8 +93,8 @@ const DOCUMENTS: Doc[] = [
     type: "Data sheet",
     format: "PDF",
     revision: "Rev B",
-    date: "9 Sep 2026",
-    dateTime: "2026-09-09",
+    date: "2026-09-09",
+    dateLabel: "9 Sep 2026",
     sizeMb: "0.88",
   },
   {
@@ -104,8 +102,8 @@ const DOCUMENTS: Doc[] = [
     type: "Certificate",
     format: "PDF",
     revision: "Rev A",
-    date: "4 Sep 2026",
-    dateTime: "2026-09-04",
+    date: "2026-09-04",
+    dateLabel: "4 Sep 2026",
     sizeMb: "0.21",
   },
   {
@@ -113,20 +111,22 @@ const DOCUMENTS: Doc[] = [
     type: "Certificate",
     format: "PDF",
     revision: "Rev C",
-    date: "1 Sep 2026",
-    dateTime: "2026-09-01",
+    date: "2026-09-01",
+    dateLabel: "1 Sep 2026",
     sizeMb: "0.47",
   },
 ]
 
-const FILTERS: { value: Filter; label: string }[] = [
+type Filter = "all" | DocType
+
+const filters: { value: Filter; label: string }[] = [
   { value: "all", label: "All" },
   { value: "Data sheet", label: "Data sheets" },
   { value: "CAD file", label: "CAD files" },
   { value: "Certificate", label: "Certificates" },
 ]
 
-const FORMATS: { format: string; text: string }[] = [
+const formats = [
   { format: "PDF", text: "Data sheets and certificates, for any PDF reader." },
   { format: "STEP", text: "3D models for any CAD system, in millimetres." },
   {
@@ -135,60 +135,55 @@ const FORMATS: { format: string; text: string }[] = [
   },
 ]
 
-const NAV_LINKS = [
+const navLinks = [
   { label: "Catalogue", href: "/catalogue" },
   { label: "Compare", href: "/compare" },
   { label: "Downloads", href: "/downloads" },
   { label: "Quote", href: "/quote" },
 ]
-const CURRENT_HREF = "/downloads"
 
-const FOCUS =
+const current = "/downloads"
+
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const TEXT_LINK = cn(
-  "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
-  FOCUS
-)
-const LABEL = "font-mono text-label text-muted-foreground"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const CONTAINER = "mx-auto w-full max-w-[1280px] px-4"
-const BUTTON_TEXT = "px-4 font-mono text-label"
+
+const container = "mx-auto w-full max-w-[1280px] px-4"
+
+function countFor(filter: Filter) {
+  return filter === "all"
+    ? documents.length
+    : documents.filter((d) => d.type === filter).length
+}
 
 function documentsWord(n: number) {
   return n === 1 ? "document" : "documents"
 }
 
-function countOf(type: Filter) {
-  return type === "all"
-    ? DOCUMENTS.length
-    : DOCUMENTS.filter((d) => d.type === type).length
-}
-
-function NavLinks({ mobile = false }: { mobile?: boolean }) {
+function NavLink({
+  label,
+  href,
+  className,
+}: {
+  label: string
+  href: string
+  className?: string
+}) {
+  const isCurrent = href === current
   return (
-    <ul className={mobile ? "py-2" : "flex gap-6"}>
-      {NAV_LINKS.map((link) => {
-        const current = link.href === CURRENT_HREF
-        return (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              aria-current={current ? "page" : undefined}
-              className={cn(
-                "font-mono text-label transition-colors duration-150",
-                mobile && "block py-2",
-                current
-                  ? "text-foreground underline underline-offset-4"
-                  : "text-muted-foreground hover:text-foreground",
-                FOCUS
-              )}
-            >
-              {link.label}
-            </a>
-          </li>
-        )
-      })}
-    </ul>
+    <a
+      href={href}
+      aria-current={isCurrent ? "page" : undefined}
+      className={cn(
+        "font-mono text-label transition-colors duration-150",
+        isCurrent
+          ? "text-foreground underline underline-offset-4"
+          : "text-muted-foreground hover:text-foreground",
+        focusRing,
+        className
+      )}
+    >
+      {label}
+    </a>
   )
 }
 
@@ -198,11 +193,11 @@ export function App() {
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   const shown =
-    filter === "all" ? DOCUMENTS : DOCUMENTS.filter((d) => d.type === filter)
+    filter === "all" ? documents : documents.filter((d) => d.type === filter)
   const countText =
     filter === "all"
-      ? `${DOCUMENTS.length} ${documentsWord(DOCUMENTS.length)}`
-      : `${shown.length} of ${DOCUMENTS.length} ${documentsWord(DOCUMENTS.length)}`
+      ? `${documents.length} ${documentsWord(documents.length)}`
+      : `${shown.length} of ${documents.length} ${documentsWord(documents.length)}`
 
   function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (!menuOpen || event.key !== "Escape") return
@@ -216,29 +211,35 @@ export function App() {
         className="border-b border-border bg-card"
         onKeyDown={onHeaderKeyDown}
       >
-        <div className={cn(CONTAINER, "flex items-center gap-6 py-3")}>
+        <div className={cn(container, "flex items-center gap-6 py-3")}>
           <a
             href="/catalogue"
             className={cn(
               "font-heading text-h2 text-foreground transition-colors duration-150",
-              FOCUS
+              focusRing
             )}
           >
             Torvale
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <NavLinks />
+            <ul className="flex gap-6">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <NavLink {...link} />
+                </li>
+              ))}
+            </ul>
           </nav>
-          <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
+          <p className="ml-auto hidden font-mono text-label text-muted-foreground tabular-nums md:block">
             Sales 01632 960 418
           </p>
           <Button
             ref={menuButtonRef}
             variant="secondary"
+            className="ml-auto px-4 font-mono text-label md:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             onClick={() => setMenuOpen((open) => !open)}
-            className={cn(BUTTON_TEXT, "ml-auto md:hidden")}
           >
             Menu
           </Button>
@@ -249,30 +250,43 @@ export function App() {
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
-          <div className={CONTAINER}>
-            <NavLinks mobile />
+          <div className={container}>
+            <ul className="py-2">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <NavLink {...link} className="block py-2" />
+                </li>
+              ))}
+            </ul>
           </div>
         </nav>
       </header>
 
       <main className="flex-1 py-6">
-        <div className={cn(CONTAINER, "flex flex-col gap-6")}>
+        <div className={cn(container, "flex flex-col gap-6")}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className={LABEL}>Downloads</p>
+              <p className="font-mono text-label text-muted-foreground">
+                Downloads
+              </p>
               <h1 className="text-h1">TVL range documents</h1>
-              <p className={SMALL_FIGURE}>
-                Deep groove ball bearings · {DOCUMENTS.length}{" "}
-                {documentsWord(DOCUMENTS.length)} · updated{" "}
+              <p className="font-mono text-label text-muted-foreground tabular-nums">
+                Deep groove ball bearings · 10 documents · updated{" "}
                 <time dateTime="2026-10-21">21 Oct 2026</time>
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <a href="#" className={cn(buttonVariants(), BUTTON_TEXT)}>
+              <a
+                href="#"
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "px-4 font-mono text-label"
+                )}
+              >
                 <Download
+                  aria-hidden="true"
                   className="size-4"
                   strokeWidth={1.5}
-                  aria-hidden="true"
                 />
                 Download all (ZIP, 9.73 MB)
               </a>
@@ -280,36 +294,31 @@ export function App() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-            <section
-              aria-labelledby="documents-heading"
-              className="flex flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-9"
-            >
+            <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 id="documents-heading" className="text-h2">
-                  Documents
-                </h2>
+                <h2 className="text-h2">Documents</h2>
                 <div className="flex flex-wrap items-center gap-3">
                   <div
                     role="group"
                     aria-label="Document type"
                     className="flex flex-wrap gap-1"
                   >
-                    {FILTERS.map((f) => (
+                    {filters.map((f) => (
                       <Button
                         key={f.value}
                         variant="secondary"
                         aria-pressed={filter === f.value}
+                        className="px-4 font-mono text-label aria-pressed:border-foreground aria-pressed:font-bold"
                         onClick={() => setFilter(f.value)}
-                        className={cn(
-                          BUTTON_TEXT,
-                          "aria-pressed:border-foreground aria-pressed:font-bold"
-                        )}
                       >
-                        {f.label} ({countOf(f.value)})
+                        {f.label} ({countFor(f.value)})
                       </Button>
                     ))}
                   </div>
-                  <p aria-live="polite" className={SMALL_FIGURE}>
+                  <p
+                    aria-live="polite"
+                    className="font-mono text-label text-muted-foreground tabular-nums"
+                  >
                     {countText}
                   </p>
                 </div>
@@ -318,19 +327,25 @@ export function App() {
               <Table label="Documents" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn(LABEL, "min-w-48 px-4")}>
+                    <TableHead className="min-w-48 px-4 font-mono text-label text-muted-foreground">
                       Document
                     </TableHead>
-                    <TableHead className={cn(LABEL, "px-4")}>Type</TableHead>
-                    <TableHead className={cn(LABEL, "px-4")}>Format</TableHead>
-                    <TableHead className={cn(LABEL, "px-4")}>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
+                      Type
+                    </TableHead>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
+                      Format
+                    </TableHead>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
                       Revision
                     </TableHead>
-                    <TableHead className={cn(LABEL, "px-4")}>Date</TableHead>
-                    <TableHead className={cn(LABEL, "px-4 text-right")}>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
+                      Date
+                    </TableHead>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Size (MB)
                     </TableHead>
-                    <TableHead className={cn(LABEL, "px-4")}>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
                       <span className="sr-only">File</span>
                     </TableHead>
                   </TableRow>
@@ -350,8 +365,13 @@ export function App() {
                       <TableCell className="px-4 py-2 font-mono">
                         {doc.revision}
                       </TableCell>
-                      <TableCell className="px-4 py-2 font-mono tabular-nums">
-                        <time dateTime={doc.dateTime}>{doc.date}</time>
+                      <TableCell className="px-4 py-2">
+                        <time
+                          dateTime={doc.date}
+                          className="font-mono tabular-nums"
+                        >
+                          {doc.dateLabel}
+                        </time>
                       </TableCell>
                       <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
                         {doc.sizeMb}
@@ -359,17 +379,16 @@ export function App() {
                       <TableCell className="px-4 py-2 text-left">
                         <a
                           href="#"
-                          download
                           aria-label={`Download ${doc.title}, ${doc.format}, ${doc.sizeMb} MB`}
                           className={cn(
-                            TEXT_LINK,
-                            "inline-flex items-center gap-2 font-mono text-label"
+                            "inline-flex items-center gap-2 font-mono text-label text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
+                            focusRing
                           )}
                         >
                           <Download
+                            aria-hidden="true"
                             className="size-4"
                             strokeWidth={1.5}
-                            aria-hidden="true"
                           />
                           Download
                         </a>
@@ -379,49 +398,42 @@ export function App() {
                 </TableBody>
               </Table>
 
-              <p
-                className={cn(SMALL_FIGURE, "border-t border-border px-4 py-3")}
-              >
-                Each file shows its revision on its first page. Older revisions
-                are sent on request.
-              </p>
-            </section>
+              <div className="border-t border-border px-4 py-3">
+                <p className="font-mono text-label text-muted-foreground tabular-nums">
+                  Each file shows its revision on its first page. Older
+                  revisions are sent on request.
+                </p>
+              </div>
+            </div>
 
-            <section
-              aria-labelledby="formats-heading"
-              className="flex flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-3"
-            >
+            <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-3">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 id="formats-heading" className="text-h2">
-                  File formats
-                </h2>
+                <h2 className="text-h2">File formats</h2>
               </div>
               <dl>
-                {FORMATS.map((f, i) => (
+                {formats.map((item, i) => (
                   <div
-                    key={f.format}
+                    key={item.format}
                     className={cn(
                       "flex flex-col gap-1 px-4 py-3",
                       i > 0 && "border-t border-border"
                     )}
                   >
                     <dt className="font-mono text-label text-foreground">
-                      {f.format}
+                      {item.format}
                     </dt>
-                    <dd className="max-w-lg text-body text-foreground">
-                      {f.text}
-                    </dd>
+                    <dd className="text-body text-foreground">{item.text}</dd>
                   </div>
                 ))}
               </dl>
-            </section>
+            </div>
           </div>
         </div>
       </main>
 
       <footer className="border-t border-border">
-        <div className={cn(CONTAINER, "py-6")}>
-          <p className={SMALL_FIGURE}>
+        <div className={cn(container, "py-6")}>
+          <p className="font-mono text-label text-muted-foreground tabular-nums">
             Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
             nothing is sold or sent.
           </p>

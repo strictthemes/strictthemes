@@ -21,7 +21,7 @@ The header from the layout notes, with "My booking" as the current page; its lin
 
 ### 2. Opening
 
-The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-cols-12`):
+The first section, with `pt-8`, in columns 1–8 of a grid (`grid grid-cols-1 gap-5 md:grid-cols-12`):
 
 - A `<p>` holding the state from the layout notes, `Confirmed`.
 - With `mt-2`, the `<h1>` "Your crossing is booked" in `text-h1`.
@@ -30,7 +30,7 @@ The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-
 
 ### 3. Boarding pass and what to bring
 
-A section with `mt-16`, as a grid (`grid gap-5 md:grid-cols-12 md:items-start`):
+A section with `mt-16`, as a grid (`grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7: the ticket card and, after it, a row of actions.
 - In columns 9–12: the "What to bring" card. On a phone it comes after the actions.
@@ -41,11 +41,11 @@ The first part, a `<div>` with `p-5`:
 
 1. A top line, `flex flex-wrap items-center justify-between gap-x-5 gap-y-2`: a label in `text-muted-foreground`, `Boarding pass · Kestrel Ferries`, and the state `Confirmed`.
 2. With `mt-2`, the `<h2>` "Harrowmouth to Port Ellery".
-3. With `mt-5`, a row `<div>` with `flex flex-wrap items-end justify-between gap-x-5 gap-y-3`: on the left a `<div>` with a label in `text-muted-foreground`, `Booking reference`, and under it with `mt-1` the reference as a `<p>` in `font-mono text-h1 text-foreground`, `KF-7Q4M2R` (Overpass Mono at the h1 size, on purpose, like the prices); on the right a `<div>` with `flex items-center gap-3` holding the "Copy reference" button (`variant="outline"`, the notes' button classes) and, after it, a `<span>` with `role="status"` and `font-mono text-label text-foreground`, empty from the start.
+3. With `mt-5`, a row `<div>` with `flex flex-wrap items-end justify-between gap-x-5 gap-y-3`: on the left a `<div>` with a label in `text-muted-foreground`, `Booking reference`, and under it with `mt-1` the reference as a `<p>` in `font-mono text-h1 text-foreground`, `KF-7Q4M2R` (Overpass Mono at the h1 size, on purpose, like the prices); on the right a `<div>` with `flex items-center` (no gap) holding the "Copy reference" button (`variant="outline"`, the notes' button classes) and, after it, a `<span>` with `role="status"` and `font-mono text-label text-foreground`, empty from the start. Its message is an inner `<span>` with `ml-3`, rendered only when there is a message: a gap on the row would leave 12px of space after the button while the status is empty, and the button would stop short of the card's right edge.
 4. With `mt-5`, the journey from the layout notes in its full size: `09:15` and `Harrowmouth` on the left, `1 h 45 min` and `Direct` on the line, `11:00` and `Port Ellery` on the right.
 5. With `mt-5`, a description list as the layout notes describe, seven rows: Date (`Saturday 19 December 2026`, in a `<time>`); Route (`HRW–PEL`, a label in `text-foreground`); Ship (`MV Isla Grey`); Berth (`2`, a label in `text-foreground`); Check-in closes (`08:45`, a label in `text-foreground`, in a `<time>`); Passengers (`Maren Holt` and `Tomas Holt`, each a block `<span>`, so they stand on two lines); Extras (`2 bicycles`).
 
-The tear line, a `<div>` with `relative border-t border-dashed` and `aria-hidden="true"`, running the full width of the card. In it two notches, page-colored half circles cut into the card's edges: `absolute top-0 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background` and `absolute top-0 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background`. They are 20px circles, within the theme's limit for a full round, with no border, and the card's `overflow-hidden` cuts each to a half. These and the state dot are the only round shapes on the page.
+The tear line, a `<div>` with `relative border-t border-dashed` and `aria-hidden="true"`, running the full width of the card. In it two notches, page-colored half circles cut into the card's edges: `absolute top-0 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background` and `absolute top-0 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background`. They are 20px circles, within the theme's limit for a full round, with no border, and the card's `overflow-hidden` cuts each to a half. These and the two `Confirmed` dots are the only round shapes on the page.
 
 The second part, a `<div>` with `flex items-center gap-5 p-5`:
 

@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-// A link in the header or the footer, and a name or a title that is a link.
+// A link in the header or the footer, or a name or title that is a link.
 const plainLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focus
@@ -18,16 +18,6 @@ const textLink = cn(
 )
 
 const label = "font-mono text-label uppercase"
-const labelHeading = "font-mono text-label uppercase text-foreground"
-
-const sectionGrid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-const sectionDivided =
-  "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
-
-const dlRow =
-  "grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
-const dtClass = "font-mono text-label uppercase text-muted-foreground"
-const ddClass = "col-span-2 text-body"
 
 const navLinks = [
   { label: "Practice", href: "/practice/commercial-disputes" },
@@ -50,7 +40,7 @@ const matters = [
     kind: "Warranty claim",
     name: "The sellers of Halden Print",
     summary:
-      "Led the defence of a buyer's warranty claim, struck out because its notice arrived one day after the contract's deadline.",
+      "Led the defence of a buyer’s warranty claim, which was struck out because its notice arrived one day after the contract’s deadline.",
     value: "£3.4m",
   },
   {
@@ -58,7 +48,7 @@ const matters = [
     kind: "Trial",
     name: "Estley Mills v Brandreth Engineering",
     summary:
-      "With David Achterberg, won a claim for a textile mill after a nine-day trial.",
+      "With David Achterberg, won a textile mill’s claim against the seller of its dyeing works after a nine-day trial.",
     value: "£6.2m",
   },
   {
@@ -66,7 +56,7 @@ const matters = [
     kind: "Arbitration",
     name: "Pellam Foods",
     summary:
-      "Recovered the cost of a failed packaging contract for a food producer in an arbitration seated in Wexcombe.",
+      "Recovered the cost of a failed packaging contract for a food producer, in an arbitration seated in Wexcombe.",
     value: "£1.8m",
   },
 ]
@@ -75,7 +65,7 @@ const briefings = [
   {
     date: "2026-11-10",
     dateText: "10 November 2026",
-    readingTime: "8 min read",
+    minutes: 8,
     title:
       "Notice clauses after a sale: when a late letter ends a warranty claim",
     href: "/insights/notice-clauses",
@@ -83,11 +73,16 @@ const briefings = [
   {
     date: "2026-09-17",
     dateText: "17 September 2026",
-    readingTime: "6 min read",
+    minutes: 6,
     title: "Earn-outs that end in dispute",
     href: "#",
   },
 ]
+
+const sectionDivided = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+const dlRow = "grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
+const dt = cn(label, "text-muted-foreground")
 
 export function App() {
   return (
@@ -114,7 +109,7 @@ export function App() {
       </header>
 
       <main>
-        <section className={cn("mt-14 md:mt-28", sectionGrid)}>
+        <section className={cn("mt-14 md:mt-28", grid)}>
           <div className="md:col-span-5">
             <div
               role="img"
@@ -140,26 +135,26 @@ export function App() {
               </Badge>
             </div>
             <h1 className="mt-4 text-h1 md:text-display">Ruth Calloway</h1>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               Ruth acts in disputes that follow the sale of a company: warranty
               claims, earn-outs and the accounts drawn up at completion. She
-              was made a partner in May 2026, fifteen years after she joined
-              the firm as a trainee.
+              was made a partner in May 2026, fifteen years after she joined the
+              firm as a trainee.
             </p>
 
-            <h2 className={cn("mt-8", labelHeading)}>Contact</h2>
+            <h2 className={cn("mt-8", label, "text-foreground")}>Contact</h2>
             <dl className="mt-4 border-b border-border">
               <div className={dlRow}>
-                <dt className={dtClass}>Direct line</dt>
-                <dd className={ddClass}>
+                <dt className={dt}>Direct line</dt>
+                <dd className="col-span-2 text-body tabular-nums">
                   <a href="tel:01632960237" className={textLink}>
                     01632 960 237
                   </a>
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={dtClass}>Email</dt>
-                <dd className={cn(ddClass, "wrap-anywhere")}>
+                <dt className={dt}>Email</dt>
+                <dd className="col-span-2 text-body wrap-anywhere">
                   <a
                     href="mailto:r.calloway@harrowvane.example"
                     className={textLink}
@@ -169,8 +164,8 @@ export function App() {
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={dtClass}>Assistant</dt>
-                <dd className={ddClass}>
+                <dt className={dt}>Assistant</dt>
+                <dd className="col-span-2 text-body tabular-nums">
                   Owen Pryce ·{" "}
                   <a href="tel:01632960238" className={textLink}>
                     01632 960 238
@@ -178,8 +173,10 @@ export function App() {
                 </dd>
               </div>
               <div className={dlRow}>
-                <dt className={dtClass}>Office</dt>
-                <dd className={ddClass}>4 Chancery Row, Wexcombe</dd>
+                <dt className={dt}>Office</dt>
+                <dd className="col-span-2 text-body tabular-nums">
+                  4 Chancery Row, Wexcombe
+                </dd>
               </div>
             </dl>
 
@@ -197,56 +194,56 @@ export function App() {
           </div>
         </section>
 
-        <section className={cn(sectionDivided, sectionGrid)}>
+        <section className={cn(sectionDivided, grid)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">Experience</h2>
-            <p className="mt-4 max-w-xl text-body">
+            <p className="mt-4 max-w-xl">
               Ruth acts for the buyers and sellers of owner-managed companies,
-              most of them family businesses sold after one or two generations,
-              and for the private equity houses that have bought some of them.
-              Her clients are usually founders, finance directors and the
-              investment managers who sat at the table when the deal was done.
+              and for the private equity houses that back some of those buyers.
+              Most of her clients come to her after a sale has completed, when
+              one side says the business was not what the contract promised.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              In the first weeks of a claim she reads the sale contract's notice
-              and limitation clauses before anything else, because a claim
-              served late or in the wrong form can end there. Within two weeks
-              the client has her written view of what the claim is worth, what
-              it will cost to bring or defend, and how long it is likely to
-              take.
+            <p className="mt-4 max-w-xl">
+              In the first weeks of a claim she reads the contract’s notice and
+              limitation clauses before anything else, because a claim can be
+              lost on a date long before its merits are argued. Within two
+              weeks she gives the client a written view of what the claim is
+              worth and what it will cost to pursue or defend.
             </p>
-            <p className="mt-4 max-w-xl text-body">
-              Many sale contracts send disputes over completion accounts to an
-              expert or to arbitration, and Ruth has acted in both, as well as
-              at mediations that settled claims before a hearing. She works
-              with the rest of{" "}
+            <p className="mt-4 max-w-xl">
+              She has acted in arbitrations under the rules of the main
+              institutions and has represented clients at more than twenty
+              mediations, most of which settled on the day. She works with
+              partners across{" "}
               <a href="/practice/commercial-disputes" className={textLink}>
                 the Commercial disputes team
               </a>{" "}
-              on claims that go to trial.
+              and with the firm’s corporate lawyers who advised on the sale.
             </p>
           </div>
 
           <div className="mt-14 md:col-span-4 md:col-start-9 md:mt-0">
-            <h3 className={labelHeading}>Languages</h3>
-            <p className="mt-4 text-body">English and German</p>
-            <h3 className={cn("mt-8", labelHeading)}>Practice areas</h3>
-            <p className="mt-4 text-body">
-              Commercial disputes; Corporate (on the sale side of disputes)
+            <h3 className={cn(label, "text-foreground")}>Languages</h3>
+            <p className="mt-4">English and German</p>
+            <h3 className={cn("mt-8", label, "text-foreground")}>
+              Practice areas
+            </h3>
+            <p className="mt-4">
+              Commercial disputes; Corporate, for claims that follow a sale
             </p>
           </div>
         </section>
 
-        <section className={cn(sectionDivided, sectionGrid)}>
+        <section className={cn(sectionDivided, grid)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">Admissions and education</h2>
             <dl className="mt-8 border-b border-border">
               {admissions.map((item) => (
                 <div key={item.year} className={dlRow}>
-                  <dt className={cn(dtClass, "tabular-nums")}>
+                  <dt className={cn(dt, "tabular-nums")}>
                     <time dateTime={item.year}>{item.year}</time>
                   </dt>
-                  <dd className={ddClass}>{item.text}</dd>
+                  <dd className="col-span-2 text-body">{item.text}</dd>
                 </div>
               ))}
             </dl>
@@ -255,7 +252,7 @@ export function App() {
 
         <section className={sectionDivided}>
           <h2 className="text-h2">Recent matters</h2>
-          <ul className="mt-8 list-none border-b border-border p-0">
+          <ul className="mt-8 border-b border-border">
             {matters.map((matter) => (
               <li
                 key={matter.name}
@@ -274,7 +271,7 @@ export function App() {
                   <h3 className="text-h2">{matter.name}</h3>
                   <p className="mt-2 max-w-xl text-body">{matter.summary}</p>
                 </div>
-                <p className="mt-2 font-mono text-label text-foreground uppercase tabular-nums md:col-span-2 md:mt-0 md:text-right">
+                <p className="mt-2 font-mono text-label text-foreground tabular-nums md:col-span-2 md:mt-0 md:text-right">
                   {matter.value}
                 </p>
               </li>
@@ -284,7 +281,7 @@ export function App() {
 
         <section className={sectionDivided}>
           <h2 className="text-h2">Briefings by Ruth</h2>
-          <ul className="mt-8 list-none border-b border-border p-0">
+          <ul className="mt-8 border-b border-border">
             {briefings.map((briefing) => (
               <li
                 key={briefing.title}
@@ -297,7 +294,7 @@ export function App() {
                   )}
                 >
                   <time dateTime={briefing.date}>{briefing.dateText}</time> ·{" "}
-                  {briefing.readingTime}
+                  {briefing.minutes} min read
                 </p>
                 <h3 className="mt-2 text-h2 md:col-span-9 md:mt-0">
                   <a href={briefing.href} className={plainLink}>
@@ -311,21 +308,27 @@ export function App() {
       </main>
 
       <footer className="mt-14 border-t border-border py-8 md:mt-28">
-        <div className={sectionGrid}>
+        <div className={grid}>
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Harrow &amp; Vane LLP</p>
-            <address className="mt-2 font-mono text-label text-muted-foreground uppercase not-italic">
+            <address
+              className={cn(
+                "mt-2 not-italic",
+                label,
+                "text-muted-foreground"
+              )}
+            >
               <p>4 Chancery Row</p>
               <p>Wexcombe WX1 2LN</p>
             </address>
           </div>
           <div className="mt-8 md:col-span-4 md:col-start-5 md:mt-0">
-            <p className={label}>
+            <p className={cn(label, "tabular-nums")}>
               <a href="tel:01632960214" className={plainLink}>
                 01632 960 214
               </a>
             </p>
-            <p className={cn("mt-2 wrap-anywhere", label)}>
+            <p className={cn("mt-2", label, "wrap-anywhere")}>
               <a
                 href="mailto:enquiries@harrowvane.example"
                 className={cn(plainLink, "normal-case")}
@@ -340,7 +343,7 @@ export function App() {
           >
             <ul>
               {navLinks.map((link, index) => (
-                <li key={link.href} className={cn(index > 0 && "mt-2")}>
+                <li key={link.href} className={index > 0 ? "mt-2" : undefined}>
                   <a
                     href={link.href}
                     aria-current={link.current ? "page" : undefined}
@@ -357,7 +360,7 @@ export function App() {
             </ul>
           </nav>
         </div>
-        <p className={cn("mt-8 text-muted-foreground", label)}>
+        <p className={cn("mt-8", label, "text-muted-foreground tabular-nums")}>
           © 2026 Harrow &amp; Vane LLP · Registered in England and Wales
         </p>
       </footer>

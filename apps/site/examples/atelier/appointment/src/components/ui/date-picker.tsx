@@ -2,14 +2,14 @@ import * as React from "react"
 import { CalendarIcon } from "lucide-react"
 import type { Matcher } from "react-day-picker"
 
+import { cn } from "@/lib/utils"
+import { formatDate, toDateTime } from "@/lib/dates"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { formatDate, toDateTime } from "@/lib/date"
-import { cn } from "@/lib/utils"
 
 type DatePickerProps = {
   id: string
@@ -17,11 +17,11 @@ type DatePickerProps = {
   value: Date | undefined
   onValueChange: (value: Date | undefined) => void
   className?: string
+  "aria-invalid"?: boolean
+  "aria-describedby"?: string
   disabled?: Matcher | Matcher[]
   startMonth?: Date
   ref?: React.Ref<HTMLButtonElement>
-  "aria-invalid"?: boolean
-  "aria-describedby"?: string
 }
 
 function DatePicker({
@@ -30,11 +30,11 @@ function DatePicker({
   value,
   onValueChange,
   className,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
   disabled,
   startMonth,
   ref,
-  "aria-invalid": ariaInvalid,
-  "aria-describedby": ariaDescribedBy,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
@@ -48,7 +48,7 @@ function DatePicker({
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
         className={cn(
-          "flex h-auto w-full items-center justify-between gap-2 rounded-lg border border-muted-foreground bg-transparent px-4 py-2 text-left text-body transition-colors outline-none select-none focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50",
+          "flex h-auto w-full items-center justify-between gap-2 rounded-lg border border-muted-foreground bg-transparent px-4 py-2 text-left text-body transition-colors outline-none select-none focus-visible:border-ring focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive dark:bg-input/30 dark:hover:bg-input/50 dark:aria-invalid:border-destructive/50",
           className
         )}
       >

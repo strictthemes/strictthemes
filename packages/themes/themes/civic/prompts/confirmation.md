@@ -23,7 +23,7 @@ The header from the layout notes: "Callowmere Council" and "Apply for a resident
 The first element of `<main>`: a box. Inside it:
 
 - A row `flex items-start gap-4`: the `CircleCheck` icon in `text-success`, `mt-1 size-8 shrink-0` (here `size-8` in place of the Icons note's `size-5`, to match the heading) and `aria-hidden="true"`, and the `<h1>` "Application sent". The word in the heading says it; the green icon only repeats it.
-- With `mt-6`, as the first text under the `<h1>`, one paragraph: a copy of the application has been sent to the email address, which is in `wrap-break-word` so it can wrap on a phone.
+- With `mt-6`, as the first text under the `<h1>`, one paragraph with `wrap-break-word`, so the email address in it can wrap on a phone: a copy of the application has been sent to that address, written as plain text, not a link.
 - With `mt-6`, the label "Your reference number" as a `<p>` in `font-mono text-label text-muted-foreground`.
 - With `mt-2`, the number as a `<p>` in `font-mono text-h2 tabular-nums whitespace-nowrap text-foreground` (`text-h2` brings weight 700) (`whitespace-nowrap`, because a line could otherwise break at a hyphen; it fits at 375px), here in `text-h2` in place of the label size the Labels note gives a reference number, with no `aria-labelledby`, which a `<p>` may not have: the label is read just before it. It is plain text that can be selected; no input, no letter spacing of your own.
 - With `mt-4`, a wrapper `<div>` holding a `secondary` `Button` "Copy reference number" with the `Copy` icon before the words, and after the button, in the same wrapper, the status element from the layout notes, whose message is a `<p>` with `mt-2`.
@@ -60,5 +60,5 @@ The footer from the layout notes.
 ### Behavior
 
 - "Copy reference number" writes `CPP-2611-4827` to the clipboard with `await navigator.clipboard.writeText(…)` inside a `try`/`catch`. When it works, the status message reads "Reference number copied". When it fails, it reads "Copying did not work. Select the number and copy it yourself." It fails where `navigator.clipboard` is undefined (a page not on a secure address), where the call throws and where its promise rejects; the `try`/`catch` around the awaited call catches all three, where a `.catch()` alone would miss the first. Each click empties the status element first and sets the message 100 milliseconds later with `setTimeout`, clearing a timer still waiting from an earlier click, so that a second click is announced again. The message stays until the next click. The button keeps its words and is never disabled; focus stays on it.
-- The other links go to `#`.
+- The other links go to `#`, except the council's name in the header, which goes to `/`.
 - On a phone the reference number stays on one line, and the button fills the column.

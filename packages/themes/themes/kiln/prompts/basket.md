@@ -26,7 +26,7 @@ The first section of `<main>`: the `<h1>` in `text-h1`, "Your basket", and with 
 
 In the same section as the title, with `mt-6`, a 12-column grid with `md:items-start`. Below `md` the summary comes under the lines and the note, with `mt-10 md:mt-0`.
 
-**Lines**, columns 1–7. A visually hidden `<h2>`, "Pieces in your basket", then a `<ul>` with no markers and no gap. Each line is an `<li>` with `border-t py-6 last:border-b`: a 1px top border, and the last also a bottom one. A line is a row, `flex gap-4`:
+**Lines**, columns 1–7. A visually hidden `<h2>`, "Pieces in your basket", then a `<ul>` with no markers, no gap and no top margin (the hidden heading takes no space). Each line is an `<li>` with `border-t py-6 last:border-b`: a 1px top border, and the last also a bottom one. A line is a row, `flex gap-4`:
 
 - A picture as the Pictures note says, `size-20 shrink-0 rounded-xl border` (square, in place of the note's aspect class), the piece in the shape for its kind and the fill for its glaze (Ash is pale, Iron dark), with an `aria-label` such as "Moor mug in ash glaze".
 - Beside it, a column with `min-w-0 flex-1`:

@@ -51,7 +51,7 @@ The shadcn `Table` with the label "Documents" and seven columns:
 - **Revision:** `Rev A`, in `font-mono`.
 - **Date:** a `<time>` in `font-mono tabular-nums`, `21 Oct 2026`, with its `dateTime`.
 - **Size (MB):** `0.91`, two decimals, right-aligned, header too.
-- **The last column:** its header is "File", made `sr-only` as the Tables note says. The cell is left-aligned and holds a text link to `#` with the `download` attribute, `inline-flex items-center gap-2`, in `font-mono text-label`: the `Download` icon, then the word "Download". Its `aria-label` names the file: "Download TVL-2552-RS data sheet, PDF, 0.91 MB".
+- **The last column:** its header is "File", made `sr-only` as the Tables note says. The cell is left-aligned and holds a text link to `#`, with no `download` attribute (on `#` it would save the page itself), `inline-flex items-center gap-2`, in `font-mono text-label`: the `Download` icon, then the word "Download". Its `aria-label` names the file: "Download TVL-2552-RS data sheet, PDF, 0.91 MB".
 
 Seven columns of nine on 1280px fit without scrolling; on a phone the table scrolls in its box. Every filter leaves at least three rows, so there is no empty state.
 
@@ -59,7 +59,7 @@ Under the table, inside the same panel, a row with `border-t border-border px-4 
 
 ### 4. File formats
 
-A panel with rows spanning three columns from `lg` up, full width below. A heading row with the `<h2>` "File formats", then a `<dl>` of three rows. Each row is a `<div>` with `flex flex-col gap-1 px-4 py-3` and `border-t border-border` except the first, as the Panels with rows note sets a row (not the Description lists note's row): the `<dt>` is the format as a label in `text-foreground`, the `<dd>` one sentence in `text-body`.
+A panel with rows spanning three columns from `lg` up, full width below. A heading row holding only the `<h2>` "File formats", then a `<dl>` of three rows. Each row is a `<div>` with `flex flex-col gap-1 px-4 py-3` and `border-t border-border` except the first, as the Panels with rows note sets a row (not the Description lists note's row): the `<dt>` is the format as a label in `text-foreground`, the `<dd>` one sentence in `text-body`.
 
 - `PDF`: "Data sheets and certificates, for any PDF reader."
 - `STEP`: "3D models for any CAD system, in millimetres."

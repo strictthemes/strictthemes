@@ -5,173 +5,94 @@ import {
   type MouseEvent,
   type ReactNode,
 } from "react"
-import { CircleAlert, CircleCheck } from "lucide-react"
+import { Check, CircleAlert } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-type Day = "up" | "slow" | "down"
-type Tone = "success" | "caution" | "neutral"
+type DayState = "up" | "slow" | "down"
+type Tone = "success" | "destructive" | "tertiary" | "neutral"
 
 const DAYS = 30
 const MINUTES_IN_PERIOD = DAYS * 24 * 60
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const FOCUS_FROM_CODE =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-
-const LABEL = "font-mono text-label uppercase"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-
-// Day 0 is 15 Oct, day 29 is today, 13 Nov.
-function history(slow: number[], down: number[]): Day[] {
-  return Array.from({ length: DAYS }, (_, i) =>
-    down.includes(i) ? "down" : slow.includes(i) ? "slow" : "up"
-  )
+// Index 0 is 30 days ago (15 Oct), index 29 is today (13 Nov).
+function history(overrides: Record<number, DayState>): DayState[] {
+  return Array.from({ length: DAYS }, (_, i) => overrides[i] ?? "up")
 }
 
-const systems: {
+type System = {
   name: string
-  state: string
-  tone: Tone
-  days: Day[]
+  state: { word: string; tone: Tone }
+  days: DayState[]
   downMinutes: number
-}[] = [
-  {
-    name: "Tracking site",
-    state: "Operational",
-    tone: "success",
-    days: history([], []),
-    downMinutes: 0,
-  },
+}
+
+const operational = { word: "Operational", tone: "success" as const }
+
+const systems: System[] = [
+  { name: "Tracking site", state: operational, days: history({}), downMinutes: 0 },
   {
     name: "Booking API",
-    state: "Operational",
-    tone: "success",
-    days: history([], [20]),
+    state: operational,
+    days: history({ 20: "down" }),
     downMinutes: 38,
   },
   {
     name: "Label printing",
-    state: "Degraded",
-    tone: "caution",
-    days: history([25, 29], []),
+    state: { word: "Degraded", tone: "tertiary" },
+    days: history({ 6: "slow", 29: "slow" }),
     downMinutes: 0,
   },
-  {
-    name: "Email notices",
-    state: "Operational",
-    tone: "success",
-    days: history([13], []),
-    downMinutes: 0,
-  },
+  { name: "Email notices", state: operational, days: history({}), downMinutes: 0 },
   {
     name: "Customer dashboard",
-    state: "Operational",
-    tone: "success",
-    days: history([], []),
+    state: operational,
+    days: history({}),
     downMinutes: 0,
   },
   {
     name: "Webhooks",
-    state: "Operational",
-    tone: "success",
-    days: history([6], []),
+    state: operational,
+    days: history({ 12: "slow" }),
     downMinutes: 0,
   },
 ]
 
-const incidents = [
-  {
-    title: "Booking API returned errors",
-    date: "2026-11-04T09:14Z",
-    dateText: "4 Nov",
-    duration: "38 min",
-    updates: [
-      {
-        kind: "Resolved",
-        time: "2026-11-04T09:52Z",
-        timeText: "09:52",
-        text: "Bookings have gone through normally for 20 minutes. Bookings that failed during the incident were not charged and can be sent again.",
-      },
-      {
-        kind: "Monitoring",
-        time: "2026-11-04T09:40Z",
-        timeText: "09:40",
-        text: "We moved the API back to the previous release. Error rates are back to normal and we are watching them.",
-      },
-      {
-        kind: "Identified",
-        time: "2026-11-04T09:28Z",
-        timeText: "09:28",
-        text: "A release this morning broke address checks for some postcodes, so those bookings were refused.",
-      },
-      {
-        kind: "Investigating",
-        time: "2026-11-04T09:14Z",
-        timeText: "09:14",
-        text: "Some booking requests to the API fail with a server error. We are looking into it.",
-      },
-    ],
-  },
-  {
-    title: "Email notices sent late",
-    date: "2026-10-28T16:20Z",
-    dateText: "28 Oct",
-    duration: "1 h 12 min",
-    updates: [
-      {
-        kind: "Resolved",
-        time: "2026-10-28T17:32Z",
-        timeText: "17:32",
-        text: "The queue is empty and new notices go out within a minute again.",
-      },
-      {
-        kind: "Monitoring",
-        time: "2026-10-28T17:05Z",
-        timeText: "17:05",
-        text: "Our mail provider has fixed the fault. Delayed notices are going out now, oldest first.",
-      },
-      {
-        kind: "Investigating",
-        time: "2026-10-28T16:20Z",
-        timeText: "16:20",
-        text: "Delivery and collection emails are reaching customers up to 40 minutes late. Tracking pages show the right status.",
-      },
-    ],
-  },
-  {
-    title: "Webhook deliveries delayed",
-    date: "2026-10-21T11:05Z",
-    dateText: "21 Oct",
-    duration: "47 min",
-    updates: [
-      {
-        kind: "Resolved",
-        time: "2026-10-21T11:52Z",
-        timeText: "11:52",
-        text: "All delayed webhooks have been delivered. No events were lost.",
-      },
-      {
-        kind: "Identified",
-        time: "2026-10-21T11:24Z",
-        timeText: "11:24",
-        text: "One of our delivery workers stopped taking jobs. We have restarted it and added a second one.",
-      },
-      {
-        kind: "Investigating",
-        time: "2026-10-21T11:05Z",
-        timeText: "11:05",
-        text: "Scan events reach webhook endpoints up to 15 minutes late. We are looking into it.",
-      },
-    ],
-  },
-]
+function plural(n: number, word: string) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`
+}
 
-const dayColor: Record<Day, string> = {
+function uptime(system: System) {
+  if (system.downMinutes === 0) return "100%"
+  const value = (1 - system.downMinutes / MINUTES_IN_PERIOD) * 100
+  return `${(Math.floor(value * 100) / 100).toFixed(2)}%`
+}
+
+function summary(system: System) {
+  const slow = system.days.filter((d) => d === "slow").length
+  const down = system.days.filter((d) => d === "down").length
+  const percent = uptime(system)
+  const figureParts: string[] = []
+  const labelParts: string[] = []
+  if (slow > 0) {
+    figureParts.push(`${plural(slow, "day")} slow`)
+    labelParts.push(`Slow on ${plural(slow, "day")}.`)
+  }
+  if (down > 0) {
+    figureParts.push(`${plural(down, "day")} down`)
+    labelParts.push(`Down on ${plural(down, "day")}.`)
+  }
+  const figure = [percent, ...figureParts].join(" · ")
+  const label =
+    `${percent} uptime over 30 days. ` +
+    (labelParts.length > 0 ? labelParts.join(" ") : "No slow or down days.")
+  return { figure, label }
+}
+
+const dayColor: Record<DayState, string> = {
   up: "bg-success",
   slow: "bg-tertiary",
   down: "bg-destructive",
@@ -179,67 +100,134 @@ const dayColor: Record<Day, string> = {
 
 const dotColor: Record<Tone, string> = {
   success: "bg-success",
-  caution: "bg-tertiary",
+  destructive: "bg-destructive",
+  tertiary: "bg-tertiary",
   neutral: "bg-muted-foreground",
 }
 
-function plural(n: number, word: string) {
-  return `${n} ${word}${n === 1 ? "" : "s"}`
+type Incident = {
+  title: string
+  date: string
+  dateLabel: string
+  duration: string
+  updates: { kind: string; time: string; text: string }[]
 }
 
-function uptimeText(downMinutes: number) {
-  if (downMinutes === 0) return "100%"
-  return `${(100 - (downMinutes / MINUTES_IN_PERIOD) * 100).toFixed(2)}%`
-}
+const incidents: Incident[] = [
+  {
+    title: "Booking API returned errors",
+    date: "2026-11-04",
+    dateLabel: "4 Nov",
+    duration: "38 min",
+    updates: [
+      {
+        kind: "Resolved",
+        time: "13:50",
+        text: "Bookings have gone through normally for 20 minutes. Any booking that failed in this window can be sent again with the same reference.",
+      },
+      {
+        kind: "Monitoring",
+        time: "13:41",
+        text: "We rolled back the release and error rates are back to normal. We are watching the API before we close this incident.",
+      },
+      {
+        kind: "Identified",
+        time: "13:24",
+        text: "A release at 13:05 changed how parcel weights are checked, and most bookings over 10 kg were refused. We are rolling it back.",
+      },
+      {
+        kind: "Investigating",
+        time: "13:12",
+        text: "Many booking requests are failing with a server error. We are looking into it.",
+      },
+    ],
+  },
+  {
+    title: "Webhook deliveries delayed",
+    date: "2026-10-27",
+    dateLabel: "27 Oct",
+    duration: "1 h 12 min",
+    updates: [
+      {
+        kind: "Resolved",
+        time: "10:32",
+        text: "All queued events have been delivered, in order. New events arrive within a few seconds again.",
+      },
+      {
+        kind: "Monitoring",
+        time: "10:05",
+        text: "The queue is draining. Delays are down to about two minutes and falling.",
+      },
+      {
+        kind: "Identified",
+        time: "09:45",
+        text: "One of our delivery workers stopped taking jobs after a network change. We have restarted it and added a second one.",
+      },
+      {
+        kind: "Investigating",
+        time: "09:20",
+        text: "Tracking events are reaching webhook endpoints up to 25 minutes late. No events have been lost.",
+      },
+    ],
+  },
+  {
+    title: "Labels slow to print",
+    date: "2026-10-21",
+    dateLabel: "21 Oct",
+    duration: "1 h 40 min",
+    updates: [
+      {
+        kind: "Resolved",
+        time: "16:50",
+        text: "Labels print in about 3 seconds again. We have raised the size of the shared font cache so this does not recur.",
+      },
+      {
+        kind: "Monitoring",
+        time: "16:20",
+        text: "Print times are back to normal after the fix. We are keeping an eye on the afternoon peak.",
+      },
+      {
+        kind: "Identified",
+        time: "15:35",
+        text: "The print service was rebuilding its font cache for every label. We are deploying a fix.",
+      },
+      {
+        kind: "Investigating",
+        time: "15:10",
+        text: "Labels are taking up to a minute to print from the dashboard and the API. Bookings themselves are not affected.",
+      },
+    ],
+  },
+]
 
-function summary(days: Day[], downMinutes: number) {
-  const slow = days.filter((d) => d === "slow").length
-  const down = days.filter((d) => d === "down").length
-  const parts: string[] = []
-  if (slow > 0) parts.push(`${plural(slow, "day")} slow`)
-  if (down > 0) parts.push(`${plural(down, "day")} down`)
-  const figure = [uptimeText(downMinutes), ...parts].join(" · ")
+const labelClass = "font-mono text-label uppercase text-muted-foreground"
+const figureClass = "font-mono text-label tabular-nums text-muted-foreground"
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-  const said: string[] = []
-  if (slow > 0) said.push(`slow on ${plural(slow, "day")}`)
-  if (down > 0) said.push(`down on ${plural(down, "day")}`)
-  const detail =
-    said.length > 0
-      ? said.join(", ").replace(/^./, (c) => c.toUpperCase()) + "."
-      : "No slow or down days."
-  return {
-    figure,
-    label: `${uptimeText(downMinutes)} uptime over 30 days. ${detail}`,
-  }
-}
-
-function State({ tone, children }: { tone: Tone; children: string }) {
+function State({ word, tone }: { word: string; tone: Tone }) {
   return (
     <span className="inline-flex items-center gap-2">
       <span
         aria-hidden="true"
         className={cn("size-2 shrink-0 rounded-full", dotColor[tone])}
       />
-      <span className="text-body text-foreground">{children}</span>
+      <span className="text-body text-foreground">{word}</span>
     </span>
   )
 }
 
 function PanelHeading({
-  id,
   children,
-  end,
+  aside,
 }: {
-  id: string
   children: string
-  end?: ReactNode
+  aside?: ReactNode
 }) {
   return (
     <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
-      <h2 id={id} className={cn(LABEL, "text-muted-foreground")}>
-        {children}
-      </h2>
-      {end}
+      <h2 className={labelClass}>{children}</h2>
+      {aside}
     </div>
   )
 }
@@ -250,22 +238,20 @@ export function App() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
-
-  const sectionRef = useRef<HTMLElement>(null)
+  const panelRef = useRef<HTMLElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const confirmationRef = useRef<HTMLParagraphElement>(null)
+  const statusRef = useRef<HTMLDivElement>(null)
 
   function goToUpdates(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
-    sectionRef.current?.scrollIntoView()
-    const target = subscribed ? confirmationRef.current : inputRef.current
+    panelRef.current?.scrollIntoView()
+    const target = subscribed ? statusRef.current : inputRef.current
     target?.focus({ preventScroll: true })
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function subscribe(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = email.trim()
-    setEmail(value)
     if (value === "") {
       setError("Enter your email address.")
       inputRef.current?.focus()
@@ -278,7 +264,8 @@ export function App() {
     }
     setError(null)
     setSubscribed(true)
-    requestAnimationFrame(() => confirmationRef.current?.focus())
+    // The form, which held the focus, is gone: move focus to the message.
+    statusRef.current?.focus()
   }
 
   return (
@@ -290,12 +277,12 @@ export function App() {
               href="/"
               className={cn(
                 "font-heading text-h2 text-foreground transition-colors duration-150",
-                FOCUS
+                focusOutline
               )}
             >
               Northgate
             </a>
-            <span className={cn(LABEL, "text-muted-foreground")}>Status</span>
+            <span className={labelClass}>Status</span>
           </div>
           <a
             href="#updates"
@@ -311,47 +298,36 @@ export function App() {
       </header>
 
       <main className="mx-auto flex max-w-3xl flex-col gap-5 px-3 py-5 md:px-5">
-        {/* Current state */}
         <section className="rounded-xl border bg-card p-5">
           <h1 className="text-h1">One system is running slowly</h1>
           <div className="mt-3">
-            <State tone="caution">Degraded performance</State>
+            <State word="Degraded performance" tone="tertiary" />
           </div>
           <p className="mt-3 max-w-md text-body">
-            Label printing is slow: a label can take up to 40 seconds to appear
-            instead of a few. Bookings, tracking and all other systems work
-            normally. We are moving print jobs to extra servers.
+            Label printing is slow: labels take up to 40 seconds to come
+            through, against the usual 3. Bookings, tracking and notices are
+            not affected. We have traced it to a busy print server and are
+            adding capacity.
           </p>
           <div className="mt-5 flex flex-wrap items-baseline gap-2">
-            <span className={cn(LABEL, "text-muted-foreground")}>
-              Last checked
-            </span>
-            <time dateTime="2026-11-13T14:05Z" className={SMALL_FIGURE}>
+            <span className={labelClass}>Last checked</span>
+            <time dateTime="2026-11-13T14:05Z" className={figureClass}>
               13 Nov, 14:05
             </time>
           </div>
         </section>
 
-        {/* Systems */}
-        <section
-          aria-labelledby="systems-heading"
-          className="overflow-hidden rounded-xl border bg-card"
-        >
+        <section className="overflow-hidden rounded-xl border bg-card">
           <div className="border-b px-5 pt-5 pb-3">
             <PanelHeading
-              id="systems-heading"
-              end={
-                <span className={cn(LABEL, "text-muted-foreground")}>
-                  Last 30 days
-                </span>
-              }
+              aside={<span className={labelClass}>Last 30 days</span>}
             >
               Systems
             </PanelHeading>
           </div>
           <ul>
             {systems.map((system) => {
-              const { figure, label } = summary(system.days, system.downMinutes)
+              const { figure, label } = summary(system)
               return (
                 <li
                   key={system.name}
@@ -361,13 +337,9 @@ export function App() {
                     <h3 className="font-sans text-body font-medium">
                       {system.name}
                     </h3>
-                    <State tone={system.tone}>{system.state}</State>
+                    <State {...system.state} />
                   </div>
-                  <div
-                    role="img"
-                    aria-label={label}
-                    className="mt-3 flex gap-px"
-                  >
+                  <div role="img" aria-label={label} className="mt-3 flex gap-px">
                     {system.days.map((day, i) => (
                       <div
                         key={i}
@@ -376,22 +348,16 @@ export function App() {
                     ))}
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3">
-                    <span className={cn(LABEL, "text-muted-foreground")}>
-                      30 days ago
-                    </span>
+                    <span className={labelClass}>30 days ago</span>
                     <span
                       className={cn(
-                        SMALL_FIGURE,
+                        figureClass,
                         "order-last col-span-2 md:order-none md:col-span-1 md:text-center"
                       )}
                     >
                       {figure}
                     </span>
-                    <span
-                      className={cn(LABEL, "text-right text-muted-foreground")}
-                    >
-                      Today
-                    </span>
+                    <span className={cn(labelClass, "text-right")}>Today</span>
                   </div>
                 </li>
               )
@@ -400,32 +366,25 @@ export function App() {
           <div className="flex flex-wrap gap-5 border-t px-5 py-3">
             {(
               [
-                ["up", "Up"],
-                ["slow", "Slow"],
-                ["down", "Down"],
+                ["Up", "bg-success"],
+                ["Slow", "bg-tertiary"],
+                ["Down", "bg-destructive"],
               ] as const
-            ).map(([day, word]) => (
-              <span key={day} className="inline-flex items-center gap-2">
+            ).map(([word, color]) => (
+              <span key={word} className="inline-flex items-center gap-2">
                 <span
                   aria-hidden="true"
-                  className={cn("size-3 rounded-sm", dayColor[day])}
+                  className={cn("size-3 rounded-sm", color)}
                 />
-                <span className={cn(LABEL, "text-muted-foreground")}>
-                  {word}
-                </span>
+                <span className={labelClass}>{word}</span>
               </span>
             ))}
           </div>
         </section>
 
-        {/* Planned maintenance */}
-        <section
-          aria-labelledby="maintenance-heading"
-          className="rounded-xl border bg-card p-5"
-        >
+        <section className="rounded-xl border bg-card p-5">
           <PanelHeading
-            id="maintenance-heading"
-            end={
+            aside={
               <Badge
                 variant="outline"
                 className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
@@ -441,55 +400,50 @@ export function App() {
           </h3>
           <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
             <div className="flex items-baseline gap-2">
-              <span className={cn(LABEL, "text-muted-foreground")}>Starts</span>
-              <time dateTime="2026-11-18T02:00Z" className={SMALL_FIGURE}>
+              <span className={labelClass}>Starts</span>
+              <time dateTime="2026-11-18T02:00Z" className={figureClass}>
                 18 Nov, 02:00
               </time>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className={cn(LABEL, "text-muted-foreground")}>Ends</span>
-              <time dateTime="2026-11-18T03:30Z" className={SMALL_FIGURE}>
+              <span className={labelClass}>Ends</span>
+              <time dateTime="2026-11-18T03:30Z" className={figureClass}>
                 18 Nov, 03:30
               </time>
             </div>
           </div>
           <p className="mt-3 max-w-md text-body">
-            New bookings through the API may take up to 30 seconds to confirm,
-            and a few may be refused and need sending again. Tracking, label
-            printing and the customer dashboard are not affected.
+            New bookings through the API will be held for up to 90 minutes
+            and sent as soon as the work is done. Tracking, labels for parcels
+            already booked and the dashboard work as usual.
           </p>
         </section>
 
-        {/* Get updates */}
         <section
           id="updates"
-          ref={sectionRef}
-          aria-labelledby="updates-heading"
+          ref={panelRef}
           className="scroll-mt-5 rounded-xl border bg-card p-5"
         >
-          <PanelHeading id="updates-heading">Get updates</PanelHeading>
+          <PanelHeading>Get updates</PanelHeading>
           <p className="mt-3 max-w-md text-body">
-            Get an email about incidents and planned maintenance for Northgate.
+            Get an email about incidents and planned maintenance for
+            Northgate.
           </p>
           <div className="mt-5">
             {!subscribed && (
-              <form noValidate onSubmit={onSubmit}>
-                <label
-                  htmlFor="email"
-                  className={cn(LABEL, "block text-muted-foreground")}
-                >
+              <form noValidate onSubmit={subscribe}>
+                <label htmlFor="email" className={cn("block", labelClass)}>
                   Email address
                 </label>
                 <div className="mt-2 flex flex-col gap-3 md:flex-row">
                   <Input
                     ref={inputRef}
                     id="email"
-                    name="email"
                     type="email"
                     autoComplete="email"
                     value={email}
-                    onChange={(event) => {
-                      setEmail(event.target.value)
+                    onChange={(e) => {
+                      setEmail(e.target.value)
                       setError(null)
                     }}
                     aria-invalid={error ? true : undefined}
@@ -509,8 +463,8 @@ export function App() {
                   id="email-help"
                   className="mt-2 max-w-md font-mono text-label text-muted-foreground"
                 >
-                  One email when an incident opens and one when it is resolved.
-                  Every email has an unsubscribe link.
+                  One email when an incident opens and one when it is
+                  resolved. Every email has an unsubscribe link.
                 </p>
                 {error && (
                   <p
@@ -527,17 +481,15 @@ export function App() {
                 )}
               </form>
             )}
-            <div role="status">
+            <div
+              ref={statusRef}
+              role="status"
+              tabIndex={-1}
+              className="focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+            >
               {subscribed && (
-                <p
-                  ref={confirmationRef}
-                  tabIndex={-1}
-                  className={cn(
-                    "flex items-center gap-2 text-body text-foreground",
-                    FOCUS_FROM_CODE
-                  )}
-                >
-                  <CircleCheck
+                <p className="flex items-center gap-2 text-body">
+                  <Check
                     aria-hidden="true"
                     className="size-4 shrink-0 text-success"
                     strokeWidth={1.5}
@@ -549,51 +501,48 @@ export function App() {
           </div>
         </section>
 
-        {/* Past incidents */}
         <h2 className="mt-3 text-h2">Past incidents</h2>
+
         {incidents.map((incident) => (
-          <article
-            key={incident.date}
+          <section
+            key={incident.title}
             className="rounded-xl border bg-card p-5"
           >
             <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
               <h3 className="font-sans text-body font-medium">
                 {incident.title}
               </h3>
-              <State tone="neutral">Resolved</State>
+              <State word="Resolved" tone="neutral" />
             </div>
-            <div className={cn(SMALL_FIGURE, "mt-2 flex flex-wrap gap-x-5")}>
-              <time dateTime={incident.date}>{incident.dateText}</time>
+            <div className={cn("mt-2 flex flex-wrap gap-x-5", figureClass)}>
+              <time dateTime={incident.date}>{incident.dateLabel}</time>
               <span>{incident.duration}</span>
             </div>
-            <ol role="list" className="mt-5">
+            <ol className="mt-5">
               {incident.updates.map((update) => (
-                <li key={update.time} className="border-t py-3 last:pb-0">
+                <li key={update.kind} className="border-t py-3 last:pb-0">
                   <div className="flex items-baseline gap-2">
-                    <span className={cn(LABEL, "text-foreground")}>
+                    <span className="font-mono text-label text-foreground uppercase">
                       {update.kind}
                     </span>
-                    <time dateTime={update.time} className={SMALL_FIGURE}>
-                      {update.timeText}
+                    <time
+                      dateTime={`${incident.date}T${update.time}Z`}
+                      className={figureClass}
+                    >
+                      {update.time}
                     </time>
                   </div>
                   <p className="mt-1 max-w-md text-body">{update.text}</p>
                 </li>
               ))}
             </ol>
-          </article>
+          </section>
         ))}
       </main>
 
-      <footer className="mx-auto max-w-3xl px-3 md:px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-5">
-          <span className={cn(LABEL, "text-muted-foreground")}>
-            Northgate Parcels Ltd, 2026
-          </span>
-          <span className={cn(LABEL, "text-muted-foreground")}>
-            All times UTC
-          </span>
-        </div>
+      <footer className="mx-auto flex max-w-3xl flex-wrap justify-between gap-x-5 gap-y-1 px-3 pb-5 md:px-5">
+        <span className={labelClass}>Northgate Parcels Ltd, 2026</span>
+        <span className={labelClass}>All times UTC</span>
       </footer>
     </div>
   )

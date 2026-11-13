@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { ArrowDownRight, ArrowUpRight, Menu } from "lucide-react"
+import { ArrowDownIcon, ArrowUpIcon, MenuIcon, PlusIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -20,19 +20,35 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
 const buttonClass = "rounded-sm px-4 font-mono text-label uppercase"
-
 const labelHeading = "font-mono text-label uppercase text-foreground"
+
+type NavLink = { name: string; current?: boolean }
+
+const navGroups: { name: string; links: NavLink[] }[] = [
+  {
+    name: "Workspace",
+    links: [
+      { name: "Overview", current: true },
+      { name: "Sheets" },
+      { name: "Members" },
+      { name: "Activity" },
+    ],
+  },
+  {
+    name: "Settings",
+    links: [{ name: "Billing" }, { name: "API keys" }],
+  },
+]
 
 type Period = "7" | "30" | "90"
 
-const periods: { value: Period; label: string }[] = [
-  { value: "7", label: "7 days" },
-  { value: "30", label: "30 days" },
-  { value: "90", label: "90 days" },
+const periods: { value: Period; name: string; long: string }[] = [
+  { value: "7", name: "7 days", long: "the previous 7 days" },
+  { value: "30", name: "30 days", long: "the previous 30 days" },
+  { value: "90", name: "90 days", long: "the previous 90 days" },
 ]
 
 type KeyNumber = {
@@ -44,163 +60,156 @@ type KeyNumber = {
 
 const keyNumbers: Record<Period, KeyNumber[]> = {
   "7": [
-    { label: "Active sheets", value: "128", direction: "up", change: "6%" },
-    { label: "Editors", value: "42", direction: "up", change: "12%" },
-    { label: "Edits per day", value: "559", direction: "up", change: "9%" },
-    { label: "Comments", value: "286", direction: "down", change: "4%" },
+    { label: "Active sheets", value: "1,284", direction: "up", change: "12%" },
+    { label: "Editors", value: "86", direction: "up", change: "4%" },
+    { label: "Comments", value: "612", direction: "down", change: "3%" },
+    { label: "Shared", value: "64%", direction: "up", change: "2 pts" },
   ],
   "30": [
-    { label: "Active sheets", value: "214", direction: "up", change: "3%" },
-    { label: "Editors", value: "57", direction: "up", change: "4%" },
-    { label: "Edits per day", value: "512", direction: "down", change: "3%" },
-    { label: "Comments", value: "1,140", direction: "up", change: "11%" },
+    { label: "Active sheets", value: "2,904", direction: "up", change: "9%" },
+    { label: "Editors", value: "143", direction: "up", change: "6%" },
+    { label: "Comments", value: "2,488", direction: "up", change: "5%" },
+    { label: "Shared", value: "61%", direction: "down", change: "1 pt" },
   ],
   "90": [
-    { label: "Active sheets", value: "342", direction: "up", change: "18%" },
-    { label: "Editors", value: "61", direction: "down", change: "2%" },
-    { label: "Edits per day", value: "498", direction: "up", change: "7%" },
-    { label: "Comments", value: "3,402", direction: "up", change: "21%" },
+    { label: "Active sheets", value: "4,117", direction: "up", change: "21%" },
+    { label: "Editors", value: "198", direction: "up", change: "15%" },
+    { label: "Comments", value: "7,105", direction: "up", change: "11%" },
+    { label: "Shared", value: "58%", direction: "up", change: "6 pts" },
   ],
 }
 
-// Friday 6 March to Thursday 12 March 2026, oldest first.
 const editsPerDay = [
-  { short: "Fri", day: "Friday", value: 584 },
-  { short: "Sat", day: "Saturday", value: 162 },
-  { short: "Sun", day: "Sunday", value: 138 },
-  { short: "Mon", day: "Monday", value: 642 },
-  { short: "Tue", day: "Tuesday", value: 711 },
-  { short: "Wed", day: "Wednesday", value: 689 },
-  { short: "Thu", day: "Thursday", value: 987 },
+  { day: "Fri", long: "Friday", value: 712 },
+  { day: "Sat", long: "Saturday", value: 241 },
+  { day: "Sun", long: "Sunday", value: 198 },
+  { day: "Mon", long: "Monday", value: 655 },
+  { day: "Tue", long: "Tuesday", value: 803 },
+  { day: "Wed", long: "Wednesday", value: 868 },
+  { day: "Thu", long: "Thursday", value: 841 },
 ]
+const maxEdits = Math.max(...editsPerDay.map((d) => d.value))
 
 type Status = "Shared" | "Private"
-type StatusFilter = "All" | Status
 
-const statusFilters: StatusFilter[] = ["All", "Shared", "Private"]
-
-const sheets: {
+type SheetRow = {
   name: string
   owner: string
   status: Status
   edits: number
   date: string
   dateLabel: string
-}[] = [
+}
+
+const sheets: SheetRow[] = [
   {
     name: "Q3 budget",
-    owner: "Dana Whitcombe",
+    owner: "Dana Whitfield",
     status: "Shared",
-    edits: 412,
+    edits: 214,
     date: "2026-03-12",
     dateLabel: "12 March 2026",
   },
   {
     name: "Hiring plan 2026",
-    owner: "Mira Halvorsen",
+    owner: "Omar Lindqvist",
     status: "Private",
-    edits: 96,
+    edits: 187,
     date: "2026-03-12",
     dateLabel: "12 March 2026",
   },
   {
-    name: "Warehouse stock count",
-    owner: "Tobias Renk",
+    name: "Vendor contracts",
+    owner: "Priya Castellano",
     status: "Shared",
-    edits: 1284,
+    edits: 96,
     date: "2026-03-11",
     dateLabel: "11 March 2026",
   },
   {
-    name: "Supplier price list",
-    owner: "Ines Carvalho",
+    name: "Office move checklist",
+    owner: "Theo Marchetti",
     status: "Shared",
-    edits: 238,
+    edits: 152,
     date: "2026-03-11",
     dateLabel: "11 March 2026",
   },
   {
-    name: "Board pack figures",
-    owner: "Mira Halvorsen",
-    status: "Private",
-    edits: 57,
+    name: "Marketing calendar",
+    owner: "Ines Halvorsen",
+    status: "Shared",
+    edits: 341,
     date: "2026-03-10",
     dateLabel: "10 March 2026",
   },
   {
-    name: "Event seating chart",
-    owner: "Kofi Mensah",
-    status: "Shared",
-    edits: 174,
+    name: "Support rota",
+    owner: "Dana Whitfield",
+    status: "Private",
+    edits: 78,
     date: "2026-03-09",
     dateLabel: "9 March 2026",
   },
   {
-    name: "Travel expenses March",
-    owner: "Dana Whitcombe",
-    status: "Private",
-    edits: 31,
+    name: "Inventory count",
+    owner: "Kofi Ashworth",
+    status: "Shared",
+    edits: 263,
     date: "2026-03-07",
     dateLabel: "7 March 2026",
   },
   {
-    name: "Customer churn model",
-    owner: "Tobias Renk",
-    status: "Shared",
-    edits: 1,
+    name: "Board metrics",
+    owner: "Omar Lindqvist",
+    status: "Private",
+    edits: 129,
     date: "2026-03-06",
     dateLabel: "6 March 2026",
   },
 ]
 
+type StatusFilter = "All" | Status
+const statusFilters: StatusFilter[] = ["All", "Shared", "Private"]
+
 const activity = [
   {
-    text: "Dana renamed Q3 budget",
+    text: "Dana Whitfield renamed Q3 forecast to Q3 budget.",
     dateTime: "2026-03-12T14:05",
     label: "12 March 2026, 14:05",
   },
   {
-    text: "Tobias added 40 rows to Warehouse stock count",
-    dateTime: "2026-03-12T11:32",
-    label: "12 March 2026, 11:32",
+    text: "Omar Lindqvist added two columns to Hiring plan 2026.",
+    dateTime: "2026-03-12T11:42",
+    label: "12 March 2026, 11:42",
   },
   {
-    text: "Mira made Hiring plan 2026 private",
-    dateTime: "2026-03-12T09:18",
-    label: "12 March 2026, 09:18",
+    text: "Priya Castellano shared Vendor contracts with the legal team.",
+    dateTime: "2026-03-11T16:20",
+    label: "11 March 2026, 16:20",
   },
   {
-    text: "Ines shared Supplier price list with Kofi",
-    dateTime: "2026-03-11T16:47",
-    label: "11 March 2026, 16:47",
+    text: "Theo Marchetti left a comment on Office move checklist.",
+    dateTime: "2026-03-11T09:15",
+    label: "11 March 2026, 09:15",
   },
   {
-    text: "Kofi left a comment on Event seating chart",
-    dateTime: "2026-03-11T10:02",
-    label: "11 March 2026, 10:02",
+    text: "Ines Halvorsen imported 48 rows into Marketing calendar.",
+    dateTime: "2026-03-10T15:33",
+    label: "10 March 2026, 15:33",
   },
   {
-    text: "Dana created Travel expenses March",
-    dateTime: "2026-03-10T08:40",
-    label: "10 March 2026, 08:40",
-  },
-]
-
-const navGroups = [
-  {
-    name: "Workspace",
-    links: ["Overview", "Sheets", "Members", "Activity"],
-  },
-  {
-    name: "Settings",
-    links: ["Billing", "API keys"],
+    text: "Kofi Ashworth invited Lena Brandt to Inventory count.",
+    dateTime: "2026-03-07T10:08",
+    label: "7 March 2026, 10:08",
   },
 ]
 
 function SidebarContent() {
   return (
     <>
-      <p className="px-2 font-heading text-h2">Plainsheet</p>
+      <p className="px-2 font-heading text-h2 text-sidebar-foreground">
+        Plainsheet
+      </p>
       <nav aria-label="Main" className="flex flex-col gap-8">
         {navGroups.map((group) => (
           <div key={group.name} className="flex flex-col gap-2">
@@ -208,68 +217,34 @@ function SidebarContent() {
               {group.name}
             </p>
             <ul className="flex flex-col gap-1">
-              {group.links.map((link) => {
-                const current = link === "Overview"
-                return (
-                  <li key={link}>
-                    <a
-                      href="#"
-                      aria-current={current ? "page" : undefined}
-                      className={cn(
-                        "block rounded-sm px-2 py-2 font-mono text-label text-sidebar-foreground uppercase underline-offset-4 transition-colors duration-150 hover:underline",
-                        focusRing,
-                        current &&
-                          "bg-sidebar-accent text-sidebar-accent-foreground"
-                      )}
-                    >
-                      {link}
-                    </a>
-                  </li>
-                )
-              })}
+              {group.links.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href="#"
+                    aria-current={link.current ? "page" : undefined}
+                    className={cn(
+                      "block rounded-sm px-2 py-2 font-mono text-label uppercase underline-offset-4 transition-colors duration-150 hover:underline",
+                      focusOutline,
+                      link.current
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "text-sidebar-foreground"
+                    )}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         ))}
       </nav>
-      <div className="mt-auto flex flex-col px-2">
-        <p className="wrap-break-word">Mira Halvorsen</p>
+      <div className="mt-auto px-2">
+        <p className="text-body text-sidebar-foreground">Mara Okonkwo</p>
         <p className="font-mono text-label wrap-break-word text-muted-foreground">
-          mira.halvorsen@northfield.example
+          mara.okonkwo@fernhollow.example
         </p>
       </div>
     </>
-  )
-}
-
-function ButtonGroup<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string
-  options: { value: T; label: string }[]
-  value: T
-  onChange: (value: T) => void
-}) {
-  return (
-    <div role="group" aria-label={label} className="flex gap-1">
-      {options.map((option) => {
-        const selected = option.value === value
-        return (
-          <Button
-            key={option.value}
-            type="button"
-            variant={selected ? "secondary" : "outline"}
-            aria-pressed={selected}
-            className={buttonClass}
-            onClick={() => onChange(option.value)}
-          >
-            {option.label}
-          </Button>
-        )
-      })}
-    </div>
   )
 }
 
@@ -280,32 +255,30 @@ export function App() {
   const [query, setQuery] = useState("")
 
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 64rem)")
+    const mq = window.matchMedia("(min-width: 64rem)")
     const onChange = (event: MediaQueryListEvent) => {
       if (event.matches) setMenuOpen(false)
     }
-    media.addEventListener("change", onChange)
-    return () => media.removeEventListener("change", onChange)
+    mq.addEventListener("change", onChange)
+    return () => mq.removeEventListener("change", onChange)
   }, [])
 
-  const term = query.trim().toLowerCase()
+  const needle = query.trim().toLowerCase()
   const rows = sheets.filter(
-    (sheet) =>
-      (status === "All" || sheet.status === status) &&
-      sheet.name.toLowerCase().includes(term)
+    (row) =>
+      (status === "All" || row.status === status) &&
+      row.name.toLowerCase().includes(needle)
   )
-
-  const largest = Math.max(...editsPerDay.map((day) => day.value))
-  const periodLabel = periods.find((p) => p.value === period)!.label
+  const currentPeriod = periods.find((p) => p.value === period)!
 
   return (
-    <div className="min-h-svh bg-background text-body text-foreground lg:flex">
-      <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col gap-8 overflow-y-auto border-r border-border bg-sidebar p-4 text-sidebar-foreground lg:flex">
+    <div className="flex min-h-svh text-body">
+      <aside className="sticky top-0 hidden h-svh w-64 shrink-0 flex-col gap-8 overflow-y-auto border-r bg-sidebar p-4 lg:flex">
         <SidebarContent />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex flex-wrap items-center justify-between gap-4 border-b border-border px-4 py-4 md:px-8">
+        <header className="flex flex-wrap items-center justify-between gap-4 border-b px-4 py-4 md:px-8">
           <div className="flex items-center gap-4">
             <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
               <SheetTrigger
@@ -316,14 +289,14 @@ export function App() {
                   />
                 }
               >
-                <Menu aria-hidden="true" className="size-4" strokeWidth={1.5} />
+                <MenuIcon className="size-4" strokeWidth={1.5} aria-hidden />
                 Menu
               </SheetTrigger>
               <SheetContent
                 side="left"
                 className="overflow-y-auto bg-sidebar px-4 pt-16 pb-8 text-body text-sidebar-foreground data-[side=left]:w-64"
               >
-                <SheetTitle className="sr-only">Navigation</SheetTitle>
+                <SheetTitle className="sr-only">Menu</SheetTitle>
                 <div className="flex flex-1 flex-col gap-8">
                   <SidebarContent />
                 </div>
@@ -331,29 +304,37 @@ export function App() {
             </Sheet>
             <h1 className="text-h2">Overview</h1>
           </div>
-          <Button type="button" className={buttonClass}>
+          <Button className={buttonClass}>
+            <PlusIcon className="size-4" strokeWidth={1.5} aria-hidden />
             New sheet
           </Button>
         </header>
 
         <main className="flex flex-col gap-8 p-4 md:p-8">
-          <section aria-labelledby="key-numbers-heading">
+          <section aria-labelledby="key-numbers">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 id="key-numbers-heading" className={labelHeading}>
+              <h2 id="key-numbers" className={labelHeading}>
                 Key numbers
               </h2>
-              <ButtonGroup
-                label="Period"
-                options={periods}
-                value={period}
-                onChange={setPeriod}
-              />
+              <div role="group" aria-label="Period" className="flex gap-1">
+                {periods.map((p) => (
+                  <Button
+                    key={p.value}
+                    variant={period === p.value ? "secondary" : "outline"}
+                    aria-pressed={period === p.value}
+                    onClick={() => setPeriod(p.value)}
+                    className={buttonClass}
+                  >
+                    {p.name}
+                  </Button>
+                ))}
+              </div>
             </div>
-            <div className="mt-4 overflow-hidden rounded-md border border-border">
+            <div className="mt-4 overflow-hidden rounded-md border bg-background">
               <dl className="grid grid-cols-2 gap-px bg-border md:grid-cols-4">
                 {keyNumbers[period].map((item) => {
                   const Arrow =
-                    item.direction === "up" ? ArrowUpRight : ArrowDownRight
+                    item.direction === "up" ? ArrowUpIcon : ArrowDownIcon
                   return (
                     <div
                       key={item.label}
@@ -367,16 +348,16 @@ export function App() {
                       </dd>
                       <dd className="flex items-center gap-1 font-mono text-label text-foreground tabular-nums">
                         <Arrow
-                          aria-hidden="true"
                           className="size-4 shrink-0"
                           strokeWidth={1.5}
+                          aria-hidden
                         />
                         <span>
                           {item.direction === "up" ? "Up" : "Down"}{" "}
                           {item.change}
                           <span className="sr-only">
                             {" "}
-                            from the previous {periodLabel}
+                            from {currentPeriod.long}
                           </span>
                         </span>
                       </dd>
@@ -388,36 +369,36 @@ export function App() {
           </section>
 
           <section
-            aria-labelledby="chart-heading"
-            className="rounded-md border border-border bg-background p-4 md:p-8"
+            aria-labelledby="edits-per-day"
+            className="rounded-md border bg-background p-4 md:p-8"
           >
             <div className="flex flex-wrap items-baseline justify-between gap-4">
-              <h2 id="chart-heading" className={labelHeading}>
+              <h2 id="edits-per-day" className={labelHeading}>
                 Edits per day
               </h2>
               <p className="font-mono text-label text-muted-foreground uppercase">
                 Last 7 days
               </p>
             </div>
-            <div aria-hidden="true" className="mt-4 grid grid-cols-7 gap-2">
-              {editsPerDay.map((day) => (
-                <div key={day.short} className="flex min-w-0 flex-col gap-2">
+            <div aria-hidden className="mt-4 grid grid-cols-7 gap-2">
+              {editsPerDay.map((d) => (
+                <div key={d.day} className="flex min-w-0 flex-col gap-2">
                   <div className="flex h-64 flex-col justify-end gap-2">
                     <span className="font-mono text-label text-foreground tabular-nums">
-                      {day.value}
+                      {d.value}
                     </span>
                     <div
-                      className="w-full bg-foreground"
-                      style={{ height: `${(day.value / largest) * 90}%` }}
+                      className="bg-foreground"
+                      style={{ height: `${(d.value / maxEdits) * 90}%` }}
                     />
                   </div>
                   <span className="font-mono text-label text-muted-foreground uppercase">
-                    {day.short}
+                    {d.day}
                   </span>
                 </div>
               ))}
             </div>
-            <table className="sr-only" aria-labelledby="chart-heading">
+            <table className="sr-only" aria-label="Edits per day">
               <thead>
                 <tr>
                   <th scope="col">Day</th>
@@ -425,43 +406,54 @@ export function App() {
                 </tr>
               </thead>
               <tbody>
-                {editsPerDay.map((day) => (
-                  <tr key={day.short}>
-                    <th scope="row">{day.day}</th>
-                    <td>{day.value}</td>
+                {editsPerDay.map((d) => (
+                  <tr key={d.day}>
+                    <th scope="row">{d.long}</th>
+                    <td>{d.value}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </section>
 
-          <div className="grid grid-cols-1 gap-y-8 2xl:grid-cols-12 2xl:gap-x-8">
+          <div className="grid grid-cols-1 gap-8 2xl:grid-cols-12">
             <section
-              aria-labelledby="sheets-heading"
-              className="min-w-0 rounded-md border border-border bg-background 2xl:col-span-8"
+              aria-labelledby="recent-sheets"
+              className="min-w-0 rounded-md border bg-background 2xl:col-span-8"
             >
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border p-4">
-                <h2 id="sheets-heading" className={labelHeading}>
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b p-4">
+                <h2 id="recent-sheets" className={labelHeading}>
                   Recent sheets
                 </h2>
                 <div className="flex w-full flex-wrap items-center gap-4 sm:w-auto">
                   <Input
                     type="search"
-                    value={query}
-                    onChange={(event) => setQuery(event.target.value)}
                     placeholder="Filter by name"
                     aria-label="Filter by name"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
                     className="w-full rounded-sm px-2 py-0 text-body sm:w-64 md:text-body [&::-webkit-search-cancel-button]:appearance-none"
                   />
-                  <ButtonGroup
-                    label="Status"
-                    options={statusFilters.map((s) => ({ value: s, label: s }))}
-                    value={status}
-                    onChange={setStatus}
-                  />
+                  <div
+                    role="group"
+                    aria-label="Status"
+                    className="flex gap-1"
+                  >
+                    {statusFilters.map((s) => (
+                      <Button
+                        key={s}
+                        variant={status === s ? "secondary" : "outline"}
+                        aria-pressed={status === s}
+                        onClick={() => setStatus(s)}
+                        className={buttonClass}
+                      >
+                        {s}
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </div>
-              <Table label="Recent sheets" className="text-body">
+              <Table label="Recent sheets" className="min-w-lg text-body">
                 <TableHeader>
                   <TableRow>
                     <TableHead
@@ -504,23 +496,23 @@ export function App() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    rows.map((sheet) => (
-                      <TableRow key={sheet.name}>
-                        <TableCell>{sheet.name}</TableCell>
-                        <TableCell>{sheet.owner}</TableCell>
+                    rows.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell>{row.owner}</TableCell>
                         <TableCell>
                           <Badge
                             variant="outline"
                             className="h-auto rounded-none px-2 py-1 font-mono text-label uppercase"
                           >
-                            {sheet.status}
+                            {row.status}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right font-mono tabular-nums">
-                          {sheet.edits.toLocaleString("en-GB")}
+                          {row.edits}
                         </TableCell>
                         <TableCell className="text-right font-mono tabular-nums">
-                          <time dateTime={sheet.date}>{sheet.dateLabel}</time>
+                          <time dateTime={row.date}>{row.dateLabel}</time>
                         </TableCell>
                       </TableRow>
                     ))
@@ -530,27 +522,24 @@ export function App() {
             </section>
 
             <section
-              aria-labelledby="activity-heading"
-              className="min-w-0 rounded-md border border-border bg-background 2xl:col-span-4"
+              aria-labelledby="activity"
+              className="min-w-0 rounded-md border bg-background 2xl:col-span-4 2xl:col-start-9"
             >
-              <div className="border-b border-border p-4">
-                <h2 id="activity-heading" className={labelHeading}>
+              <div className="flex items-center border-b p-4 2xl:min-h-16">
+                <h2 id="activity" className={labelHeading}>
                   Activity
                 </h2>
               </div>
-              <ul>
+              <ol className="divide-y">
                 {activity.map((entry) => (
-                  <li
-                    key={entry.dateTime}
-                    className="flex flex-col gap-2 border-b border-border p-4 last:border-b-0"
-                  >
+                  <li key={entry.dateTime} className="flex flex-col gap-2 p-4">
                     <p>{entry.text}</p>
                     <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
                       <time dateTime={entry.dateTime}>{entry.label}</time>
                     </p>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </section>
           </div>
         </main>

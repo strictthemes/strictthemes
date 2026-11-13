@@ -68,7 +68,7 @@ Right after the row, the status element from the Announcements note, empty at th
 
 A grid row with two items.
 
-**The table,** nine columns from `lg` up: a card with rows that holds the table from the Tables note and, after the table, a row with `border-t border-border px-5 py-3` holding one line of small print: "Clubs level on points are split by goal difference, then by goals scored. The champions go up to the Premier Division and the bottom two go down."
+**The table,** nine columns from `lg` up: a card with rows that holds the table from the Tables note and, after the table, a row with `border-t border-border px-5 py-3` holding a `<p>` of small print: "Clubs level on points are split by goal difference, then by goals scored. The champions go up to the Premier Division and the bottom two go down."
 
 The caption follows the control: "Kestrel Valley League, Division One: all matches, after 14 of 22.", "Kestrel Valley League, Division One: home matches only." or "Kestrel Valley League, Division One: away matches only."
 

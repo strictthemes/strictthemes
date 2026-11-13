@@ -39,7 +39,7 @@ The header from the layout notes. "Tableware" is the current page. The basket ho
 
 The first section of `<main>` holds this part and the next. It opens with a 12-column grid; its columns 1–7 hold a breadcrumb, then the `<h1>` and a paragraph.
 
-- The breadcrumb is a `<nav>` with the `aria-label` "Breadcrumb" holding an `<ol>` in one row, `flex flex-wrap gap-2 font-mono text-label text-muted-foreground`: a link "Shop" to `/`, styled as a header link and so in `text-foreground`, a `/` with `aria-hidden="true"` and "Tableware" with `aria-current="page"`, both muted.
+- The breadcrumb is a `<nav>` with the `aria-label` "Breadcrumb" holding an `<ol>` in one row, `flex flex-wrap gap-2 font-mono text-label text-muted-foreground`: a link "Shop" to `/`, styled as a header link and so in `text-foreground`, at the `<ol>`'s label size, a `/` with `aria-hidden="true"` and "Tableware" with `aria-current="page"`, both muted.
 - With `mt-2` the `<h1>` in `text-h1`: "Tableware".
 - With `mt-4` one paragraph: everything here is food-safe and goes in the dishwasher; no two pieces come out of the kiln quite the same.
 
@@ -62,7 +62,7 @@ In the same section as the introduction, after its grid: first a visually hidden
 - With `mt-4` one sentence: "The next jugs come out of the kiln in early December."
 - With `mt-6` a `secondary` button "Show all pieces".
 
-In the sample only Jugs is ever empty. Build the heading from the category's name in lower case ("No bowls just now"), so that any category that empties gets its own. The sentence's month holds for jugs only: for any other category it is "The next bowls come out of the next firing."
+In the sample only Jugs is ever empty. Build the heading from the category's whole name in lower case ("No bowls just now", "No mugs and cups just now"), so that any category that empties gets its own. The sentence's month holds for jugs only: for any other category it is "The next bowls come out of the next firing."
 
 This page has no default (terracotta) button.
 

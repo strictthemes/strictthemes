@@ -21,7 +21,7 @@ A section, but it opens with no heading row: the `<h1>` is its heading. Its stac
 
 - A stack with `gap-2`: a label, `Music and design · Varsby Docks`, then the `<h1>` "Tremor Days".
 - The dates and the place in `font-heading text-h2`, on one `<p>`: "4–5 December 2026 · Varsby Docks", the dates as the range from the Numbers note, "4" in a `<time dateTime="2026-12-04">` and "5 December 2026" in a `<time dateTime="2026-12-05">`. On a phone the line wraps; it never runs off the screen.
-- One paragraph of at most two sentences, in `text-body` straight on the page, `max-w-xl`: what the festival is, in plain words.
+- One paragraph of at most two sentences, in `text-body` straight on the page, `max-w-xl`: what the festival is, in plain words, such as "Two days of bands, live sets and design talks in the old harbour of Varsby. Three stages sit between the cranes and the pump house."
 - A row of two links styled as buttons, `flex flex-wrap gap-3`: "Buy tickets" (`/tickets`) in the default variant, and "See the line-up" (`/line-up`) in the `secondary` variant. This is the page's one default button.
 
 ### 2. Countdown
@@ -30,7 +30,7 @@ A section on the page, not on a panel: large numbers are part of the look. Its h
 
 - The four units, in a row with `grid grid-cols-2 gap-5 md:flex md:items-center md:gap-8`: two by two on a phone, one line from `md` up. Each unit is a stack with `gap-1`: the number, two digits with a leading zero (`04`), in `font-heading text-h1 tabular-nums` below `md` and `md:text-display` from `md` up; under it its label, `Days`, `Hours`, `Minutes` or `Seconds`. These four numbers are the one other `text-display` text on the page. The days count may have three digits; it does not need a leading zero then.
 - Between the units, from `md` up only, a separator: `hidden md:flex flex-col gap-2` holding two countdown dots, each `size-3 rounded-full bg-foreground`. Below `md` they are not shown, so the grid holds only the four units.
-- The whole row of units and dots has `aria-hidden="true"`, which hides the separators too; they need no `aria-hidden` of their own. Beside it, a `<p>` with `sr-only` gives the same time in words: "12 days, 4 hours and 31 minutes until the gates open." It is not a live region: it changes once a minute and is read when someone reaches it.
+- The whole row of units and dots has `aria-hidden="true"`, which hides the separators too; they need no `aria-hidden` of their own. Right after it in the source, before the label line below, a `<p>` with `sr-only` gives the same time in words: "12 days, 4 hours and 31 minutes until the gates open." It is not a live region: it changes once a minute and is read when someone reaches it.
 - Under the row, a label line with the start as one `<time dateTime="2026-12-04T16:00+01:00">` that wraps the whole `Fri 4 Dec · 16:00`, since it is one moment.
 
 ### 3. First names
@@ -54,7 +54,7 @@ A section with a visually hidden `<h2>` "The festival in numbers" and the grid f
 
 A section whose one child is a panel across the full width, with no grid around it; the panel carries the section's heading. The panel has `gap-5` and lays its two parts side by side from `md` up: `md:flex-row md:items-center md:justify-between`.
 
-- At the left, a stack with `gap-3`: the `<h2>` "Tickets on sale" in `text-h2 md:text-h1`, and two sentences in `text-body`: "Weekend €118, day tickets from €64. Saturday day tickets are sold out."
+- At the left, a stack with `gap-3`: the `<h2>` "Tickets on sale" in `text-h2 md:text-h1`, and two sentences in `text-body`: "Weekend €118, day tickets from €64. Saturday day tickets are sold out." The sold-out fact stays in words: no badge here, and the page has none.
 - At the right, `self-start md:self-auto md:shrink-0`: a link styled as the `secondary` button, "Buy tickets" (`/tickets`). It is blue, not black, because the hero's is the page's one default button, and a tall screen can show both. Below `md` it sits under the text, at its own width.
 
 ### 6. Footer

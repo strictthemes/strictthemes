@@ -1,5 +1,5 @@
 import * as React from "react"
-import { CalendarIcon } from "lucide-react"
+import { Calendar as CalendarIcon } from "lucide-react"
 
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { formatShortDate, isoDate } from "@/lib/format"
+import { formatShortDate, isoDate } from "@/format"
 
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -35,28 +35,28 @@ export function DatePicker({
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
-  const valueId = `${id}-value`
+  const timeId = `${id}-value`
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(next) => setOpen(next)}>
       <PopoverTrigger
         ref={ref}
         id={id}
-        aria-labelledby={`${labelId} ${valueId}`}
+        aria-labelledby={`${labelId} ${timeId}`}
         aria-describedby={describedBy}
         className={`flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-2 text-body whitespace-nowrap transition-colors outline-none focus-visible:border-ring ${FOCUS}`}
       >
         <time
-          id={valueId}
+          id={timeId}
           dateTime={isoDate(value)}
           className="font-mono tabular-nums"
         >
           {formatShortDate(value)}
         </time>
         <CalendarIcon
-          aria-hidden="true"
-          strokeWidth={1.5}
           className="size-4 shrink-0 text-muted-foreground"
+          strokeWidth={1.5}
+          aria-hidden="true"
         />
       </PopoverTrigger>
       <PopoverContent
@@ -79,7 +79,7 @@ export function DatePicker({
             startMonth={today}
             endMonth={latest}
             disabled={{ before: today, after: latest }}
-            onSelect={(date) => {
+            onSelect={(date: Date) => {
               onChange(date)
               setOpen(false)
             }}

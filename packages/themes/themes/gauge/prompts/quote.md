@@ -46,7 +46,7 @@ The shadcn `Table` with the label "Lines" and six columns:
 - **Quantity:** right-aligned, header too. The cell holds a stack with `flex flex-col items-end gap-2`: an `Input` in the quantity look of the Inputs note with `w-24`, no visible label but the `aria-label` "Quantity of TVL-2047-RS" (with the line's part number), then the error line when there is one, with `max-w-48 text-left`, so a wrapped sentence reads on from its icon; the cell has `whitespace-normal` so the line can wrap. The column grows while an error shows; that is expected.
 - **Unit price (£):** the price of the break the quantity falls in, `2.28`, right-aligned, header too. While the quantity is not valid it shows the 1 to 49 price.
 - **Line total (£):** `570.00`, right-aligned, header too. While the quantity is not valid it reads `0.00`.
-- **The last column** has the header "Action", made `sr-only`, and holds a `secondary` button "Remove" with the `aria-label` "Remove TVL-2047-RS". While only one line is left, its "Remove" is disabled with the plain `disabled` prop.
+- **The last column** has the header "Action", made `sr-only`; its cells are left-aligned, as stock, and hold a `secondary` button "Remove" with the `aria-label` "Remove TVL-2047-RS". While only one line is left, its "Remove" is disabled with the plain `disabled` prop.
 
 The `<tfoot>` has one row: its first cell spans the first four columns and holds the label "Subtotal, excluding VAT", right-aligned; the next cell holds the sum of the line totals, `1,137.80`, in `font-heading text-h2 tabular-nums`, right-aligned; the last cell is empty. The `TableFooter`'s own top border is the rule above it, as the Tables note says.
 
@@ -77,7 +77,7 @@ Every field starts empty but the select.
   - `weekdays`: add `gap-1`. `weekday`: replace its arbitrary text size and `font-normal` with `font-mono text-label`, the label style, in sentence case as the library writes them (`Mo`, `Tu`). `week`: replace its stock top margin with `mt-1` and add `gap-1`, so the gutter is 4px both ways, which is where the focus outline fits.
   - `today`: leave only `text-foreground`; delete its corner class, `bg-muted` and the `data-[selected=true]:` class. A grey fill would mark today by a color alone.
   - The `Chevron` component: give `ChevronLeftIcon` and `ChevronRightIcon` `strokeWidth={1.5}`.
-  - `CalendarDayButton`: in its classes, delete `border-0`, the three `group-data-[focused=true]/day:` classes that draw the ring (`…:border-ring`, `…:ring-[3px]`, `…:ring-ring/50`) and `dark:hover:text-foreground`, which would make the chosen day's figure unreadable on hover in dark mode; replace the small text size in `[&>span]:` with `[&>span]:text-label`; and add `font-mono text-body tabular-nums group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold`. A day is then a mono figure; today has a 1px border in the text color and a bold figure, and the bold still shows when today is the chosen day; the chosen day keeps the stock graphite fill (`data-[selected-single=true]:bg-primary`); the focused day shows the outline `button.tsx` already has.
+  - `CalendarDayButton`: in its classes, delete `border-0`, the three `group-data-[focused=true]/day:` classes that draw the ring (`…:border-ring`, `…:ring-[3px]`, `…:ring-ring/50`) and `dark:hover:text-foreground`, which would make the chosen day's figure unreadable on hover in dark mode; leave the `[&>span]:` classes as they are (this version draws no `<span>` in a day, so they do nothing); and add `font-mono text-body tabular-nums group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold`. A day is then a mono figure; today has a 1px border in the text color and a bold figure, and the bold still shows when today is the chosen day; the chosen day keeps the stock graphite fill (`data-[selected-single=true]:bg-primary`); the focused day shows the outline `button.tsx` already has.
 - `button.tsx`, the `ghost` variant, which only the calendar's days and arrows use: replace `hover:bg-muted` with `hover:bg-accent`, the fill of a highlighted row in a select, and delete `dark:hover:bg-muted/50`, which cannot be seen on the popup in dark mode. No button of the page itself is `ghost`.
 
 Then write `components/ui/date-picker.tsx`, a `DatePicker` with the props `id`, `labelId`, `value` (a `Date` or `undefined`), `onValueChange`, `today`, `aria-invalid` and `aria-describedby`. It keeps `open` in state and renders a `Popover` with:
@@ -104,13 +104,13 @@ Rendered inside the confirmation element only after a good submit, when the `<fo
 
 ### Behavior
 
-- A quantity is read as a whole number after trimming spaces and dropping thousands commas. A valid one is from 1 to 10,000. As it is typed, the line's unit price, its line total and the subtotal follow at once; an invalid quantity counts as zero in the subtotal. All sums are worked in pence.
-- "Remove" removes its line, and focus moves to the quantity field of the line that took its place, or of the line above when the last line went. The count follows. The lines left keep their quantities.
+- A quantity is read as a whole number after trimming spaces and dropping every comma, wherever it stands. A valid one is from 1 to 10,000. As it is typed, the line's unit price, its line total and the subtotal follow at once; an invalid quantity counts as zero in the subtotal. All sums are worked in pence.
+- "Remove" removes its line, and focus moves to the quantity field of the line that took its place, or of the line above when the last line went. The count follows. The lines left keep their quantities. A removed line's error goes with it; every other error stays until the next submit.
 - "Request a quote" checks every field in code, the quantities first, then the fields in their order, and moves focus to the first one with an error once the error lines are rendered. Each error, with its text:
   - A quantity: "Enter a whole number from 1 to 10,000."
   - Company: "Enter your company's name."
   - Your name: "Enter your name."
-  - Email empty: "Enter your email address." Anything without one `@` with text before it and a dot in the text after it: "Enter an email address such as buyer@pellam.example."
+  - Email empty: "Enter your email address." Anything without one `@` with text before it and, after it, a dot with text on both sides (`a@b.c`, not `a@.` or `a@b.`): "Enter an email address such as buyer@pellam.example."
   - Phone, only when it is not empty: with spaces removed, anything but 10 to 15 digits with an optional `+` in front: "Enter a phone number of 10 to 15 digits, or leave it empty."
   - Delivery address: "Enter the delivery address."
   - Town: "Enter the town."

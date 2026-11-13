@@ -31,20 +31,20 @@ The header from the layout notes. This page is a step of booking, not the bookin
 
 ### 2. Opening
 
-The first section, with `pt-8`, in columns 1–8 of a grid (`grid gap-5 md:grid-cols-12`): a label, `Step 1 of 3 · Choose a sailing`, then with `mt-2` the `<h1>` "Harrowmouth to Port Ellery" in `text-h1`, then with `mt-3` a label line in `text-foreground`: `Saturday 19 December 2026 · One way · 2 adults`, with the date in a `<time>`. Then with `mt-3` a `<p>` holding a link in running text, "Change search", that goes to `/`.
+The first section, with `pt-8`, in columns 1–8 of a grid (`grid grid-cols-1 gap-5 md:grid-cols-12`): a label, `Step 1 of 3 · Choose a sailing`, then with `mt-2` the `<h1>` "Harrowmouth to Port Ellery" in `text-h1`, then with `mt-3` a label line in `text-foreground`: `Saturday 19 December 2026 · One way · 2 adults`, with the date in a `<time>`. Then with `mt-3` a `<p>` holding a link in running text, "Change search", that goes to `/`.
 
 ### 3. Sailings and summary
 
-A section with `mt-16`, as a grid that is a single column up to `lg`: `grid gap-5 lg:grid-cols-12 lg:items-start`.
+A section with `mt-16`, as a grid that is a single column up to `lg`: `grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start`.
 
 - In columns 1–8 (`lg:col-span-8`): the sailings.
 - In columns 9–12 (`lg:col-span-4`): the summary card, with `lg:sticky lg:top-5`, so it stays in view while the list scrolls. Below `lg` it comes after the list.
 
 **Sailings.** An `<h2>` "Sailings", then with `mt-3` one sentence: fares are for 2 adults, one way, and include port fees. Then with `mt-5` the sort card, a card holding a label `<p>` with an `id`, "Sort by", in `font-mono text-label text-foreground`, then with `mt-2` a button group as the layout notes describe, named by that label with `aria-labelledby`: "Departure", "Price", "Duration", with "Departure" chosen. Then, still in the sort card, with `mt-3`, a `<p>` with `role="status"`, a label in `text-muted-foreground`, that says the order: `5 sailings, earliest first`, `5 sailings, lowest fare first` or `5 sailings, shortest first`. Unlike the confirmations in the layout notes, it holds its first text from the start: it is a line that changes, not a message that replaces a form.
 
-Then with `mt-5` the sailings as an `<ol>` with no markers and no padding, `grid gap-5`. Each `<li>` is a card, holding:
+Then with `mt-5` the sailings as an `<ol>` with no markers and no padding, `grid grid-cols-1 gap-5`. Each `<li>` is a card, holding:
 
-1. A top line, `flex flex-wrap items-center justify-between gap-x-5 gap-y-2`: on the left the state from the layout notes (`Seats free`, `Sold out`, `Few seats left`), or for the 12:40 in its place the page's one badge, `Lowest fare` (add it with `npx shadcn@latest add badge` if the project has none). On the right, only on the chosen sailing, a mark: a `<span>` with `inline-flex items-center gap-2 font-mono text-label text-foreground` holding the `Check` icon and the word `Chosen`.
+1. A top line, `flex flex-wrap items-center justify-between gap-x-5 gap-y-2`: on the left the state from the layout notes (`Seats free`, `Sold out`, `Few seats left`), or for the 12:40 in its place the page's one badge, `Lowest fare` (add it with `npx shadcn@latest add badge` if the project has none). The 12:40 has seats free; its fare and its "Choose" button already say it can be booked, so it shows no state beside the badge. On the right, only on the chosen sailing, a mark: a `<span>` with `inline-flex items-center gap-2 font-mono text-label text-foreground` holding the `Check` icon and the word `Chosen`.
 2. With `mt-5`, the main row: `flex flex-col gap-5 md:flex-row md:items-center`. This is a layout row, not a stack of text, so the gap is right here. In it:
    - The journey from the layout notes, in its full size, in a `<div>` with `md:min-w-0 md:flex-1`: the departure time and `Harrowmouth` on the left, the duration (`1 h 45 min`) and the way (`Direct` or `1 stop`) on the line, the arrival time and `Port Ellery` on the right.
    - A `<div>` with `flex items-center justify-end gap-5 md:shrink-0`: the fare in a `<div>` with `text-right`, a `<p>` in `font-mono text-h2 text-foreground tabular-nums` (`£78.00`) and under it with `mt-1` a label in `text-muted-foreground`, `2 adults`; then the "Choose" button. The sold-out sailing has neither: it shows no `<div>` here at all, and its state says why.

@@ -1,11 +1,9 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-type View = "all" | "home" | "away"
-
-type MatchRecord = {
+type Record = {
   played: number
   won: number
   drawn: number
@@ -16,11 +14,13 @@ type MatchRecord = {
 
 type Club = {
   name: string
-  home: MatchRecord
-  away: MatchRecord
+  home: Record
+  away: Record
 }
 
-type Row = MatchRecord & {
+type View = "all" | "home" | "away"
+
+type Row = Record & {
   name: string
   goalDifference: number
   points: number
@@ -28,112 +28,105 @@ type Row = MatchRecord & {
 
 const OWN_CLUB = "Wendmoor FC"
 
-function rec(
+function record(
   played: number,
   won: number,
   drawn: number,
   lost: number,
   goalsFor: number,
   goalsAgainst: number
-): MatchRecord {
+): Record {
   return { played, won, drawn, lost, goalsFor, goalsAgainst }
 }
 
+// Kestrel Valley League, Division One, after 14 of 22 matches.
 const CLUBS: Club[] = [
   {
     name: "Castlebrook United",
-    home: rec(6, 4, 1, 1, 12, 6),
-    away: rec(8, 5, 1, 2, 22, 14),
+    home: record(6, 4, 1, 1, 12, 6),
+    away: record(8, 5, 1, 2, 22, 14),
   },
   {
     name: "Dunmarsh Athletic",
-    home: rec(7, 5, 2, 0, 15, 4),
-    away: rec(7, 2, 4, 1, 15, 14),
+    home: record(7, 5, 2, 0, 15, 4),
+    away: record(7, 2, 4, 1, 15, 14),
   },
   {
     name: "Wendmoor FC",
-    home: rec(7, 6, 0, 1, 17, 7),
-    away: rec(7, 2, 3, 2, 13, 12),
+    home: record(7, 6, 0, 1, 17, 7),
+    away: record(7, 2, 3, 2, 13, 12),
   },
   {
     name: "Pellow Green",
-    home: rec(8, 6, 1, 1, 14, 7),
-    away: rec(6, 2, 1, 3, 6, 6),
+    home: record(8, 6, 1, 1, 14, 7),
+    away: record(6, 2, 1, 3, 6, 6),
   },
   {
     name: "Stenwick Albion",
-    home: rec(6, 4, 0, 2, 13, 8),
-    away: rec(8, 3, 2, 3, 7, 8),
+    home: record(6, 4, 0, 2, 13, 8),
+    away: record(8, 3, 2, 3, 7, 8),
   },
   {
     name: "Lowmere Welfare",
-    home: rec(8, 5, 1, 2, 12, 8),
-    away: rec(6, 1, 1, 4, 6, 9),
+    home: record(8, 5, 1, 2, 12, 8),
+    away: record(6, 1, 1, 4, 6, 9),
   },
   {
     name: "Sedgeholme",
-    home: rec(6, 3, 2, 1, 10, 9),
-    away: rec(8, 2, 1, 5, 12, 13),
+    home: record(6, 3, 2, 1, 10, 9),
+    away: record(8, 2, 1, 5, 12, 13),
   },
   {
     name: "Otterby Town",
-    home: rec(6, 3, 2, 1, 9, 5),
-    away: rec(8, 1, 3, 4, 8, 13),
+    home: record(6, 3, 2, 1, 9, 5),
+    away: record(8, 1, 3, 4, 8, 13),
   },
   {
     name: "Tarrowby United",
-    home: rec(7, 2, 3, 2, 7, 10),
-    away: rec(7, 1, 2, 4, 3, 8),
+    home: record(7, 2, 3, 2, 7, 10),
+    away: record(7, 1, 2, 4, 3, 8),
   },
   {
     name: "Kirkfen Rangers",
-    home: rec(7, 2, 4, 1, 12, 9),
-    away: rec(7, 0, 2, 5, 7, 14),
+    home: record(7, 2, 4, 1, 12, 9),
+    away: record(7, 0, 2, 5, 7, 14),
   },
   {
     name: "Hollinvale",
-    home: rec(8, 2, 3, 3, 10, 14),
-    away: rec(6, 0, 1, 5, 3, 12),
+    home: record(8, 2, 3, 3, 10, 14),
+    away: record(6, 0, 1, 5, 3, 12),
   },
   {
     name: "Eastlow Wanderers",
-    home: rec(8, 2, 2, 4, 8, 17),
-    away: rec(6, 0, 0, 6, 2, 16),
+    home: record(8, 2, 2, 4, 8, 17),
+    away: record(6, 0, 0, 6, 2, 16),
   },
 ]
 
-const VIEWS: {
-  value: View
-  button: string
-  label: string
-  status: string
-  caption: string
-}[] = [
-  {
-    value: "all",
-    button: "All matches",
-    label: "ALL MATCHES",
-    status: "All matches",
-    caption:
-      "Kestrel Valley League, Division One: all matches, after 14 of 22.",
-  },
-  {
-    value: "home",
-    button: "Home",
-    label: "HOME MATCHES",
-    status: "Home matches",
-    caption: "Kestrel Valley League, Division One: home matches only.",
-  },
-  {
-    value: "away",
-    button: "Away",
-    label: "AWAY MATCHES",
-    status: "Away matches",
-    caption: "Kestrel Valley League, Division One: away matches only.",
-  },
-]
+const VIEWS: { value: View; button: string; label: string; caption: string }[] =
+  [
+    {
+      value: "all",
+      button: "All matches",
+      label: "All matches",
+      caption:
+        "Kestrel Valley League, Division One: all matches, after 14 of 22.",
+    },
+    {
+      value: "home",
+      button: "Home",
+      label: "Home matches",
+      caption: "Kestrel Valley League, Division One: home matches only.",
+    },
+    {
+      value: "away",
+      button: "Away",
+      label: "Away matches",
+      caption: "Kestrel Valley League, Division One: away matches only.",
+    },
+  ]
 
-function recordFor(club: Club, view: View): MatchRecord {
+function recordFor(club: Club, view: View): Record {
   if (view === "home") return club.home
   if (view === "away") return club.away
   return {
@@ -173,22 +166,25 @@ function signed(n: number) {
 function ordinal(n: number) {
   const tens = n % 100
   if (tens >= 11 && tens <= 13) return `${n}th`
-  const ones = n % 10
-  const suffix =
-    ones === 1 ? "st" : ones === 2 ? "nd" : ones === 3 ? "rd" : "th"
-  return `${n}${suffix}`
+  if (n % 10 === 1) return `${n}st`
+  if (n % 10 === 2) return `${n}nd`
+  if (n % 10 === 3) return `${n}rd`
+  return `${n}th`
 }
 
-function gapToTop(rows: Row[]) {
-  const top = rows[0]
-  const own = rows.find((r) => r.name === OWN_CLUB)!
-  if (top.name === OWN_CLUB) return "Top of the table."
-  const gap = top.points - own.points
-  if (gap === 0) return `Level on points with ${top.name}.`
-  return `${gap} ${gap === 1 ? "point" : "points"} behind ${top.name}.`
+function points(n: number) {
+  return `${n} ${n === 1 ? "point" : "points"}`
 }
 
-const NAV = [
+const bandFocus =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-foreground"
+
+const pageFocus =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const buttonClasses = "h-auto px-5 py-2 font-mono text-label uppercase"
+
+const NAV_LINKS = [
   { label: "Fixtures", href: "/fixtures" },
   { label: "Table", href: "/standings" },
   { label: "Report", href: "/report" },
@@ -196,22 +192,17 @@ const NAV = [
 ]
 
 const KEY = [
-  ["P", "Played"],
-  ["W", "Won"],
-  ["D", "Drawn"],
-  ["L", "Lost"],
-  ["GF", "Goals for"],
-  ["GA", "Goals against"],
-  ["GD", "Goal difference"],
-  ["PTS", "Points"],
+  { short: "P", meaning: "Played" },
+  { short: "W", meaning: "Won" },
+  { short: "D", meaning: "Drawn" },
+  { short: "L", meaning: "Lost" },
+  { short: "GF", meaning: "Goals for" },
+  { short: "GA", meaning: "Goals against" },
+  { short: "GD", meaning: "Goal difference" },
+  { short: "Pts", meaning: "Points" },
 ]
 
-const bandFocus =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-foreground"
-const pageFocus =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const buttonClasses = "h-auto px-5 py-2 font-mono text-label uppercase"
-const headCell = "py-3 font-mono text-label uppercase text-ice"
+const headCell = "px-2 py-3 font-mono text-label uppercase text-ice"
 const mdOnly = "hidden md:table-cell"
 
 function Header() {
@@ -234,12 +225,12 @@ function Header() {
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-5">
-            {NAV.map((item) => {
-              const current = item.href === "/standings"
+            {NAV_LINKS.map((link) => {
+              const current = link.href === "/standings"
               return (
-                <li key={item.href}>
+                <li key={link.href}>
                   <a
-                    href={item.href}
+                    href={link.href}
                     aria-current={current ? "page" : undefined}
                     className={cn(
                       "inline-flex h-10 items-center font-mono text-label uppercase underline-offset-4 hover:underline",
@@ -247,7 +238,7 @@ function Header() {
                       bandFocus
                     )}
                   >
-                    {item.label}
+                    {link.label}
                   </a>
                 </li>
               )
@@ -266,24 +257,24 @@ function Footer() {
         <p className="font-heading text-h2 uppercase">Wendmoor FC</p>
         <nav aria-label="Footer">
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
-            {NAV.map((item) => (
-              <li key={item.href}>
+            {NAV_LINKS.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={item.href}
+                  href={link.href}
                   className={cn(
                     "font-mono text-label text-foreground uppercase underline underline-offset-4 hover:decoration-2",
                     pageFocus
                   )}
                 >
-                  {item.label}
+                  {link.label}
                 </a>
               </li>
             ))}
           </ul>
         </nav>
         <p className="font-mono text-label text-muted-foreground uppercase">
-          © 2027 WENDMOOR FOOTBALL CLUB · MILLRACE PARK, WENDMOOR · A DEMO:
-          NOTHING IS SENT OR STORED
+          © 2027 Wendmoor Football Club · Millrace Park, Wendmoor · A demo:
+          nothing is sent or stored
         </p>
       </div>
     </footer>
@@ -292,24 +283,32 @@ function Footer() {
 
 export function App() {
   const [view, setView] = useState<View>("all")
-  const [announcement, setAnnouncement] = useState("")
+  const [status, setStatus] = useState("")
 
-  const rows = standings(view)
+  const rows = useMemo(() => standings(view), [view])
   const current = VIEWS.find((v) => v.value === view)!
   const ownIndex = rows.findIndex((r) => r.name === OWN_CLUB)
   const own = rows[ownIndex]
-  const ownPosition = ownIndex + 1
+  const position = ownIndex + 1
+  const top = rows[0]
+
+  let gap: string
+  if (ownIndex === 0) {
+    gap = "Top of the table."
+  } else if (top.points === own.points) {
+    gap = `Level on points with ${top.name}.`
+  } else {
+    gap = `${points(top.points - own.points)} behind ${top.name}.`
+  }
 
   function choose(next: View) {
     if (next === view) return
-    setView(next)
     const nextRows = standings(next)
-    const index = nextRows.findIndex((r) => r.name === OWN_CLUB)
-    const label = VIEWS.find((v) => v.value === next)!.status
-    setAnnouncement(
-      `${label}: ${OWN_CLUB} are ${ordinal(index + 1)} with ${nextRows[index].points} ${
-        nextRows[index].points === 1 ? "point" : "points"
-      }.`
+    const nextIndex = nextRows.findIndex((r) => r.name === OWN_CLUB)
+    const label = VIEWS.find((v) => v.value === next)!.label
+    setView(next)
+    setStatus(
+      `${label}: ${OWN_CLUB} are ${ordinal(nextIndex + 1)} with ${points(nextRows[nextIndex].points)}.`
     )
   }
 
@@ -320,11 +319,10 @@ export function App() {
       <main className="flex-1">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-18 px-5 pt-8 pb-18">
           <div className="flex flex-col gap-8">
-            {/* Page head */}
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div className="flex flex-col gap-3">
                 <p className="font-mono text-label text-muted-foreground uppercase">
-                  KESTREL VALLEY LEAGUE · 2027 SEASON
+                  Kestrel Valley League · 2027 season
                 </p>
                 <h1 className="text-h1 uppercase">Division One table</h1>
               </div>
@@ -339,39 +337,35 @@ export function App() {
               </a>
             </div>
 
-            {/* Matches control */}
-            <div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div
-                  role="group"
-                  aria-label="Matches counted"
-                  className="flex flex-wrap gap-2"
-                >
-                  {VIEWS.map((v) => {
-                    const chosen = v.value === view
-                    return (
-                      <Button
-                        key={v.value}
-                        variant={chosen ? "secondary" : "outline"}
-                        aria-pressed={chosen}
-                        className={buttonClasses}
-                        onClick={() => choose(v.value)}
-                      >
-                        {v.button}
-                      </Button>
-                    )
-                  })}
-                </div>
-                <p className="font-mono text-label text-muted-foreground uppercase">
-                  AFTER 14 OF 22 MATCHES
-                </p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div
+                role="group"
+                aria-label="Matches counted"
+                className="flex flex-wrap gap-2"
+              >
+                {VIEWS.map((v) => {
+                  const chosen = v.value === view
+                  return (
+                    <Button
+                      key={v.value}
+                      variant={chosen ? "secondary" : "outline"}
+                      aria-pressed={chosen}
+                      className={buttonClasses}
+                      onClick={() => choose(v.value)}
+                    >
+                      {v.button}
+                    </Button>
+                  )
+                })}
               </div>
-              <p role="status" className="sr-only">
-                {announcement}
+              <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+                After 14 of 22 matches
               </p>
             </div>
+            <p role="status" className="sr-only">
+              {status}
+            </p>
 
-            {/* Table and side column */}
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
               <div className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
                 <table className="w-full border-collapse text-body">
@@ -383,20 +377,20 @@ export function App() {
                         className={cn(headCell, "pr-2 pl-5 text-left")}
                       >
                         <abbr title="Position" className="no-underline">
-                          POS
+                          Pos
                         </abbr>
                       </th>
-                      <th scope="col" className={cn(headCell, "px-2 text-left")}>
-                        CLUB
+                      <th scope="col" className={cn(headCell, "text-left")}>
+                        Club
                       </th>
-                      <th scope="col" className={cn(headCell, "px-2 text-right")}>
+                      <th scope="col" className={cn(headCell, "text-right")}>
                         <abbr title="Played" className="no-underline">
                           P
                         </abbr>
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, mdOnly, "px-2 text-right")}
+                        className={cn(headCell, "text-right", mdOnly)}
                       >
                         <abbr title="Won" className="no-underline">
                           W
@@ -404,7 +398,7 @@ export function App() {
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, mdOnly, "px-2 text-right")}
+                        className={cn(headCell, "text-right", mdOnly)}
                       >
                         <abbr title="Drawn" className="no-underline">
                           D
@@ -412,7 +406,7 @@ export function App() {
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, mdOnly, "px-2 text-right")}
+                        className={cn(headCell, "text-right", mdOnly)}
                       >
                         <abbr title="Lost" className="no-underline">
                           L
@@ -420,7 +414,7 @@ export function App() {
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, mdOnly, "px-2 text-right")}
+                        className={cn(headCell, "text-right", mdOnly)}
                       >
                         <abbr title="Goals for" className="no-underline">
                           GF
@@ -428,13 +422,13 @@ export function App() {
                       </th>
                       <th
                         scope="col"
-                        className={cn(headCell, mdOnly, "px-2 text-right")}
+                        className={cn(headCell, "text-right", mdOnly)}
                       >
                         <abbr title="Goals against" className="no-underline">
                           GA
                         </abbr>
                       </th>
-                      <th scope="col" className={cn(headCell, "px-2 text-right")}>
+                      <th scope="col" className={cn(headCell, "text-right")}>
                         <abbr title="Goal difference" className="no-underline">
                           GD
                         </abbr>
@@ -444,7 +438,7 @@ export function App() {
                         className={cn(headCell, "pr-5 pl-2 text-right")}
                       >
                         <abbr title="Points" className="no-underline">
-                          PTS
+                          Pts
                         </abbr>
                       </th>
                     </tr>
@@ -465,10 +459,13 @@ export function App() {
                           </td>
                           <th
                             scope="row"
-                            className="px-2 py-3 text-left font-normal"
+                            className={cn(
+                              "px-2 py-3 text-left",
+                              isOwn ? "font-bold" : "font-normal"
+                            )}
                           >
-                            <div className="flex flex-col gap-1">
-                              <span className={cn(isOwn && "font-bold")}>
+                            <span className="flex flex-col gap-1">
+                              <span>
                                 {row.name}
                                 {isOwn && (
                                   <span className="sr-only"> (this club)</span>
@@ -476,14 +473,14 @@ export function App() {
                               </span>
                               <span
                                 className={cn(
-                                  "font-mono text-label uppercase md:hidden",
+                                  "font-mono text-label uppercase tabular-nums md:hidden",
                                   !isOwn && "text-muted-foreground"
                                 )}
                               >
                                 W{row.won} D{row.drawn} L{row.lost} ·{" "}
                                 {row.goalsFor}–{row.goalsAgainst}
                               </span>
-                            </div>
+                            </span>
                           </th>
                           <td className="px-2 py-3 text-right tabular-nums">
                             {row.played}
@@ -550,17 +547,17 @@ export function App() {
 
               <div className="flex min-w-0 flex-col gap-5 lg:col-span-3">
                 <section
-                  aria-labelledby="own-place-heading"
+                  aria-labelledby="place-heading"
                   className="flex flex-col gap-5 rounded-xl bg-ice p-5 text-ice-foreground"
                 >
-                  <h2 id="own-place-heading" className="text-h2 uppercase">
+                  <h2 id="place-heading" className="text-h2 uppercase">
                     Wendmoor FC
                   </h2>
                   <p className="font-mono text-label uppercase">
                     {current.label}
                   </p>
-                  <p className="font-heading text-h1 tabular-nums">
-                    {ordinal(ownPosition).toUpperCase()}
+                  <p className="font-heading text-h1 uppercase tabular-nums">
+                    {ordinal(position)}
                   </p>
                   <dl className="flex flex-col gap-2">
                     <div className="flex items-baseline justify-between gap-3">
@@ -584,7 +581,7 @@ export function App() {
                       </dd>
                     </div>
                   </dl>
-                  <p className="text-body">{gapToTop(rows)}</p>
+                  <p className="text-body">{gap}</p>
                 </section>
 
                 <section
@@ -595,18 +592,18 @@ export function App() {
                     Key
                   </h2>
                   <dl>
-                    {KEY.map(([term, meaning], i) => (
+                    {KEY.map((item, i) => (
                       <div
-                        key={term}
+                        key={item.short}
                         className={cn(
                           "flex items-baseline justify-between gap-3 py-2",
                           i > 0 && "border-t border-border"
                         )}
                       >
                         <dt className="font-mono text-label text-foreground uppercase">
-                          {term}
+                          {item.short}
                         </dt>
-                        <dd className="text-right text-body">{meaning}</dd>
+                        <dd className="text-right text-body">{item.meaning}</dd>
                       </div>
                     ))}
                   </dl>

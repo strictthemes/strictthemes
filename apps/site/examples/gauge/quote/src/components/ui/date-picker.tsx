@@ -19,7 +19,6 @@ type DatePickerProps = {
   "aria-invalid"?: boolean
   "aria-describedby"?: string
   ref?: React.Ref<HTMLButtonElement>
-  className?: string
 }
 
 function DatePicker({
@@ -31,7 +30,6 @@ function DatePicker({
   "aria-invalid": ariaInvalid,
   "aria-describedby": ariaDescribedBy,
   ref,
-  className,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const popupRef = React.useRef<HTMLDivElement>(null)
@@ -46,8 +44,8 @@ function DatePicker({
         aria-describedby={ariaDescribedBy}
         aria-labelledby={`${labelId} ${valueId}`}
         className={cn(
-          "flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-2 text-body whitespace-nowrap text-foreground transition-colors outline-none select-none focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid aria-invalid:border-destructive",
-          className
+          "flex h-8 w-full items-center justify-between gap-2 rounded-lg border border-input bg-card px-2 text-body whitespace-nowrap text-foreground transition-colors outline-none select-none focus-visible:border-ring aria-invalid:border-destructive",
+          "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         )}
       >
         <span id={valueId}>

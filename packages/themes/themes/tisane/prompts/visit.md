@@ -22,11 +22,11 @@ The header from the layout notes, with "Visit" as the current page; its link kee
 
 ### 2. Opening
 
-The first section, with `pt-10`, in columns 1–8 of a grid (`grid gap-6 md:grid-cols-12`): a label, `Mill Lane, Ashby Wold`, then with `mt-2` the `<h1>` "Visit us" in `text-h1`, then with `mt-4` one or two sentences: where the room is, and that there is no need to book unless you are four or more.
+The first section, with `pt-10`, in columns 1–8 of a grid (`grid grid-cols-1 gap-6 md:grid-cols-12`): a label, `Mill Lane, Ashby Wold`, then with `mt-2` the `<h1>` "Visit us" in `text-h1`, then with `mt-4` one or two sentences: where the room is, and that there is no need to book unless you are four or more.
 
 ### 3. Address and hours
 
-A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with `mt-18`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4: an `<h2>` "Address", then with `mt-4` an `<address className="not-italic">` with three block lines in `text-body`: `14 Mill Lane`, `Ashby Wold`, `AW3 7LN`. With `mt-4` the phone number and with `mt-2` the email address, each a link in running text in its own `<p>` inside the `<address>`, the `<p>` carrying the margin: `tel:+441632960418` and `mailto:hello@lindenroom.example`.
 - In columns 6–12: an `<h2>` "Opening hours", then with `mt-6` the hours table.
@@ -39,7 +39,7 @@ At 375px the table fits: `whitespace-nowrap` on every Room and Kitchen cell, Mon
 
 ### 4. Getting here
 
-A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with `mt-18`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–5: an `<h2>` "Getting here", then with `mt-6` four entries as a `<ul>` with no markers and no padding. Each entry after the first has `mt-6`. Each is an `<h3>` in `text-body` (By train, By bus, By bike, By car), and with `mt-2` one or two sentences in `text-body`. By car: there is no parking on Mill Lane; the car park on Station Road is three minutes away.
 - In columns 7–12: a `<div>` holding the map's `<figure>` and, after the figure, the directions paragraph.
@@ -79,5 +79,5 @@ The footer from the layout notes.
 
 - Each empty field gets its own error line: "Write your name.", "Write your email address.", "Choose what your message is about.", "Write a message." A malformed address gets "Check the email address: it needs an @ and a domain." Focus moves to the first field with an error.
 - When all four are good, the form is replaced in its card by the confirmation in the status element: an `<h3>` in `text-h2`, "Thank you", with `tabIndex={-1}`, and with `mt-4` one sentence saying an answer comes within two days, to the address they gave. The heading and sentence sit in the message `<div>`, the `mt-4` on the sentence; no button follows. Move focus to the heading.
-- Today's mark is set when the page loads.
+- Today's mark is set when the page loads and does not move while the page stays open.
 - The other links need no behavior.

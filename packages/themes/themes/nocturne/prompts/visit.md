@@ -31,7 +31,7 @@ The first `<section>`, a grid (`md:grid-cols-12`):
 
 The second `<section>`, with `mt-24`. An `<h2>` "Opening times" in `text-h2 md:text-h1`, then with `mt-4` one sentence: the box office opens half an hour before the first film.
 
-With `mt-6`, in columns 1–8 of a grid (`md:grid-cols-12`), the `Table` from the layout notes (add it with `npx shadcn@latest add table`), with the `label` "Opening times". Columns: Day, Doors open, Last film starts, Bar closes. One row per day, Monday to Sunday; the first cell of each row is a `TableHead` with `scope="row"` and, in place of the column headers' `font-mono text-label uppercase text-muted-foreground`, `py-2 font-sans text-body font-normal text-foreground`; like every cell it keeps `px-4` and `first:pl-0 last:pr-0`. The column headers are `<th scope="col">`. Every time is a `<time>` (`dateTime="17:00"`) in `font-mono tabular-nums`. Monday is closed: its row says "Closed" in words in the Doors open cell, and its other two cells hold "—" with a visually hidden "Closed". Today, Wednesday, is not marked.
+With `mt-6`, in columns 1–8 of a grid (`md:grid-cols-12`), the `Table` from the layout notes (add it with `npx shadcn@latest add table`), with the `label` "Opening times". Columns: Day, Doors open, Last film starts, Bar closes. One row per day, Monday to Sunday; the first cell of each row is a `TableHead` with `scope="row"` and, in place of the column headers' `font-mono text-label uppercase text-muted-foreground`, `py-2 font-sans text-body font-normal text-foreground`; like every cell it keeps `px-4` and `first:pl-0 last:pr-0`. The column headers are `<th scope="col">`. Every time is a `<time>` (`dateTime="17:00"`) in `font-mono tabular-nums`. Monday is closed: its row says "Closed" in words in the Doors open cell, and its other two cells hold "—" in a `<span aria-hidden="true">` and a visually hidden "Closed", so a screen reader reads only the word. The bar's midnight on Friday and Saturday is written `00:00` (`<time dateTime="00:00">`), so the column stays figures. Today, Wednesday, is not marked.
 
 The stock cells do not wrap, so the table is about 480px wide: at 375px it is wider than the screen and scrolls sideways inside its own box, and the page does not.
 
@@ -44,7 +44,7 @@ With `mt-6`, three cards from the layout notes in a grid `grid grid-cols-1 gap-6
 - The screen's name as an `<h3>` in `text-h2` ("Screen 1").
 - With `mt-2`, a label in `text-muted-foreground`: the seats and the screen's format, e.g. `212 seats · 35mm and digital`.
 - With `mt-4`, one sentence about the room.
-- With `mt-6`, the access notes as a `<ul>` with `list-disc pl-4` in `text-body`, with `mt-2` on every item but the first. Write them as facts: step-free from the street, the number of wheelchair spaces and where they are, a hearing loop, which seats have extra legroom, captioned screenings on Tuesdays. Screen 3 is up a flight of stairs with no lift: say so plainly, as the first note.
+- With `mt-6`, the access notes as a `<ul>` with `list-disc pl-4` in `text-body`, with `mt-2` on every item but the first. Write them as facts: step-free from the street, the number of wheelchair spaces and where they are, a hearing loop, which seats have extra legroom, captioned screenings on Tuesdays. Screen 3 is up a flight of stairs with no lift: say so plainly, as the first note, and say next that it has no wheelchair spaces.
 
 Below `md` the cards stack.
 
@@ -82,6 +82,6 @@ The footer from the layout notes.
 
 ### Behavior
 
-- When the form is sent, check it in code: the name must not be empty ("Enter your name."), the email must not be empty and must look like an address: no spaces, one `@` with text before it, and after it a dot with text on both sides ("Enter an email address such as name@example.com."), and the message must be at least 20 characters ("Write a few words more, so we can help: at least 20 characters."). Show every error at once and move focus to the first field with an error.
+- When the form is sent, check it in code: the name must not be empty ("Enter your name."), the email must not be empty and must look like an address: no spaces, one `@` with text before it, and after it at least one dot, with text on both sides of every dot (`a@b.c.d` passes, `a@b..c` does not) ("Enter an email address such as name@example.com."), and the message must be at least 20 characters ("Write a few words more, so we can help: at least 20 characters."). Show every error at once and move focus to the first field with an error.
 - A good form is replaced by the confirmation. Its `<h3>`: "Thank you, your message is with us", with no full stop. Under it, with `mt-4`, one sentence that names the topic and the email address the reply goes to: "We will answer your question about access at mara@example.com within two working days." The topic reads "your question" for General question, "your question about access", "your question about private hire" and "your message about lost property". Nothing is sent anywhere: this is a demo.
 - The phone and email links use `tel:01632960418` and `mailto:hello@vesper.example`. No link needs behavior.

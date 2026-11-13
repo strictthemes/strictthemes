@@ -2,24 +2,24 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const textLink = cn(
-  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focusRing
-)
 
 const navLink = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
+  focus
+)
+
+const textLink = cn(
+  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
+  focus
 )
 
 const card = "rounded-xl border border-border bg-card p-7"
+
 const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+
 const label = "font-mono text-label"
-const badgeClass =
-  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground"
 
 const navItems = [
   { label: "Approach", href: "/approach" },
@@ -74,24 +74,10 @@ const steps = [
 ]
 
 const inShort = [
-  { badge: "In person", text: "The Garden Room, 14 Orchard Row, Larkmere" },
-  { badge: "Online", text: "By video, with a link I send the day before" },
-  { badge: "Evenings", text: "On Wednesdays, until 20:00" },
+  { term: "In person", value: "The Garden Room, 14 Orchard Row, Larkmere" },
+  { term: "Online", value: "By video, with a link I send the day before" },
+  { term: "Evenings", value: "On Wednesdays, until 20:00" },
 ]
-
-function NavList({ className }: { className?: string }) {
-  return (
-    <ul className={className}>
-      {navItems.map((item) => (
-        <li key={item.href}>
-          <a href={item.href} className={navLink}>
-            {item.label}
-          </a>
-        </li>
-      ))}
-    </ul>
-  )
-}
 
 export function App() {
   return (
@@ -101,18 +87,29 @@ export function App() {
           href="/"
           className={cn(
             "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
-            focusRing
+            focus
           )}
         >
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <NavList className="flex flex-wrap gap-x-4 md:gap-x-7" />
+          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <a href={item.href} className={navLink}>
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </nav>
       </header>
 
       <main>
-        <section aria-labelledby="opening-heading" className={cn(grid, "mt-12 md:mt-28")}>
+        <section
+          aria-labelledby="opening-heading"
+          className={cn(grid, "mt-12 md:mt-28")}
+        >
           <p className={cn(label, "text-muted-foreground md:col-span-12")}>
             Psychotherapy · Larkmere and online
           </p>
@@ -122,7 +119,7 @@ export function App() {
           >
             A quiet room, and <em className="italic">time to think</em>
           </h1>
-          <p className="mt-7 max-w-xl md:col-span-7 md:col-start-1">
+          <p className="mt-7 max-w-xl text-body md:col-span-7 md:col-start-1">
             I am Nora Ellingham, a psychotherapist. I work with adults, one to
             one, in a garden room in Larkmere and online. You do not need to
             know what to say before you come.
@@ -139,7 +136,7 @@ export function App() {
             <h2 id="bring-heading" className="text-h2">
               What people bring
             </h2>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 text-body">
               Most people come with one of these, or with something they cannot
               name yet. Both are fine.
             </p>
@@ -149,11 +146,11 @@ export function App() {
               {concerns.map((item) => (
                 <li key={item.title} className="border-t border-border py-4">
                   <h3 className="text-h2">{item.title}</h3>
-                  <p className="mt-2 max-w-xl">{item.text}</p>
+                  <p className="mt-2 text-body">{item.text}</p>
                 </li>
               ))}
             </ul>
-            <p className="mt-7 max-w-xl">
+            <p className="mt-7 max-w-xl text-body">
               If what you carry is not on this list, write to me anyway. I will
               tell you honestly whether I am the right person.
             </p>
@@ -162,13 +159,13 @@ export function App() {
 
         <section
           id="how-it-starts"
-          aria-labelledby="steps-heading"
+          aria-labelledby="starts-heading"
           className="mt-28 scroll-mt-7"
         >
-          <h2 id="steps-heading" className="text-h2">
+          <h2 id="starts-heading" className="text-h2">
             How it starts
           </h2>
-          <p className="mt-4 max-w-xl">
+          <p className="mt-4 max-w-xl text-body">
             Three steps, at your own pace. You can stop after any of them.
           </p>
           <ol className={cn(grid, "mt-7 list-none p-0")}>
@@ -181,12 +178,17 @@ export function App() {
                   index > 0 && "mt-4 md:mt-0"
                 )}
               >
-                <p className={cn(label, "text-muted-foreground")}>
+                <p className={cn(label, "text-muted-foreground tabular-nums")}>
                   Step {index + 1}
                 </p>
                 <h3 className="mt-4 text-h2">{step.title}</h3>
-                <p className="mt-4">{step.text}</p>
-                <p className={cn(label, "mt-auto pt-7 text-foreground")}>
+                <p className="mt-4 text-body">{step.text}</p>
+                <p
+                  className={cn(
+                    label,
+                    "mt-auto pt-7 text-foreground tabular-nums"
+                  )}
+                >
                   {step.note}
                 </p>
               </li>
@@ -194,7 +196,10 @@ export function App() {
           </ol>
         </section>
 
-        <section aria-labelledby="therapist-heading" className={cn(grid, "mt-28")}>
+        <section
+          aria-labelledby="therapist-heading"
+          className={cn(grid, "mt-28")}
+        >
           <div className="md:col-span-7">
             <h2 id="therapist-heading" className="text-h2">
               Who you would be talking to
@@ -209,16 +214,21 @@ export function App() {
               </div>
               <div className="min-w-0">
                 <p className="font-heading text-h2">Nora Ellingham</p>
-                <p className={cn(label, "mt-2 text-muted-foreground")}>
+                <p
+                  className={cn(
+                    label,
+                    "mt-2 text-muted-foreground tabular-nums"
+                  )}
+                >
                   Registered psychotherapist · In practice since 2014
                 </p>
               </div>
             </div>
-            <p className="mt-7 max-w-xl">
+            <p className="mt-7 max-w-xl text-body">
               I trained for four years, after nine years as a teacher. I have
               worked with adults in private practice since 2014.
             </p>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 max-w-xl text-body">
               I listen more than I talk. I will not hurry you, and I will not
               tell you what to do with your life.
             </p>
@@ -228,15 +238,19 @@ export function App() {
               </a>
             </p>
           </div>
-          <div className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0")}>
+          <div
+            className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0")}
+          >
             <h3 className="text-h2">In short</h3>
             <dl className="mt-4">
               {inShort.map((row, index) => (
-                <div key={row.badge} className={cn(index > 0 && "mt-4")}>
+                <div key={row.term} className={cn(index > 0 && "mt-4")}>
                   <dt>
-                    <Badge className={badgeClass}>{row.badge}</Badge>
+                    <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground">
+                      {row.term}
+                    </Badge>
                   </dt>
-                  <dd className="mt-2">{row.text}</dd>
+                  <dd className="mt-2 text-body">{row.value}</dd>
                 </div>
               ))}
             </dl>
@@ -251,9 +265,9 @@ export function App() {
             <h2 id="fee-heading" className="mt-4 text-h1">
               A session is 50 minutes and costs £68
             </h2>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 max-w-xl text-body">
               The first call is 20 minutes and free. I send one invoice a month,
-              and there is no charge if you cancel with 48 hours' notice.
+              and there is no charge if you cancel with 48 hours&apos; notice.
             </p>
             <p className="mt-7">
               <a href="/fees" className={textLink}>
@@ -268,7 +282,7 @@ export function App() {
             <h2 id="action-heading" className="text-h2">
               When you are ready
             </h2>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 max-w-xl text-body">
               The button leads to a short form. I reply within two working days,
               and nothing is booked until we have spoken.
             </p>
@@ -294,7 +308,7 @@ export function App() {
             <p className={cn(label, "mt-2 text-muted-foreground")}>
               Registered psychotherapist · Larkmere and online
             </p>
-            <address className="mt-7 not-italic">
+            <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
             <p className="mt-2 wrap-break-word">
@@ -307,7 +321,15 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <NavList />
+            <ul>
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a href={item.href} className={navLink}>
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

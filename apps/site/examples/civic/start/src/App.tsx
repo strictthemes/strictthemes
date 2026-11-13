@@ -5,15 +5,26 @@ import { cn } from "@/lib/utils"
 
 const container = "mx-auto max-w-[720px] px-4 md:px-6"
 
-const focus =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 const textLink = cn(
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focus
+  "text-primary underline underline-offset-4 hover:text-foreground transition-colors duration-150",
+  focusRing
 )
 
 const listLink = cn(textLink, "inline-block py-2")
+
+const headerLink = cn(
+  "text-foreground no-underline hover:underline underline-offset-4 transition-colors duration-150",
+  focusRing
+)
+
+const relatedLinks = [
+  "Who can get a permit and what it costs",
+  "Visitor parking permits",
+  "Find your permit zone",
+]
 
 const footerLinks = [
   "Accessibility",
@@ -22,20 +33,14 @@ const footerLinks = [
   "Contact the council",
 ]
 
-const relatedLinks = [
-  "Who can get a permit and what it costs",
-  "Visitor parking permits",
-  "Find your permit zone",
-]
-
 export function App() {
   return (
-    <div className="bg-background text-body text-foreground">
+    <div className="min-h-svh bg-background text-body text-foreground">
       <a
         href="#main"
         className={cn(
           "sr-only text-primary underline underline-offset-4 focus-visible:not-sr-only focus-visible:block focus-visible:px-4 focus-visible:py-2",
-          focus
+          focusRing
         )}
       >
         Skip to main content
@@ -48,22 +53,10 @@ export function App() {
             "flex flex-wrap items-baseline gap-x-6 gap-y-1 py-4"
           )}
         >
-          <a
-            href="/"
-            className={cn(
-              "font-heading text-h2 text-foreground no-underline underline-offset-4 hover:underline",
-              focus
-            )}
-          >
+          <a href="/" className={cn("font-heading text-h2", headerLink)}>
             Callowmere Council
           </a>
-          <a
-            href="#"
-            className={cn(
-              "text-body font-bold text-foreground no-underline underline-offset-4 hover:underline",
-              focus
-            )}
-          >
+          <a href="#" className={cn("text-body font-bold", headerLink)}>
             Apply for a resident's parking permit
           </a>
         </div>
@@ -75,17 +68,15 @@ export function App() {
         </h1>
         <p className="mt-6">
           A resident's parking permit lets you park one vehicle in your permit
-          zone, close to your home. It lasts for 12 months.
+          zone, close to where you live, without a time limit.
         </p>
         <p className="mt-4">You can use this service to:</p>
         <ul className="mt-4 list-disc pl-6">
-          <li>apply for a first permit for your address</li>
+          <li>apply for a first permit</li>
           <li className="mt-2">
             apply for a second permit at the same address
           </li>
-          <li className="mt-2">
-            replace your permit when you change your vehicle
-          </li>
+          <li className="mt-2">replace a permit when you change vehicle</li>
         </ul>
 
         <h2 className="mt-10 text-h2">Who can apply</h2>
@@ -94,11 +85,9 @@ export function App() {
           <li>you live at an address in permit zone A, B, C or D</li>
           <li className="mt-2">
             the vehicle is registered to you at that address, or is a company
-            car that you are the main driver of
+            car you are the main driver of
           </li>
-          <li className="mt-2">
-            the address has fewer than two permits already
-          </li>
+          <li className="mt-2">the address has fewer than two permits already</li>
         </ul>
         <p className="mt-4">
           You cannot apply if you live at Linden Yard, because it was built
@@ -124,8 +113,9 @@ export function App() {
           approved your application.
         </p>
         <p className="mt-4">
-          A permit costs £30 to £144 a year, depending on your vehicle type and
-          whether it is the first or second permit at your address.
+          A permit lasts 12 months and costs £30 to £144 a year, depending on
+          your vehicle type and whether it is the first or second permit at your
+          address.
         </p>
 
         <p className="mt-10">
@@ -140,7 +130,7 @@ export function App() {
             <ArrowRight className="size-5" strokeWidth={2} aria-hidden="true" />
           </a>
         </p>
-        <p className="mt-4 text-body">
+        <p className="mt-4">
           You can save your answers and come back to them within 7 days.
         </p>
 
@@ -184,7 +174,7 @@ export function App() {
 
           <p className="mt-6">
             If you need this page in another format, such as large print or
-            audio, call 01632 960 418.
+            audio, call us on 01632 960 418.
           </p>
         </section>
 
@@ -195,7 +185,7 @@ export function App() {
           <h2 id="related" className="text-h2">
             Related
           </h2>
-          <ul className="mt-4 list-none p-0">
+          <ul className="mt-4">
             {relatedLinks.map((label) => (
               <li key={label}>
                 <a href="#" className={listLink}>
@@ -210,7 +200,7 @@ export function App() {
       <footer className="border-t border-border bg-card">
         <div className={cn(container, "py-10")}>
           <nav aria-label="Footer">
-            <ul className="flex list-none flex-wrap gap-x-6 p-0">
+            <ul className="flex flex-wrap gap-x-6">
               {footerLinks.map((label) => (
                 <li key={label}>
                   <a href="#" className={listLink}>
@@ -223,9 +213,7 @@ export function App() {
           <p className="mt-6 text-muted-foreground">
             Callowmere Council, Guildhall, Market Street, Callowmere CM1 1AA
           </p>
-          <p className="mt-2 text-muted-foreground">
-            © Callowmere Council 2026
-          </p>
+          <p className="mt-2 text-muted-foreground">© Callowmere Council 2026</p>
         </div>
       </footer>
     </div>

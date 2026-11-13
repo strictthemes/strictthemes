@@ -4,7 +4,7 @@ title: Home
 description: the home page of an amateur football club, with a scoreboard band that holds the last result and the next match, the latest news as a list, the top of the league table, the three kinds of membership and one main action to join.
 order: 1
 checks:
-  - "The scoreboard is one band with the last result, Wendmoor FC 3–1 Otterby Town with the page's one Final badge, beside the next match and its kick-off time, the score and the time set in the heading font at `text-display` from `md` up."
+  - "The scoreboard is one band with the last result, Wendmoor FC 3–1 Otterby Town with the page's one Final badge, beside the next match and its kick-off time, the score and the time set in the heading font at `text-display` from `md` up, the score stepping down to `text-h1` between `lg` and `xl` so the side names fit."
   - "The header and the scoreboard are `bg-navy` in both modes, no text on them has a text color class but `text-ice` on labels (a crest and the badge keep their own pair), and the links there show their focus outline in `outline-navy-foreground`."
   - "The league table is a real `<table>` with a caption and scoped headers, shows the top five clubs, and marks Wendmoor FC, third on 27 points, with an ice blue row, a bold name and hidden words."
   - "Join the club in the page head is the only amber button on the page, and no text, link, icon or border is amber or orange."
@@ -42,7 +42,7 @@ A `<section>` that is a scoreboard band, with the classes of the Scoreboards not
 - A label line, centered with `text-center`: `SAT 5 JUN · MILLRACE PARK · ATTENDANCE 212`, the date a `<time>`.
 - A link on the band, "Match report", to `/report`, centered with `self-center`: a label with the underline classes of the Links note and the band's focus outline.
 
-**Next match,** a stack with `flex flex-col gap-5 border-t border-ice pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8`, so a rule divides the halves: above this one while they are stacked, to its left from `lg` up.
+**Next match,** left-aligned, since it is text and not a match row: a stack with `flex flex-col gap-5 border-t border-ice pt-8 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-8`, so a rule divides the halves: above this one while they are stacked, to its left from `lg` up.
 
 - An `<h3>` label, `NEXT MATCH`, styled as the first.
 - A stack with `gap-1`: the kick-off time, `15:00`, a figure in `text-h1 md:text-display`, in a `<time>` with `dateTime="2027-06-12T15:00"`; under it the label line `SAT 12 JUN · CASTLE MEADOW · AWAY`.
@@ -61,9 +61,9 @@ A grid row with two items.
 3. `SUN 30 MAY`, "Under 18s reach the cup final", to `#`: "A 2–1 win at Pellow Green puts the under 18s in the County Youth Cup final on Sunday 27 June."
 4. `WED 26 MAY`, "Summer coaching week opens", to `#`: "Booking is open for a week of coaching for ages 7 to 14 at Millrace Park, from Monday 2 August."
 
-**League table,** five columns from `lg` up: a `<section>` named by its `<h2>`, laid out as `flex flex-col gap-5`. Its heading row holds the `<h2>` "Division One" and a label link "Full table" to `/standings`. Under it a card with rows that holds the table from the Tables note and, after the table, a row with `border-t border-border px-5 py-3` holding one line of small print: "After 14 of 22 matches. Clubs level on points are split by goal difference."
+**League table,** five columns from `lg` up: a `<section>` named by its `<h2>`, laid out as `flex flex-col gap-5`. Its heading row holds the `<h2>` "Division One" and a label link "Full table" to `/standings`. Under it a card with rows that holds the table from the Tables note and, after the table, a row with `border-t border-border px-5 py-3` holding a `<p>` of small print: "After 14 of 22 matches. Clubs level on points are split by goal difference."
 
-The table's caption: "Kestrel Valley League, Division One: the top five clubs after 14 of 22 matches." Five columns, with these headers: `POS` (an `<abbr>` with the `title` "Position"), `CLUB`, `P` ("Played"), `GD` ("Goal difference") and `PTS` ("Points"); the last three are right-aligned. The five rows of the sample, with the goal difference signed (`+14`). The row of Wendmoor FC is the club's own row. A club's name may wrap on a phone; the table has no scroll box, because five short columns fit 375px.
+The table's caption: "Kestrel Valley League, Division One: the top five clubs after 14 of 22 matches." Five columns, with these headers: `POS` (an `<abbr>` with the `title` "Position"), `CLUB`, `P` ("Played"), `GD` ("Goal difference") and `PTS` ("Points"); the last three are right-aligned. The five rows of the sample, with the goal difference signed (`+14`; a negative one takes U+2212, `−4`, and zero is `0`). The row of Wendmoor FC is the club's own row. A club's name may wrap on a phone; the table has no scroll box, because five short columns fit 375px.
 
 ### 5. Memberships
 

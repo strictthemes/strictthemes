@@ -1,4 +1,10 @@
-import { useRef, useState, type KeyboardEvent, type ReactNode } from "react"
+import {
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,139 +18,86 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-// The sample's today: a fixed date, never the device clock.
-const TODAY = "2026-11-27"
-
-const MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-]
-
-function formatDate(iso: string) {
-  const [year, month, day] = iso.split("-").map(Number)
-  return `${day} ${MONTHS[month - 1]} ${year}`
-}
-
-function DateValue({ iso }: { iso: string }) {
-  return <time dateTime={iso}>{formatDate(iso)}</time>
-}
-
-function formatMoney(pence: number) {
-  const pounds = Math.floor(pence / 100)
-  const rest = String(pence % 100).padStart(2, "0")
-  return `£${pounds.toLocaleString("en-GB")}.${rest}`
-}
-
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const label = "font-mono text-label uppercase text-muted-foreground"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-const sheet = "rounded-xl border border-border bg-card"
-const headingRow = "flex min-h-8 flex-wrap items-center justify-between gap-3"
-
-const NAV_LINKS = [
+const navLinks = [
   { label: "Overview", href: "/" },
   { label: "Transactions", href: "/transactions" },
   { label: "Invoices", href: "/invoice" },
   { label: "Payments", href: "/payment" },
   { label: "Reports", href: "/report" },
 ]
-const CURRENT_HREF = "/invoice"
+const currentPath = "/invoice"
 
-const INVOICE = {
-  number: "INV-0142",
-  issued: "2026-11-13",
-  due: "2026-11-27",
-  reference: "LC-PO-2211",
-}
-
-const LINE_ITEMS = [
+const lineItems = [
   {
-    description: "Menu cards, A5, printed both sides on 350gsm uncoated",
-    quantity: 400,
-    unit: 110,
+    description: "Menu cards, printed on both sides.",
+    quantity: "400",
+    unitPrice: "£1.10",
+    amount: "£440.00",
   },
   {
-    description: "Table tents, folded and scored",
-    quantity: 120,
-    unit: 250,
+    description: "Table tents, folded and scored.",
+    quantity: "120",
+    unitPrice: "£2.50",
+    amount: "£300.00",
   },
   {
-    description: "Window posters, A2, for the spring menu",
-    quantity: 6,
-    unit: 4500,
+    description: "Window posters, A2 on matt stock.",
+    quantity: "6",
+    unitPrice: "£45.00",
+    amount: "£270.00",
   },
   {
-    description: "Design and proofing, two rounds of changes",
-    quantity: 1,
-    unit: 23000,
+    description: "Design and proofing, two rounds of changes.",
+    quantity: "1",
+    unitPrice: "£230.00",
+    amount: "£230.00",
   },
 ]
 
-const SUBTOTAL = LINE_ITEMS.reduce(
-  (sum, item) => sum + item.quantity * item.unit,
-  0
-)
-const VAT = Math.round(SUBTOTAL * 0.2)
-const TOTAL = SUBTOTAL + VAT
+type ActivityItem = {
+  id: string
+  text: ReactNode
+  date: string
+  dateTime: string
+}
 
-type ActivityItem = { id: string; text: ReactNode; date: string }
-
-const INITIAL_ACTIVITY: ActivityItem[] = [
-  { id: "viewed", text: "Viewed by Larkspur Café", date: "2026-11-24" },
+const initialActivity: ActivityItem[] = [
+  {
+    id: "viewed",
+    text: "Viewed by Larkspur Café",
+    date: "24 Nov 2026",
+    dateTime: "2026-11-24",
+  },
   {
     id: "sent",
     text: (
       <>
-        Sent to{" "}
-        <span className="font-mono wrap-break-word">
-          accounts@larkspur.example
-        </span>
+        Sent to <span className="font-mono">accounts@larkspur.example</span>
       </>
     ),
-    date: "2026-11-13",
+    date: "13 Nov 2026",
+    dateTime: "2026-11-13",
   },
-  { id: "created", text: "Created by Ada Hollis", date: "2026-11-13" },
+  {
+    id: "created",
+    text: "Created by Ada Hollis",
+    date: "13 Nov 2026",
+    dateTime: "2026-11-13",
+  },
 ]
 
-function NavLinks({ className }: { className?: string }) {
-  return NAV_LINKS.map((link) => {
-    const current = link.href === CURRENT_HREF
-    return (
-      <li key={link.href}>
-        <a
-          href={link.href}
-          aria-current={current ? "page" : undefined}
-          className={cn(
-            "font-mono text-label uppercase transition-colors duration-150",
-            current
-              ? "text-foreground underline underline-offset-4"
-              : "text-muted-foreground hover:text-foreground",
-            focusOutline,
-            className
-          )}
-        >
-          {link.label}
-        </a>
-      </li>
-    )
-  })
-}
+const label = "font-mono text-label uppercase text-muted-foreground"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const sheet = "rounded-xl border border-border bg-card p-6"
+const dlRow =
+  "flex items-baseline justify-between gap-3 py-2 not-first:border-t not-first:border-border"
 
-function State({ paid }: { paid: boolean }) {
+function InvoiceState({ paid }: { paid: boolean }) {
   return (
-    <span className="inline-flex items-center gap-2">
+    <p className="inline-flex items-center gap-2">
       <span
         aria-hidden="true"
         className={cn(
@@ -155,40 +108,61 @@ function State({ paid }: { paid: boolean }) {
       <span className="text-body text-foreground">
         {paid ? "Paid" : "Sent"}
       </span>
-    </span>
+    </p>
   )
 }
 
-function DetailRow({
-  term,
-  children,
-  mono = true,
+function NavList({
+  className,
+  linkClassName,
 }: {
-  term: string
-  children: ReactNode
-  mono?: boolean
+  className?: string
+  linkClassName?: string
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 border-border py-2 not-first:border-t">
-      <dt className={label}>{term}</dt>
-      <dd
-        className={cn(
-          "text-right",
-          mono ? "font-mono tabular-nums" : "text-body"
-        )}
-      >
-        {children}
-      </dd>
-    </div>
+    <ul className={className}>
+      {navLinks.map((link) => {
+        const current = link.href === currentPath
+        return (
+          <li key={link.href}>
+            <a
+              href={link.href}
+              aria-current={current ? "page" : undefined}
+              className={cn(
+                "font-mono text-label uppercase transition-colors duration-150",
+                focusOutline,
+                current
+                  ? "text-foreground underline underline-offset-4"
+                  : "text-muted-foreground hover:text-foreground",
+                linkClassName
+              )}
+            >
+              {link.label}
+            </a>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const [paid, setPaid] = useState(false)
-  const [activity, setActivity] = useState(INITIAL_ACTIVITY)
-  const [message, setMessage] = useState("")
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const menuId = useId()
+
+  const activity: ActivityItem[] = paid
+    ? [
+        {
+          id: "paid",
+          text: "Marked as paid by Ada Hollis",
+          date: "27 Nov 2026",
+          dateTime: "2026-11-27",
+        },
+        ...initialActivity,
+      ]
+    : initialActivity
 
   function handleHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (!menuOpen || event.key !== "Escape") return
@@ -199,14 +173,7 @@ export function App() {
   function markAsPaid() {
     if (paid) return
     setPaid(true)
-    setActivity((items) => [
-      { id: "paid", text: "Marked as paid by Ada Hollis", date: TODAY },
-      ...items,
-    ])
-    setMessage(`Invoice ${INVOICE.number} marked as paid.`)
   }
-
-  const buttonText = "px-4 font-mono text-label uppercase"
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
@@ -225,9 +192,7 @@ export function App() {
             Fairhold
           </a>
           <nav aria-label="Main" className="hidden md:block">
-            <ul className="flex gap-6">
-              <NavLinks />
-            </ul>
+            <NavList className="flex gap-6" />
           </nav>
           <p className={cn(smallFigure, "ml-auto hidden md:block")}>
             Hollis &amp; Vane
@@ -236,23 +201,21 @@ export function App() {
             ref={menuButtonRef}
             variant="outline"
             aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
+            aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
-            className={cn(buttonText, "ml-auto md:hidden")}
+            className="ml-auto px-4 font-mono text-label uppercase md:hidden"
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-menu"
+          id={menuId}
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
           <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
-            <ul className="py-2">
-              <NavLinks className="block py-2" />
-            </ul>
+            <NavList className="py-2" linkClassName="block py-2" />
           </div>
         </nav>
       </header>
@@ -262,17 +225,20 @@ export function App() {
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
               <p className={label}>Invoice</p>
-              <h1 className="text-h1">{INVOICE.number}</h1>
+              <h1 className="text-h1">INV-0142</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className={buttonText}>
+              <Button
+                variant="outline"
+                className="px-4 font-mono text-label uppercase"
+              >
                 Download PDF
               </Button>
               <Button
                 onClick={markAsPaid}
                 disabled={paid}
                 focusableWhenDisabled
-                className={buttonText}
+                className="px-4 font-mono text-label uppercase"
               >
                 Mark as paid
               </Button>
@@ -282,10 +248,7 @@ export function App() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <article
               aria-labelledby="invoice-title"
-              className={cn(
-                sheet,
-                "flex min-w-0 flex-col gap-12 p-6 md:p-12 lg:col-span-8"
-              )}
+              className="flex flex-col gap-12 rounded-xl border border-border bg-card p-6 md:p-12 lg:col-span-8"
             >
               <div className="flex flex-wrap items-start justify-between gap-6">
                 <div className="flex flex-col gap-2">
@@ -303,10 +266,8 @@ export function App() {
                   <h2 id="invoice-title" className="text-h2">
                     Invoice
                   </h2>
-                  <p className={cn(smallFigure, "text-foreground")}>
-                    {INVOICE.number}
-                  </p>
-                  <State paid={paid} />
+                  <p className={cn(smallFigure, "text-foreground")}>INV-0142</p>
+                  <InvoiceState paid={paid} />
                 </div>
               </div>
 
@@ -324,16 +285,30 @@ export function App() {
                   </address>
                 </div>
                 <dl>
-                  <DetailRow term="Invoice number">{INVOICE.number}</DetailRow>
-                  <DetailRow term="Issued">
-                    <DateValue iso={INVOICE.issued} />
-                  </DetailRow>
-                  <DetailRow term="Due">
-                    <DateValue iso={INVOICE.due} />
-                  </DetailRow>
-                  <DetailRow term="Your reference">
-                    {INVOICE.reference}
-                  </DetailRow>
+                  <div className={dlRow}>
+                    <dt className={label}>Invoice number</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      INV-0142
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Issued</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      <time dateTime="2026-11-13">13 Nov 2026</time>
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Due</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      <time dateTime="2026-11-27">27 Nov 2026</time>
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Your reference</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      LC-PO-2211
+                    </dd>
+                  </div>
                 </dl>
               </div>
 
@@ -376,19 +351,19 @@ export function App() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {LINE_ITEMS.map((item) => (
+                    {lineItems.map((item) => (
                       <TableRow key={item.description}>
                         <TableCell className="px-4 py-2 whitespace-normal first:pl-0 last:pr-0">
                           {item.description}
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
-                          {item.quantity.toLocaleString("en-GB")}
+                          {item.quantity}
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
-                          {formatMoney(item.unit)}
+                          {item.unitPrice}
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
-                          {formatMoney(item.quantity * item.unit)}
+                          {item.amount}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -398,45 +373,63 @@ export function App() {
                   <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
                     <dt className={label}>Subtotal</dt>
                     <dd className="font-mono text-foreground tabular-nums">
-                      {formatMoney(SUBTOTAL)}
+                      £1,240.00
                     </dd>
                   </div>
                   <div className="flex items-baseline justify-between gap-3 border-t border-border py-2">
                     <dt className={label}>VAT 20%</dt>
                     <dd className="font-mono text-foreground tabular-nums">
-                      {formatMoney(VAT)}
+                      £248.00
                     </dd>
                   </div>
                   <div className="flex items-baseline justify-between gap-3 border-t-4 border-double border-foreground py-2 font-heading text-h2 tabular-nums">
                     <dt>Total</dt>
-                    <dd>{formatMoney(TOTAL)}</dd>
+                    <dd>£1,488.00</dd>
                   </div>
                 </dl>
               </div>
 
               <div className="flex flex-col gap-3 border-t border-border pt-6">
                 <h3 className={label}>Payment details</h3>
-                <p className="max-w-lg text-body text-foreground">
+                <p className="max-w-lg text-body">
                   Pay by bank transfer within 14 days, quoting the invoice
                   number.
                 </p>
                 <dl className="w-full max-w-md">
-                  <DetailRow term="Account name" mono={false}>
-                    Hollis &amp; Vane Ltd
-                  </DetailRow>
-                  <DetailRow term="Sort code">60-14-22</DetailRow>
-                  <DetailRow term="Account number">31884417</DetailRow>
-                  <DetailRow term="Reference">{INVOICE.number}</DetailRow>
+                  <div className={dlRow}>
+                    <dt className={label}>Account name</dt>
+                    <dd className="text-right text-body">
+                      Hollis &amp; Vane Ltd
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Sort code</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      60-14-22
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Account number</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      31884417
+                    </dd>
+                  </div>
+                  <div className={dlRow}>
+                    <dt className={label}>Reference</dt>
+                    <dd className="text-right font-mono tabular-nums">
+                      INV-0142
+                    </dd>
+                  </div>
                 </dl>
               </div>
             </article>
 
-            <div className="flex min-w-0 flex-col gap-6 lg:col-span-4">
+            <div className="flex flex-col gap-6 lg:col-span-4">
               <section
                 aria-labelledby="status-heading"
-                className={cn(sheet, "flex flex-col gap-3 p-6")}
+                className={cn(sheet, "flex flex-col gap-3")}
               >
-                <div className={headingRow}>
+                <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
                   <h2 id="status-heading" className={label}>
                     Status
                   </h2>
@@ -451,21 +444,25 @@ export function App() {
                 </div>
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <State paid={paid} />
+                    <InvoiceState paid={paid} />
                     <p className={smallFigure}>
                       {paid ? "Paid" : "Due"}{" "}
-                      <DateValue iso={paid ? TODAY : INVOICE.due} />
+                      <time dateTime="2026-11-27">27 Nov 2026</time>
                     </p>
                   </div>
                   <div>
                     <div className="flex flex-col gap-1">
                       <p className={label}>Amount due</p>
                       <p className="font-heading text-h1 text-foreground tabular-nums">
-                        {formatMoney(paid ? 0 : TOTAL)}
+                        {paid ? "£0.00" : "£1,488.00"}
                       </p>
                     </div>
                     <div role="status">
-                      {message && <p className="mt-3 text-body">{message}</p>}
+                      {paid && (
+                        <p className="mt-3 text-body">
+                          Invoice INV-0142 marked as paid.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -473,14 +470,9 @@ export function App() {
 
               <section
                 aria-labelledby="activity-heading"
-                className={cn(sheet, "flex flex-1 flex-col overflow-hidden")}
+                className="flex-1 overflow-hidden rounded-xl border border-border bg-card"
               >
-                <div
-                  className={cn(
-                    headingRow,
-                    "border-b border-border px-6 pt-6 pb-3"
-                  )}
-                >
+                <div className="flex min-h-8 flex-wrap items-center justify-between gap-3 border-b border-border px-6 pt-6 pb-3">
                   <h2 id="activity-heading" className={label}>
                     Activity
                   </h2>
@@ -491,10 +483,10 @@ export function App() {
                       key={item.id}
                       className="flex flex-col gap-1 border-border px-6 py-3 not-first:border-t"
                     >
-                      <p className="text-body text-foreground">{item.text}</p>
-                      <p className={smallFigure}>
-                        <DateValue iso={item.date} />
-                      </p>
+                      <p className="text-body wrap-break-word">{item.text}</p>
+                      <time dateTime={item.dateTime} className={smallFigure}>
+                        {item.date}
+                      </time>
                     </li>
                   ))}
                 </ul>

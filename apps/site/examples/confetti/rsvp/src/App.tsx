@@ -4,14 +4,11 @@ import {
   useState,
   type FormEvent,
   type ReactNode,
-  type RefObject,
 } from "react"
-import { flushSync } from "react-dom"
 import { CircleAlert, Minus, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
   SelectContent,
@@ -19,51 +16,48 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const textLink = `text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground ${focusOutline}`
-
-const navLink = `inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline ${focusOutline}`
-
-const buttonClass = "h-11 rounded-md px-6 font-mono text-label"
-
-const container = "mx-auto max-w-[1088px] px-6"
-
-const fieldLabel = "block font-mono text-label text-foreground"
-
+const codeFocusRing =
+  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+const textLink = cn(
+  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+const navLink = cn(
+  "inline-flex h-11 items-center font-mono text-label text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+const buttonClasses = "h-11 rounded-md px-6 font-mono text-label"
+const fieldLabel = "block font-mono text-label"
 const helperText = "font-mono text-label text-muted-foreground"
 
-const dinners = [
+const EMAIL = "hello@clemandrafe.example"
+const MIN_GUESTS = 1
+const MAX_GUESTS = 4
+const NOTE_MAX = 300
+
+const DINNERS = [
   "Roast chicken with tarragon",
   "Wild mushroom pie (vegetarian)",
   "Summer vegetable tart (vegan)",
   "Children's plate (under 12)",
 ]
 
-const navItems = [
+const NAV = [
   { label: "Reply", href: "/rsvp", current: true },
   { label: "Gifts", href: "/gifts", current: false },
   { label: "The day", href: "/day", current: false },
   { label: "Guestbook", href: "/guestbook", current: false },
 ]
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const NOTE_MAX = 300
-const GUESTS_MIN = 1
-const GUESTS_MAX = 4
-
 type Coming = "yes" | "no" | null
-
-type Errors = {
-  name?: string
-  email?: string
-  coming?: string
-  dinner?: string
-}
-
-type Reply = {
+type FieldKey = "name" | "email" | "coming" | "dinner"
+type Errors = Partial<Record<FieldKey, string>>
+type Sent = {
   name: string
   email: string
   coming: "yes" | "no"
@@ -71,12 +65,22 @@ type Reply = {
   dinner: string | null
 }
 
-function guestCount(n: number) {
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+function guestsLabel(n: number) {
   return n === 1 ? "1 guest" : `${n} guests`
 }
 
 function charactersLeft(n: number) {
   return n === 1 ? "1 character left" : `${n} characters left`
+}
+
+function MailLink() {
+  return (
+    <a href={`mailto:${EMAIL}`} className={textLink}>
+      {EMAIL}
+    </a>
+  )
 }
 
 function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
@@ -95,34 +99,31 @@ function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
   )
 }
 
-function OurEmail() {
-  return (
-    <a href="mailto:hello@clemandrafe.example" className={textLink}>
-      hello@clemandrafe.example
-    </a>
-  )
+function describedBy(...ids: (string | false | undefined)[]) {
+  return ids.filter(Boolean).join(" ") || undefined
 }
 
-function Header() {
+function SiteHeader() {
   return (
     <header className="border-b border-border">
-      <div
-        className={`${container} flex flex-wrap items-center gap-x-6 gap-y-2 py-3`}
-      >
+      <div className="mx-auto flex max-w-[1088px] flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
         <a
           href="/"
-          className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
+          className={cn(
+            "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
+            focusRing
+          )}
         >
           Clem &amp; Rafe
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
           <ul className="flex flex-wrap gap-x-6">
-            {navItems.map((item) => (
+            {NAV.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
                   aria-current={item.current ? "page" : undefined}
-                  className={item.current ? `${navLink} underline` : navLink}
+                  className={cn(navLink, item.current && "underline")}
                 >
                   {item.label}
                 </a>
@@ -135,20 +136,18 @@ function Header() {
   )
 }
 
-function Footer() {
+function SiteFooter() {
   return (
     <footer className="border-t border-border">
-      <div
-        className={`${container} flex flex-col gap-3 py-10 md:flex-row md:items-center md:justify-between`}
-      >
+      <div className="mx-auto flex max-w-[1088px] flex-col gap-3 px-6 py-10 md:flex-row md:items-center md:justify-between">
         <p className="font-heading text-h2">Clem &amp; Rafe</p>
         <div className="flex flex-col gap-2 md:items-end">
-          <p className="font-mono text-label text-muted-foreground">
+          <p className="font-mono text-label text-muted-foreground tabular-nums">
             <time dateTime="2027-07-17">Saturday 17 July 2027</time> ·
             Quillbrook Barn, Little Saltry
           </p>
-          <p className="font-mono text-label text-muted-foreground">
-            Questions: <OurEmail />
+          <p className="font-mono text-label wrap-break-word text-muted-foreground">
+            Questions: <MailLink />
           </p>
         </div>
       </div>
@@ -156,97 +155,45 @@ function Footer() {
   )
 }
 
-function Opening() {
-  return (
-    <section
-      aria-labelledby="opening-title"
-      className="flex flex-col gap-6 rounded-xl bg-mist p-6 text-mist-foreground md:p-10"
-    >
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-2">
-          <p className="font-mono text-label">
-            Reply by <time dateTime="2027-04-30">Friday 30 April 2027</time>
-          </p>
-          <h1 id="opening-title" className="text-h1 md:text-display">
-            Will you come?
-          </h1>
-        </div>
-        <p className="max-w-xl text-body">
-          Tell us who is coming and what you would like for dinner. It takes a
-          minute, and it helps us plan the tables and the minibuses.
-        </p>
-      </div>
-    </section>
-  )
-}
-
-function Confirmation({
-  reply,
-  headingRef,
-}: {
-  reply: Reply
-  headingRef: RefObject<HTMLHeadingElement | null>
-}) {
-  const headingClass =
-    "text-h2 wrap-break-word focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-
-  if (reply.coming === "yes") {
-    return (
-      <div className="flex flex-col gap-3">
-        <h3 ref={headingRef} tabIndex={-1} className={headingClass}>
-          Thank you, {reply.name}
-        </h3>
-        <p className="max-w-xl">
-          We have you down for {guestCount(reply.guests)} on{" "}
-          <time dateTime="2027-07-17">Saturday 17 July 2027</time>, with{" "}
-          {reply.dinner} for your dinner.
-        </p>
-        <p className="max-w-xl wrap-break-word">
-          A copy is on its way to {reply.email}. To change anything before{" "}
-          <time dateTime="2027-04-30">30 April</time>, write to <OurEmail />.
-        </p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-3">
-      <h3 ref={headingRef} tabIndex={-1} className={headingClass}>
-        Thank you for letting us know
-      </h3>
-      <p className="max-w-xl wrap-break-word">
-        We will miss you, {reply.name}. If your plans change before{" "}
-        <time dateTime="2027-04-30">30 April</time>, write to <OurEmail /> and
-        we will make room.
-      </p>
-    </div>
-  )
-}
-
 function ReplyForm() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [coming, setComing] = useState<Coming>(null)
-  const [guests, setGuests] = useState(GUESTS_MIN)
+  const [guests, setGuests] = useState(MIN_GUESTS)
   const [dinner, setDinner] = useState<string | null>(null)
   const [note, setNote] = useState("")
   const [errors, setErrors] = useState<Errors>({})
-  const [reply, setReply] = useState<Reply | null>(null)
+  const [focusRequest, setFocusRequest] = useState<{
+    field: FieldKey
+    n: number
+  } | null>(null)
+  const [sent, setSent] = useState<Sent | null>(null)
 
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const yesRef = useRef<HTMLButtonElement>(null)
   const dinnerRef = useRef<HTMLButtonElement>(null)
-  const headingRef = useRef<HTMLHeadingElement>(null)
+  const confirmationRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (reply) headingRef.current?.focus()
-  }, [reply])
+    if (!focusRequest) return
+    const targets = {
+      name: nameRef,
+      email: emailRef,
+      coming: yesRef,
+      dinner: dinnerRef,
+    }
+    targets[focusRequest.field].current?.focus()
+  }, [focusRequest])
 
-  function clearError(field: keyof Errors) {
-    setErrors((current) => {
-      if (!current[field]) return current
-      const next = { ...current }
+  useEffect(() => {
+    if (sent) confirmationRef.current?.focus()
+  }, [sent])
+
+  function clearError(field: FieldKey) {
+    setErrors((prev) => {
+      if (!prev[field]) return prev
+      const next = { ...prev }
       delete next[field]
       return next
     })
@@ -259,129 +206,123 @@ function ReplyForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-
     const trimmedName = name.trim()
     const trimmedEmail = email.trim()
     const next: Errors = {}
 
-    if (!trimmedName) {
+    if (!trimmedName)
       next.name = "Write your name, as it is on your invitation."
-    }
-    if (!trimmedEmail) {
+    if (!trimmedEmail)
       next.email = "Write your email address, so we can send you a copy."
-    } else if (!EMAIL_PATTERN.test(trimmedEmail)) {
+    else if (!emailPattern.test(trimmedEmail))
       next.email = "Check the email address: it needs an @ and a domain."
-    }
-    if (!coming) {
-      next.coming = "Choose whether you can come."
-    }
-    if (coming === "yes" && !dinner) {
+    if (!coming) next.coming = "Choose whether you can come."
+    if (coming === "yes" && !dinner)
       next.dinner = "Choose a dinner for yourself."
-    }
 
-    if (Object.keys(next).length > 0) {
-      flushSync(() => setErrors(next))
-      if (next.name) nameRef.current?.focus()
-      else if (next.email) emailRef.current?.focus()
-      else if (next.coming) yesRef.current?.focus()
-      else if (next.dinner) dinnerRef.current?.focus()
+    setErrors(next)
+    const order: FieldKey[] = ["name", "email", "coming", "dinner"]
+    const first = order.find((key) => next[key])
+    if (first) {
+      setFocusRequest((prev) => ({ field: first, n: (prev?.n ?? 0) + 1 }))
       return
     }
 
-    setErrors({})
-    setReply({
+    setSent({
       name: trimmedName,
       email: trimmedEmail,
       coming: coming as "yes" | "no",
       guests,
-      dinner: coming === "yes" ? dinner : null,
+      dinner,
     })
   }
 
-  const emailDescribedBy = errors.email
-    ? "email-help email-error"
-    : "email-help"
-  const dinnerDescribedBy = errors.dinner
-    ? "dinner-help dinner-error"
-    : "dinner-help"
-
   return (
     <div className="rounded-xl border border-border bg-card p-6">
-      {!reply && (
+      {!sent && (
         <form
           noValidate
           aria-label="Your reply"
-          onSubmit={handleSubmit}
           className="flex flex-col gap-6"
+          onSubmit={handleSubmit}
         >
           <div className="flex flex-col gap-2">
-            <label htmlFor="name" className={fieldLabel}>
+            <label htmlFor="reply-name" className={fieldLabel}>
               Your name
             </label>
             <Input
               ref={nameRef}
-              id="name"
-              name="name"
+              id="reply-name"
               autoComplete="name"
               value={name}
-              onChange={(event) => {
-                setName(event.target.value)
+              onChange={(e) => {
+                setName(e.target.value)
                 clearError("name")
               }}
               aria-invalid={errors.name ? true : undefined}
-              aria-describedby={
-                errors.name ? "name-help name-error" : "name-help"
-              }
+              aria-describedby={describedBy(
+                "reply-name-help",
+                errors.name && "reply-name-error"
+              )}
               className="h-11 rounded-md px-3 text-body md:text-body"
             />
-            <p id="name-help" className={helperText}>
-              As it is on your invitation
+            <p id="reply-name-help" className={helperText}>
+              As it is on your invitation.
             </p>
-            {errors.name && <ErrorLine id="name-error">{errors.name}</ErrorLine>}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <label htmlFor="email" className={fieldLabel}>
-              Email address
-            </label>
-            <Input
-              ref={emailRef}
-              id="email"
-              name="email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(event) => {
-                setEmail(event.target.value)
-                clearError("email")
-              }}
-              aria-invalid={errors.email ? true : undefined}
-              aria-describedby={emailDescribedBy}
-              className="h-11 rounded-md px-3 text-body md:text-body"
-            />
-            <p id="email-help" className={helperText}>
-              We send a copy of your reply here.
-            </p>
-            {errors.email && (
-              <ErrorLine id="email-error">{errors.email}</ErrorLine>
+            {errors.name && (
+              <ErrorLine id="reply-name-error">{errors.name}</ErrorLine>
             )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <p id="coming-label" className="font-mono text-label text-foreground">
+            <label htmlFor="reply-email" className={fieldLabel}>
+              Email address
+            </label>
+            <Input
+              ref={emailRef}
+              id="reply-email"
+              type="email"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                clearError("email")
+              }}
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={describedBy(
+                "reply-email-help",
+                errors.email && "reply-email-error"
+              )}
+              className="h-11 rounded-md px-3 text-body md:text-body"
+            />
+            <p id="reply-email-help" className={helperText}>
+              We send a copy of your reply here.
+            </p>
+            {errors.email && (
+              <ErrorLine id="reply-email-error">{errors.email}</ErrorLine>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <p
+              id="reply-coming-label"
+              className="font-mono text-label text-foreground"
+            >
               Are you coming?
             </p>
             <div
               role="group"
-              aria-labelledby="coming-label"
-              aria-describedby={errors.coming ? "coming-error" : undefined}
+              aria-labelledby="reply-coming-label"
+              aria-describedby={
+                errors.coming ? "reply-coming-error" : undefined
+              }
               className="flex flex-wrap gap-2"
             >
               <Button
                 ref={yesRef}
                 aria-pressed={coming === "yes"}
                 variant={coming === "yes" ? "secondary" : "outline"}
-                className={buttonClass}
+                className={buttonClasses}
                 onClick={() => choose("yes")}
               >
                 Yes, I will be there
@@ -389,14 +330,14 @@ function ReplyForm() {
               <Button
                 aria-pressed={coming === "no"}
                 variant={coming === "no" ? "secondary" : "outline"}
-                className={buttonClass}
+                className={buttonClasses}
                 onClick={() => choose("no")}
               >
                 Sorry, I cannot come
               </Button>
             </div>
             {errors.coming && (
-              <ErrorLine id="coming-error">{errors.coming}</ErrorLine>
+              <ErrorLine id="reply-coming-error">{errors.coming}</ErrorLine>
             )}
           </div>
 
@@ -404,15 +345,15 @@ function ReplyForm() {
             <>
               <div className="flex flex-col gap-2">
                 <p
-                  id="guests-label"
+                  id="reply-guests-label"
                   className="font-mono text-label text-foreground"
                 >
                   Guests, you included
                 </p>
                 <div
                   role="group"
-                  aria-labelledby="guests-label"
-                  aria-describedby="guests-help"
+                  aria-labelledby="reply-guests-label"
+                  aria-describedby="reply-guests-help"
                   className="flex items-center gap-2"
                 >
                   <Button
@@ -420,10 +361,10 @@ function ReplyForm() {
                     size="icon"
                     className="size-11 rounded-md"
                     aria-label="Fewer guests"
-                    disabled={guests <= GUESTS_MIN}
+                    disabled={guests <= MIN_GUESTS}
                     focusableWhenDisabled
                     onClick={() =>
-                      setGuests((n) => Math.max(GUESTS_MIN, n - 1))
+                      setGuests((n) => Math.max(MIN_GUESTS, n - 1))
                     }
                   >
                     <Minus
@@ -436,17 +377,17 @@ function ReplyForm() {
                     aria-live="polite"
                     className="inline-flex min-w-24 justify-center font-mono text-label text-foreground tabular-nums"
                   >
-                    {guestCount(guests)}
+                    {guestsLabel(guests)}
                   </span>
                   <Button
                     variant="outline"
                     size="icon"
                     className="size-11 rounded-md"
                     aria-label="More guests"
-                    disabled={guests >= GUESTS_MAX}
+                    disabled={guests >= MAX_GUESTS}
                     focusableWhenDisabled
                     onClick={() =>
-                      setGuests((n) => Math.min(GUESTS_MAX, n + 1))
+                      setGuests((n) => Math.min(MAX_GUESTS, n + 1))
                     }
                   >
                     <Plus
@@ -456,15 +397,15 @@ function ReplyForm() {
                     />
                   </Button>
                 </div>
-                <p id="guests-help" className={helperText}>
+                <p id="reply-guests-help" className={helperText}>
                   Your invitation is for up to 4 people.
                 </p>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label
-                  id="dinner-label"
-                  htmlFor="dinner"
+                  id="reply-dinner-label"
+                  htmlFor="reply-dinner"
                   className={fieldLabel}
                 >
                   Your dinner
@@ -479,122 +420,152 @@ function ReplyForm() {
                 >
                   <SelectTrigger
                     ref={dinnerRef}
-                    id="dinner"
-                    aria-labelledby="dinner-label"
+                    id="reply-dinner"
+                    aria-labelledby="reply-dinner-label"
                     aria-invalid={errors.dinner ? true : undefined}
-                    aria-describedby={dinnerDescribedBy}
+                    aria-describedby={describedBy(
+                      "reply-dinner-help",
+                      errors.dinner && "reply-dinner-error"
+                    )}
                   >
                     <SelectValue placeholder="Choose a dinner" />
                   </SelectTrigger>
                   <SelectContent>
-                    {dinners.map((item) => (
-                      <SelectItem key={item} value={item}>
-                        {item}
+                    {DINNERS.map((d) => (
+                      <SelectItem key={d} value={d}>
+                        {d}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <p id="dinner-help" className={helperText}>
+                <p id="reply-dinner-help" className={helperText}>
                   If others come with you, tell us their dinners in the note.
                 </p>
                 {errors.dinner && (
-                  <ErrorLine id="dinner-error">{errors.dinner}</ErrorLine>
+                  <ErrorLine id="reply-dinner-error">{errors.dinner}</ErrorLine>
                 )}
               </div>
             </>
           )}
 
           <div className="flex flex-col gap-2">
-            <label htmlFor="note" className={fieldLabel}>
+            <label htmlFor="reply-note" className={fieldLabel}>
               A note for Clem and Rafe (optional)
             </label>
             <Textarea
-              id="note"
-              name="note"
+              id="reply-note"
               maxLength={NOTE_MAX}
               value={note}
-              onChange={(event) => setNote(event.target.value)}
-              aria-describedby="note-help"
+              onChange={(e) => setNote(e.target.value)}
+              aria-describedby="reply-note-help"
               className="min-h-32 resize-none rounded-md px-3 py-2 text-body md:text-body"
             />
-            <p id="note-help" className={helperText}>
+            <p id="reply-note-help" className={cn(helperText, "tabular-nums")}>
               {charactersLeft(NOTE_MAX - note.length)}
             </p>
           </div>
 
           <Button
             type="submit"
-            className={`${buttonClass} w-full md:w-auto md:self-start`}
+            className={cn(buttonClasses, "w-full md:w-auto md:self-start")}
           >
             Send my reply
           </Button>
         </form>
       )}
+
       <div role="status">
-        {reply && <Confirmation reply={reply} headingRef={headingRef} />}
+        {sent && (
+          <div className="flex flex-col gap-3">
+            {sent.coming === "yes" ? (
+              <>
+                <h3
+                  ref={confirmationRef}
+                  tabIndex={-1}
+                  className={cn("text-h2 wrap-break-word", codeFocusRing)}
+                >
+                  Thank you, {sent.name}
+                </h3>
+                <p>
+                  We have you down for {guestsLabel(sent.guests)} on{" "}
+                  <time dateTime="2027-07-17">Saturday 17 July 2027</time>, with{" "}
+                  {sent.dinner} for your dinner.
+                </p>
+                <p className="wrap-break-word">
+                  A copy is on its way to {sent.email}. To change anything
+                  before <time dateTime="2027-04-30">30 April</time>, write to{" "}
+                  <MailLink />.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3
+                  ref={confirmationRef}
+                  tabIndex={-1}
+                  className={cn("text-h2", codeFocusRing)}
+                >
+                  Thank you for letting us know
+                </h3>
+                <p className="wrap-break-word">
+                  We will miss you, {sent.name}. If your plans change before{" "}
+                  <time dateTime="2027-04-30">30 April</time>, write to{" "}
+                  <MailLink /> and we will make room.
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
 }
 
-function DayInShort() {
-  const rows: { term: string; value: ReactNode }[] = [
-    {
-      term: "Date",
-      value: <time dateTime="2027-07-17">Saturday 17 July 2027</time>,
-    },
-    {
-      term: "Arrive",
-      value: (
-        <>
-          From <time dateTime="13:30">13:30</time>
-        </>
-      ),
-    },
-    { term: "Ceremony", value: <time dateTime="14:00">14:00</time> },
-    { term: "Place", value: "Quillbrook Barn, Little Saltry" },
-    {
-      term: "Reply by",
-      value: <time dateTime="2027-04-30">Friday 30 April 2027</time>,
-    },
-  ]
-
-  return (
-    <aside
-      aria-labelledby="day-title"
-      className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4 md:col-start-9"
-    >
-      <h2 id="day-title" className="text-h2">
-        The day in short
-      </h2>
-      <dl className="divide-y divide-border">
-        {rows.map((row) => (
-          <div
-            key={row.term}
-            className="flex items-baseline justify-between gap-6 py-3 first:pt-0 last:pb-0"
-          >
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              {row.term}
-            </dt>
-            <dd className="min-w-0 text-right text-body text-foreground tabular-nums">
-              {row.value}
-            </dd>
-          </div>
-        ))}
-      </dl>
-      <p className="text-body wrap-break-word">
-        Something the form does not ask? Write to <OurEmail />.
-      </p>
-    </aside>
-  )
-}
+const DAY_ROWS: { term: string; value: ReactNode }[] = [
+  {
+    term: "Date",
+    value: <time dateTime="2027-07-17">Saturday 17 July 2027</time>,
+  },
+  {
+    term: "Arrive",
+    value: (
+      <>
+        From <time dateTime="13:30">13:30</time>
+      </>
+    ),
+  },
+  { term: "Ceremony", value: <time dateTime="14:00">14:00</time> },
+  { term: "Place", value: "Quillbrook Barn, Little Saltry" },
+  {
+    term: "Reply by",
+    value: <time dateTime="2027-04-30">Friday 30 April 2027</time>,
+  },
+]
 
 export function App() {
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <Header />
-      <main className={`${container} flex flex-col gap-22 pt-10 pb-22`}>
-        <Opening />
+      <SiteHeader />
+
+      <main className="mx-auto flex max-w-[1088px] flex-col gap-22 px-6 pt-10 pb-22">
+        <section
+          aria-labelledby="opening-title"
+          className="flex flex-col gap-6 rounded-xl bg-mist p-6 text-mist-foreground md:p-10"
+        >
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
+              <p className="font-mono text-label tabular-nums">
+                Reply by <time dateTime="2027-04-30">Friday 30 April 2027</time>
+              </p>
+              <h1 id="opening-title" className="text-h1 md:text-display">
+                Will you come?
+              </h1>
+            </div>
+            <p className="max-w-xl text-body">
+              Tell us who is coming and what you would like for dinner. It takes
+              a minute, and it helps us plan the tables and the minibuses.
+            </p>
+          </div>
+        </section>
 
         <section
           aria-labelledby="reply-title"
@@ -606,7 +577,33 @@ export function App() {
             </h2>
             <ReplyForm />
           </div>
-          <DayInShort />
+
+          <aside
+            aria-labelledby="day-title"
+            className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6 md:col-span-4 md:col-start-9"
+          >
+            <h2 id="day-title" className="text-h2">
+              The day in short
+            </h2>
+            <dl className="divide-y divide-border">
+              {DAY_ROWS.map((row) => (
+                <div
+                  key={row.term}
+                  className="flex items-baseline justify-between gap-6 py-3 first:pt-0 last:pb-0"
+                >
+                  <dt className="shrink-0 font-mono text-label text-muted-foreground">
+                    {row.term}
+                  </dt>
+                  <dd className="min-w-0 text-right text-body text-foreground tabular-nums">
+                    {row.value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <p className="text-body wrap-break-word">
+              Something the form does not ask? Write to <MailLink />.
+            </p>
+          </aside>
         </section>
 
         <section
@@ -617,17 +614,18 @@ export function App() {
             <h2 id="offline-title" className="text-h2">
               Cannot reply online?
             </h2>
-            <p className="max-w-xl text-body">
+            <p className="max-w-xl text-body wrap-break-word">
               Clem&apos;s sister, Bea Ashdown, is keeping the list. Call her on{" "}
               <a href="tel:+441632960573" className={textLink}>
                 01632 960 573
               </a>{" "}
-              or write to <OurEmail />, and she will add you.
+              or write to <MailLink />, and she will add you.
             </p>
           </div>
         </section>
       </main>
-      <Footer />
+
+      <SiteFooter />
     </div>
   )
 }

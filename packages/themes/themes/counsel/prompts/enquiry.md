@@ -49,7 +49,7 @@ A section in the grid with two parts.
 - With `mt-8`, the fields, `mt-8` apart, each in its own wrapper (`npx shadcn@latest add input textarea select checkbox`):
   - "Your name": an `Input`, `autoComplete="name"`.
   - "Organisation (optional)": an `Input`, `autoComplete="organization"`.
-  - A row with the email and the telephone: `md:grid md:grid-cols-2 md:gap-x-8`, each field in its own wrapper, the telephone's wrapper with `mt-8 md:mt-0`. On a phone the two stack. "Email address": an `Input` of type `email`, `autoComplete="email"`. "Telephone (optional)": an `Input` of type `tel`, `autoComplete="tel"`.
+  - A row with the email and the telephone: a `<div>` with `md:grid md:grid-cols-2 md:gap-x-8`, which takes the `mt-8` between fields; inside it each field in its own wrapper, the email's with no margin, the telephone's with `mt-8 md:mt-0`. On a phone the two stack. "Email address": an `Input` of type `email`, `autoComplete="email"`. "Telephone (optional)": an `Input` of type `tel`, `autoComplete="tel"`.
   - "What does the matter concern?": a `Select` from the layout notes, with the placeholder `Choose an area` and the choices `Corporate`, `Commercial disputes`, `Employment`, `Real estate`, `Private client` and `Something else`.
   - "Other parties involved (optional)": an `Input`. Under its label, with `mt-2`, a helper line: a `<p>` in `font-mono text-label text-muted-foreground`, not uppercased, "Names of the other companies or people, so that we can check for conflicts.", with the `id` `parties-help`, which the field's `aria-describedby` names at all times. Here the field has `mt-2` under the helper line, in place of the Inputs note's `mt-2` under the label.
   - "Tell us about the matter": a `Textarea` with `min-h-48`. Under its label, with `mt-2`, a helper line as above with the `id` `message-help`: "A few sentences: what happened, what you would like, and any deadline you know of." The textarea has `mt-2` under it and names it in its `aria-describedby` at all times.
@@ -62,7 +62,7 @@ The footer from the layout notes.
 
 ### On a phone
 
-The office's details come first and the form after them, at the full width, 56px under. The email and telephone fields stack. The form keeps its `p-8`. Inputs and the select take the full width of the form. The badge wraps under the form's heading if the line is too short. The send button is `w-full md:w-auto`: full width on a phone, its own width from `md` up.
+The office's details come first and the form after them, at the full width, 56px under. The email and telephone fields stack. The form keeps its `p-8`. Inputs and the select take the full width of the form. The badge wraps under the form's heading if the line is too short. The send button and the "Send another enquiry" button are each `w-full md:w-auto`: full width on a phone, their own width from `md` up.
 
 ### Behavior
 

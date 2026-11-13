@@ -24,7 +24,7 @@ The site header from the layout notes. Nav links, in order: Docs (`/docs`), Chan
 A `<section>`, inside the container, as a 12-column grid that is a single column below `lg`. No top margin: `<main>`'s `pt-12` gives the space above it.
 
 - **Columns 1–7, the text.** First a line, `flex flex-wrap items-center gap-2`: the signal badge, "new" (add it with `npx shadcn@latest add badge`), and a text link to `/changelog`, "`2.4.0`: a preview for every branch", with the version in `font-mono`. This badge is the page's one lime mark. Then, with `mt-6`, the `<h1>`, in `text-display` from `md` up and `text-h1` below. Sample: "Deploy from the terminal you already have open". Then, with `mt-3`, one paragraph of two sentences. Then, with `mt-6`, the install command as a code block from the layout notes: the strip's label is `install`, and the `<pre>` holds the one command with no prompt sign. On a phone the command is wider than the box and scrolls in it. Then, with `mt-6`, a row with `gap-3` that wraps: the default button-link "Get started" (`/docs/get-started/quick-start`) and a text link "See every command" (`/docs/commands/deploy`).
-- **Columns 8–12, the terminal.** A `<figure>` built like a code block, with no Copy button: the strip holds the `<figcaption>` `~/orrin-web` on the left and, on the right, a `<p>` `zsh` in `font-mono text-label text-muted-foreground`. No dots for close and minimise, no title bar of any other kind. Under the strip, the session: a `<pre>` with `overflow-x-auto p-4 font-mono text-label`, scrolling sideways in its own box as a code block does (`tabIndex={0}`, `role="region"`, the `aria-label` "Terminal session", the outline drawn inside). Its lines, one per line of the `<pre>`:
+- **Columns 8–12, the terminal.** A `<figure>` built like a code block, with no Copy button: the strip holds the label `~/orrin-web` on the left, a `<p>` with an `id` named by the figure's `aria-labelledby`, as in a code block, and, on the right, a `<p>` `zsh` in `font-mono text-label text-muted-foreground`. No dots for close and minimise, no title bar of any other kind. Under the strip, the session: a `<pre>` with `overflow-x-auto p-4 font-mono text-label`, scrolling sideways in its own box as a code block does (`tabIndex={0}`, `role="region"`, the `aria-label` "Terminal session", the outline drawn inside). Its lines, one per line of the `<pre>`:
 
   ```
   $ plinth deploy
@@ -35,7 +35,7 @@ A `<section>`, inside the container, as a 12-column grid that is a single column
   $
   ```
 
-  The `$` signs are `text-muted-foreground`. The command after the first `$` is `text-foreground`. The three output lines are `text-muted-foreground`. On the `ready` line the word `ready` is `text-success`, the address `text-foreground` and `in 38s` `text-muted-foreground`. After the last `$` and a space, the cursor: a `<span>` with `inline-block h-3 w-2 bg-primary align-middle` and `aria-hidden="true"`. It does not blink. The `<figcaption>` is the figure's only caption.
+  The `$` signs are `text-muted-foreground`. The command after the first `$` is `text-foreground`. The three output lines are `text-muted-foreground`. On the `ready` line the word `ready` is `text-success`, the address `text-foreground` and `in 38s` `text-muted-foreground`. After the last `$` and a space, the cursor: a `<span>` with `inline-block h-3 w-2 bg-primary align-middle` and `aria-hidden="true"`. It does not blink. The figure has no `<figcaption>`: the strip's label names it. As a grid item it gets `self-start` and `min-w-0`, as a code block does.
 
 On a phone the terminal comes under the text, `gap-6` from it, at full width.
 
@@ -43,7 +43,7 @@ On a phone the terminal comes under the text, `gap-6` from it, at full width.
 
 A `<section>` with `mt-12`, a 1px `border-t border-border` and `pt-12`. First a label, `features`, in `text-muted-foreground`. Then, with `mt-2`, the `<h2>`: "What it does between commit and address". Then, with `mt-6`, a 12-column grid: four features, each three columns from `lg` up, six from `md` to `lg`, and the full width below `md`. No cards and no panels. Each feature is a `<div>` with a 1px `border-t border-border` and `pt-4`, holding:
 
-- An icon: `GitBranch`, `Undo2`, `KeyRound` and `ScrollText`.
+- An icon, with `block` so that the `mt-3` under it measures from the icon, not from a line box: `GitBranch`, `Undo2`, `KeyRound` and `ScrollText`.
 - With `mt-3`, an `<h3>`: "A preview for every branch", "Roll back in one command", "Secrets outside the repo", "Logs as they happen".
 - With `mt-3`, a paragraph of one or two sentences that names the command as inline code: `plinth deploy`, `plinth rollback`, `plinth env set`, `plinth logs --follow`.
 

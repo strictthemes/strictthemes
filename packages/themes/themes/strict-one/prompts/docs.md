@@ -29,7 +29,7 @@ From `lg` up (not `md`, as on other pages), a 12-column grid with `gap-x-8`. Eac
 - **Columns 4–9, content.**
 - **Columns 10–12, on this page.** A label heading "ON THIS PAGE", an `<h2>` (it comes after the content), in `text-foreground` and one label link per `<h2>` of the content, each a block with a 2px left line (`border-l-2`) and `pl-4`. `sticky top-0 self-start`, with the `pt-8` inside it. Hidden below `xl`; the content takes columns 4–12 then, and its text keeps to the measure.
 
-Below `lg`, the header's "Menu" button opens a `Sheet` from the left that holds the search, the header links and the sidebar, in that order, `gap-8` apart in the sheet's one wrapper. There the header links are a `flex flex-col gap-2` list of label links, like a sidebar group. If the window grows to `lg` while the sheet is open, close it (a `matchMedia("(min-width: 64rem)")` change). In the sheet the sidebar keeps its groups and link lines but drops `sticky top-0 max-h-svh self-start overflow-y-auto pb-8`, its `pt-8` and `-mx-1 px-1`: the sheet is the scroll box. This is the page's only menu.
+Below `lg`, the header's "Menu" button opens a `Sheet` from the left that holds the search, the header links and the sidebar, in that order, `gap-8` apart in the sheet's one wrapper. There the header links are a `flex flex-col gap-2` list of label links, like a sidebar group. If the window grows to `lg` while the sheet is open, close it (a `matchMedia("(min-width: 64rem)")` change). In the sheet the sidebar keeps its groups and link lines (the current link's line is `border-sidebar-foreground` there, as its text is `text-sidebar-foreground`) but drops `sticky top-0 max-h-svh self-start overflow-y-auto pb-8`, its `pt-8` and `-mx-1 px-1`: the sheet is the scroll box. This is the page's only menu.
 
 ### 3. Content
 
@@ -57,5 +57,5 @@ A footer with `py-8` and a 1px top border, holding one line: a label with the co
 ### Behavior
 
 - Mark the section in view in "on this page". Work it out from the headings' positions on scroll: the section in view is the last `<h2>` whose top is above a line one third of the way down the window, the first one before any is, and the last one when the page is scrolled to its end. An `IntersectionObserver` on the headings alone misses jumps. The marked link is `text-foreground` with a `border-foreground` left line and `aria-current="location"`; the rest are `text-muted-foreground` with a transparent line.
-- The search filters sidebar links by their text and shows "No pages match" when nothing is left, in a `role="status"` element that is always rendered and empty otherwise, so a screen reader hears it. The header's field and the sheet's share one value.
+- The search filters sidebar links by their text; a group with no link left is hidden, its name included. It shows "No pages match" when nothing is left, in a `role="status"` element that is always rendered and empty otherwise, so a screen reader hears it. The header's field and the sheet's share one value.
 - Copying uses `navigator.clipboard`.

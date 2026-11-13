@@ -25,15 +25,13 @@ const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const codeFocusOutline =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const textLink =
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground"
-const buttonText = "h-11 px-6 font-mono text-label"
-const goodNewsBadge =
-  "h-auto gap-1 rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
+const label = "font-mono text-label text-muted-foreground"
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 const card = "rounded-xl border border-border bg-card p-6"
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const goodNewsBadge =
+  "h-auto gap-1 rounded-sm px-2 py-1 font-mono text-label border-transparent bg-tertiary text-tertiary-foreground"
+const fieldClass = "h-11 px-4 text-body md:text-body"
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 const previewHabits = [
   { name: "Drink 8 glasses of water", done: true },
@@ -73,7 +71,7 @@ const features: { icon: LucideIcon; title: string; text: string }[] = [
 type Errors = { name?: string; email?: string }
 type Sent = { name: string; email: string }
 
-function FieldError({ id, message }: { id: string; message: string }) {
+function FieldError({ id, children }: { id: string; children: string }) {
   return (
     <p
       id={id}
@@ -84,62 +82,8 @@ function FieldError({ id, message }: { id: string; message: string }) {
         strokeWidth={1.5}
         aria-hidden="true"
       />
-      <span>{message}</span>
+      <span>{children}</span>
     </p>
-  )
-}
-
-function AppPreview() {
-  return (
-    <figure className="flex w-full flex-col gap-2 md:mx-auto md:max-w-sm">
-      <div
-        role="img"
-        aria-label="The Mossy home screen: three of five habits done today, and a 12-day streak"
-        className={cn(card, "flex flex-col gap-4")}
-      >
-        <div aria-hidden="true" className="flex flex-col gap-2">
-          <p className={smallFigure}>Wednesday, 11 November</p>
-          <p className="font-heading text-h2 text-foreground">
-            Good morning, Ines
-          </p>
-        </div>
-        <div aria-hidden="true" className="flex flex-wrap items-center gap-3">
-          <Badge className={goodNewsBadge}>
-            <Flame aria-hidden="true" strokeWidth={1.5} />
-            12-day streak
-          </Badge>
-        </div>
-        {previewHabits.map((habit) => (
-          <div
-            key={habit.name}
-            aria-hidden="true"
-            className="flex items-center gap-3 border-t border-border pt-4"
-          >
-            <span
-              className={cn(
-                "flex size-6 shrink-0 items-center justify-center rounded-sm border border-border",
-                habit.done && "bg-secondary"
-              )}
-            >
-              {habit.done && (
-                <Check
-                  className="size-4 text-secondary-foreground"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-              )}
-            </span>
-            <span className="text-body text-foreground">{habit.name}</span>
-            <span className="ml-auto font-mono text-label text-muted-foreground">
-              {habit.done ? "Done" : "To do"}
-            </span>
-          </div>
-        ))}
-      </div>
-      <figcaption className="font-mono text-label text-muted-foreground md:text-center">
-        What your mornings look like in Mossy
-      </figcaption>
-    </figure>
   )
 }
 
@@ -177,7 +121,7 @@ export function App() {
     if (!trimmedName) {
       next.name = "Add your first name so we know what to call you."
     }
-    if (!EMAIL_PATTERN.test(trimmedEmail)) {
+    if (!emailPattern.test(trimmedEmail)) {
       next.email =
         "Check your email: it needs an @ and a domain, like ines@example.com."
     }
@@ -205,7 +149,7 @@ export function App() {
           <a
             href="/"
             className={cn(
-              "inline-flex h-11 items-center font-heading text-h2 text-foreground",
+              "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
               focusOutline
             )}
           >
@@ -214,8 +158,7 @@ export function App() {
           <a
             href="#"
             className={cn(
-              "ml-auto inline-flex h-11 items-center font-mono text-label",
-              textLink,
+              "ml-auto inline-flex h-11 items-center font-mono text-label text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
               focusOutline
             )}
           >
@@ -225,13 +168,14 @@ export function App() {
       </header>
 
       <main className={cn(container, "flex flex-col gap-16 pt-10 pb-16")}>
+        {/* Opening */}
         <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-center md:gap-x-6">
           <div className="flex flex-col gap-6 md:col-span-6">
             <div className="flex flex-col gap-4">
               <h1 className="text-h1 text-foreground md:text-display">
                 Small steps, every day
               </h1>
-              <p className="max-w-lg text-body text-foreground">
+              <p className="max-w-lg">
                 Mossy helps you keep a few small habits. Tick each one off when
                 it is done. It takes about ten seconds a day.
               </p>
@@ -242,7 +186,7 @@ export function App() {
                 onClick={handleStart}
                 className={cn(
                   buttonVariants({ variant: "default" }),
-                  buttonText
+                  "h-11 px-6 font-mono text-label"
                 )}
               >
                 Start for free
@@ -250,21 +194,73 @@ export function App() {
               <p className={smallFigure}>Free for 5 habits · No card needed</p>
             </div>
           </div>
+
           <div className="md:col-span-6">
-            <AppPreview />
+            {/* Preview of the app */}
+            <figure className="flex w-full flex-col gap-2 md:mx-auto md:max-w-sm">
+              <div
+                role="img"
+                aria-label="The Mossy home screen: three of five habits done today, and a 12-day streak"
+                className={cn(card, "flex flex-col gap-4")}
+              >
+                <div aria-hidden="true" className="flex flex-col gap-2">
+                  <p className={smallFigure}>Wednesday, 11 November</p>
+                  <p className="font-heading text-h2 text-foreground">
+                    Good morning, Ines
+                  </p>
+                </div>
+                <div aria-hidden="true" className="flex flex-wrap items-center gap-3">
+                  <Badge className={goodNewsBadge}>
+                    <Flame strokeWidth={1.5} aria-hidden="true" />
+                    12-day streak
+                  </Badge>
+                </div>
+                {previewHabits.map((item) => (
+                  <div
+                    key={item.name}
+                    aria-hidden="true"
+                    className="flex items-center gap-3 border-t border-border pt-4"
+                  >
+                    <span
+                      className={cn(
+                        "flex size-6 shrink-0 items-center justify-center rounded-sm border border-border",
+                        item.done && "bg-secondary"
+                      )}
+                    >
+                      {item.done && (
+                        <Check
+                          className="size-4 text-secondary-foreground"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      )}
+                    </span>
+                    <span className="min-w-0 text-body text-foreground">
+                      {item.name}
+                    </span>
+                    <span
+                      className={cn(label, "ml-auto shrink-0 whitespace-nowrap")}
+                    >
+                      {item.done ? "Done" : "To do"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <figcaption className={cn(label, "md:text-center")}>
+                What your mornings look like in Mossy
+              </figcaption>
+            </figure>
           </div>
         </div>
 
-        <section
-          aria-labelledby="features-heading"
-          className="flex flex-col gap-6"
-        >
+        {/* What it does */}
+        <section aria-labelledby="features-heading" className="flex flex-col gap-6">
           <h2 id="features-heading" className="text-h2 text-foreground">
             What Mossy does for you
           </h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+          <ul className="grid grid-cols-1 gap-6 md:grid-cols-12">
             {features.map(({ icon: Icon, title, text }) => (
-              <div
+              <li
                 key={title}
                 className={cn(card, "flex flex-col gap-4 md:col-span-4")}
               >
@@ -274,12 +270,13 @@ export function App() {
                   aria-hidden="true"
                 />
                 <h3 className="text-h2 text-foreground">{title}</h3>
-                <p className="max-w-lg text-body text-foreground">{text}</p>
-              </div>
+                <p className="max-w-lg">{text}</p>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
+        {/* What people say */}
         <section aria-label="What people say">
           <blockquote className="flex flex-col gap-4 md:max-w-3xl">
             <p className="font-heading text-h1 text-foreground">
@@ -301,9 +298,10 @@ export function App() {
           </blockquote>
         </section>
 
+        {/* Sign-up */}
         <section
-          id="signup"
           ref={signupRef}
+          id="signup"
           aria-labelledby="signup-heading"
           className="scroll-mt-10"
         >
@@ -312,10 +310,11 @@ export function App() {
               <h2 id="signup-heading" className="text-h2 text-foreground">
                 Start with one habit
               </h2>
-              <p className="max-w-lg text-body text-foreground">
+              <p className="max-w-lg">
                 You can add more habits later. Free stays free, for up to five.
               </p>
             </div>
+
             <div className={cn(card, "md:col-span-7")}>
               {!sent && (
                 <form
@@ -324,15 +323,13 @@ export function App() {
                   className="flex flex-col gap-6"
                 >
                   <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="signup-name"
-                      className="block font-mono text-label text-muted-foreground"
-                    >
+                    <label htmlFor="signup-name" className={cn(label, "block")}>
                       Your first name
                     </label>
                     <Input
-                      id="signup-name"
                       ref={nameRef}
+                      id="signup-name"
+                      name="name"
                       autoComplete="given-name"
                       value={name}
                       onChange={(event) => {
@@ -344,23 +341,21 @@ export function App() {
                       aria-describedby={
                         errors.name ? "signup-name-error" : undefined
                       }
-                      className="h-11 px-4 text-body md:text-body"
+                      className={fieldClass}
                     />
                     {errors.name && (
-                      <FieldError id="signup-name-error" message={errors.name} />
+                      <FieldError id="signup-name-error">{errors.name}</FieldError>
                     )}
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <label
-                      htmlFor="signup-email"
-                      className="block font-mono text-label text-muted-foreground"
-                    >
+                    <label htmlFor="signup-email" className={cn(label, "block")}>
                       Email
                     </label>
                     <Input
-                      id="signup-email"
                       ref={emailRef}
+                      id="signup-email"
+                      name="email"
                       type="email"
                       autoComplete="email"
                       value={email}
@@ -375,16 +370,15 @@ export function App() {
                           ? "signup-email-help signup-email-error"
                           : "signup-email-help"
                       }
-                      className="h-11 px-4 text-body md:text-body"
+                      className={fieldClass}
                     />
                     <p id="signup-email-help" className={smallFigure}>
                       We send one email to confirm, and nothing else.
                     </p>
                     {errors.email && (
-                      <FieldError
-                        id="signup-email-error"
-                        message={errors.email}
-                      />
+                      <FieldError id="signup-email-error">
+                        {errors.email}
+                      </FieldError>
                     )}
                   </div>
 
@@ -392,7 +386,7 @@ export function App() {
                     <label
                       id="signup-habit-label"
                       htmlFor="signup-habit"
-                      className="block font-mono text-label text-muted-foreground"
+                      className={cn(label, "block")}
                     >
                       Your first habit
                     </label>
@@ -421,12 +415,13 @@ export function App() {
 
                   <Button
                     type="submit"
-                    className={cn(buttonText, "w-full md:w-auto md:self-start")}
+                    className="h-11 w-full px-6 font-mono text-label md:w-auto md:self-start"
                   >
                     Create my account
                   </Button>
                 </form>
               )}
+
               <div role="status">
                 {sent && (
                   <div className="flex flex-col items-start gap-4">
@@ -440,7 +435,7 @@ export function App() {
                     >
                       You are in, {sent.name}
                     </h3>
-                    <p className="max-w-lg text-body wrap-break-word text-foreground">
+                    <p className="max-w-lg wrap-break-word">
                       We sent a link to {sent.email}. Open it on your phone and
                       your first habit is waiting.
                     </p>
@@ -461,7 +456,7 @@ export function App() {
           )}
         >
           <p className="font-heading text-h2 text-foreground">Mossy</p>
-          <p className="font-mono text-label text-muted-foreground">
+          <p className="font-mono text-label tabular-nums text-muted-foreground">
             Mossy · Made for small, daily steps · 2026
           </p>
         </div>

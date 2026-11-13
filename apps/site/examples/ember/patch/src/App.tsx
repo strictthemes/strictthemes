@@ -16,30 +16,30 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLink = cn(
+const navLinkClass = cn(
   "font-mono text-label text-foreground uppercase underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
 
-const textLink = cn(
+const textLinkClass = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-2",
   focusRing
 )
 
-const buttonClasses = "h-auto px-6 py-2 font-mono text-label uppercase"
+const buttonClass = "h-auto px-6 py-2 font-mono text-label uppercase"
 
-const pages = [
-  { name: "Game", href: "/" },
-  { name: "Patch notes", href: "/patch" },
-  { name: "Leaderboard", href: "/leaderboard" },
-  { name: "Store", href: "/store" },
-  { name: "Profile", href: "/player" },
+const mainLinks = [
+  { label: "Game", href: "/" },
+  { label: "Patch notes", href: "/patch" },
+  { label: "Leaderboard", href: "/leaderboard" },
+  { label: "Store", href: "/store" },
+  { label: "Profile", href: "/player" },
 ]
 
-const currentPage = "/patch"
+const currentHref = "/patch"
 
-type HeroClass = "Bulwark" | "Cinderblade" | "Flarecaster" | "Mender"
-type Filter = "All" | HeroClass
+type PlayerClass = "Bulwark" | "Cinderblade" | "Flarecaster" | "Mender"
+type Filter = "All" | PlayerClass
 
 const filters: Filter[] = [
   "All",
@@ -50,7 +50,7 @@ const filters: Filter[] = [
 ]
 
 type BalanceChange = {
-  heroClass: HeroClass
+  playerClass: PlayerClass
   ability: string
   stat: string
   before: string
@@ -60,7 +60,7 @@ type BalanceChange = {
 
 const balanceChanges: BalanceChange[] = [
   {
-    heroClass: "Bulwark",
+    playerClass: "Bulwark",
     ability: "Slag Wall",
     stat: "Wall health",
     before: "1,200",
@@ -68,7 +68,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Nerf",
   },
   {
-    heroClass: "Bulwark",
+    playerClass: "Bulwark",
     ability: "Anchor Step",
     stat: "Cooldown",
     before: "14 s",
@@ -76,7 +76,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Buff",
   },
   {
-    heroClass: "Cinderblade",
+    playerClass: "Cinderblade",
     ability: "Coal Rush",
     stat: "Damage",
     before: "65",
@@ -84,7 +84,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Nerf",
   },
   {
-    heroClass: "Cinderblade",
+    playerClass: "Cinderblade",
     ability: "Backdraft",
     stat: "Duration",
     before: "1.5 s",
@@ -92,7 +92,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Nerf",
   },
   {
-    heroClass: "Flarecaster",
+    playerClass: "Flarecaster",
     ability: "Flare Bolt",
     stat: "Damage",
     before: "42",
@@ -100,7 +100,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Buff",
   },
   {
-    heroClass: "Flarecaster",
+    playerClass: "Flarecaster",
     ability: "Heat Haze",
     stat: "Radius",
     before: "6 m",
@@ -108,7 +108,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Nerf",
   },
   {
-    heroClass: "Mender",
+    playerClass: "Mender",
     ability: "Mending Smoke",
     stat: "Healing a second",
     before: "30",
@@ -116,7 +116,7 @@ const balanceChanges: BalanceChange[] = [
     change: "Buff",
   },
   {
-    heroClass: "Mender",
+    playerClass: "Mender",
     ability: "Ash Veil",
     stat: "Cooldown",
     before: "20 s",
@@ -125,92 +125,93 @@ const balanceChanges: BalanceChange[] = [
   },
 ]
 
-const newThings = [
+const newItems = [
   {
     kind: "Mode",
     name: "Duel Pits",
-    text: "A 2v2 mode on a small map, played as a best of five rounds. It is unranked and stays in rotation until Tuesday 1 December.",
+    text: "Two teams of two fight on a small map, best of five rounds, and the result does not count towards your rating. Duel Pits stays in the rotation until Tuesday 1 December.",
   },
   {
     kind: "Feature",
     name: "Replay viewer",
-    text: "Your last ten matches can now be watched again from your profile. Play them back at any speed and from any player's view.",
+    text: "Your last ten matches can now be watched again from your profile, at any speed. Follow the match from any player's view, your opponents included.",
   },
   {
     kind: "Feature",
     name: "Ping wheel",
-    text: "Hold a key to mark an enemy, an item or a place for your team. Every ping comes with a spoken line in every language the game has.",
+    text: "Hold the ping key to mark an enemy, an item or a place for your team. Every mark comes with a spoken line in each language the game has.",
   },
 ]
 
 const fixGroups = [
   {
-    name: "Gameplay",
+    title: "Gameplay",
     items: [
-      "Anchor Step could carry a Bulwark through the wall at the Glasswater Yard pump house; it now stops at the wall.",
-      "Coal Rush sometimes hit a target twice when it was used next to a ledge, and now hits only once.",
-      "A Mender who died while channelling Mending Smoke kept healing for a second after death, which no longer happens.",
-      "The round timer in Duel Pits could keep running after the last player on a team fell, and now stops at once.",
+      "Anchor Step could carry a Bulwark through the wall at the Glasswater Yard pump house; the wall now stops it.",
+      "Backdraft sometimes went on cooldown without firing when it was used straight after Coal Rush, and now always fires.",
+      "A Mender who died while channelling Mending Smoke kept healing for a second afterwards, which no longer happens.",
+      "Players could get stuck on the crates by the east gate of Kiln Market, and those crates now have a clean edge.",
     ],
   },
   {
-    name: "Interface",
+    title: "Interface",
     items: [
-      "The scoreboard showed the wrong class icon for players who swapped class in the first ten seconds, and now shows the right one.",
-      "Cooldown numbers on the ability bar were cut off at large text sizes and now fit.",
-      "The party invite stayed on screen after it had been accepted, and now closes on its own.",
+      "The scoreboard showed the wrong team's kill count for the first few seconds of a round, and now shows the right one.",
+      "Ability cooldown timers on the bar could freeze at one second after a respawn, and they now count down to zero.",
+      "The friends list did not update when a friend joined a match, and it now shows their status straight away.",
     ],
   },
   {
-    name: "Audio",
+    title: "Audio",
     items: [
-      "Footsteps on metal floors in Glasswater Yard played from the wrong side, and now come from where the player is.",
-      "The Flare Bolt impact sound was missing when it hit a Slag Wall, and plays again.",
-      "Announcer lines could talk over each other at the start of a round, and now wait their turn.",
+      "Footsteps on metal floors were silent for players on the far side of the map, and they can be heard again.",
+      "The round-start horn sometimes played twice in Duel Pits test matches, and it now plays once.",
+      "Flare Bolt's impact sound cut out when several bolts hit at once, and every hit now has its sound.",
     ],
   },
 ]
 
 const knownIssues = [
   {
-    text: "The replay viewer can lose sound after you skip forward more than once.",
-    workaround: "Workaround · Pause and play",
+    text: "Some players see a black screen for a few seconds when they open the replay viewer for the first time.",
+    workaround: "Workaround · Reopen the replay",
   },
   {
-    text: "Some players see the Duel Pits queue time as zero while they are still waiting for a match.",
+    text: "The ping wheel's spoken lines play in English for players who have chosen Polish or Turkish.",
     workaround: "No workaround yet",
   },
   {
-    text: "The ping wheel can stay open after you leave a match while holding its key.",
-    workaround: "Workaround · Press the key again",
+    text: "Heat Haze can show its old, larger ring for a moment before the new radius takes over.",
+    workaround: "Workaround · Recast Heat Haze",
   },
 ]
-
-function countText(filter: Filter, n: number) {
-  const who = filter === "All" ? "All classes" : filter
-  return `${who} · ${n} ${n === 1 ? "change" : "changes"}`
-}
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
-  const [filter, setFilter] = useState<Filter>("All")
+  const [chosen, setChosen] = useState<Filter>("All")
 
-  const rows =
-    filter === "All"
+  const shownChanges =
+    chosen === "All"
       ? balanceChanges
-      : balanceChanges.filter((row) => row.heroClass === filter)
+      : balanceChanges.filter((row) => row.playerClass === chosen)
+  const shownCount = shownChanges.length
+  const countLine = `${chosen === "All" ? "All classes" : chosen} · ${shownCount} ${
+    shownCount === 1 ? "change" : "changes"
+  }`
 
-  function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (menuOpen && event.key === "Escape") {
-      setMenuOpen(false)
-      menuButtonRef.current?.focus()
-    }
+  function handleHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (!menuOpen || event.key !== "Escape") return
+    setMenuOpen(false)
+    menuButtonRef.current?.focus()
   }
 
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <header className="border-b border-border" onKeyDown={onHeaderKeyDown}>
+      <header
+        className="border-b border-border"
+        onKeyDown={handleHeaderKeyDown}
+      >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-3 py-3 md:px-6">
           <a
             href="/"
@@ -223,19 +224,19 @@ export function App() {
           </a>
           <nav aria-label="Main" className="hidden md:block">
             <ul className="flex gap-6">
-              {pages.map((page) => (
-                <li key={page.href}>
+              {mainLinks.map((link) => (
+                <li key={link.href}>
                   <a
-                    href={page.href}
+                    href={link.href}
                     aria-current={
-                      page.href === currentPage ? "page" : undefined
+                      link.href === currentHref ? "page" : undefined
                     }
                     className={cn(
-                      navLink,
-                      page.href === currentPage && "underline decoration-2"
+                      navLinkClass,
+                      link.href === currentHref && "underline decoration-2"
                     )}
                   >
-                    {page.name}
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -244,37 +245,37 @@ export function App() {
           <Button
             ref={menuButtonRef}
             variant="outline"
-            className={cn(buttonClasses, "md:hidden")}
+            className={cn(buttonClass, "md:hidden")}
             aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
+            aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-menu"
+          id="main-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
           <div className="mx-auto max-w-[1280px] px-3 py-2 md:px-6">
             <ul>
-              {pages.map((page) => (
-                <li key={page.href}>
+              {mainLinks.map((link) => (
+                <li key={link.href}>
                   <a
-                    href={page.href}
+                    href={link.href}
                     aria-current={
-                      page.href === currentPage ? "page" : undefined
+                      link.href === currentHref ? "page" : undefined
                     }
                     onClick={() => setMenuOpen(false)}
                     className={cn(
-                      navLink,
+                      navLinkClass,
                       "block py-2",
-                      page.href === currentPage && "underline decoration-2"
+                      link.href === currentHref && "underline decoration-2"
                     )}
                   >
-                    {page.name}
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -311,47 +312,48 @@ export function App() {
                 </p>
                 <p className="mt-3">
                   The servers were down for an hour, from 08:00 to 09:00 on
-                  Tuesday, while the patch went out. Ranked ratings were not
-                  touched: your rating and tier are where you left them.
+                  Tuesday, while we put the patch live. Ranked ratings were not
+                  touched.
                 </p>
               </div>
             </div>
-            <dl className="mt-12 grid grid-cols-2 gap-x-6 md:col-span-4 md:mt-0">
-              {[
-                { term: "New", value: "3" },
-                { term: "Balance", value: "8" },
-                { term: "Fixes", value: "10" },
-                { term: "Issues", value: "3" },
-              ].map((entry) => (
-                <div key={entry.term} className="border-t border-border py-3">
-                  <dt className="font-mono text-label text-muted-foreground uppercase">
-                    {entry.term}
-                  </dt>
-                  <dd className="mt-2 font-mono text-h2 tabular-nums">
-                    {entry.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <div className="mt-12 md:col-span-4 md:mt-0">
+              <dl className="grid grid-cols-2 gap-x-6">
+                {[
+                  { term: "New", value: 3 },
+                  { term: "Balance", value: 8 },
+                  { term: "Fixes", value: 10 },
+                  { term: "Issues", value: 3 },
+                ].map((entry) => (
+                  <div key={entry.term} className="border-t border-border py-3">
+                    <dt className="font-mono text-label text-muted-foreground uppercase">
+                      {entry.term}
+                    </dt>
+                    <dd className="mt-2 font-mono text-h2 tabular-nums">
+                      {entry.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
           </div>
-
           <nav aria-label="On this page" className="mt-12">
             <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {[
-                { name: "New", href: "#new" },
-                { name: "Balance changes", href: "#balance" },
-                { name: "Fixes", href: "#fixes" },
-                { name: "Known issues", href: "#known" },
+                { label: "New", href: "#new" },
+                { label: "Balance changes", href: "#balance" },
+                { label: "Fixes", href: "#fixes" },
+                { label: "Known issues", href: "#known" },
               ].map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
                     className={cn(
-                      "font-mono text-label text-foreground uppercase underline decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-2",
-                      focusRing
+                      "font-mono text-label uppercase",
+                      textLinkClass
                     )}
                   >
-                    {link.name}
+                    {link.label}
                   </a>
                 </li>
               ))}
@@ -363,7 +365,7 @@ export function App() {
         <section id="new" className="mt-20">
           <h2 className="text-h2 uppercase md:text-h1">New</h2>
           <ul className="mt-6 border-b border-border">
-            {newThings.map((item) => (
+            {newItems.map((item) => (
               <li key={item.name} className="border-t border-border py-6">
                 <article className="grid grid-cols-1 md:grid-cols-12 md:gap-x-6">
                   <p className="font-mono text-label text-muted-foreground uppercase md:col-span-3">
@@ -383,23 +385,22 @@ export function App() {
         <section id="balance" className="mt-20">
           <h2 className="text-h2 uppercase md:text-h1">Balance changes</h2>
           <p className="mt-3 max-w-xl">
-            Figures are per hit or per use, unless the change says otherwise.
+            Figures are per hit or per use unless the change says otherwise.
           </p>
-
           <div
             role="group"
             aria-label="Show changes for"
             className="mt-6 flex flex-wrap gap-2"
           >
-            {filters.map((option) => (
+            {filters.map((filter) => (
               <Button
-                key={option}
-                variant={filter === option ? "secondary" : "outline"}
-                aria-pressed={filter === option}
-                className={buttonClasses}
-                onClick={() => setFilter(option)}
+                key={filter}
+                variant={filter === chosen ? "secondary" : "outline"}
+                aria-pressed={filter === chosen}
+                className={buttonClass}
+                onClick={() => setChosen(filter)}
               >
-                {option}
+                {filter}
               </Button>
             ))}
           </div>
@@ -407,40 +408,38 @@ export function App() {
             aria-live="polite"
             className="mt-3 font-mono text-label text-muted-foreground uppercase tabular-nums"
           >
-            {countText(filter, rows.length)}
+            {countLine}
           </p>
-
-          <div className="mt-6 min-w-0">
+          <div className="mt-6">
             <Table label="Balance changes" className="min-w-2xl text-body">
               <TableHeader>
                 <TableRow>
                   {[
-                    "Class",
-                    "Ability",
-                    "Stat",
-                    "Before",
-                    "After",
-                    "Change",
-                  ].map((name) => (
+                    { label: "Class", numeric: false },
+                    { label: "Ability", numeric: false },
+                    { label: "Stat", numeric: false },
+                    { label: "Before", numeric: true },
+                    { label: "After", numeric: true },
+                    { label: "Change", numeric: false },
+                  ].map((column) => (
                     <TableHead
-                      key={name}
+                      key={column.label}
                       scope="col"
                       className={cn(
                         "px-3 font-mono text-label text-muted-foreground uppercase first:pl-0 last:pr-0",
-                        (name === "Before" || name === "After") &&
-                          "text-right tabular-nums"
+                        column.numeric && "text-right tabular-nums"
                       )}
                     >
-                      {name}
+                      {column.label}
                     </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={`${row.heroClass}-${row.ability}`}>
+                {shownChanges.map((row) => (
+                  <TableRow key={`${row.playerClass}-${row.ability}`}>
                     <TableCell className="px-3 py-2 first:pl-0 last:pr-0">
-                      {row.heroClass}
+                      {row.playerClass}
                     </TableCell>
                     <TableCell className="px-3 py-2 first:pl-0 last:pr-0">
                       {row.ability}
@@ -471,12 +470,12 @@ export function App() {
         <section id="fixes" className="mt-20">
           <h2 className="text-h2 uppercase md:text-h1">Fixes</h2>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 md:gap-x-6">
-            {fixGroups.map((group, index) => (
+            {fixGroups.map((group, groupIndex) => (
               <div
-                key={group.name}
-                className={cn(index > 0 && "mt-12 md:mt-0")}
+                key={group.title}
+                className={cn(groupIndex > 0 && "mt-12 md:mt-0")}
               >
-                <h3 className="text-h2">{group.name}</h3>
+                <h3 className="text-h2">{group.title}</h3>
                 <ul className="mt-3 list-disc pl-6 text-body">
                   {group.items.map((item, itemIndex) => (
                     <li key={item} className={cn(itemIndex > 0 && "mt-2")}>
@@ -493,7 +492,7 @@ export function App() {
         <section id="known" className="mt-20">
           <h2 className="text-h2 uppercase md:text-h1">Known issues</h2>
           <p className="mt-3 max-w-xl">
-            The team is working on these and will fix them in patch 4.2.1.
+            We are working on these and will fix them in patch 4.2.1.
           </p>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-12 md:gap-x-6">
             <div className="rounded-xl border border-border bg-card p-6 md:col-span-8">
@@ -512,7 +511,7 @@ export function App() {
                         aria-hidden="true"
                       />
                       <div>
-                        <p className="text-body">{issue.text}</p>
+                        <p>{issue.text}</p>
                         <p className="mt-2 font-mono text-label text-muted-foreground uppercase">
                           {issue.workaround}
                         </p>
@@ -545,7 +544,7 @@ export function App() {
                 key={patch.name}
                 className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2 border-t border-border py-3"
               >
-                <a href="#" className={cn(textLink, "text-body")}>
+                <a href="#" className={cn("text-body", textLinkClass)}>
                   {patch.name}
                 </a>
                 <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
@@ -567,10 +566,13 @@ export function App() {
               </p>
             </div>
             <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 md:col-span-6 md:mt-0">
-              {pages.map((page) => (
-                <li key={page.href}>
-                  <a href={page.href} className={cn(textLink, "text-body")}>
-                    {page.name}
+              {mainLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    className={cn("text-body", textLinkClass)}
+                  >
+                    {link.label}
                   </a>
                 </li>
               ))}

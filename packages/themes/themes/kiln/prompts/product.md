@@ -42,7 +42,7 @@ The first section of `<main>`, with the `aria-label` "Fold bowl". It opens with 
 
 A `<section>` with the `aria-label` "Details and care", a 12-column grid with `md:items-start`, so the Care card is only as tall as its text.
 
-- Columns 1–7: the `<h2>` "Details", then with `mt-6` a `<dl>` as the Description lists note says, with seven rows: Size (`16 cm across, 6 cm high`), Holds (`550 ml`), Weight (`420 g`), Clay (Buff stoneware), Glaze (the chosen glaze), Fired (6 November 2026, a `<time>` with `dateTime="2026-11-06"`), Foot (Unglazed and sanded smooth). The `<dd>` of Size, Holds and Weight is `font-mono tabular-nums` as a whole, units included; the other four are body text, the date too, as the Dates note says.
+- Columns 1–7: the `<h2>` "Details", then with `mt-6` a `<dl>` as the Description lists note says, with seven rows: Size (`16 cm across, 6 cm high`), Holds (`550 ml`), Weight (`420 g`), Clay (Buff stoneware), Glaze (the chosen glaze's name alone, `Iron`, as on its button), Fired (6 November 2026, a `<time>` with `dateTime="2026-11-06"`), Foot (Unglazed and sanded smooth). The `<dd>` of Size, Holds and Weight is `font-mono tabular-nums` as a whole, units included; the other four are body text, the date too, as the Dates note says.
 - Columns 9–12: a card, as the Cards note says, with the `<h2>` "Care", then with `mt-4` a `list-disc` list with `pl-6`, `mt-2` between its items, of four: safe in the dishwasher and the microwave; not for the oven or the hob; let it cool before it meets cold water; a fine crackle in Ash glaze is part of the glaze, not a crack. Below `md` the card comes under the list with `mt-10 md:mt-0`.
 
 ### 4. Goes well with

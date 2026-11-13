@@ -8,7 +8,7 @@ checks:
   - The fee table has one header row, its amounts are right-aligned, and its scroll box is named "Prices for a 12-month permit".
   - There is exactly one signal-yellow notice, with dark text, the word "Important" beside its icon, and no link or muted text inside it.
   - The page has one civic-blue main action, "Apply for a permit", which is a link styled as a button.
-  - Paragraphs are short (at most three sentences), and no text is muted except hints, captions and the updated date.
+  - Paragraphs are short (at most three sentences), and no text is muted except the caption, the updated date, the Contents heading and the footer's two lines.
 ---
 
 Sample content, if the user gave none: "Callowmere Council", an invented town council, and its guidance "Resident parking permits: who can get one and what it costs", updated on 4 November 2026. Permits are for homes in zones A to D, last 12 months, and at most two are given per address. Prices for 12 months, first permit and second permit at the same address: petrol or diesel £96 and £144, hybrid £72 and £108, fully electric £30 and £45. Visitor permits are £24 for a book of 20 day permits. From 1 April 2027, petrol and diesel permits go up to £102 and £150. Homes at Linden Yard, built without parking, cannot get a permit. Use these facts as they are; write the rest of the copy yourself, plain and short.
@@ -41,7 +41,7 @@ Five sections. They are not new parts: no `<section>` around them and no `mt-16`
 **What a permit costs.** One paragraph: the price depends on what the vehicle runs on and on whether it is the first or the second permit at the address. Then:
 
 - An `<h3>` "Prices for a 12-month permit", with the `mt-6` from the layout notes.
-- With `mt-4`, here in place of the `mt-2` under an `<h3>`, a wrapper `<div>` around the fee table: the shadcn `Table` as the layout notes set it, with the `label` "Prices for a 12-month permit". Three columns, "Vehicle runs on", "First permit" and "Second permit"; the two price columns and their headers are right-aligned (`text-right tabular-nums`). Three rows: petrol or diesel, hybrid, fully electric, with the prices from the sample. Every cell of a body row is a `TableCell`, the first one too, and the header cells need no `scope`: the table has one header row. Add it with `npx shadcn@latest add table`.
+- With `mt-4`, here in place of the `mt-2` under an `<h3>`, a wrapper `<div>` around the fee table: the shadcn `Table` as the layout notes set it, with the `label` "Prices for a 12-month permit". Three columns, "Vehicle runs on", "First permit" and "Second permit"; the two price columns are right-aligned with `text-right tabular-nums`, and their headers with `text-right`. Three rows: petrol or diesel, hybrid, fully electric, with the prices from the sample. Every cell of a body row is a `TableCell`, the first one too, and the header cells need no `scope`: the table has one header row. Add it with `npx shadcn@latest add table`.
 - With `mt-6`, one paragraph: visitor permits cost £24 for a book of 20 day permits. It ends with the sentence "Read about visitor parking permits.", in which "visitor parking permits", lower case, is the text link.
 - With `mt-6`, the notice from the layout notes, the only one on the page: from 1 April 2027 petrol and diesel permits cost £102 for a first permit and £150 for a second. A permit bought before then keeps its price until it ends. The date is a `<time>`.
 - With `mt-6`, one paragraph: if you get council tax support, your first permit costs half the price.
@@ -50,7 +50,7 @@ Five sections. They are not new parts: no `<section>` around them and no `mt-16`
 
 **How long a permit lasts.** Two paragraphs: a permit lasts 12 months from its start date; a reminder email comes 4 weeks before it ends, and you renew online in the same way you applied.
 
-**If something changes.** The sentence "Tell us if one of these happens:", then with `mt-4` a bulleted list of three cases, each one or two sentences: you change vehicle (update the registration online, free); you move house (cancel the permit; you get back the full months left, less a £10 fee); you sell the vehicle and do not replace it (cancel it the same way).
+**If something changes.** The sentence "Tell us if one of these happens:", then with `mt-4` a bulleted list of three cases, each one or two full sentences: you change vehicle (update the registration online, free); you move house (cancel the permit; you get back the full months left, less a £10 fee); you sell the vehicle and do not replace it (cancel it the same way).
 
 ### 5. Related
 
@@ -62,5 +62,5 @@ The footer from the layout notes.
 
 ### Behavior
 
-- The contents links jump to their headings. Nothing else on the page needs behavior; every other link goes to `#`.
+- The contents links jump to their headings. Nothing else on the page needs behavior; every other link goes to `#`, except the council's name in the header, which goes to `/`.
 - On a phone the fee table scrolls sideways inside its box, the button fills the column, and the long `<h1>` wraps.

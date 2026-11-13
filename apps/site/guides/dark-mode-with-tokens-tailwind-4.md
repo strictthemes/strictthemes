@@ -68,7 +68,7 @@ You still need `dark:` now and then, for something that is not a color swap: a d
 
 This is the line a new shadcn project has in `src/index.css`. With it, the compiled selector is `.dark\:underline:is(.dark *)`.
 
-Keep `dark:` rare. The stock shadcn button has nine `dark:` classes for small adjustments, such as `dark:bg-input/30`. The 567-line shop page in this site's registry has none. A page that needs many is a sign that a token is missing.
+Keep `dark:` rare. The stock shadcn button has nine `dark:` classes for small adjustments, such as `dark:bg-input/30`. The 572-line shop page in this site's registry has none. A page that needs many is a sign that a token is missing.
 
 ## 4. Switch the class, and honor the system setting
 
@@ -97,8 +97,8 @@ It is tempting to think dark mode swaps the page and the text and leaves the res
 | Measure | Count |
 |---|---|
 | Color tokens across 23 themes | 308 |
-| Change in dark | 236 (76.6%) |
-| Stay the same | 72 |
+| Change in dark | 237 (76.9%) |
+| Stay the same | 71 |
 | Tokens that stay, in the median theme | 2 |
 
 By role:
@@ -109,13 +109,13 @@ By role:
 | `primary` | 22 of 23 |
 | `secondary` | 22 of 23 |
 | `on-primary` (the text on a primary fill) | 21 of 23 |
-| `tertiary` | 3 of 23 |
+| `tertiary` | 4 of 23 |
 
 Two things stand out.
 
 **The brand color changes.** `primary` is lighter in dark mode in 22 of the 23 themes, and darker in none. One theme, Relay, keeps both its `primary` and the text on it.
 
-**What stays is a fill with its own text.** `tertiary` is the same in both modes in 20 themes, and its text color `on-tertiary` in 21. In Strict One, for example, it is a signal color for one badge: a fill with its own text on it, so the pair carries its contrast wherever it sits. The same goes for the fixed colors some themes add: Kiln's two glaze colors are for a drawing of a pot, and "a pot does not change color when the page does", as its `DESIGN.md` puts it.
+**What stays is a fill with its own text.** `tertiary` is the same in both modes in 19 themes, and its text color `on-tertiary` in 21. In Strict One, for example, it is a signal color for one badge: a fill with its own text on it, so the pair carries its contrast wherever it sits. The same goes for the fixed colors some themes add: Kiln's two glaze colors are for a drawing of a pot, and "a pot does not change color when the page does", as its `DESIGN.md` puts it.
 
 So the rule of thumb: a color that touches the page must change with the page. A color that only touches its own partner may stay.
 

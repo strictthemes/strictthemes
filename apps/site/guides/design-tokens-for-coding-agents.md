@@ -47,7 +47,7 @@ It removes a decision. An agent that puts a label on a `secondary` button does n
 
 It also makes contrast checkable before anything is built. Contrast is a ratio from 1:1 (no difference) to 21:1 (black on white), and WCAG level AA asks for 4.5:1 for normal text. A linter cannot know which of 15 colors will meet which. With pairs, it knows exactly which to test.
 
-We measured every pair in the 23 themes, in light and dark mode: 77 pairs, 154 measurements. The lowest is 4.64:1 and the median is 9.25:1. None is under 4.5:1, and 32 are under 7:1, the AAA level. Kiln's `on-primary` on `primary` is 6.93:1.
+We measured every pair in the 23 themes, in light and dark mode: 77 pairs, 154 measurements. The lowest is 4.64:1 and the median is 9.25:1. None is under 4.5:1, and 33 are under 7:1, the AAA level. Kiln's `on-primary` on `primary` is 6.93:1.
 
 Compare a pairing nobody declared. Kiln's `tertiary` blue as text on its `primary` terracotta is 1.19:1, which is unreadable. Nothing in the token list forbids it except the missing pair. [Contrast for non-designers](/guides/contrast-for-non-designers/) goes through the thresholds.
 
@@ -95,7 +95,7 @@ These are three pages on one day, measured at one width in one color mode. They 
 
 A dark mode in a `DESIGN.md` is a list of overrides: only the colors it names change. A color it leaves out keeps its value.
 
-That is sometimes what you want. Kiln's dark mode overrides 13 of 15 colors and leaves the two glaze colors alone. Its prose gives the reason: "a pot does not change color when the page does". In 21 of the 23 themes `tertiary` is also the same in both modes.
+That is sometimes what you want. Kiln's dark mode overrides 13 of 15 colors and leaves the two glaze colors alone. Its prose gives the reason: "a pot does not change color when the page does". In 19 of the 23 themes `tertiary` is also the same in both modes.
 
 Decide this per token and write it down. An agent that sees a color missing from the dark list cannot tell a decision from an oversight unless the prose says which it is. [Dark mode with tokens in Tailwind 4](/guides/dark-mode-with-tokens-tailwind-4/) shows the mechanics.
 

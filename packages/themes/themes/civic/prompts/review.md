@@ -77,6 +77,6 @@ The footer from the layout notes.
 
 - "Submit application" checks the declaration in code. If it is not ticked: the error line "Tick the box to confirm your answers are correct" shows beside the checkbox with the red line, the error summary appears with the same words as its link and takes focus, and the page's `<title>` starts with "Error: ".
 - Ticking the box removes the error line, the red line and `aria-invalid`, as the Errors note says; the error summary and the title's prefix stay until the next send.
-- A send with the box ticked removes the summary and the prefix, and the status element reads "In the full service, your application would be sent now and the confirmation page would open." Focus stays on the button. Nothing is sent anywhere.
+- A send with the box ticked removes the summary and the prefix, and the status element reads "In the full service, your application would be sent now and the confirmation page would open." Focus stays on the button. Nothing is sent anywhere. A later change to the box empties the status element, since the message was about the answers as they were sent.
 - The "Change" links and the Back link go to `#`.
 - On a phone each row stacks: question, answer, then the "Change" link, all left-aligned. The email address breaks if it has to.

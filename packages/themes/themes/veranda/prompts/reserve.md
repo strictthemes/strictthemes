@@ -22,17 +22,17 @@ The header from the layout notes, with "Reserve" as the current page.
 
 ### 2. Opening
 
-The first section, with `pt-12`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+The first section, with `pt-12`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7 (`md:col-span-7`): a label line in `text-muted-foreground`, `Six rooms · We reply within a day`; with `mt-2` the `<h1>` in `text-h1 lg:text-display`, "Request a reservation", with no italic; with `mt-4` a `<p>` in `text-body`: "Tell us the days and the room you would like. Nothing is charged now: we write back to confirm, and you pay at the house when you leave."
-- In columns 9–12 (`md:col-span-4 md:col-start-9`): the page's clay block, holding:
+- In columns 9–12 (`md:col-span-4 md:col-start-9`): the page's clay block, the grid item itself (the block's classes and the span on one element), holding:
   - A label with no text color class, so it takes the block's ink: `How it works`.
   - With `mt-2`, an `<h2>` in `text-h2` (not the notes' `md:text-h1`: the block is narrow): "A request, not a payment".
   - With `mt-6`, an `<ol>` with no markers and no padding, three items, the second and third with `mt-4`. Each `<li>` is `flex items-baseline gap-4`: the step's number as a label with `tabular-nums`, `01`, `02`, `03`, then a `<p>` in `text-body`. The steps: "You send the days and the room you would like." "We check the room and write back within a day." "You pay at the house when you leave, by card or in cash."
 
 ### 3. Request and summary
 
-A section with the hairline from the layout notes and the `aria-label` "Request and summary", as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline from the layout notes and the `aria-label` "Request and summary", as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–7 (`md:col-span-7`): a card that is the wrapper for the form and the confirmation. It holds the `<form>` (with `noValidate` and `aria-labelledby` pointing at its heading) and, after it, the empty `role="status"` element.
 - In columns 9–12 (`md:col-span-4 md:col-start-9`), with `md:sticky md:top-6`: the summary card of part 4. On a phone it comes after the form card.
@@ -57,14 +57,14 @@ The summary card is an `<aside>` with `aria-labelledby` pointing at its heading.
 - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Your stay` in `text-muted-foreground`, then the badge "Breakfast included".
 - With `mt-2`, an `<h2>` in `text-h2` (the card is narrow): "Summary".
 - With `mt-6`, a facts list from the layout notes, five rows: Arrive, Leave, Nights, Room, Guests. A date reads `Friday 14 May 2027`, in a `<time>`; the nights read `3 nights`; the room is its name, `Marram`; the guests read `2 guests`. A value that is still missing, and the nights while the two dates do not give at least one, reads "Not chosen yet", with `text-muted-foreground` on that `<dd>`.
-- With `mt-6`, a second facts list, the price. It has one row for each season the stay has nights in, in the order the nights come (group the nights by season, not by price): the `<dt>` reads `3 nights at £152` and the `<dd>` the sum, `£456`, as a label in `text-foreground` with `tabular-nums`. Its last row is the total: the `<dt>` reads `Total` and the `<dd>` the sum of the rows in `font-heading text-h2 tabular-nums`, `£456`. While the dates or the room are missing, or the dates do not give at least one night, the list has only the total row, and its `<dd>` reads "Not worked out yet" in `text-body text-muted-foreground`.
+- With `mt-6`, a second facts list, the price. It has one row for each season the stay has nights in, in the order the nights come (group the nights by season, not by price): the `<dt>` reads `3 nights at £152` and the `<dd>` the sum, `£456`, as a label in `text-foreground` with `tabular-nums`. Its last row is the total: the `<dt>` reads `Total` and the `<dd>` the sum of the rows in `font-heading text-h2 tabular-nums`, `£456`. The summary prices any stay of one night or more, also one the form will refuse (over 14 nights, or one night in July or August): the error line says why. While the dates or the room are missing, or the dates do not give at least one night, the list has only the total row, and its `<dd>` reads "Not worked out yet" in `text-body text-muted-foreground`.
 - With `mt-4`, a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "Breakfast is included. You pay at the house when you leave."
 
 The facts lists have only hairlines, no corners, so they are not cards in a card. The summary is not a live region: it changes with every choice, and announcing each one would be noise.
 
 ### 5. Before you arrive
 
-A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4 (`md:col-span-4`): a label line, `Good to know`; with `mt-2` an `<h2>`, "Before you arrive".
 - In columns 6–12 (`md:col-span-7 md:col-start-6`): rows from the layout notes, four rows:
@@ -87,15 +87,15 @@ The footer from the layout notes.
 - **Price:** each night is charged at the room's price for the season of the date the night begins on. The season comes from that date's month: November to March is winter; April, May, June, September and October are spring and autumn; July and August are summer. So Marram from 29 June to 3 July 2027 is `2 nights at £152`, `£304`, then `2 nights at £178`, `£356`, and a total of `£660`. A sum of a thousand pounds or more has a comma: `£3,136`.
 - **Sending:** check the fields in code, in the order of the form, and show one error per field, the first that applies:
   - Arrival date: empty gives "Choose the day you arrive."; a day before today gives "Choose today or a later day."
-  - Departure date: empty gives "Choose the day you leave."; a day that is not after the arrival date gives "Choose a day after the day you arrive."; more than 14 nights gives "We take requests for up to 14 nights. For a longer stay, write to us."; a single night that begins in July or August gives "In July and August we take stays of two nights or more. Choose a later day." While the arrival date is empty, the departure date gets only its empty check.
+  - Departure date: empty gives "Choose the day you leave."; a day that is not after the arrival date gives "Choose a day after the day you arrive."; more than 14 nights gives "We take requests for up to 14 nights. For a longer stay, write to us."; a single night that begins in July or August gives "In July and August we take stays of two nights or more. Choose a later day." While the arrival date is empty, the departure date gets only its empty check; with an arrival date set, also one before today, it gets all its checks.
   - Room: no room chosen gives "Choose a room."
   - Guests: more guests than the chosen room sleeps gives a line that names the room and its number: "Marram sleeps 2. Choose fewer guests or another room." Without a room this field has no error.
   - Name: empty gives "Write your name."
   - Email address: empty gives "Write your email address."; a malformed one gives "Check the email address: it needs an @ and a domain."
-  - Phone: empty is fine. Anything but digits, spaces and one leading `+`, or fewer than 7 digits, gives "Write the number in digits, such as 01632 960 352, or leave it empty."
+  - Phone: empty is fine. Trimmed, it may hold only digits and spaces, with one `+` at the start (`/^\+?[\d ]+$/`), and at least 7 digits; anything else, a hyphen or a bracket too, gives "Write the number in digits, such as 01632 960 352, or leave it empty."
   - Time of arrival: no time chosen gives "Choose when you expect to arrive."
   - The note is never checked.
 - **Errors and focus:** each error line follows the Errors note, and focus moves to the first field with an error. Two errors depend on a second field, and also go when that field changes: the departure date's when the arrival date changes, and the guests' when the room changes.
 - **Confirmation:** when everything is good, the form is replaced in its card by the message in the status element: an `<h2>` in `text-h2`, "Thank you. We have your request", with `tabIndex={-1}` and focus moved to it. Then with `mt-4` a `<p>` in `text-body` that repeats the stay as the summary has it: "Marram for 2 guests, from Friday 14 May 2027 to Monday 17 May 2027: 3 nights, £456 in all.", each date a `<time>`. Then with `mt-4` a `<p>` in `text-body`: "We will write to ines@example.com within a day to say whether the room is free. Nothing has been paid.", with the email address as it was typed. Then with `mt-4` a label in `text-muted-foreground`: `Reference · KH-2705-014`, made from the arrival date: `KH-`, its year and month as four figures, a dash and its day as three figures. The heading has no top margin: the message is the card's only content.
-- **Again:** after the status element, in the card and only while the message shows, a `<div>` with `mt-6` holding a `secondary` button, "Make another request". It empties the status element, brings back the form as it starts with no query string and no errors, and moves focus to the arrival date. The summary follows, since it reads the same state.
+- **Again:** after the status element, in the card and only while the message shows, a `<div>` with `mt-6` holding a `secondary` button, "Make another request". It empties the status element, brings back the form as it starts with no query string and no errors, takes the query string out of the address with `history.replaceState`, so a reload does not fill the old values in again, and moves focus to the arrival date. The summary follows, since it reads the same state.
 - Nothing is sent anywhere: the confirmation is shown in the page. The other links need no behavior.

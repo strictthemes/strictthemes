@@ -1,7 +1,7 @@
 import * as React from "react"
 import { Calendar as CalendarIcon, Check, CircleAlert } from "lucide-react"
 
-import { buttonVariants, Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
@@ -13,10 +13,11 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { cn } from "@/lib/utils"
 
-// The sample's "now": Tuesday 8 June 2027, 20:05. Never the device clock.
-const TODAY = new Date(2027, 5, 8)
+// The sample's now, fixed: Tuesday 8 June 2027 at 20:05.
+const TODAY = new Date(2027, 5, 8, 20, 5)
+const TODAY_DATE = new Date(2027, 5, 8)
 const EARLIEST = new Date(1927, 0, 1)
-// Born on or before this day: 18 or over on 8 June 2027.
+// Born on or before this day, a member is 18 or over on 8 June 2027.
 const ADULT_CUTOFF = new Date(2009, 5, 8)
 const MEMBER_NUMBER = "WFC-27-0141"
 
@@ -26,16 +27,8 @@ const FOCUS_BAND =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-foreground"
 const FOCUS_CODE =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const ICON = {
-  className: "size-4 shrink-0",
-  strokeWidth: 2,
-  strokeLinecap: "square" as const,
-  "aria-hidden": true as const,
-}
 const BUTTON = "h-auto px-5 py-2 font-mono text-label uppercase"
-const FIELD_LABEL = "block font-mono text-label uppercase text-foreground"
-const SMALL_PRINT = "text-label text-muted-foreground"
-const LABEL = "font-mono text-label uppercase text-muted-foreground"
+const ICON = "size-4 shrink-0"
 
 const NAV = [
   { label: "Fixtures", href: "/fixtures" },
@@ -44,15 +37,16 @@ const NAV = [
   { label: "Membership", href: "/membership" },
 ]
 
-type Kind = "playing" | "junior" | "social"
+type MembershipKind = "playing" | "junior" | "social"
 
 const MEMBERSHIPS: {
-  value: Kind
+  value: MembershipKind
   name: string
   price: string
   forWhom: string
   includes: string[]
-  lastRow: { label: string; value: string }
+  nextLabel: string
+  nextValue: string
 }[] = [
   {
     value: "playing",
@@ -64,7 +58,8 @@ const MEMBERSHIPS: {
       "A place in the first team or reserves squad",
       "Match kit and insurance for the season",
     ],
-    lastRow: { label: "First session", value: "Thursday 10 June, 19:00" },
+    nextLabel: "First session",
+    nextValue: "Thursday 10 June, 19:00",
   },
   {
     value: "junior",
@@ -76,7 +71,8 @@ const MEMBERSHIPS: {
       "Matches with the under 18s on Sundays",
       "Match kit and insurance for the season",
     ],
-    lastRow: { label: "First session", value: "Thursday 10 June, 17:30" },
+    nextLabel: "First session",
+    nextValue: "Thursday 10 June, 17:30",
   },
   {
     value: "social",
@@ -88,7 +84,8 @@ const MEMBERSHIPS: {
       "A vote at the annual meeting",
       "The club newsletter each month",
     ],
-    lastRow: { label: "Next home match", value: "Saturday 19 June, 15:00" },
+    nextLabel: "Next home match",
+    nextValue: "Saturday 19 June, 15:00",
   },
 ]
 
@@ -107,18 +104,18 @@ const MONTHS = [
   "December",
 ]
 
-function formatDate(date: Date) {
-  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
-}
-
 function isoDate(date: Date) {
   const m = String(date.getMonth() + 1).padStart(2, "0")
   const d = String(date.getDate()).padStart(2, "0")
   return `${date.getFullYear()}-${m}-${d}`
 }
 
+function longDate(date: Date) {
+  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
+}
+
 type FieldKey = "name" | "email" | "dob" | "contact" | "phone" | "consent"
-const ORDER: FieldKey[] = [
+const FIELD_ORDER: FieldKey[] = [
   "name",
   "email",
   "dob",
@@ -128,15 +125,10 @@ const ORDER: FieldKey[] = [
 ]
 type Errors = Partial<Record<FieldKey, string>>
 
-type Confirmed = { firstName: string; email: string; kind: Kind }
-
-function ErrorLine({ id, message }: { id: string; message: string }) {
-  return (
-    <p id={id} className="flex items-start gap-2 text-label text-destructive">
-      <CircleAlert {...ICON} />
-      <span>{message}</span>
-    </p>
-  )
+type Confirmed = {
+  firstName: string
+  email: string
+  membership: (typeof MEMBERSHIPS)[number]
 }
 
 function describedBy(...ids: (string | false | undefined)[]) {
@@ -144,17 +136,127 @@ function describedBy(...ids: (string | false | undefined)[]) {
   return list || undefined
 }
 
+function ErrorLine({ id, message }: { id: string; message: string }) {
+  return (
+    <p id={id} className="flex items-start gap-2 text-label text-destructive">
+      <CircleAlert
+        className={ICON}
+        strokeWidth={2}
+        strokeLinecap="square"
+        aria-hidden="true"
+      />
+      <span>{message}</span>
+    </p>
+  )
+}
+
+function FieldLabel({
+  htmlFor,
+  id,
+  children,
+}: {
+  htmlFor: string
+  id?: string
+  children: React.ReactNode
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      id={id}
+      className="block font-mono text-label text-foreground uppercase"
+    >
+      {children}
+    </label>
+  )
+}
+
+function Header() {
+  return (
+    <header className="border-b border-border bg-navy text-navy-foreground">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-x-8 gap-y-1 px-5 py-3">
+        <a href="/" className={cn("group inline-flex items-center gap-3", FOCUS_BAND)}>
+          <span
+            aria-hidden="true"
+            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ice font-heading text-body font-extrabold text-ice-foreground"
+          >
+            W
+          </span>
+          <span className="font-heading text-h2 uppercase underline-offset-4 group-hover:underline">
+            Wendmoor FC
+          </span>
+        </a>
+        <nav aria-label="Main">
+          <ul className="flex flex-wrap gap-x-5">
+            {NAV.map((item) => {
+              const current = item.href === "/membership"
+              return (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    aria-current={current ? "page" : undefined}
+                    className={cn(
+                      "inline-flex h-10 items-center font-mono text-label uppercase underline-offset-4 hover:underline",
+                      current && "underline decoration-2",
+                      FOCUS_BAND
+                    )}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              )
+            })}
+          </ul>
+        </nav>
+      </div>
+    </header>
+  )
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-border">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-3 px-5 py-8">
+        <p className="font-heading text-h2 uppercase">Wendmoor FC</p>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            {NAV.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className={cn(
+                    "font-mono text-label text-foreground uppercase underline underline-offset-4 hover:decoration-2",
+                    FOCUS
+                  )}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <p className="font-mono text-label text-muted-foreground uppercase">
+          © 2027 Wendmoor Football Club · Millrace Park, Wendmoor · A demo:
+          nothing is sent or stored
+        </p>
+      </div>
+    </footer>
+  )
+}
+
 export function App() {
-  const [kind, setKind] = React.useState<Kind>("playing")
+  const [membership, setMembership] = React.useState<MembershipKind>("playing")
   const [name, setName] = React.useState("")
   const [email, setEmail] = React.useState("")
   const [dob, setDob] = React.useState<Date | undefined>(undefined)
+  const [dobOpen, setDobOpen] = React.useState(false)
   const [contact, setContact] = React.useState("")
   const [phone, setPhone] = React.useState("")
   const [consent, setConsent] = React.useState(false)
-  const [dobOpen, setDobOpen] = React.useState(false)
+
   const [errors, setErrors] = React.useState<Errors>({})
-  const [focusTick, setFocusTick] = React.useState(0)
+  const [focusRequest, setFocusRequest] = React.useState<{
+    field: FieldKey
+  } | null>(null)
   const [confirmed, setConfirmed] = React.useState<Confirmed | null>(null)
 
   const nameRef = React.useRef<HTMLInputElement>(null)
@@ -164,11 +266,11 @@ export function App() {
   const phoneRef = React.useRef<HTMLInputElement>(null)
   const consentRef = React.useRef<HTMLButtonElement>(null)
   const calendarRef = React.useRef<HTMLDivElement>(null)
-  const headingRef = React.useRef<HTMLHeadingElement>(null)
+  const confirmHeadingRef = React.useRef<HTMLHeadingElement>(null)
 
-  // Move focus once the error lines are on the page.
+  // Focus the first field with an error once its error line is rendered.
   React.useEffect(() => {
-    if (focusTick === 0) return
+    if (!focusRequest) return
     const refs: Record<FieldKey, React.RefObject<HTMLElement | null>> = {
       name: nameRef,
       email: emailRef,
@@ -177,20 +279,18 @@ export function App() {
       phone: phoneRef,
       consent: consentRef,
     }
-    const first = ORDER.find((key) => errors[key])
-    if (first) refs[first].current?.focus()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focusTick])
+    refs[focusRequest.field].current?.focus()
+  }, [errors, focusRequest])
 
   React.useEffect(() => {
-    if (confirmed) headingRef.current?.focus()
+    if (confirmed) confirmHeadingRef.current?.focus()
   }, [confirmed])
 
-  function clearError(key: FieldKey) {
+  function clearError(field: FieldKey) {
     setErrors((prev) => {
-      if (!prev[key]) return prev
+      if (!prev[field]) return prev
       const next = { ...prev }
-      delete next[key]
+      delete next[field]
       return next
     })
   }
@@ -200,7 +300,7 @@ export function App() {
     const trimmedName = name.trim()
     const trimmedEmail = email.trim()
     const trimmedContact = contact.trim()
-    const digits = phone.trim().replace(/\s/g, "")
+    const compactPhone = phone.replace(/\s/g, "")
 
     if (!trimmedName) next.name = "Enter your full name."
 
@@ -209,18 +309,18 @@ export function App() {
       next.email = "Enter an email address such as name@example.com."
 
     if (!dob) next.dob = "Enter your date of birth."
-    else if (dob > TODAY || dob < EARLIEST)
+    else if (dob > TODAY_DATE || dob < EARLIEST)
       next.dob = "Enter a date of birth from 1927 to today."
-    else if (kind === "playing" && dob > ADULT_CUTOFF)
+    else if (membership === "playing" && dob > ADULT_CUTOFF)
       next.dob =
         "Playing membership is for adults. Choose Junior membership, or check the date."
-    else if (kind === "junior" && dob <= ADULT_CUTOFF)
+    else if (membership === "junior" && dob <= ADULT_CUTOFF)
       next.dob =
         "Junior membership is for under 18s. Choose Playing or Social membership, or check the date."
 
     if (!trimmedContact) next.contact = "Enter the name of someone we can call."
 
-    if (!/^\+?\d{10,15}$/.test(digits))
+    if (!/^\+?\d{10,15}$/.test(compactPhone))
       next.phone = "Enter a phone number of 10 to 15 digits."
 
     if (!consent) next.consent = "Tick the box to agree to the code of conduct."
@@ -231,72 +331,32 @@ export function App() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const next = validate()
-    if (Object.keys(next).length > 0) {
-      setErrors(next)
-      setFocusTick((tick) => tick + 1)
+    const first = FIELD_ORDER.find((field) => next[field])
+    setErrors(next)
+    if (first) {
+      setFocusRequest({ field: first })
       return
     }
-    setErrors({})
+    setFocusRequest(null)
     setConfirmed({
       firstName: name.trim().split(/\s+/)[0],
       email: email.trim(),
-      kind,
+      membership: MEMBERSHIPS.find((m) => m.value === membership)!,
     })
   }
 
-  const chosen = confirmed
-    ? MEMBERSHIPS.find((m) => m.value === confirmed.kind)!
-    : null
-
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <header className="border-b border-border bg-navy text-navy-foreground">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-x-8 gap-y-1 px-5 py-3">
-          <a
-            href="/"
-            className={cn("group inline-flex items-center gap-3", FOCUS_BAND)}
-          >
-            <span
-              aria-hidden="true"
-              className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ice font-heading text-body font-extrabold text-ice-foreground"
-            >
-              W
-            </span>
-            <span className="font-heading text-h2 uppercase underline-offset-4 group-hover:underline">
-              Wendmoor FC
-            </span>
-          </a>
-          <nav aria-label="Main">
-            <ul className="flex flex-wrap gap-x-5">
-              {NAV.map((link) => {
-                const current = link.href === "/membership"
-                return (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      aria-current={current ? "page" : undefined}
-                      className={cn(
-                        "inline-flex h-10 items-center font-mono text-label uppercase underline-offset-4 hover:underline",
-                        current && "underline decoration-2",
-                        FOCUS_BAND
-                      )}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       <main className="flex-1">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-18 px-5 pt-8 pb-18">
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div className="flex flex-col gap-3">
-                <p className={LABEL}>2027 Season · 140 members</p>
+                <p className="font-mono text-label text-muted-foreground uppercase">
+                  2027 season · 140 members
+                </p>
                 <h1 className="text-h1 uppercase">Join the club</h1>
                 <p className="max-w-2xl text-body">
                   Choose a membership, tell us who you are, and come to your
@@ -310,14 +370,14 @@ export function App() {
                 <form
                   noValidate
                   aria-label="Join the club"
-                  onSubmit={handleSubmit}
                   className="flex flex-col gap-8"
+                  onSubmit={handleSubmit}
                 >
                   <RadioGroup
                     name="membership"
-                    value={kind}
+                    value={membership}
                     onValueChange={(value) => {
-                      setKind(value as Kind)
+                      setMembership(value as MembershipKind)
                       clearError("dob")
                     }}
                     aria-labelledby="membership-heading"
@@ -353,20 +413,24 @@ export function App() {
                               <span className="font-heading text-h1 tabular-nums">
                                 {m.price}
                               </span>
-                              <span className={LABEL}>A season</span>
+                              <span className="font-mono text-label text-muted-foreground uppercase">
+                                A season
+                              </span>
                             </span>
                             <span className="block text-body">{m.forWhom}</span>
                             <span className="flex flex-col gap-2">
-                              {m.includes.map((line) => (
+                              {m.includes.map((item) => (
                                 <span
-                                  key={line}
+                                  key={item}
                                   className="flex items-start gap-2 text-body"
                                 >
                                   <Check
-                                    {...ICON}
-                                    className="mt-1 size-4 shrink-0"
+                                    className={cn(ICON, "mt-1")}
+                                    strokeWidth={2}
+                                    strokeLinecap="square"
+                                    aria-hidden="true"
                                   />
-                                  <span>{line}</span>
+                                  <span>{item}</span>
                                 </span>
                               ))}
                             </span>
@@ -377,24 +441,18 @@ export function App() {
                   </RadioGroup>
 
                   <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-                    <section
-                      aria-labelledby="details-heading"
-                      className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5 lg:col-span-8"
-                    >
-                      <h2 id="details-heading" className="text-h2 uppercase">
-                        Your details
-                      </h2>
+                    <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5 lg:col-span-8">
+                      <h2 className="text-h2 uppercase">Your details</h2>
 
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        <div className="flex flex-col gap-2 md:col-span-2">
-                          <label htmlFor="name" className={FIELD_LABEL}>
-                            Full name
-                          </label>
+                        <div className="flex min-w-0 flex-col gap-2 md:col-span-2">
+                          <FieldLabel htmlFor="full-name">Full name</FieldLabel>
                           <Input
                             ref={nameRef}
-                            id="name"
+                            id="full-name"
                             name="name"
                             autoComplete="name"
+                            className="h-10 px-3 text-body md:text-body"
                             value={name}
                             onChange={(e) => {
                               setName(e.target.value)
@@ -402,25 +460,23 @@ export function App() {
                             }}
                             aria-invalid={errors.name ? true : undefined}
                             aria-describedby={describedBy(
-                              errors.name && "name-error"
+                              errors.name && "full-name-error"
                             )}
-                            className="h-10 px-3 text-body md:text-body"
                           />
                           {errors.name && (
-                            <ErrorLine id="name-error" message={errors.name} />
+                            <ErrorLine id="full-name-error" message={errors.name} />
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <label htmlFor="email" className={FIELD_LABEL}>
-                            Email
-                          </label>
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <FieldLabel htmlFor="email">Email</FieldLabel>
                           <Input
                             ref={emailRef}
                             id="email"
                             name="email"
                             type="email"
                             autoComplete="email"
+                            className="h-10 px-3 text-body md:text-body"
                             value={email}
                             onChange={(e) => {
                               setEmail(e.target.value)
@@ -430,29 +486,20 @@ export function App() {
                             aria-describedby={describedBy(
                               errors.email && "email-error"
                             )}
-                            className="h-10 px-3 text-body md:text-body"
                           />
                           {errors.email && (
-                            <ErrorLine
-                              id="email-error"
-                              message={errors.email}
-                            />
+                            <ErrorLine id="email-error" message={errors.email} />
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <label
-                            id="dob-label"
-                            htmlFor="dob"
-                            className={FIELD_LABEL}
-                          >
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <FieldLabel htmlFor="dob" id="dob-label">
                             Date of birth
-                          </label>
+                          </FieldLabel>
                           <Popover open={dobOpen} onOpenChange={setDobOpen}>
                             <PopoverTrigger
                               ref={dobRef}
                               id="dob"
-                              type="button"
                               aria-labelledby="dob-label dob-value"
                               aria-invalid={errors.dob ? true : undefined}
                               aria-describedby={describedBy(
@@ -467,7 +514,7 @@ export function App() {
                               <span id="dob-value">
                                 {dob ? (
                                   <time dateTime={isoDate(dob)}>
-                                    {formatDate(dob)}
+                                    {longDate(dob)}
                                   </time>
                                 ) : (
                                   <span className="text-muted-foreground">
@@ -476,8 +523,10 @@ export function App() {
                                 )}
                               </span>
                               <CalendarIcon
-                                {...ICON}
-                                className="size-4 shrink-0 text-muted-foreground"
+                                className={cn(ICON, "text-muted-foreground")}
+                                strokeWidth={2}
+                                strokeLinecap="square"
+                                aria-hidden="true"
                               />
                             </PopoverTrigger>
                             <PopoverContent
@@ -500,7 +549,7 @@ export function App() {
                                   endMonth={new Date(2027, 5)}
                                   selected={dob}
                                   defaultMonth={dob ?? TODAY}
-                                  onSelect={(date) => {
+                                  onSelect={(date: Date) => {
                                     setDob(date)
                                     clearError("dob")
                                     setDobOpen(false)
@@ -509,7 +558,10 @@ export function App() {
                               </div>
                             </PopoverContent>
                           </Popover>
-                          <p id="dob-help" className={SMALL_PRINT}>
+                          <p
+                            id="dob-help"
+                            className="text-label text-muted-foreground"
+                          >
                             Playing members are 18 or over. Juniors are under
                             18.
                           </p>
@@ -518,15 +570,16 @@ export function App() {
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <label htmlFor="contact" className={FIELD_LABEL}>
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <FieldLabel htmlFor="contact">
                             Emergency contact
-                          </label>
+                          </FieldLabel>
                           <Input
                             ref={contactRef}
                             id="contact"
                             name="contact"
                             autoComplete="off"
+                            className="h-10 px-3 text-body md:text-body"
                             value={contact}
                             onChange={(e) => {
                               setContact(e.target.value)
@@ -537,9 +590,11 @@ export function App() {
                               "contact-help",
                               errors.contact && "contact-error"
                             )}
-                            className="h-10 px-3 text-body md:text-body"
                           />
-                          <p id="contact-help" className={SMALL_PRINT}>
+                          <p
+                            id="contact-help"
+                            className="text-label text-muted-foreground"
+                          >
                             Someone we can call on a match day. For a junior, a
                             parent or guardian.
                           </p>
@@ -551,16 +606,17 @@ export function App() {
                           )}
                         </div>
 
-                        <div className="flex flex-col gap-2">
-                          <label htmlFor="phone" className={FIELD_LABEL}>
-                            Emergency contact&apos;s phone
-                          </label>
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <FieldLabel htmlFor="contact-phone">
+                            Emergency contact’s phone
+                          </FieldLabel>
                           <Input
                             ref={phoneRef}
-                            id="phone"
-                            name="phone"
+                            id="contact-phone"
+                            name="contact-phone"
                             type="tel"
                             autoComplete="off"
+                            className="h-10 px-3 text-body md:text-body"
                             value={phone}
                             onChange={(e) => {
                               setPhone(e.target.value)
@@ -568,13 +624,12 @@ export function App() {
                             }}
                             aria-invalid={errors.phone ? true : undefined}
                             aria-describedby={describedBy(
-                              errors.phone && "phone-error"
+                              errors.phone && "contact-phone-error"
                             )}
-                            className="h-10 px-3 text-body md:text-body"
                           />
                           {errors.phone && (
                             <ErrorLine
-                              id="phone-error"
+                              id="contact-phone-error"
                               message={errors.phone}
                             />
                           )}
@@ -585,7 +640,7 @@ export function App() {
                         <label className="flex items-start gap-3 text-body text-foreground">
                           <Checkbox
                             ref={consentRef}
-                            name="consent"
+                            className="mt-0.5"
                             checked={consent}
                             onCheckedChange={(checked) => {
                               setConsent(checked)
@@ -595,18 +650,14 @@ export function App() {
                             aria-describedby={describedBy(
                               errors.consent && "consent-error"
                             )}
-                            className="mt-0.5"
                           />
                           <span>
-                            I agree to the club&apos;s code of conduct, and to
-                            the club keeping these details for the 2027 season.
+                            I agree to the club’s code of conduct, and to the
+                            club keeping these details for the 2027 season.
                           </span>
                         </label>
                         {errors.consent && (
-                          <ErrorLine
-                            id="consent-error"
-                            message={errors.consent}
-                          />
+                          <ErrorLine id="consent-error" message={errors.consent} />
                         )}
                       </div>
 
@@ -614,12 +665,12 @@ export function App() {
                         <Button type="submit" className={BUTTON}>
                           Join the club
                         </Button>
-                        <p className={SMALL_PRINT}>
+                        <p className="text-label text-muted-foreground">
                           You pay at your first session. Nothing is charged
                           here.
                         </p>
                       </div>
-                    </section>
+                    </div>
 
                     <aside
                       aria-labelledby="next-heading"
@@ -631,7 +682,7 @@ export function App() {
                       <ol role="list" className="flex flex-col gap-3">
                         {[
                           "We email your membership number and a welcome from the club.",
-                          "You come to your first session at Millrace Park and pay the season's fee there.",
+                          "You come to your first session at Millrace Park and pay the season’s fee there.",
                           "Players are registered with the league within a week, and can then be picked.",
                         ].map((step, index) => (
                           <li key={step} className="flex items-baseline gap-3">
@@ -643,8 +694,8 @@ export function App() {
                         ))}
                       </ol>
                       <p className="text-body">
-                        Questions? Call the club secretary, Marian Osei, on
-                        01632 960 277.
+                        Questions? Call the club secretary, Marian Osei, on 01632
+                        960 277.
                       </p>
                     </aside>
                   </div>
@@ -652,39 +703,41 @@ export function App() {
               )}
 
               <div role="status">
-                {confirmed && chosen && (
-                  <section
-                    aria-labelledby="welcome-heading"
-                    className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5"
-                  >
+                {confirmed && (
+                  <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
                     <h2
-                      id="welcome-heading"
-                      ref={headingRef}
+                      ref={confirmHeadingRef}
                       tabIndex={-1}
                       className={cn("text-h2 uppercase", FOCUS_CODE)}
                     >
                       Welcome to Wendmoor FC
                     </h2>
                     <p className="max-w-2xl text-body wrap-break-word">
-                      Thank you, {confirmed.firstName}. Your {chosen.name}{" "}
-                      membership for the 2027 season is ready.
+                      Thank you, {confirmed.firstName}. Your{" "}
+                      {confirmed.membership.name} membership for the 2027 season
+                      is ready.
                     </p>
                     <dl className="w-full max-w-md">
                       {[
-                        { label: "Membership number", value: MEMBER_NUMBER },
-                        { label: "Membership", value: chosen.name },
-                        { label: "Fee for the season", value: chosen.price },
-                        chosen.lastRow,
-                      ].map((row, index) => (
+                        ["Membership number", MEMBER_NUMBER],
+                        ["Membership", confirmed.membership.name],
+                        ["Fee for the season", confirmed.membership.price],
+                        [
+                          confirmed.membership.nextLabel,
+                          confirmed.membership.nextValue,
+                        ],
+                      ].map(([term, value], index) => (
                         <div
-                          key={row.label}
+                          key={term}
                           className={cn(
                             "flex items-baseline justify-between gap-3 py-2",
                             index > 0 && "border-t border-border"
                           )}
                         >
-                          <dt className={LABEL}>{row.label}</dt>
-                          <dd className="text-right text-body">{row.value}</dd>
+                          <dt className="font-mono text-label text-muted-foreground uppercase">
+                            {term}
+                          </dt>
+                          <dd className="text-right text-body">{value}</dd>
                         </div>
                       ))}
                     </dl>
@@ -702,7 +755,7 @@ export function App() {
                     >
                       See the fixtures
                     </a>
-                  </section>
+                  </div>
                 )}
               </div>
             </div>
@@ -710,32 +763,7 @@ export function App() {
         </div>
       </main>
 
-      <footer className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-3 px-5 py-8">
-          <p className="font-heading text-h2 uppercase">Wendmoor FC</p>
-          <nav aria-label="Footer">
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
-              {NAV.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className={cn(
-                      "font-mono text-label text-foreground uppercase underline underline-offset-4 hover:decoration-2",
-                      FOCUS
-                    )}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          <p className={LABEL}>
-            © 2027 Wendmoor Football Club · Millrace Park, Wendmoor · A demo:
-            nothing is sent or stored
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { Check } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -15,22 +16,26 @@ import { cn } from "@/lib/utils"
 const container = "mx-auto max-w-[1248px] px-6"
 const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label uppercase"
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 hover:decoration-2",
   focus
 )
+const navLink = cn(
+  "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
+  focus
+)
 const buttonClasses = "h-11 rounded-md px-6 font-mono text-label uppercase"
 
-const navLinks = [
-  { label: "Lessons", href: "/lessons" },
-  { label: "Forecast", href: "/forecast" },
-  { label: "Guide", href: "/guide" },
-  { label: "Book", href: "/booking" },
+const navItems = [
+  { label: "Lessons", href: "/lessons", current: true },
+  { label: "Forecast", href: "/forecast", current: false },
+  { label: "Guide", href: "/guide", current: false },
+  { label: "Book", href: "/booking", current: false },
 ]
 
 const lessons = [
   {
-    id: "first-waves",
     level: "Beginners",
     name: "First Waves",
     description:
@@ -46,7 +51,6 @@ const lessons = [
     price: "£42",
   },
   {
-    id: "green-waves",
     level: "Improvers",
     name: "Green Waves",
     description:
@@ -62,7 +66,6 @@ const lessons = [
     price: "£55",
   },
   {
-    id: "private-coaching",
     level: "Any level",
     name: "Private Coaching",
     description:
@@ -79,7 +82,7 @@ const lessons = [
   },
 ]
 
-const kit = [
+const hire = [
   { item: "Foam surfboard, 7 to 9 ft", prices: ["£10", "£15", "£22"] },
   { item: "Hard surfboard, 6 to 9 ft", prices: ["£14", "£20", "£28"] },
   { item: "Wetsuit, summer or winter", prices: ["£6", "£9", "£12"] },
@@ -88,11 +91,68 @@ const kit = [
   { item: "Foam board and wetsuit together", prices: ["£14", "£21", "£30"] },
 ]
 
-const rowClasses =
-  "flex items-baseline justify-between gap-6 py-4 first:pt-0 last:pb-0"
-const termClasses =
-  "shrink-0 font-mono text-label uppercase text-muted-foreground"
-const valueClasses = "min-w-0 text-right text-body text-foreground"
+const questions = [
+  {
+    q: "Do I need to be able to swim?",
+    a: (
+      <>
+        Yes, a little: 50 metres in a pool is enough. Beginners’ lessons stay in
+        water no deeper than your waist.
+      </>
+    ),
+  },
+  {
+    q: "What should I bring?",
+    a: (
+      <>
+        Swimwear, a towel and a bottle of water. We lend you the wetsuit, the
+        boots and the board, and there are hot showers at the Boat Shed.
+      </>
+    ),
+  },
+  {
+    q: "What if the sea is too rough or too flat?",
+    a: (
+      <>
+        We decide by{" "}
+        <time dateTime="07:30" className="tabular-nums">
+          07:30
+        </time>{" "}
+        on the day. If we call a lesson off, you choose another date or a full
+        refund.
+      </>
+    ),
+  },
+  {
+    q: "Can I move my booking?",
+    a: (
+      <>
+        Yes, free of charge up to 48 hours before the lesson. After that we keep
+        half the price, unless we can fill your place.
+      </>
+    ),
+  },
+  {
+    q: "How old do children need to be?",
+    a: (
+      <>
+        Eight for First Waves, twelve for Green Waves, and six for Private
+        Coaching with a parent in the water.
+      </>
+    ),
+  },
+]
+
+function Row({ term, children }: { term: string; children: ReactNode }) {
+  return (
+    <div className="flex items-baseline justify-between gap-6 py-4 first:pt-0 last:pb-0">
+      <dt className={cn(label, "shrink-0 text-muted-foreground")}>{term}</dt>
+      <dd className="min-w-0 text-right text-body text-foreground tabular-nums">
+        {children}
+      </dd>
+    </div>
+  )
+}
 
 export function App() {
   return (
@@ -112,24 +172,17 @@ export function App() {
           </a>
           <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
             <ul className="flex flex-wrap gap-x-6">
-              {navLinks.map((link) => {
-                const current = link.href === "/lessons"
-                return (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      aria-current={current ? "page" : undefined}
-                      className={cn(
-                        "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
-                        current && "underline",
-                        focus
-                      )}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                )
-              })}
+              {navItems.map((item) => (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    aria-current={item.current ? "page" : undefined}
+                    className={cn(navLink, item.current && "underline")}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
@@ -137,15 +190,13 @@ export function App() {
 
       <main className={cn(container, "flex flex-col gap-24 pt-10 pb-24")}>
         <section
-          aria-labelledby="opening-heading"
+          aria-labelledby="page-title"
           className="flex flex-col gap-6 rounded-xl bg-lagoon p-6 text-lagoon-foreground md:p-10"
         >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className="font-mono text-label uppercase">
-                Sandhopper Surf School · 2027
-              </p>
-              <h1 id="opening-heading" className="text-h1 md:text-display">
+              <p className={label}>Sandhopper Surf School · 2027</p>
+              <h1 id="page-title" className="text-h1 md:text-display">
                 Lessons and prices
               </h1>
             </div>
@@ -155,30 +206,26 @@ export function App() {
               the day before.
             </p>
           </div>
-          <ul className="flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
-            <li className="font-mono text-label uppercase">
-              From £42 a person
-            </li>
-            <li className="font-mono text-label uppercase">
-              Groups of 8 or fewer
-            </li>
-            <li className="font-mono text-label uppercase">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            <li className={cn(label, "tabular-nums")}>From £42 a person</li>
+            <li className={cn(label, "tabular-nums")}>Groups of 8 or fewer</li>
+            <li className={cn(label, "tabular-nums")}>
               Free to move up to 48 hours before
             </li>
           </ul>
         </section>
 
         <section
-          aria-labelledby="lessons-heading"
+          aria-labelledby="lessons-title"
           className="flex flex-col gap-6"
         >
-          <h2 id="lessons-heading" className="text-h2">
+          <h2 id="lessons-title" className="text-h2">
             Choose a lesson
           </h2>
-          <ul className="grid list-none grid-cols-1 gap-6 p-0 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {lessons.map((lesson) => (
               <li
-                key={lesson.id}
+                key={lesson.name}
                 className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6"
               >
                 <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase">
@@ -187,24 +234,13 @@ export function App() {
                 <h3 className="text-h2">{lesson.name}</h3>
                 <p className="text-body">{lesson.description}</p>
                 <dl className="divide-y divide-border">
-                  <div className={rowClasses}>
-                    <dt className={termClasses}>Length</dt>
-                    <dd className={valueClasses}>{lesson.length}</dd>
-                  </div>
-                  <div className={rowClasses}>
-                    <dt className={termClasses}>Group</dt>
-                    <dd className={valueClasses}>{lesson.group}</dd>
-                  </div>
-                  <div className={rowClasses}>
-                    <dt className={termClasses}>Ages</dt>
-                    <dd className={valueClasses}>{lesson.ages}</dd>
-                  </div>
+                  <Row term="Length">{lesson.length}</Row>
+                  <Row term="Group">{lesson.group}</Row>
+                  <Row term="Ages">{lesson.ages}</Row>
                 </dl>
                 <div className="flex flex-col gap-2">
-                  <p className="font-mono text-label text-muted-foreground uppercase">
-                    Included
-                  </p>
-                  <ul className="flex list-none flex-col gap-2 p-0">
+                  <p className={cn(label, "text-muted-foreground")}>Included</p>
+                  <ul className="flex flex-col gap-2">
                     {lesson.included.map((thing) => (
                       <li key={thing} className="flex items-start gap-2">
                         <Check
@@ -222,7 +258,7 @@ export function App() {
                     <span className="font-heading text-h2 text-foreground tabular-nums">
                       {lesson.price}
                     </span>
-                    <span className="font-mono text-label text-muted-foreground uppercase">
+                    <span className={cn(label, "text-muted-foreground")}>
                       a person
                     </span>
                   </p>
@@ -244,12 +280,12 @@ export function App() {
         </section>
 
         <section
-          aria-labelledby="kit-heading"
+          aria-labelledby="hire-title"
           className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-x-6"
         >
-          <div className="flex flex-col gap-6 lg:col-span-8">
+          <div className="flex min-w-0 flex-col gap-6 lg:col-span-8">
             <div className="flex flex-col gap-4">
-              <h2 id="kit-heading" className="text-h2">
+              <h2 id="hire-title" className="text-h2">
                 Kit hire
               </h2>
               <p className="max-w-xl text-body">
@@ -265,7 +301,10 @@ export function App() {
                       <TableHead
                         key={head}
                         scope="col"
-                        className="h-auto px-6 py-4 font-mono text-label text-muted-foreground uppercase"
+                        className={cn(
+                          label,
+                          "h-auto px-6 py-4 text-muted-foreground tabular-nums"
+                        )}
                       >
                         {head}
                       </TableHead>
@@ -273,14 +312,17 @@ export function App() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {kit.map((row) => (
+                  {hire.map((row) => (
                     <TableRow key={row.item} className="hover:bg-transparent">
-                      <TableCell className="px-6 py-4 text-foreground">
+                      <th
+                        scope="row"
+                        className="px-6 py-4 text-left align-middle font-normal whitespace-nowrap text-foreground"
+                      >
                         {row.item}
-                      </TableCell>
-                      {row.prices.map((price, index) => (
+                      </th>
+                      {row.prices.map((price, i) => (
                         <TableCell
-                          key={index}
+                          key={i}
                           className="px-6 py-4 text-foreground tabular-nums"
                         >
                           {price}
@@ -296,35 +338,23 @@ export function App() {
           <div className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 lg:col-span-4">
             <h3 className="text-h2">How hire works</h3>
             <dl className="divide-y divide-border">
-              <div className={rowClasses}>
-                <dt className={termClasses}>Half day</dt>
-                <dd className={valueClasses}>4 hours</dd>
-              </div>
-              <div className={rowClasses}>
-                <dt className={termClasses}>Full day</dt>
-                <dd className={cn(valueClasses, "tabular-nums")}>
-                  <time dateTime="08:30">08:30</time>–
-                  <time dateTime="18:00">18:00</time>
-                </dd>
-              </div>
-              <div className={rowClasses}>
-                <dt className={termClasses}>Deposit</dt>
-                <dd className={valueClasses}>A bank card or a car key</dd>
-              </div>
-              <div className={rowClasses}>
-                <dt className={termClasses}>Sizes</dt>
-                <dd className={valueClasses}>Wetsuits from age 4 to XXL</dd>
-              </div>
+              <Row term="Half day">4 hours</Row>
+              <Row term="Full day">
+                <time dateTime="08:30">08:30</time>–
+                <time dateTime="18:00">18:00</time>
+              </Row>
+              <Row term="Deposit">A bank card or a car key</Row>
+              <Row term="Sizes">Wetsuits from age 4 to XXL</Row>
             </dl>
           </div>
         </section>
 
         <section
-          aria-labelledby="faq-heading"
+          aria-labelledby="faq-title"
           className="grid grid-cols-1 gap-10 md:grid-cols-12 md:items-start md:gap-x-6"
         >
           <div className="flex flex-col gap-4 md:col-span-4">
-            <h2 id="faq-heading" className="text-h2">
+            <h2 id="faq-title" className="text-h2">
               Good to know
             </h2>
             <p className="text-body">
@@ -335,67 +365,25 @@ export function App() {
               .
             </p>
           </div>
-          <ul className="list-none divide-y divide-border p-0 md:col-span-8">
-            <li className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0">
-              <h3 className="text-body font-bold">
-                Do I need to be able to swim?
-              </h3>
-              <p className="max-w-xl text-body">
-                Yes, a little: 50 metres in a pool is enough. Beginners&apos;
-                lessons stay in water no deeper than your waist.
-              </p>
-            </li>
-            <li className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0">
-              <h3 className="text-body font-bold">What should I bring?</h3>
-              <p className="max-w-xl text-body">
-                Swimwear, a towel and a bottle of water. We lend you the
-                wetsuit, the boots and the board, and there are hot showers at
-                the Boat Shed.
-              </p>
-            </li>
-            <li className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0">
-              <h3 className="text-body font-bold">
-                What if the sea is too rough or too flat?
-              </h3>
-              <p className="max-w-xl text-body">
-                We decide by{" "}
-                <time dateTime="07:30" className="tabular-nums">
-                  07:30
-                </time>{" "}
-                on the day. If we call a lesson off, you choose another date or
-                a full refund.
-              </p>
-            </li>
-            <li className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0">
-              <h3 className="text-body font-bold">Can I move my booking?</h3>
-              <p className="max-w-xl text-body">
-                Yes, free of charge up to 48 hours before the lesson. After that
-                we keep half the price, unless we can fill your place.
-              </p>
-            </li>
-            <li className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0">
-              <h3 className="text-body font-bold">
-                How old do children need to be?
-              </h3>
-              <p className="max-w-xl text-body">
-                Eight for First Waves, twelve for Green Waves, and six for
-                Private Coaching with a parent in the water.
-              </p>
-            </li>
+          <ul className="divide-y divide-border md:col-span-8">
+            {questions.map((item) => (
+              <li
+                key={item.q}
+                className="flex flex-col gap-2 py-6 first:pt-0 last:pb-0"
+              >
+                <h3 className="text-body font-bold">{item.q}</h3>
+                <p className="max-w-xl text-body">{item.a}</p>
+              </li>
+            ))}
           </ul>
         </section>
 
-        <section
-          aria-labelledby="ready-heading"
-          className="flex flex-col gap-6"
-        >
-          <div className="flex flex-col gap-6 rounded-xl bg-coral p-6 text-coral-foreground md:p-10">
+        <section aria-labelledby="ready-title" className="flex flex-col gap-6">
+          <div className="rounded-xl bg-coral p-6 text-coral-foreground md:p-10">
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <p className="font-mono text-label uppercase">
-                  Every day of the year
-                </p>
-                <h2 id="ready-heading" className="text-h2">
+                <p className={label}>Every day of the year</p>
+                <h2 id="ready-title" className="text-h2">
                   Ready to get in?
                 </h2>
               </div>
@@ -439,22 +427,19 @@ export function App() {
             </p>
           </div>
           <div className="flex flex-col gap-2 md:items-end">
-            <p className="font-mono text-label text-muted-foreground uppercase">
+            <p className={cn(label, "text-muted-foreground")}>
               The Boat Shed · Beach Road · Pentarrow Sands · ZP7 3SB
             </p>
-            <p className="text-body">
+            <p className="text-body wrap-break-word">
               <a href="tel:+441632960418" className={textLink}>
                 01632 960 418
               </a>
               {" · "}
-              <a
-                href="mailto:hello@sandhopper.example"
-                className={cn(textLink, "wrap-break-word")}
-              >
+              <a href="mailto:hello@sandhopper.example" className={textLink}>
                 hello@sandhopper.example
               </a>
             </p>
-            <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+            <p className={cn(label, "text-muted-foreground tabular-nums")}>
               Every day · <time dateTime="08:30">08:30</time>–
               <time dateTime="18:00">18:00</time> · © 2027 Sandhopper Surf
               School

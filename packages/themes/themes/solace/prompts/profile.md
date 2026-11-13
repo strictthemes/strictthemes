@@ -7,7 +7,7 @@ checks:
   - "The portrait is a 72px round fill with the initials NE, with the img role and an aria-label, in a row beside the `<h1>` and a line of training; it is the only round thing on the page."
   - "Training and registration are a `<dl>` of five rows with a hairline above each and one under the last, each year in a `<time>` element, and no real school, register or qualification is named."
   - "The days and times are a `<table>` with a visually hidden caption, column headers and row headers that are not bold, each time in a `<time>` element, and a badge In person or Online, or both, in each row."
-  - "At 375px the table fits its column without scrolling sideways: the times do not wrap, and two badges in one row wrap under each other."
+  - "At 375px the table fits its column without scrolling sideways: the times do not wrap, and Wednesday's two badges wrap under each other rather than widen the table."
   - "The page has exactly one default (indigo) button, Request a first session, and no text on the page is bold or italic."
 ---
 
@@ -54,7 +54,7 @@ A section in the grid, with two parts:
 A section in the grid, with two parts:
 
 - **Heading**, in columns 1–4 (`md:col-span-4`): an `<h2>`, "Areas of work", then with `mt-4` a `<p>` in `text-body`: "These are what people most often bring. The list is not a boundary."
-- **The list**, in columns 6–12 (`md:col-start-6 md:col-span-7`), with `mt-7 md:mt-0`: one `<div>` holding a `<ul>` as a list with hairlines (see the layout notes), six entries, which from `md` up is also two columns: `md:grid md:grid-cols-2 md:gap-x-7`. Each `<li>` is its name alone, in `font-heading text-h2`, with no sentence under it: "Anxiety and worry", "Low mood", "Grief and loss", "Burnout and work", "Relationships", "A change you did not choose". Under the list, in the same `<div>`, with `mt-7`, a `<p>` in `text-body`, at most `max-w-xl`: "I do not work with couples, families or anyone under 18. The rest of what I do not offer is on the page about how I work.", with "the page about how I work" a link in running text to `/approach#not-offered`.
+- **The list**, in columns 6–12 (`md:col-start-6 md:col-span-7`), with `mt-7 md:mt-0`: one `<div>` holding a `<ul>` as a list with hairlines (see the layout notes), six entries, which from `md` up is also two columns: `md:grid md:grid-cols-2 md:gap-x-7`. From `md` up each column closes with its own hairline, so the closing line has the same gap as the others: the `<ul>` adds `md:border-b-0`, and the fifth and sixth `<li>` add `md:border-b`. Each `<li>` is its name alone, in `font-heading text-h2`, with no sentence under it: "Anxiety and worry", "Low mood", "Grief and loss", "Burnout and work", "Relationships", "A change you did not choose". Under the list, in the same `<div>`, with `mt-7`, a `<p>` in `text-body`, at most `max-w-xl`: "I do not work with couples, families or anyone under 18. The rest of what I do not offer is on the page about how I work.", with "the page about how I work" a link in running text to `/approach#not-offered`.
 
 ### 5. When sessions are held
 
@@ -91,7 +91,7 @@ The footer from the layout notes.
 
 ### On a phone
 
-Every part is one column. The portrait keeps its 72px with the name beside it; the `<h1>` is `text-h1` and wraps onto two lines, and the label line under it wraps too. The rows of training keep their year and their text side by side. The Languages card comes 48px under the list. The areas of work are one column of six. The table keeps its three columns: the times stay on one line, and Wednesday's two badges stand one under the other. The Finding the room card comes 48px under the table's caption.
+Every part is one column. The portrait keeps its 72px with the name beside it; the `<h1>` is `text-h1` and wraps onto two lines, and the label line under it wraps too. The rows of training keep their year and their text side by side. The Languages card comes 48px under the list. The areas of work are one column of six. The table keeps its three columns: the times stay on one line, and Wednesday's two badges wrap one under the other where the column is too narrow for both (at 375px they do; a little wider they sit side by side, which is fine). The Finding the room card comes 48px under the table's caption.
 
 ### Behavior
 

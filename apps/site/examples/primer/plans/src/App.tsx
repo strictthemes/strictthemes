@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react"
 import { Check, Minus } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import {
   Accordion,
   AccordionContent,
@@ -18,19 +19,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
 
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const container = "mx-auto w-full max-w-[1240px] px-5"
-
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 
 const badgeClasses =
   "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
 
 const buttonClasses = "h-10 px-5 font-sans text-body font-semibold"
+
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 
 type Billing = "monthly" | "yearly"
 
@@ -43,18 +41,19 @@ type Price = {
 type Plan = {
   id: string
   name: string
-  badge?: string
-  price: Record<Billing, Price>
-  audience: string
-  includes: { text: string; has: boolean }[]
-  cta: { label: string; variant: "default" | "secondary" }
+  marked: boolean
+  prices: Record<Billing, Price>
+  forWhom: string
+  includes: { has: boolean; text: string }[]
+  action: { label: string; variant: "default" | "secondary" }
 }
 
 const plans: Plan[] = [
   {
     id: "free",
     name: "Free",
-    price: {
+    marked: false,
+    prices: {
       monthly: {
         amount: "$0",
         unit: "a month",
@@ -66,21 +65,21 @@ const plans: Plan[] = [
         note: "Free for as long as you like",
       },
     },
-    audience: "For trying a course before you decide.",
+    forWhom: "For trying a course before you decide.",
     includes: [
-      { text: "The first module of every course", has: true },
-      { text: "A question at the end of each lesson", has: true },
-      { text: "Your progress and your days in a row", has: true },
-      { text: "No practice files", has: false },
-      { text: "No certificates", has: false },
+      { has: true, text: "The first module of every course" },
+      { has: true, text: "A question at the end of each lesson" },
+      { has: true, text: "Your progress and your days in a row" },
+      { has: false, text: "No practice files" },
+      { has: false, text: "No certificates" },
     ],
-    cta: { label: "Start for free", variant: "secondary" },
+    action: { label: "Start for free", variant: "secondary" },
   },
   {
     id: "plus",
     name: "Plus",
-    badge: "Most chosen",
-    price: {
+    marked: true,
+    prices: {
       monthly: { amount: "$18", unit: "a month", note: "Billed every month" },
       yearly: {
         amount: "$15",
@@ -88,19 +87,20 @@ const plans: Plan[] = [
         note: "Billed $180 once a year",
       },
     },
-    audience: "For one learner who wants every course.",
+    forWhom: "For one learner who wants every course.",
     includes: [
-      { text: "All 9 courses, 102 lessons", has: true },
-      { text: "Practice files for every lesson", has: true },
-      { text: "A certificate for each course you finish", has: true },
-      { text: "Everything in Free", has: true },
+      { has: true, text: "All 9 courses, 102 lessons" },
+      { has: true, text: "Practice files for every lesson" },
+      { has: true, text: "A certificate for each course you finish" },
+      { has: true, text: "Everything in Free" },
     ],
-    cta: { label: "Choose Plus", variant: "default" },
+    action: { label: "Choose Plus", variant: "default" },
   },
   {
     id: "team",
     name: "Team",
-    price: {
+    marked: false,
+    prices: {
       monthly: {
         amount: "$24",
         unit: "a learner a month",
@@ -112,36 +112,34 @@ const plans: Plan[] = [
         note: "Billed $240 a learner once a year · From 3 learners",
       },
     },
-    audience: "For a team that learns together at work.",
+    forWhom: "For a team that learns together at work.",
     includes: [
-      { text: "Everything in Plus, for 3 to 50 learners", has: true },
-      { text: "The whole team's progress on one page", has: true },
-      { text: "One invoice, by card or bank transfer", has: true },
+      { has: true, text: "Everything in Plus, for 3 to 50 learners" },
+      { has: true, text: "The whole team's progress on one page" },
+      { has: true, text: "One invoice, by card or bank transfer" },
     ],
-    cta: { label: "Choose Team", variant: "secondary" },
+    action: { label: "Choose Team", variant: "secondary" },
   },
 ]
 
 type Cell =
-  | { kind: "figure"; text: string }
-  | { kind: "phrase"; text: string }
   | { kind: "yes" }
   | { kind: "no" }
+  | { kind: "figure"; text: string }
+  | { kind: "phrase"; text: string }
 
 const yes: Cell = { kind: "yes" }
 const no: Cell = { kind: "no" }
-const phrase = (text: string): Cell => ({ kind: "phrase", text })
 const figure = (text: string): Cell => ({ kind: "figure", text })
+const phrase = (text: string): Cell => ({ kind: "phrase", text })
 
 function comparisonRows(billing: Billing): { name: string; cells: Cell[] }[] {
   return [
     {
       name: "Price",
       cells: plans.map((plan) => {
-        const price = plan.price[billing]
-        return figure(
-          price.amount === "$0" ? "$0" : `${price.amount} ${price.unit}`
-        )
+        const price = plan.prices[billing]
+        return figure(`${price.amount} ${price.unit}`)
       }),
     },
     {
@@ -204,15 +202,24 @@ const navLinks = [
   { label: "Plans", href: "/plans" },
 ]
 
-function SiteHeader({ current }: { current: string }) {
+function Container({
+  className,
+  children,
+}: {
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <div className={cn("mx-auto w-full max-w-[1240px] px-5", className)}>
+      {children}
+    </div>
+  )
+}
+
+function Header() {
   return (
     <header className="border-b border-border">
-      <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center gap-x-8 gap-y-1 py-3"
-        )}
-      >
+      <Container className="flex flex-wrap items-center gap-x-8 gap-y-1 py-3">
         <a
           href="/catalogue"
           className={cn(
@@ -225,15 +232,15 @@ function SiteHeader({ current }: { current: string }) {
         <nav aria-label="Main" className="w-full md:w-auto">
           <ul className="flex gap-5">
             {navLinks.map((link) => {
-              const isCurrent = link.href === current
+              const current = link.href === "/plans"
               return (
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    aria-current={isCurrent ? "page" : undefined}
+                    aria-current={current ? "page" : undefined}
                     className={cn(
                       "inline-flex h-10 items-center font-sans text-body font-semibold text-foreground underline-offset-8",
-                      isCurrent ? "underline decoration-2" : "hover:underline",
+                      current ? "underline decoration-2" : "hover:underline",
                       focusOutline
                     )}
                   >
@@ -244,49 +251,45 @@ function SiteHeader({ current }: { current: string }) {
             })}
           </ul>
         </nav>
-      </div>
+      </Container>
     </header>
   )
 }
 
-function SiteFooter() {
+function Footer() {
   return (
     <footer className="border-t border-border">
-      <div
-        className={cn(
-          container,
-          "flex flex-wrap items-center justify-between gap-3 py-8"
-        )}
-      >
+      <Container className="flex flex-wrap items-center justify-between gap-3 py-8">
         <p className="font-heading text-h2">Rowlark</p>
         <p className={smallFigure}>
           Rowlark · Practical data skills, one short lesson at a time · 2027
         </p>
-      </div>
+      </Container>
     </footer>
   )
 }
 
 function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
-  const price = plan.price[billing]
+  const price = plan.prices[billing]
+  const headingId = `plan-${plan.id}`
   return (
     <li className="flex h-full flex-col gap-5 rounded-xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-h2">{plan.name}</h3>
-        {plan.badge ? (
-          <Badge className={badgeClasses}>{plan.badge}</Badge>
-        ) : null}
+        <h3 id={headingId} className="text-h2">
+          {plan.name}
+        </h3>
+        {plan.marked && <Badge className={badgeClasses}>Most chosen</Badge>}
       </div>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-baseline gap-2">
+        <p className="flex flex-wrap items-baseline gap-2">
           <span className="font-heading text-display tabular-nums">
             {price.amount}
           </span>
           <span className={smallFigure}>{price.unit}</span>
-        </div>
+        </p>
         <p className={smallFigure}>{price.note}</p>
       </div>
-      <p className="text-body">{plan.audience}</p>
+      <p className="text-body">{plan.forWhom}</p>
       <ul className="flex flex-col gap-2 border-t border-border pt-5">
         {plan.includes.map((line) => {
           const Icon = line.has ? Check : Minus
@@ -301,18 +304,18 @@ function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
       <a
         href="#"
         className={cn(
-          buttonVariants({ variant: plan.cta.variant }),
+          buttonVariants({ variant: plan.action.variant }),
           buttonClasses,
           "mt-auto w-full"
         )}
       >
-        {plan.cta.label}
+        {plan.action.label}
       </a>
     </li>
   )
 }
 
-function CellContent({ cell }: { cell: Cell }): ReactNode {
+function CellContent({ cell }: { cell: Cell }) {
   if (cell.kind === "yes" || cell.kind === "no") {
     const Icon = cell.kind === "yes" ? Check : Minus
     return (
@@ -322,7 +325,7 @@ function CellContent({ cell }: { cell: Cell }): ReactNode {
       </span>
     )
   }
-  return cell.text
+  return <>{cell.text}</>
 }
 
 export function App() {
@@ -332,10 +335,9 @@ export function App() {
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <SiteHeader current="/plans" />
-
+      <Header />
       <main className="flex-1">
-        <div className={cn(container, "flex flex-col gap-20 pt-8 pb-20")}>
+        <Container className="flex flex-col gap-20 pt-8 pb-20">
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 md:text-display">
               One plan opens every course
@@ -395,13 +397,13 @@ export function App() {
               >
                 <TableHeader>
                   <TableRow>
-                    {["What you get", "Free", "Plus", "Team"].map((name) => (
+                    {["What you get", "Free", "Plus", "Team"].map((title) => (
                       <TableHead
-                        key={name}
+                        key={title}
                         scope="col"
                         className="px-5 font-mono text-label text-muted-foreground"
                       >
-                        {name}
+                        {title}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -453,10 +455,9 @@ export function App() {
               </Accordion>
             </div>
           </section>
-        </div>
+        </Container>
       </main>
-
-      <SiteFooter />
+      <Footer />
     </div>
   )
 }

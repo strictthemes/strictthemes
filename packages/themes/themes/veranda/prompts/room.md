@@ -24,7 +24,7 @@ The header from the layout notes. This page is one room, not the list of rooms, 
 
 The first section, with `pt-12`. It holds a grid and, after it, the pictures.
 
-In columns 1–8 of the grid (`grid gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-8`):
+In columns 1–8 of the grid (`grid grid-cols-1 gap-6 md:grid-cols-12`, the `<div>` with `md:col-span-8`):
 
 - A label line with the page's one badge beside it, in the row the Badges note gives: the label `Room 4 of 6 · First floor` in `text-muted-foreground`, then the badge "Sea view".
 - With `mt-2`, the `<h1>` in `text-h1 lg:text-display`: "Marram". No italic here.
@@ -32,7 +32,7 @@ In columns 1–8 of the grid (`grid gap-6 md:grid-cols-12`, the `<div>` with `md
 
 After the grid, with `mt-6`, the pictures: one `<figure>` holding a grid of three plates and, after the grid, one caption.
 
-- The grid is `grid gap-6 md:grid-cols-12`, with no `md:items-start`: from `md` up the large plate stretches to the height of the two small ones.
+- The grid is `grid grid-cols-1 gap-6 md:grid-cols-12`, with no `md:items-start`: from `md` up the large plate stretches to the height of the two small ones.
 - The large plate, in columns 1–8 (`md:col-span-8`): `aspect-4/3 md:aspect-auto` (from `md` up it has no ratio of its own and takes the height of the row), the window at `left-1/6`; `aria-label` "The bay window of Marram, with the bed facing the sea".
 - In columns 9–12 (`md:col-span-4`), a `<div>` with `grid grid-cols-2 gap-6 md:grid-cols-1`, holding two plates, each `aspect-4/3`: side by side on a phone, one above the other from `md` up.
   - The window at `right-1/6`, the ground `h-1/2`; `aria-label` "The writing table in the bay, two chairs and the harbour wall below".
@@ -41,7 +41,7 @@ After the grid, with `mt-6`, the pictures: one `<figure>` holding a grid of thre
 
 ### 3. The room
 
-A section with the hairline from the layout notes, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`) with two items. The panel comes first in the code, so that on a phone the price and the action stand before the description; from `md` up both items have `md:row-start-1`.
+A section with the hairline from the layout notes, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`) with two items. The panel comes first in the code, so that on a phone the price and the action stand before the description; from `md` up both items have `md:row-start-1`.
 
 **The panel**, in columns 9–12 (`md:col-span-4 md:col-start-9 md:row-start-1`), with `md:sticky md:top-6`: an `<aside>` that is a card, with the `aria-label` "Price and request". Inside it:
 
@@ -68,11 +68,11 @@ A section with the hairline from the layout notes, as a grid (`grid gap-6 md:gri
 - With `mt-12`, the page's clay block, holding:
   - A label with no text color class, so it takes the block's ink: `In the price of the room`.
   - With `mt-2`, an `<h3>` in `text-h2`: "What is included".
-  - With `mt-6`, a `<ul>` with no markers and no padding, `grid gap-x-6 gap-y-2 md:grid-cols-2`, of six items. Each `<li>` is `flex items-start gap-2` in `text-body`: the `Check` icon with `mt-1 shrink-0`, then the words. The items: "Breakfast on the veranda, from 08:00 to 10:00" (each time a `<time>`), "Linen sheets and wool blankets", "A kettle, loose tea and fresh milk", "Towels, soap and a hot water bottle", "Wifi through the house", "Free parking at the quay".
+  - With `mt-6`, a `<ul>` with no markers and no padding, `grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-2`, of six items. Each `<li>` is `flex items-start gap-2` in `text-body`: the `Check` icon with `mt-1 shrink-0`, then the words. The items: "Breakfast on the veranda, from 08:00 to 10:00, on Sundays to 10:30" (each time a `<time>`), "Linen sheets and wool blankets", "A kettle, loose tea and fresh milk", "Towels, soap and a hot water bottle", "Wifi through the house", "Free parking at the quay".
 
 ### 4. Prices by season
 
-A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
 - In columns 1–4 (`md:col-span-4`): a label line, `Per night · Breakfast included`; with `mt-2` an `<h2>`, "Prices by season"; with `mt-4` one sentence in `text-body`: "The price is for the room, for one guest or two, and each night is charged at the price of its season."
 - In columns 6–12 (`md:col-span-7 md:col-start-6`): the table, then with `mt-4` a `<p>` of helper text in `font-mono text-label text-muted-foreground`, a sentence, not uppercased: "In July and August we take stays of two nights or more."
@@ -89,9 +89,9 @@ The season in each row is a `TableHead` with `scope="row"`, given `h-auto`, the 
 
 ### 5. Other rooms
 
-A section with the hairline, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
+A section with the hairline, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start`):
 
-- In columns 1–4 (`md:col-span-4`): a label line, `Five more rooms`; with `mt-2` an `<h2>`, "Other rooms".
+- In columns 1–4 (`md:col-span-4`): a label line, `Three of the other five`; with `mt-2` an `<h2>`, "Other rooms".
 - In columns 6–12 (`md:col-span-7 md:col-start-6`): rows from the layout notes, three rows. In each, the name is a link to `#`, styled as a name that is a link, and the figure is the price per night, here in `text-muted-foreground` as the Prices note says:
   - Samphire: `From £112 a night`
   - Sea Holly: `From £142 a night`

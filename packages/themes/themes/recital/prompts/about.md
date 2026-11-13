@@ -20,11 +20,11 @@ The publication's name and three nav links, in this order: Essays (`/essays`), J
 
 ### 2. Opening
 
-In the reading column, with `pt-12`: a label ("About"), then with `mt-4` the `<h1>`, whose text is one sentence, with no full stop, that says what the publication is, then two paragraphs, the first with `mt-6`: why it exists and who it is for.
+In the reading column, with `pt-12`: a label `<p>` ("About"; not a label heading, so the `<h1>` stays the first heading), then with `mt-4` the `<h1>`, whose text is one sentence, with no full stop, that says what the publication is, then two paragraphs, the first with `mt-6`: why it exists and who it is for.
 
 ### 3. In numbers
 
-Wide, with `mt-12`: a `<dl>` laid out as a row of three numbers (not `<figure>` elements), `grid gap-6 md:grid-cols-3`, single column below `md`. Each number and its term are a `<div>` with a 1px top border and `pt-4`: the number as the `<dd>` in `font-heading text-h1`, and what it counts as the `<dt>`, a label under the number with `mt-2`. Use `flex flex-col-reverse` on each pair so that the `<dt>` stays first in the code. For example: letters sent, paying readers, years in print, each term a few words.
+Wide, with `mt-12`: a `<dl>` laid out as a row of three numbers (not `<figure>` elements), `grid gap-6 md:grid-cols-3`, single column below `md`. Each number and its term are a `<div>` with a 1px top border and `pt-4`: the number as the `<dd>` in `font-heading text-h1`, and what it counts as the `<dt>`, a label in `text-muted-foreground` under the number with `mt-2`. Use `flex flex-col-reverse` on each pair so that the `<dt>` stays first in the code. For example: letters sent, paying readers, years in print, each term a few words.
 
 ### 4. Who makes it
 
@@ -39,13 +39,13 @@ The avatar is `flex size-12 shrink-0 items-center justify-center rounded-full bo
 
 In the reading column, with `mt-24`: an `<h2>` "How it is made", then two paragraphs, the first with `mt-4` and the second with `mt-6`. The first holds one `<em>`, the second one link in running text.
 
-Then a card (`my-12`), a `<div>` (it is not a note beside the text), holding only a `<dl>`: here, instead of the notes' label first, the card has no label, and the `<dl>` starts at the card's top with no margin. It has four rows: Typefaces, Published, Paid for by, Since; the value of Since is a `<time dateTime="2019">`. Each row is a `<div>` around a `<dt>`, a label, and its `<dd>`; every row but the first has `mt-4`, joined to the row's other classes with `cn(...)` so that it stays a class of its own. Below `md` the value sits under its term with `mt-2`. From `md` up each row is `md:grid md:grid-cols-4 md:items-baseline md:gap-x-6`, with the term in the first column and the value across the other three (`md:col-span-3 md:mt-0`), so the values line up.
+Then a card (`my-12`), a `<div>` (it is not a note beside the text), holding only a `<dl>`: here, instead of the notes' label first, the card has no label, and the `<dl>` starts at the card's top with no margin. It has four rows: Typefaces, Published, Paid for by, Since; the value of Since is a `<time dateTime="2019">`. Each row is a `<div>` around a `<dt>`, a label in `text-muted-foreground` of one to three short words (from `md` up its column is about 98px), and its `<dd>`; every row but the first has `mt-4`, joined to the row's other classes with `cn(...)` so that it stays a class of its own. Below `md` the value sits under its term with `mt-2`. From `md` up each row is `md:grid md:grid-cols-4 md:items-baseline md:gap-x-6`, with the term in the first column and the value across the other three (`md:col-span-3 md:mt-0`), so the values line up.
 
 ### 6. A short history
 
 In the reading column, with `mt-24`: an `<h2>` "A short history", then with `mt-6` an ordered list without numbers (`list-none`) of five entries. Each entry has a 1px top border and `py-4` (no line under the last, as the notes say) and holds two things: the year, a label `<p>` holding a `<time dateTime="2019">`; and under it, with `mt-2`, a `<p>` with one sentence about what happened.
 
-Then a block quote (`my-12`): one sentence a reader once wrote about the magazine, with their first name and their town under it, e.g. `Ingrid, Leeds`.
+Then a block quote (`my-12`): one sentence a reader once wrote about the magazine, ending with a full stop, with their first name and their town under it, e.g. `Ingrid, Leeds`.
 
 ### 7. Write to us
 

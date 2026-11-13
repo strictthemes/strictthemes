@@ -2,24 +2,17 @@ import { useEffect, useRef, useState } from "react"
 import { Bike, Clock, IdCard, Smartphone } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-
-const focusRing =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const textLink = cn(
-  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusRing
-)
-
-const headerLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-
-const buttonClasses = "h-auto rounded-md px-5 py-2 font-mono text-label"
 
 const BOOKING_REFERENCE = "KF-7Q4M2R"
+
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const headerLink = `text-foreground decoration-1 underline-offset-4 hover:underline transition-colors duration-150 ${focusOutline}`
+
+const textLink = `text-primary underline decoration-1 underline-offset-4 hover:text-foreground transition-colors duration-150 ${focusOutline}`
+
+const buttonClasses = "h-auto rounded-md px-5 py-2 font-mono text-label"
 
 const navLinks = [
   { label: "Book", href: "/" },
@@ -51,25 +44,21 @@ function ConfirmedState() {
   )
 }
 
-function SiteHeader() {
+function Header() {
   return (
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-[1120px] flex-col items-start gap-2 px-5 py-5 md:flex-row md:items-center md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", headerLink)}>
+        <a href="/" className={`font-heading text-h2 ${headerLink}`}>
           Kestrel Ferries
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             {navLinks.map((link) => (
-              <li key={link.label}>
+              <li key={link.href}>
                 <a
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
-                  className={cn(
-                    "text-body",
-                    headerLink,
-                    link.current && "underline"
-                  )}
+                  className={`text-body ${headerLink} ${link.current ? "underline" : ""}`}
                 >
                   {link.label}
                 </a>
@@ -82,14 +71,14 @@ function SiteHeader() {
   )
 }
 
-function SiteFooter() {
+function Footer() {
   return (
     <footer className="mt-16 border-t bg-card">
       <div className="mx-auto max-w-[1120px] px-5 py-8">
-        <div className="grid gap-5 md:grid-cols-12 md:items-start">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start">
           <div className="md:col-span-6">
             <p className="font-heading text-h2">Kestrel Ferries</p>
-            <p className="mt-2 text-body">
+            <p className="mt-2 max-w-xl">
               Crossings from Harrowmouth to Port Ellery, Brindle Ness, Wrenholm
               and Tollan Quay since 1987.
             </p>
@@ -98,7 +87,7 @@ function SiteFooter() {
             <p className="font-mono text-label text-muted-foreground">
               Customer desk
             </p>
-            <p className="mt-2 text-body">
+            <p className="mt-2 max-w-xl text-body">
               <a href="tel:+441632960512" className={textLink}>
                 01632 960 512
               </a>
@@ -116,6 +105,42 @@ function SiteFooter() {
     </footer>
   )
 }
+
+function Journey({ className }: { className?: string }) {
+  return (
+    <div className={`flex items-center gap-3 ${className ?? ""}`}>
+      <div className="shrink-0">
+        <p className="font-mono text-h2 text-foreground tabular-nums">
+          <time dateTime="09:15">09:15</time>
+        </p>
+        <p className="mt-1 font-mono text-label text-muted-foreground">
+          Harrowmouth
+        </p>
+      </div>
+      <div className="min-w-0 flex-1 text-center">
+        <p className="font-mono text-label text-muted-foreground">1 h 45 min</p>
+        <div aria-hidden="true" className="mt-1 h-px bg-border" />
+        <p className="mt-1 font-mono text-label text-muted-foreground">
+          Direct
+        </p>
+      </div>
+      <div className="shrink-0 text-right">
+        <p className="font-mono text-h2 text-foreground tabular-nums">
+          <time dateTime="11:00">11:00</time>
+        </p>
+        <p className="mt-1 font-mono text-label text-muted-foreground">
+          Port Ellery
+        </p>
+      </div>
+    </div>
+  )
+}
+
+const dlRow =
+  "flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0"
+const dtClass = "shrink-0 font-mono text-label text-muted-foreground"
+const ddClass = "min-w-0 text-right text-body text-foreground"
+const ddLabel = "min-w-0 text-right font-mono text-label text-foreground"
 
 function BoardingCode() {
   return (
@@ -139,20 +164,24 @@ function BoardingCode() {
 }
 
 function Ticket() {
-  const [copyStatus, setCopyStatus] = useState("")
-  const clearTimer = useRef<number | undefined>(undefined)
+  const [copyMessage, setCopyMessage] = useState("")
+  const timer = useRef<number | undefined>(undefined)
 
-  useEffect(() => () => window.clearTimeout(clearTimer.current), [])
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+
+  function showMessage(message: string) {
+    window.clearTimeout(timer.current)
+    setCopyMessage(message)
+    timer.current = window.setTimeout(() => setCopyMessage(""), 4000)
+  }
 
   async function copyReference() {
-    window.clearTimeout(clearTimer.current)
     try {
       await navigator.clipboard.writeText(BOOKING_REFERENCE)
-      setCopyStatus("Copied")
+      showMessage("Copied")
     } catch {
-      setCopyStatus("Copy failed: select the reference and copy it.")
+      showMessage("Copy failed: select the reference and copy it.")
     }
-    clearTimer.current = window.setTimeout(() => setCopyStatus(""), 4000)
   }
 
   return (
@@ -180,7 +209,7 @@ function Ticket() {
               {BOOKING_REFERENCE}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center">
             <Button
               variant="outline"
               className={buttonClasses}
@@ -192,101 +221,56 @@ function Ticket() {
               role="status"
               className="font-mono text-label text-foreground"
             >
-              {copyStatus}
+              {copyMessage && <span className="ml-3">{copyMessage}</span>}
             </span>
           </div>
         </div>
 
-        <div className="mt-5 flex items-center gap-3">
-          <div className="shrink-0">
-            <p className="font-mono text-h2 text-foreground tabular-nums">
-              <time dateTime="09:15">09:15</time>
-            </p>
-            <p className="mt-1 font-mono text-label text-muted-foreground">
-              Harrowmouth
-            </p>
-          </div>
-          <div className="min-w-0 flex-1 text-center">
-            <p className="font-mono text-label text-muted-foreground">
-              1 h 45 min
-            </p>
-            <div aria-hidden="true" className="mt-1 h-px bg-border" />
-            <p className="mt-1 font-mono text-label text-muted-foreground">
-              Direct
-            </p>
-          </div>
-          <div className="shrink-0 text-right">
-            <p className="font-mono text-h2 text-foreground tabular-nums">
-              <time dateTime="11:00">11:00</time>
-            </p>
-            <p className="mt-1 font-mono text-label text-muted-foreground">
-              Port Ellery
-            </p>
-          </div>
-        </div>
+        <Journey className="mt-5" />
 
-        <dl className="mt-5 divide-y">
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Date
-            </dt>
-            <dd className="min-w-0 text-right text-body text-foreground">
+        <dl className="mt-5 divide-y tabular-nums">
+          <div className={dlRow}>
+            <dt className={dtClass}>Date</dt>
+            <dd className={ddClass}>
               <time dateTime="2026-12-19">Saturday 19 December 2026</time>
             </dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Route
-            </dt>
-            <dd className="min-w-0 text-right font-mono text-label text-foreground">
-              HRW–PEL
-            </dd>
+          <div className={dlRow}>
+            <dt className={dtClass}>Route</dt>
+            <dd className={ddLabel}>HRW–PEL</dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Ship
-            </dt>
-            <dd className="min-w-0 text-right text-body text-foreground">
-              MV Isla Grey
-            </dd>
+          <div className={dlRow}>
+            <dt className={dtClass}>Ship</dt>
+            <dd className={ddClass}>MV Isla Grey</dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Berth
-            </dt>
-            <dd className="min-w-0 text-right font-mono text-label text-foreground">
-              2
-            </dd>
+          <div className={dlRow}>
+            <dt className={dtClass}>Berth</dt>
+            <dd className={`${ddLabel} tabular-nums`}>2</dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Check-in closes
-            </dt>
-            <dd className="min-w-0 text-right font-mono text-label text-foreground tabular-nums">
+          <div className={dlRow}>
+            <dt className={dtClass}>Check-in closes</dt>
+            <dd className={`${ddLabel} tabular-nums`}>
               <time dateTime="08:45">08:45</time>
             </dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Passengers
-            </dt>
-            <dd className="min-w-0 text-right text-body text-foreground">
+          <div className={dlRow}>
+            <dt className={dtClass}>Passengers</dt>
+            <dd className={ddClass}>
               <span className="block">Maren Holt</span>
               <span className="block">Tomas Holt</span>
             </dd>
           </div>
-          <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-            <dt className="shrink-0 font-mono text-label text-muted-foreground">
-              Extras
-            </dt>
-            <dd className="min-w-0 text-right text-body text-foreground">
-              2 bicycles
-            </dd>
+          <div className={dlRow}>
+            <dt className={dtClass}>Extras</dt>
+            <dd className={ddClass}>2 bicycles</dd>
           </div>
         </dl>
       </div>
 
-      <div aria-hidden="true" className="relative border-t border-dashed">
+      <div
+        aria-hidden="true"
+        className="relative border-t border-dashed border-border"
+      >
         <div className="absolute top-0 left-0 size-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
         <div className="absolute top-0 right-0 size-5 translate-x-1/2 -translate-y-1/2 rounded-full bg-background" />
       </div>
@@ -297,14 +281,14 @@ function Ticket() {
           <p className="font-mono text-label text-muted-foreground">
             Scan at check-in
           </p>
-          <p className="mt-2 text-body">
+          <p className="mt-2 max-w-xl text-body">
             Show this code at the desk by Berth 2 before{" "}
             <time dateTime="08:45" className="tabular-nums">
               08:45
             </time>
             .
           </p>
-          <p className="mt-2 font-mono text-label text-muted-foreground">
+          <p className="mt-2 font-mono text-label text-muted-foreground tabular-nums">
             2 adults · 2 bicycles
           </p>
         </div>
@@ -313,10 +297,12 @@ function Ticket() {
   )
 }
 
-const bringList = [
+const bringItems = [
   {
     icon: IdCard,
-    text: <>Photo ID for each adult, such as a passport or a driving licence.</>,
+    text: (
+      <>Photo ID for each adult, such as a passport or a driving licence.</>
+    ),
   },
   {
     icon: Smartphone,
@@ -340,22 +326,52 @@ const bringList = [
   },
 ]
 
+function WhatToBring() {
+  return (
+    <aside
+      aria-labelledby="bring-heading"
+      className="rounded-xl border bg-card p-5 md:col-span-4 md:col-start-9"
+    >
+      <p className="font-mono text-label text-muted-foreground">
+        Before you leave home
+      </p>
+      <h2 id="bring-heading" className="mt-2 text-h2">
+        What to bring
+      </h2>
+      <ul className="mt-5 divide-y">
+        {bringItems.map(({ icon: Icon, text }, i) => (
+          <li
+            key={i}
+            className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
+          >
+            <Icon
+              aria-hidden="true"
+              strokeWidth={1.5}
+              className="mt-1 size-4 shrink-0"
+            />
+            <p className="max-w-xl min-w-0 text-body">{text}</p>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
+
 export function App() {
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <SiteHeader />
+      <Header />
 
       <main className="mx-auto max-w-[1120px] px-5">
-        <section className="grid gap-5 pt-8 md:grid-cols-12">
+        <section className="grid grid-cols-1 gap-5 pt-8 md:grid-cols-12">
           <div className="md:col-span-8">
             <p>
               <ConfirmedState />
             </p>
             <h1 className="mt-2 text-h1">Your crossing is booked</h1>
-            <p className="mt-3 max-w-xl text-body">
-              We sent your boarding pass to{" "}
-              <span className="wrap-break-word">maren.holt@mail.example</span>.
-              Show it at check-in on your phone or on paper.
+            <p className="mt-3 max-w-xl text-body wrap-break-word">
+              We sent your boarding pass to maren.holt@mail.example. Show it at
+              check-in on your phone or on paper.
             </p>
             <p className="mt-3 font-mono text-label text-muted-foreground tabular-nums">
               Booked on{" "}
@@ -365,7 +381,7 @@ export function App() {
           </div>
         </section>
 
-        <section className="mt-16 grid gap-5 md:grid-cols-12 md:items-start">
+        <section className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-12 md:items-start">
           <div className="md:col-span-7">
             <Ticket />
             <div className="mt-5 flex flex-wrap items-center gap-5">
@@ -381,69 +397,33 @@ export function App() {
               </a>
             </div>
           </div>
-
-          <aside
-            aria-labelledby="bring-heading"
-            className="rounded-xl border bg-card p-5 md:col-span-4 md:col-start-9"
-          >
-            <p className="font-mono text-label text-muted-foreground">
-              Before you leave home
-            </p>
-            <h2 id="bring-heading" className="mt-2 text-h2">
-              What to bring
-            </h2>
-            <ul className="mt-5 divide-y">
-              {bringList.map(({ icon: Icon, text }, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-3 py-3 first:pt-0 last:pb-0"
-                >
-                  <Icon
-                    aria-hidden="true"
-                    strokeWidth={1.5}
-                    className="mt-1 size-4 shrink-0"
-                  />
-                  <p className="text-body">{text}</p>
-                </li>
-              ))}
-            </ul>
-          </aside>
+          <WhatToBring />
         </section>
 
-        <section className="mt-16 grid gap-5 md:grid-cols-12">
+        <section className="mt-16 grid grid-cols-1 gap-5 md:grid-cols-12">
           <div className="md:col-span-8">
             <h2 className="text-h2">Change or cancel</h2>
             <p className="mt-3 max-w-xl text-body">
-              Make changes and cancellations from this page or at the desk by
-              Berth 2; we charge or refund any difference in fare.
+              Make changes or ask for a refund from this page or at the desk;
+              any difference in fare is charged or refunded to your card.
             </p>
-            <dl className="mt-5 divide-y">
-              <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-                <dt className="shrink-0 font-mono text-label text-muted-foreground">
-                  Change up to 24 hours before
-                </dt>
-                <dd className="min-w-0 text-right font-mono text-label text-foreground tabular-nums">
-                  £10.00
-                </dd>
+            <dl className="mt-5 divide-y tabular-nums">
+              <div className={dlRow}>
+                <dt className={dtClass}>Change up to 24 hours before</dt>
+                <dd className={`${ddLabel} tabular-nums`}>£10.00</dd>
               </div>
-              <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-                <dt className="shrink-0 font-mono text-label text-muted-foreground">
-                  Cancel up to 7 days before
-                </dt>
-                <dd className="min-w-0 text-right font-mono text-label text-foreground tabular-nums">
+              <div className={dlRow}>
+                <dt className={dtClass}>Cancel up to 7 days before</dt>
+                <dd className={`${ddLabel} tabular-nums`}>
                   Refund less £15.00
                 </dd>
               </div>
-              <div className="flex items-baseline justify-between gap-5 py-2 first:pt-0 last:pb-0">
-                <dt className="shrink-0 font-mono text-label text-muted-foreground">
-                  Cancel later
-                </dt>
-                <dd className="min-w-0 text-right font-mono text-label text-foreground">
-                  No refund
-                </dd>
+              <div className={dlRow}>
+                <dt className={dtClass}>Cancel later</dt>
+                <dd className={ddLabel}>No refund</dd>
               </div>
             </dl>
-            <p className="mt-5">
+            <p className="mt-5 max-w-xl text-body">
               <a href="#" className={textLink}>
                 Change this booking
               </a>
@@ -452,7 +432,7 @@ export function App() {
         </section>
       </main>
 
-      <SiteFooter />
+      <Footer />
     </div>
   )
 }

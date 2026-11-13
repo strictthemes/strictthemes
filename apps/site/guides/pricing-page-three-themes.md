@@ -17,9 +17,9 @@ Each of the 23 Strict themes has five page prompts. We take three themes whose p
 
 | Theme | Made for | Its pricing page | Prompt |
 |---|---|---|---|
-| [Strict One](/themes/strict-one/) | Software products, editorial sites | Pricing: three plans, a monthly and yearly switch, a comparison table, a FAQ | 5,868 words |
-| [Primer](/themes/primer/) | Courses, schools, learning tools | Plans: three plans, a yearly switch, a comparison, questions | 7,494 words |
-| [Solace](/themes/solace/) | Therapists, coaches, private practices | Fees: a table of session fees, cancelling and paying, questions | 8,397 words |
+| [Strict One](/themes/strict-one/) | Software products, editorial sites | Pricing: three plans, a monthly and yearly switch, a comparison table, a FAQ | 6,440 words |
+| [Primer](/themes/primer/) | Courses, schools, learning tools | Plans: three plans, a yearly switch, a comparison, questions | 8,012 words |
+| [Solace](/themes/solace/) | Therapists, coaches, private practices | Fees: a table of session fees, cancelling and paying, questions | 8,907 words |
 
 The word counts are of the prompt as the site serves it, counted with `curl -s <address> | wc -w`. They are long on purpose, and the next section says what the words are spent on.
 
@@ -57,9 +57,9 @@ Every example page on the site was checked with Strict Check, and the result is 
 
 | Page | Values measured | On the theme | Errors | Warnings |
 |---|---|---|---|---|
-| Strict One, pricing | 6,632 | 100% | 0 | 0 |
-| Primer, plans | 5,099 | 100% | 0 | 0 |
-| Solace, fees | 4,400 | 100% | 0 | 0 |
+| Strict One, pricing | 6,687 | 100% | 0 | 0 |
+| Primer, plans | 5,093 | 100% | 0 | 0 |
+| Solace, fees | 4,399 | 100% | 0 | 0 |
 
 A "value" is one measured property of one element: a text color, a font size, a padding, a corner, a contrast ratio. The check opens the built page in light and dark mode, at 1280px and 375px.
 

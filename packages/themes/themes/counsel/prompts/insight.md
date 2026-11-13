@@ -35,7 +35,7 @@ A section in the grid, with two parts. The list of sections comes first in the c
 **On this page**, in columns 9–12 (`md:col-start-9 md:col-span-4 md:row-start-1`): a `<nav>` with `aria-labelledby` naming its label heading, and no `aria-label`:
 
 - A label heading "On this page", an `<h2>` with an `id`.
-- With `mt-4`, an `<ol>` with `list-none`, no padding, `mt-2` between items, holding four links in `text-body`, styled as titles that are links, one for each `<h2>` of the text below, with the same words.
+- With `mt-4`, an `<ol>` with no markers and no padding, `mt-2` between items, holding four links in `text-body`, styled as titles that are links, one for each `<h2>` of the text below, with the same words.
 
 **The text**, in columns 1–7 (`md:col-span-7 md:row-start-1`), with `mt-14 md:mt-0`: one `<div>` in normal block flow. Every paragraph, list, the In brief card and the pull quote's `<blockquote>` is at most `max-w-xl`, so their right edges line up. Inside it, in this order:
 
@@ -61,7 +61,7 @@ A section in the grid, with two parts:
 A section that is not a grid:
 
 - An `<h2>` in `text-h2`: "Related briefings".
-- With `mt-8`, a `<ul>` as a list of entries, three entries, each with `py-8`. Each `<li>` is also `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`: in columns 1–3 (`md:col-span-3`) a label line in `text-muted-foreground` with the date as a `<time>` and the reading time, `29 October 2026 · 6 min read`; in columns 4–12 (`md:col-span-9`), with `mt-2 md:mt-0`, the title as an `<h3>` in `text-h2` holding a link to `#`, styled as a title that is a link, then with `mt-2` a label line in `text-muted-foreground` with the author and the practice area, `David Achterberg · Commercial disputes`.
+- With `mt-8`, a `<ul>` as a list of entries, three entries, each with `py-8`. Each `<li>` is also `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`: in columns 1–3 (`md:col-span-3`) a label line in `text-muted-foreground` with the date as a `<time>` and the reading time, `29 October 2026 · 6 min read`; in columns 4–12 (`md:col-span-9`), with `mt-2 md:mt-0`, one `<div>` that is the grid item, holding the title as an `<h3>` in `text-h2` holding a link to `#`, styled as a title that is a link, then with `mt-2` a label line in `text-muted-foreground` with the author and the practice area, `David Achterberg · Commercial disputes`.
 
   Entries, newest first: "Freezing orders: the first forty-eight hours" (29 October 2026, 6 min read, David Achterberg, Commercial disputes); "Break clauses in a commercial lease: getting the notice right" (1 October 2026, 5 min read, Thomas Kerridge, Real estate); "Earn-outs that end in dispute" (17 September 2026, 6 min read, Ruth Calloway, Commercial disputes).
 - With `mt-8`, an onward link from the layout notes: "All briefings", to `#`.

@@ -1,26 +1,43 @@
-import { useId, useState, type ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-// The sample's now: Tuesday 8 June 2027 at 20:05. The data below is as it
-// stands at that moment; nothing on the page reads the device clock.
+// The sample's "now" is fixed: Tuesday 8 June 2027 at 20:05. Nothing ticks.
 
-type TeamId = "first" | "reserves" | "u18"
+type Club = { letters: string; ground: string }
+
+const CLUBS: Record<string, Club> = {
+  "Wendmoor FC": { letters: "W", ground: "Millrace Park" },
+  "Castlebrook United": { letters: "CU", ground: "Castle Meadow" },
+  "Dunmarsh Athletic": { letters: "DA", ground: "The Saltings" },
+  "Otterby Town": { letters: "OT", ground: "Weir Lane" },
+  "Stenwick Albion": { letters: "SA", ground: "Albion Field" },
+  "Kirkfen Rangers": { letters: "KR", ground: "Fen Road" },
+  "Lowmere Welfare": { letters: "LW", ground: "Welfare Ground" },
+  "Pellow Green": { letters: "PG", ground: "The Green" },
+  Hollinvale: { letters: "H", ground: "Hollin Bank" },
+  "Tarrowby United": { letters: "TU", ground: "Station Road" },
+  Sedgeholme: { letters: "S", ground: "Sedge Lane" },
+  "Eastlow Wanderers": { letters: "EW", ground: "Quarry Lane" },
+}
+
+const HOME_GROUND = "Millrace Park"
+
 type Side = "home" | "away" | "neutral"
 
-type Club = { name: string; crest: string; ground: string }
-
 type Match = {
-  date: string // ISO date, e.g. "2027-06-05"
-  club: string // key into CLUBS
+  date: string // ISO date
+  club: string // a key of CLUBS
   side: Side
-  kickOff: string // 24-hour clock
+  kickoff: string // 24-hour clock
   score?: [number, number] // Wendmoor FC's goals first
-  liveMinute?: number // set only on the match being played
+  live?: { score: [number, number]; minute: number }
   round?: string
-  venue?: string // overrides the usual ground (neutral matches)
+  venue?: string // only for a neutral ground
 }
+
+type TeamId = "first" | "reserves" | "u18"
 
 type Team = {
   id: TeamId
@@ -29,49 +46,15 @@ type Team = {
   matches: Match[]
 }
 
-const HOME_GROUND = "Millrace Park"
-
-const CLUBS: Record<string, Club> = {
-  CU: { name: "Castlebrook United", crest: "CU", ground: "Castle Meadow" },
-  DA: { name: "Dunmarsh Athletic", crest: "DA", ground: "The Saltings" },
-  OT: { name: "Otterby Town", crest: "OT", ground: "Weir Lane" },
-  SA: { name: "Stenwick Albion", crest: "SA", ground: "Albion Field" },
-  KR: { name: "Kirkfen Rangers", crest: "KR", ground: "Fen Road" },
-  LW: { name: "Lowmere Welfare", crest: "LW", ground: "Welfare Ground" },
-  PG: { name: "Pellow Green", crest: "PG", ground: "The Green" },
-  H: { name: "Hollinvale", crest: "H", ground: "Hollin Bank" },
-  TU: { name: "Tarrowby United", crest: "TU", ground: "Station Road" },
-  S: { name: "Sedgeholme", crest: "S", ground: "Sedge Lane" },
-  EW: { name: "Eastlow Wanderers", crest: "EW", ground: "Quarry Lane" },
-}
-
-function league(
+function m(
   date: string,
   club: string,
   side: Side,
-  score?: [number, number]
-): Match {
-  return { date, club, side, kickOff: "15:00", score }
-}
-
-function reserves(
-  date: string,
-  club: string,
-  side: Side,
+  kickoff: string,
   score?: [number, number],
-  liveMinute?: number
+  extra: Partial<Match> = {}
 ): Match {
-  return { date, club, side, kickOff: "19:30", score, liveMinute }
-}
-
-function youth(
-  date: string,
-  club: string,
-  side: Side,
-  score?: [number, number],
-  extra?: Partial<Match>
-): Match {
-  return { date, club, side, kickOff: "10:30", score, ...extra }
+  return { date, club, side, kickoff, score, ...extra }
 }
 
 const TEAMS: Team[] = [
@@ -80,28 +63,28 @@ const TEAMS: Team[] = [
     name: "First team",
     suffix: "",
     matches: [
-      league("2027-03-06", "KR", "away", [1, 1]),
-      league("2027-03-13", "TU", "home", [1, 0]),
-      league("2027-03-20", "OT", "away", [0, 3]),
-      league("2027-03-27", "CU", "home", [4, 2]),
-      league("2027-04-03", "SA", "away", [3, 2]),
-      league("2027-04-10", "S", "home", [2, 4]),
-      league("2027-04-17", "DA", "away", [2, 2]),
-      league("2027-04-24", "EW", "home", [3, 0]),
-      league("2027-05-01", "H", "away", [1, 1]),
-      league("2027-05-08", "LW", "home", [2, 0]),
-      league("2027-05-15", "PG", "away", [1, 3]),
-      league("2027-05-22", "KR", "home", [2, 0]),
-      league("2027-05-29", "TU", "away", [5, 0]),
-      league("2027-06-05", "OT", "home", [3, 1]),
-      league("2027-06-12", "CU", "away"),
-      league("2027-06-19", "SA", "home"),
-      league("2027-06-26", "S", "away"),
-      league("2027-07-03", "DA", "home"),
-      league("2027-07-10", "EW", "away"),
-      league("2027-07-17", "H", "home"),
-      league("2027-07-24", "LW", "away"),
-      league("2027-07-31", "PG", "home"),
+      m("2027-03-06", "Kirkfen Rangers", "away", "15:00", [1, 1]),
+      m("2027-03-13", "Tarrowby United", "home", "15:00", [1, 0]),
+      m("2027-03-20", "Otterby Town", "away", "15:00", [0, 3]),
+      m("2027-03-27", "Castlebrook United", "home", "15:00", [4, 2]),
+      m("2027-04-03", "Stenwick Albion", "away", "15:00", [3, 2]),
+      m("2027-04-10", "Sedgeholme", "home", "15:00", [2, 4]),
+      m("2027-04-17", "Dunmarsh Athletic", "away", "15:00", [2, 2]),
+      m("2027-04-24", "Eastlow Wanderers", "home", "15:00", [3, 0]),
+      m("2027-05-01", "Hollinvale", "away", "15:00", [1, 1]),
+      m("2027-05-08", "Lowmere Welfare", "home", "15:00", [2, 0]),
+      m("2027-05-15", "Pellow Green", "away", "15:00", [1, 3]),
+      m("2027-05-22", "Kirkfen Rangers", "home", "15:00", [2, 0]),
+      m("2027-05-29", "Tarrowby United", "away", "15:00", [5, 0]),
+      m("2027-06-05", "Otterby Town", "home", "15:00", [3, 1]),
+      m("2027-06-12", "Castlebrook United", "away", "15:00"),
+      m("2027-06-19", "Stenwick Albion", "home", "15:00"),
+      m("2027-06-26", "Sedgeholme", "away", "15:00"),
+      m("2027-07-03", "Dunmarsh Athletic", "home", "15:00"),
+      m("2027-07-10", "Eastlow Wanderers", "away", "15:00"),
+      m("2027-07-17", "Hollinvale", "home", "15:00"),
+      m("2027-07-24", "Lowmere Welfare", "away", "15:00"),
+      m("2027-07-31", "Pellow Green", "home", "15:00"),
     ],
   },
   {
@@ -109,14 +92,16 @@ const TEAMS: Team[] = [
     name: "Reserves",
     suffix: " Reserves",
     matches: [
-      reserves("2027-05-18", "SA", "away", [2, 2]),
-      reserves("2027-05-25", "LW", "home", [3, 1]),
-      reserves("2027-06-01", "DA", "away", [0, 2]),
-      reserves("2027-06-08", "S", "home", [1, 0], 35),
-      reserves("2027-06-15", "CU", "away"),
-      reserves("2027-06-22", "PG", "home"),
-      reserves("2027-06-29", "KR", "away"),
-      reserves("2027-07-06", "OT", "home"),
+      m("2027-05-18", "Stenwick Albion", "away", "19:30", [2, 2]),
+      m("2027-05-25", "Lowmere Welfare", "home", "19:30", [3, 1]),
+      m("2027-06-01", "Dunmarsh Athletic", "away", "19:30", [0, 2]),
+      m("2027-06-08", "Sedgeholme", "home", "19:30", undefined, {
+        live: { score: [1, 0], minute: 35 },
+      }),
+      m("2027-06-15", "Castlebrook United", "away", "19:30"),
+      m("2027-06-22", "Pellow Green", "home", "19:30"),
+      m("2027-06-29", "Kirkfen Rangers", "away", "19:30"),
+      m("2027-07-06", "Otterby Town", "home", "19:30"),
     ],
   },
   {
@@ -124,15 +109,14 @@ const TEAMS: Team[] = [
     name: "Under 18s",
     suffix: " U18",
     matches: [
-      youth("2027-05-23", "CU", "home", [1, 1]),
-      youth("2027-05-30", "PG", "away", [2, 1], {
+      m("2027-05-23", "Castlebrook United", "home", "10:30", [1, 1]),
+      m("2027-05-30", "Pellow Green", "away", "10:30", [2, 1], {
         round: "County Youth Cup semi-final",
       }),
-      youth("2027-06-06", "KR", "home", [4, 0]),
-      youth("2027-06-13", "SA", "away"),
-      youth("2027-06-20", "OT", "home"),
-      youth("2027-06-27", "DA", "neutral", undefined, {
-        kickOff: "14:00",
+      m("2027-06-06", "Kirkfen Rangers", "home", "10:30", [4, 0]),
+      m("2027-06-13", "Stenwick Albion", "away", "10:30"),
+      m("2027-06-20", "Otterby Town", "home", "10:30"),
+      m("2027-06-27", "Dunmarsh Athletic", "neutral", "14:00", undefined, {
         venue: "Castle Meadow",
         round: "County Youth Cup final",
       }),
@@ -140,8 +124,22 @@ const TEAMS: Team[] = [
   },
 ]
 
-const DAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"]
-const MONTHS = [
+const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const MONTHS_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+]
+const MONTHS_LONG = [
   "January",
   "February",
   "March",
@@ -157,22 +155,27 @@ const MONTHS = [
 ]
 
 function parseDate(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number)
-  return { y, m, d, weekday: new Date(Date.UTC(y, m - 1, d)).getUTCDay() }
+  const [y, mo, d] = iso.split("-").map(Number)
+  return {
+    year: y,
+    month: mo - 1,
+    day: d,
+    weekday: new Date(Date.UTC(y, mo - 1, d)).getUTCDay(),
+  }
 }
 
-function dateLabel(iso: string) {
-  const { m, d, weekday } = parseDate(iso)
-  return `${DAYS[weekday]} ${d} ${MONTHS[m - 1].slice(0, 3).toUpperCase()}`
+function shortDate(iso: string) {
+  const { day, month, weekday } = parseDate(iso)
+  return `${DAYS[weekday]} ${day} ${MONTHS_SHORT[month]}`
 }
 
-const isLive = (m: Match) => m.liveMinute !== undefined
-const isPlayed = (m: Match) => m.score !== undefined && !isLive(m)
-const isToCome = (m: Match) => m.score === undefined && !isLive(m)
+function score([a, b]: [number, number]) {
+  return `${a}–${b}`
+}
 
-function outcome([us, them]: [number, number]) {
-  if (us > them) return "Won"
-  if (us < them) return "Lost"
+function outcome([a, b]: [number, number]) {
+  if (a > b) return "Won"
+  if (a < b) return "Lost"
   return "Drew"
 }
 
@@ -180,71 +183,56 @@ function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`
 }
 
-function counts(team: Team) {
+function summarise(team: Team) {
   const total = team.matches.length
-  const played = team.matches.filter(isPlayed).length
-  const live = team.matches.filter(isLive).length
-  const toCome = team.matches.filter(isToCome).length
-  return { total, played, live, toCome }
-}
-
-function countParts(team: Team) {
-  const c = counts(team)
-  const parts = [plural(c.total, "match", "matches"), `${c.played} played`]
-  if (c.live > 0) parts.push(`${c.live} live`)
-  parts.push(`${c.toCome} to come`)
-  return parts
-}
-
-function countLabel(team: Team) {
-  return countParts(team).join(" · ")
-}
-
-function countSentence(team: Team) {
-  return `${team.name}: ${countParts(team).join(", ")}.`
+  const played = team.matches.filter((x) => x.score).length
+  const live = team.matches.filter((x) => x.live).length
+  const toCome = total - played - live
+  const parts = [
+    plural(total, "match", "matches"),
+    `${played} played`,
+    ...(live > 0 ? [`${live} live`] : []),
+    `${toCome} to come`,
+  ]
+  return {
+    label: parts.join(" · "),
+    sentence: `${team.name}: ${parts.join(", ")}.`,
+  }
 }
 
 function record(team: Team) {
   const r = { played: 0, won: 0, drawn: 0, lost: 0, for: 0, against: 0 }
-  for (const m of team.matches) {
-    if (!isPlayed(m) || !m.score) continue
-    const [us, them] = m.score
+  for (const x of team.matches) {
+    if (!x.score) continue
+    const [a, b] = x.score
     r.played += 1
-    r.for += us
-    r.against += them
-    if (us > them) r.won += 1
-    else if (us < them) r.lost += 1
+    r.for += a
+    r.against += b
+    if (a > b) r.won += 1
+    else if (a < b) r.lost += 1
     else r.drawn += 1
   }
   return r
 }
 
-function groupByMonth(matches: Match[]) {
-  const groups: { key: string; title: string; matches: Match[] }[] = []
-  const sorted = [...matches].sort((a, b) => a.date.localeCompare(b.date))
-  for (const match of sorted) {
-    const { y, m } = parseDate(match.date)
-    const key = `${y}-${m}`
-    let group = groups.find((g) => g.key === key)
-    if (!group) {
-      group = { key, title: `${MONTHS[m - 1]} ${y}`, matches: [] }
-      groups.push(group)
-    }
-    group.matches.push(match)
-  }
-  return groups
+function marks(team: Team) {
+  let latest = -1
+  team.matches.forEach((x, i) => {
+    if (x.score) latest = i
+  })
+  const live = team.matches.findIndex((x) => x.live)
+  const next = team.matches.findIndex((x) => !x.score && !x.live)
+  return { latest, live, next }
 }
 
 const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const BAND_FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-foreground"
-const LABEL = "font-mono text-label uppercase"
-const LABEL_LINK = cn(
-  LABEL,
-  "text-foreground underline underline-offset-4 hover:decoration-2",
-  FOCUS
-)
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2"
+const FOCUS_PAGE = `${FOCUS} focus-visible:outline-ring`
+const FOCUS_BAND = `${FOCUS} focus-visible:outline-navy-foreground`
+
+const BADGE =
+  "inline-flex shrink-0 items-center rounded-sm bg-tertiary px-2 py-1 font-mono text-label uppercase whitespace-nowrap text-tertiary-foreground"
+
 const BUTTON = "h-auto px-5 py-2 font-mono text-label uppercase"
 
 const NAV = [
@@ -254,21 +242,13 @@ const NAV = [
   { label: "Membership", href: "/membership" },
 ]
 
-function Badge({ children }: { children: string }) {
-  return (
-    <span className="inline-flex shrink-0 items-center rounded-sm bg-tertiary px-2 py-1 font-mono text-label whitespace-nowrap text-tertiary-foreground uppercase">
-      {children}
-    </span>
-  )
-}
-
 function Header() {
   return (
     <header className="border-b border-border bg-navy text-navy-foreground">
       <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-x-8 gap-y-1 px-5 py-3">
         <a
           href="/"
-          className={cn("group inline-flex items-center gap-3", BAND_FOCUS)}
+          className={cn("group inline-flex items-center gap-3", FOCUS_BAND)}
         >
           <span
             aria-hidden="true"
@@ -292,7 +272,7 @@ function Header() {
                     className={cn(
                       "inline-flex h-10 items-center font-mono text-label uppercase underline-offset-4 hover:underline",
                       current && "underline decoration-2",
-                      BAND_FOCUS
+                      FOCUS_BAND
                     )}
                   >
                     {link.label}
@@ -316,14 +296,20 @@ function Footer() {
           <ul className="flex flex-wrap gap-x-5 gap-y-2">
             {NAV.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className={LABEL_LINK}>
+                <a
+                  href={link.href}
+                  className={cn(
+                    "font-mono text-label text-foreground uppercase underline underline-offset-4 hover:decoration-2",
+                    FOCUS_PAGE
+                  )}
+                >
                   {link.label}
                 </a>
               </li>
             ))}
           </ul>
         </nav>
-        <p className={cn(LABEL, "text-muted-foreground")}>
+        <p className="font-mono text-label text-muted-foreground uppercase">
           © 2027 Wendmoor Football Club · Millrace Park, Wendmoor · A demo:
           nothing is sent or stored
         </p>
@@ -332,31 +318,45 @@ function Footer() {
   )
 }
 
-type RowProps = {
-  match: Match
+function MatchRow({
+  team,
+  match,
+  first,
+  badge,
+  marked,
+  report,
+}: {
   team: Team
+  match: Match
   first: boolean
-  isNext: boolean
   badge?: "Final" | "Live"
-  reportLink: boolean
-}
-
-function MatchRow({ match, team, first, isNext, badge, reportLink }: RowProps) {
+  marked: boolean
+  report: boolean
+}) {
   const club = CLUBS[match.club]
   const venue =
-    match.venue ?? (match.side === "home" ? HOME_GROUND : club.ground)
-  const muted = isNext ? undefined : "text-muted-foreground"
+    match.side === "home"
+      ? HOME_GROUND
+      : match.side === "away"
+        ? club.ground
+        : (match.venue ?? club.ground)
+  const sideLabel =
+    match.side === "home" ? "Home" : match.side === "away" ? "Away" : "Neutral"
+  const muted = marked ? "" : "text-muted-foreground"
 
   let figure: ReactNode
-  let label: string
-  if (match.score) {
-    figure = `${match.score[0]}–${match.score[1]}`
-    label = isLive(match) ? `${match.liveMinute}'` : outcome(match.score)
+  let note: string
+  if (match.live) {
+    figure = score(match.live.score)
+    note = `${match.live.minute}'`
+  } else if (match.score) {
+    figure = score(match.score)
+    note = outcome(match.score)
   } else {
     figure = (
-      <time dateTime={`${match.date}T${match.kickOff}`}>{match.kickOff}</time>
+      <time dateTime={`${match.date}T${match.kickoff}`}>{match.kickoff}</time>
     )
-    label = "Kick-off"
+    note = "Kick-off"
   }
 
   return (
@@ -364,7 +364,7 @@ function MatchRow({ match, team, first, isNext, badge, reportLink }: RowProps) {
       className={cn(
         "flex items-center justify-between gap-5 px-5 py-3",
         !first && "border-t border-border",
-        isNext && "bg-ice text-ice-foreground"
+        marked && "bg-ice text-ice-foreground"
       )}
     >
       <div className="flex min-w-0 items-center gap-3">
@@ -372,53 +372,78 @@ function MatchRow({ match, team, first, isNext, badge, reportLink }: RowProps) {
           aria-hidden="true"
           className={cn(
             "hidden size-8 shrink-0 items-center justify-center rounded-full font-mono text-label md:flex",
-            isNext
+            marked
               ? "bg-navy text-navy-foreground"
               : "bg-ice text-ice-foreground"
           )}
         >
-          {club.crest}
+          {club.letters}
         </span>
         <div className="flex min-w-0 flex-col gap-1">
-          <div className={cn("flex flex-wrap gap-x-3 gap-y-1", LABEL, muted)}>
-            <time dateTime={match.date}>{dateLabel(match.date)}</time>
-            <span>{match.side}</span>
+          <div
+            className={cn(
+              "flex flex-wrap gap-x-3 gap-y-1 font-mono text-label uppercase tabular-nums",
+              muted
+            )}
+          >
+            <time dateTime={match.date}>{shortDate(match.date)}</time>
+            <span>{sideLabel}</span>
             <span>{venue}</span>
             {match.round && <span>{match.round}</span>}
-            {reportLink && (
-              <a href="/report" className={LABEL_LINK}>
+            {report && (
+              <a
+                href="/report"
+                className={cn(
+                  "text-foreground underline underline-offset-4 hover:decoration-2",
+                  FOCUS_PAGE
+                )}
+              >
                 Match report
               </a>
             )}
           </div>
           <p className="font-heading text-body font-bold uppercase">
-            {club.name}
+            {match.club}
             {team.suffix}
           </p>
         </div>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-1">
         <div className="flex items-center gap-3">
-          {badge && <Badge>{badge}</Badge>}
+          {badge && <span className={BADGE}>{badge}</span>}
           <p className="font-heading text-h2 tabular-nums">{figure}</p>
         </div>
-        <p className={cn(LABEL, muted)}>{label}</p>
+        <p className={cn("font-mono text-label uppercase tabular-nums", muted)}>
+          {note}
+        </p>
       </div>
     </li>
   )
 }
 
 function Matches({ team }: { team: Team }) {
-  const baseId = useId()
-  const played = team.matches.filter(isPlayed)
-  const latest = played[played.length - 1]
-  const live = team.matches.find(isLive)
-  const next = team.matches.find(isToCome)
+  const { latest, live, next } = marks(team)
+  const months: {
+    key: string
+    title: string
+    items: { match: Match; index: number }[]
+  }[] = []
+  team.matches.forEach((match, index) => {
+    const { year, month } = parseDate(match.date)
+    const key = `${year}-${String(month + 1).padStart(2, "0")}`
+    let group = months.find((g) => g.key === key)
+    if (!group) {
+      group = { key, title: `${MONTHS_LONG[month]} ${year}`, items: [] }
+      months.push(group)
+    }
+    group.items.push({ match, index })
+  })
+  months.sort((a, b) => a.key.localeCompare(b.key))
 
   return (
     <div className="flex min-w-0 flex-col gap-8 lg:col-span-8">
-      {groupByMonth(team.matches).map((group) => {
-        const headingId = `${baseId}-${group.key}`
+      {months.map((group) => {
+        const headingId = `month-${team.id}-${group.key}`
         return (
           <section
             key={group.key}
@@ -429,22 +454,19 @@ function Matches({ team }: { team: Team }) {
               {group.title}
             </h2>
             <ul className="overflow-hidden rounded-xl border border-border bg-card">
-              {group.matches.map((match, i) => {
-                const badge =
-                  match === live
-                    ? "Live"
-                    : !live && match === latest
-                      ? "Final"
-                      : undefined
+              {group.items.map(({ match, index }, i) => {
+                let badge: "Final" | "Live" | undefined
+                if (live >= 0) badge = index === live ? "Live" : undefined
+                else badge = index === latest ? "Final" : undefined
                 return (
                   <MatchRow
                     key={match.date}
-                    match={match}
                     team={team}
+                    match={match}
                     first={i === 0}
-                    isNext={match === next}
                     badge={badge}
-                    reportLink={team.id === "first" && match === latest}
+                    marked={index === next}
+                    report={team.id === "first" && index === latest}
                   />
                 )
               })}
@@ -458,7 +480,7 @@ function Matches({ team }: { team: Team }) {
 
 function Record({ team }: { team: Team }) {
   const r = record(team)
-  const items: [string, number][] = [
+  const figures: [string, number][] = [
     ["Played", r.played],
     ["Won", r.won],
     ["Drawn", r.drawn],
@@ -475,32 +497,35 @@ function Record({ team }: { team: Team }) {
         <h2 id="record-heading" className="text-h2 uppercase">
           Record
         </h2>
-        <p className={cn(LABEL, "text-muted-foreground")}>{team.name}</p>
+        <p className="font-mono text-label text-muted-foreground uppercase">
+          {team.name}
+        </p>
       </div>
-      <dl className="grid grid-cols-3 gap-5">
-        {items.map(([name, value]) => (
-          <div key={name} className="flex flex-col-reverse gap-1">
-            <dt className={cn(LABEL, "text-muted-foreground")}>{name}</dt>
+      <dl className="grid grid-cols-3 items-start gap-5">
+        {figures.map(([label, value]) => (
+          <div key={label} className="flex flex-col-reverse gap-1">
+            <dt className="font-mono text-label text-muted-foreground uppercase">
+              {label}
+            </dt>
             <dd className="font-heading text-h1 tabular-nums">{value}</dd>
           </div>
         ))}
       </dl>
       <p className="text-label text-muted-foreground">
-        Scores show Wendmoor FC's goals first. A match being played is not
+        Scores show Wendmoor FC’s goals first. A match being played is not
         counted.
       </p>
     </section>
   )
 }
 
-const MATCH_DAYS: [string, string][] = [
-  ["Adults", "£4"],
-  ["Under 16s", "Free"],
-  ["Gates open", "One hour before kick-off"],
-  ["Ground", "Millrace Park, Mill Lane"],
-]
-
 function MatchDays() {
+  const rows: [string, string][] = [
+    ["Adults", "£4"],
+    ["Under 16s", "Free"],
+    ["Gates open", "One hour before kick-off"],
+    ["Ground", "Millrace Park, Mill Lane"],
+  ]
   return (
     <section
       aria-labelledby="match-days-heading"
@@ -510,9 +535,9 @@ function MatchDays() {
         Match days
       </h2>
       <dl className="flex flex-col gap-2">
-        {MATCH_DAYS.map(([name, value]) => (
-          <div key={name} className="flex items-baseline justify-between gap-3">
-            <dt className={LABEL}>{name}</dt>
+        {rows.map(([term, value]) => (
+          <div key={term} className="flex items-baseline justify-between gap-3">
+            <dt className="font-mono text-label uppercase">{term}</dt>
             <dd className="text-right text-body">{value}</dd>
           </div>
         ))}
@@ -529,11 +554,14 @@ export function App() {
   const [teamId, setTeamId] = useState<TeamId>("first")
   const [announcement, setAnnouncement] = useState("")
   const team = TEAMS.find((t) => t.id === teamId) ?? TEAMS[0]
+  const summary = summarise(team)
 
-  function choose(next: Team) {
-    if (next.id === teamId) return
-    setTeamId(next.id)
-    setAnnouncement(countSentence(next))
+  function choose(id: TeamId) {
+    if (id === teamId) return
+    const chosen = TEAMS.find((t) => t.id === id)
+    if (!chosen) return
+    setTeamId(id)
+    setAnnouncement(summarise(chosen).sentence)
   }
 
   return (
@@ -544,7 +572,7 @@ export function App() {
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div className="flex flex-col gap-3">
-                <p className={cn(LABEL, "text-muted-foreground")}>
+                <p className="font-mono text-label text-muted-foreground uppercase">
                   2027 season
                 </p>
                 <h1 className="text-h1 uppercase">Fixtures and results</h1>
@@ -569,17 +597,17 @@ export function App() {
                     <Button
                       key={t.id}
                       variant={chosen ? "secondary" : "outline"}
-                      aria-pressed={chosen}
+                      aria-pressed={chosen ? "true" : "false"}
                       className={BUTTON}
-                      onClick={() => choose(t)}
+                      onClick={() => choose(t.id)}
                     >
                       {t.name}
                     </Button>
                   )
                 })}
               </div>
-              <p className={cn(LABEL, "text-muted-foreground")}>
-                {countLabel(team)}
+              <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
+                {summary.label}
               </p>
             </div>
             <p role="status" className="sr-only">

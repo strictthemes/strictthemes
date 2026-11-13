@@ -10,7 +10,7 @@ checks:
   - The workshops are a list, each with its town, what it makes and since when, and no workshop is shown as a card or with a fill.
 ---
 
-Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon. Inès Ardelle trained as a tailor in Lyon and cut coats for theatre for nine years before she opened the house in 2014 in two rooms above a print shop. The atelier moved to 7 rue Belvèze in 2019 and now has eleven people: five cutters and tailors, three in sewing, two in the shop and one who runs the office. The house makes two collections a year, never more than four hundred pieces of each design, and cuts much of it to order. Cloth comes from Lanificio Serra, a wool mill in Biella (since 2014), Tissage Vandamme, a linen weaver in Kortrijk (since 2017), and Seteria Olmo, a silk printer in Como (since 2021); knitwear is made by Tricots Pélissier, a family workshop in Yssingeaux, in the Haute-Loire (since 2020). The portrait is by the photographer Tomas Reyl.
+Sample house, if the user gave none: **Maison Ardelle**, a small fashion house in Lyon. Inès Ardelle trained as a tailor in Lyon and cut coats for theatre for nine years before she opened the house in 2014 in two rooms above a print shop. The atelier moved to 7 rue Belvèze in 2019 and now has eleven people: five cutters and tailors, three in sewing, two in the shop and one who runs the office. The house makes two collections a year, never more than four hundred pieces of each design, and cuts much of it to order. Cloth comes from Lanificio Serra, a wool mill in Biella run by Paola Serra (since 2014), Tissage Vandamme, a linen weaver in Kortrijk run by Pieter Vandamme (since 2017), and Seteria Olmo, a silk printer in Como run by Giulia Olmo (since 2021); knitwear is made by Tricots Pélissier, a family workshop in Yssingeaux, in the Haute-Loire, run by Martine Pélissier (since 2020). The Lyon atelier is run by Inès Ardelle. The portrait is by the photographer Tomas Reyl.
 
 Build these parts in order.
 
@@ -45,8 +45,8 @@ A section in the grid:
 
 - An `<h2>` in `text-h2`, columns 1–6 (`md:col-span-6`): "Where the clothes are *made*", with the one italic word in an `<em>`.
 - With `mt-4`, in columns 1–5 (`md:col-start-1 md:col-span-5`, so it starts a new row under the heading), one sentence in `text-body`, at most `max-w-md`, saying that the clothes are cut and finished in Lyon from cloth made in three mills, and that the knitwear is made in a fourth workshop.
-- With `mt-8`, a `<ul>` as a list of entries, across columns 1–12 (`md:col-span-12`). Five entries: the atelier in Lyon first (`Since 2014`), then the four mills and workshops. Each `<li>` is itself the row and also has `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`:
-  - The town, an `<h3>` in `text-h2`, in columns 1–4 (`md:col-span-4`): Lyon, Biella, Kortrijk, Como, Yssingeaux.
+- With `mt-8`, a `<ul>` as a list of entries, across columns 1–12 (`md:col-span-12`). Five entries, in the order of their years, as in the timeline: the atelier in Lyon first (`Since 2014`), then the four mills and workshops. Each `<li>` is itself the row and also has `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`:
+  - The town, an `<h3>` in `text-h2`, in columns 1–4 (`md:col-span-4`): Lyon, Biella, Kortrijk, Yssingeaux, Como.
   - What it makes and who runs it, one sentence in a `<p>` in `text-body`, at most `max-w-md`, in columns 5–9 (`md:col-span-5`), with `mt-2 md:mt-0`.
   - Since when, a `<p>` in `font-mono text-label uppercase tabular-nums text-muted-foreground` in columns 10–12 (`md:col-span-3`), with `mt-2 md:mt-0`: `Since 2017`, with the year in a `<time dateTime="2017">`.
 

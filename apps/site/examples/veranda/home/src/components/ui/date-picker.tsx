@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { CalendarIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
@@ -9,14 +9,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-// "2027-05-14" to a local Date, without going through UTC.
+// A date as a date field holds it, "2027-05-14", read as a local day.
 function toDate(value: string): Date | undefined {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
   if (!match) return undefined
   return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
 }
 
-// A local Date to "2027-05-14", from its own year, month and day.
 function toValue(date: Date): string {
   const y = String(date.getFullYear()).padStart(4, "0")
   const m = String(date.getMonth() + 1).padStart(2, "0")

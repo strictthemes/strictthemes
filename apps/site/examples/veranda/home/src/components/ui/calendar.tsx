@@ -54,12 +54,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50 hover:bg-secondary hover:text-secondary-foreground dark:hover:bg-secondary",
+          "size-(--cell-size) p-0 select-none hover:bg-secondary hover:text-secondary-foreground aria-disabled:opacity-50 dark:hover:bg-secondary",
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50 hover:bg-secondary hover:text-secondary-foreground dark:hover:bg-secondary",
+          "size-(--cell-size) p-0 select-none hover:bg-secondary hover:text-secondary-foreground aria-disabled:opacity-50 dark:hover:bg-secondary",
           defaultClassNames.button_next
         ),
         month_caption: cn(
@@ -88,7 +88,7 @@ function Calendar({
         month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
         weekdays: cn("flex gap-1", defaultClassNames.weekdays),
         weekday: cn(
-          "flex-1 rounded-(--cell-radius) font-mono text-label uppercase font-normal text-muted-foreground select-none",
+          "flex-1 rounded-(--cell-radius) font-mono text-label font-normal uppercase text-muted-foreground select-none",
           defaultClassNames.weekday
         ),
         week: cn("mt-1 flex w-full gap-1", defaultClassNames.week),

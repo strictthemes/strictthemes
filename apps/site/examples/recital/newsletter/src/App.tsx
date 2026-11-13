@@ -5,89 +5,115 @@ import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const plainLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
 
 const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusRing
+  focusOutline
 )
 
-const labelMuted = "font-mono text-label text-muted-foreground"
+const plainLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusOutline
+)
 
-const recentLetters = [
+const label = "font-mono text-label text-muted-foreground"
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const benefits = [
   {
-    title: "The plank that would not bend",
-    date: "2026-11-08",
-    shown: "8 November 2026",
+    title: "One long letter",
+    text: "Every other Sunday, about 2,000 words on one piece of slow work, written after visiting the people doing it.",
   },
   {
-    title: "Forty-one meanings of set",
-    date: "2026-10-25",
-    shown: "25 October 2026",
+    title: "One thing by someone else",
+    text: "At the end of each letter, a book, an essay or a film about patient work that is worth your evening.",
   },
   {
-    title: "A pear tree planted for someone else",
-    date: "2026-10-11",
-    shown: "11 October 2026",
-  },
-  {
-    title: "What the slow weeks are for",
-    date: "2026-09-27",
-    shown: "27 September 2026",
-  },
-  {
-    title: "Notes from a loom in the attic",
-    date: "2026-09-13",
-    shown: "13 September 2026",
+    title: "No advertising",
+    text: "There are no sponsors and no tracking links. The letter is free, and readers who want to can chip in once a year.",
   },
 ]
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const quotes = [
+  {
+    text: "It is the one email I save for the afternoon, when I have time to read it properly.",
+    name: "Tomas",
+    role: "Joiner",
+  },
+  {
+    text: "I started reading for the boat and stayed for the dictionary. I now know far too much about the word set.",
+    name: "Ines",
+    role: "School librarian",
+  },
+]
+
+const recentLetters = [
+  { title: "The keel goes in", date: "2026-11-08", label: "8 November 2026" },
+  {
+    title: "Four thousand bulbs",
+    date: "2026-10-25",
+    label: "25 October 2026",
+  },
+  {
+    title: "A definition takes a month",
+    date: "2026-10-11",
+    label: "11 October 2026",
+  },
+  { title: "Steaming oak", date: "2026-09-27", label: "27 September 2026" },
+  {
+    title: "The garden in its ninth year",
+    date: "2026-09-13",
+    label: "13 September 2026",
+  },
+]
 
 export function App() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
-  const emailRef = useRef<HTMLInputElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
-    if (subscribed) headingRef.current?.focus()
+    if (subscribed) {
+      headingRef.current?.focus()
+    }
   }, [subscribed])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = email.trim()
-    setEmail(value)
     if (value === "") {
-      setError("Enter your email address to subscribe.")
-      emailRef.current?.focus()
+      setError("Enter your email address.")
+      inputRef.current?.focus()
       return
     }
     if (!EMAIL_PATTERN.test(value)) {
-      setError("Enter an email address in the form name@example.com.")
-      emailRef.current?.focus()
+      setError(
+        "Enter an email address with an @ and a domain, such as name@example.com."
+      )
+      inputRef.current?.focus()
       return
     }
     setError(null)
     setSubscribed(true)
   }
 
-  function focusSignUp() {
-    if (subscribed) headingRef.current?.focus({ preventScroll: true })
-    else emailRef.current?.focus({ preventScroll: true })
+  function handleSubscribeLink() {
+    if (subscribed) {
+      headingRef.current?.focus({ preventScroll: true })
+    } else {
+      inputRef.current?.focus({ preventScroll: true })
+    }
   }
 
   return (
     <div className="mx-auto max-w-3xl px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-y-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", plainLink)}>
+        <a href="/" className={cn(plainLink, "font-heading text-h2")}>
           The Long Margin
         </a>
         <nav aria-label="Main" className="flex gap-6 text-body">
@@ -101,21 +127,19 @@ export function App() {
       </header>
 
       <main>
-        {/* 2. Opening */}
         <div className="mx-auto max-w-lg pt-24">
-          <p className={labelMuted}>A letter every other Sunday</p>
-          <h1 className="mt-4 text-h1 md:text-display">
+          <p className={label}>A letter every other Sunday</p>
+          <h1 className="mt-4 text-h1 text-foreground md:text-display">
             Letters about work that takes years
           </h1>
           <p className="mt-6">
-            Every other Sunday you get one long letter about something being
-            made slowly: a boat, a dictionary, a garden, a family history. It is
-            written by Ines Halloway, who has spent six years building a wooden
-            boat in a shed behind her house.
+            Every other Sunday you get one long letter about a piece of slow
+            work: a wooden boat built over six years, a dictionary of a dying
+            dialect, a garden planted for people not yet born. It is written by
+            one person, Hanne Lindqvist, and read by about 4,000 people.
           </p>
         </div>
 
-        {/* 3. Sign-up form */}
         <div id="subscribe" className="mx-auto mt-12 max-w-lg scroll-mt-6">
           {!subscribed && (
             <form noValidate onSubmit={handleSubmit}>
@@ -126,9 +150,8 @@ export function App() {
                 Email address
               </label>
               <Input
-                ref={emailRef}
+                ref={inputRef}
                 id="email"
-                name="email"
                 type="email"
                 autoComplete="email"
                 value={email}
@@ -138,7 +161,7 @@ export function App() {
                 }}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? "email-error" : undefined}
-                className="mt-2 h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
+                className="mt-2 block h-auto rounded-md border-muted-foreground px-4 py-2 text-body md:text-body"
               />
               {error && (
                 <p
@@ -150,7 +173,7 @@ export function App() {
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
-                  <span>{error}</span>
+                  <span className="min-w-0 wrap-break-word">{error}</span>
                 </p>
               )}
               <div className="mt-4">
@@ -161,7 +184,7 @@ export function App() {
                   Subscribe
                 </Button>
               </div>
-              <p className={cn("mt-4", labelMuted)}>
+              <p className={cn(label, "mt-4")}>
                 Free · Every other Sunday · Leave with one click
               </p>
             </form>
@@ -172,47 +195,44 @@ export function App() {
                 <h2
                   ref={headingRef}
                   tabIndex={-1}
-                  className="text-h2 focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+                  className="text-h2 text-foreground focus:outline-2 focus:outline-offset-2 focus:outline-ring focus:outline-solid"
                 >
                   You are on the list
                 </h2>
                 <p className="mt-4">
-                  The next letter arrives in your inbox within two weeks, on a
-                  Sunday morning.
+                  The next letter arrives within two weeks, on a Sunday morning.
                 </p>
               </>
             )}
           </div>
         </div>
 
-        {/* 4. From the last letter */}
         <div className="mx-auto mt-24 max-w-lg">
-          <p className={labelMuted}>
+          <p className={cn(label, "tabular-nums")}>
             Letter 112 · <time dateTime="2026-11-08">8 November 2026</time>
           </p>
-          <h2 className="mt-2 text-h2">The plank that would not bend</h2>
+          <h2 className="mt-2 text-h2 text-foreground">The keel goes in</h2>
           <p className="mt-4">
-            The garboard plank is the first one fitted against the keel, and on
-            this boat it has to twist almost a quarter turn over nine feet. I
-            steamed it for two hours on Saturday, carried it from the box to
-            the hull in under a minute, and it cracked along the grain before I
-            had the second clamp on.
+            Petra and Joel have been building their boat in a barn outside
+            Ålesund since the spring of 2021. Last Tuesday, in the fifth year,
+            the keel finally went in. It took six people, two jacks and most of
+            a morning.
           </p>
           <p className="mt-6">
-            That was the third one. The larch came from a yard in the hills, and
-            I had been told it was air-dried for two years. It was not. You can
-            hear it, if you know to listen: a dry board rings when you tap it,
-            and this one only thudded.
+            The oak for it was felled in 2019 and has been drying under a tarp
+            ever since. Joel says you can rush almost anything on a boat except
+            the wood. Petra says you can rush nothing, and that Joel learns this
+            again every winter.
           </p>
           <p className="mt-6">
-            So the work this week was not building. It was ordering more timber,
-            stacking it with sticks between the boards, and <em>waiting</em>,
-            which is most of what building a boat turns out to be.
+            When the keel was down they did not celebrate. They swept the floor,
+            checked the line with a string, and went home. Petra told me the
+            line was a few millimetres off at the stern, and that this was{" "}
+            <em>fine</em>, and that she would think about it for a week anyway.
           </p>
           <blockquote className="my-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              I used to count the years as lost; now I count them as the part of
-              the job nobody photographs.
+              A boat is mostly waiting, with a few loud days in between.
             </p>
           </blockquote>
           <p className="mt-6">
@@ -222,87 +242,67 @@ export function App() {
           </p>
         </div>
 
-        {/* 5. What you get */}
         <div className="mx-auto mt-24 max-w-lg">
-          <h2 className="text-h2">What you get</h2>
+          <h2 className="text-h2 text-foreground">What you get</h2>
           <ul className="mt-6">
-            <li className="border-t py-6">
-              <h3 className="text-body font-semibold">One long letter</h3>
-              <p className="mt-2">
-                About 2,000 words every other Sunday on one piece of slow work,
-                written to be read with a cup of coffee rather than on the way
-                to somewhere.
-              </p>
-            </li>
-            <li className="border-t py-6">
-              <h3 className="text-body font-semibold">
-                One thing from someone else
-              </h3>
-              <p className="mt-2">
-                At the end of each letter, a link to an essay, a book or a film
-                by another person who took their time over something.
-              </p>
-            </li>
-            <li className="border-t py-6">
-              <h3 className="text-body font-semibold">No advertising</h3>
-              <p className="mt-2">
-                There are no sponsors and no tracking pixels. Your address is
-                used to send the letter and for nothing else.
-              </p>
-            </li>
+            {benefits.map((item) => (
+              <li key={item.title} className="border-t py-6">
+                <h3 className="text-body font-semibold text-foreground">
+                  {item.title}
+                </h3>
+                <p className="mt-2">{item.text}</p>
+              </li>
+            ))}
           </ul>
         </div>
 
-        {/* 6. Readers */}
         <div className="mx-auto mt-24 max-w-lg">
-          <h2 className="text-h2">From readers</h2>
-          <blockquote className="mt-6 mb-12 border-l-2 border-primary pl-6">
-            <p className="font-heading text-h2 font-normal italic">
-              It is the one email I save for the weekend, and I read every word.
-            </p>
-            <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Tomasz, piano tuner
-            </footer>
-          </blockquote>
-          <blockquote className="my-12 border-l-2 border-primary pl-6">
-            <p className="font-heading text-h2 font-normal italic">
-              I started a vegetable bed because of the garden letters. Three
-              years on, it finally grows something.
-            </p>
-            <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Renata, school librarian
-            </footer>
-          </blockquote>
+          <h2 className="text-h2 text-foreground">From readers</h2>
+          {quotes.map((quote, index) => (
+            <blockquote
+              key={quote.name}
+              className={cn(
+                "border-l-2 border-primary pl-6",
+                index === 0 ? "mt-6 mb-12" : "my-12"
+              )}
+            >
+              <p className="font-heading text-h2 font-normal italic">
+                {quote.text}
+              </p>
+              <footer className={cn(label, "mt-4 not-italic")}>
+                {quote.name} · {quote.role}
+              </footer>
+            </blockquote>
+          ))}
         </div>
 
-        {/* 7. The writer */}
         <div className="mx-auto mt-24 max-w-lg">
           <aside className="mb-12 rounded-xl border bg-card p-6">
-            <p className={labelMuted}>Who writes it</p>
-            <h2 className="mt-2 text-h2">Ines Halloway</h2>
+            <p className={label}>Who writes it</p>
+            <h2 className="mt-2 text-h2 text-foreground">Hanne Lindqvist</h2>
             <p className="mt-4">
-              Ines worked for twelve years as a copy editor for a dictionary
-              publisher before she started building a boat. She lives on the
-              coast with a dog and an unfinished hull, and has written The Long
-              Margin since 2022.
+              Hanne worked as a radio producer for twelve years before starting
+              this letter in 2022. She lives on the west coast of Norway and
+              spends about a week with each person she writes about.
             </p>
           </aside>
         </div>
 
-        {/* 8. Recent letters */}
         <div className="mx-auto mt-24 max-w-lg">
-          <h2 className="text-h2">Recent letters</h2>
+          <h2 className="text-h2 text-foreground">Recent letters</h2>
           <ul className="mt-6">
             {recentLetters.map((letter) => (
               <li
                 key={letter.date}
                 className="border-t py-4 md:flex md:items-baseline md:justify-between md:gap-6"
               >
-                <a href="#" className={plainLink}>
+                <a href="#" className={cn(plainLink, "min-w-0")}>
                   {letter.title}
                 </a>
-                <p className={cn("mt-2 md:mt-0 md:shrink-0", labelMuted)}>
-                  <time dateTime={letter.date}>{letter.shown}</time>
+                <p
+                  className={cn(label, "mt-2 tabular-nums md:mt-0 md:shrink-0")}
+                >
+                  <time dateTime={letter.date}>{letter.label}</time>
                 </p>
               </li>
             ))}
@@ -313,13 +313,13 @@ export function App() {
             </a>
           </p>
           <p className="mt-12">
-            If you would like the next letter, leave your address at the top of
-            the page.
+            If you would like the next one, it is free and comes every other
+            Sunday.
           </p>
           <p className="mt-4">
             <a
               href="#subscribe"
-              onClick={focusSignUp}
+              onClick={handleSubscribeLink}
               className={cn(
                 buttonVariants({ variant: "secondary" }),
                 "h-auto rounded-md px-6 py-2 font-mono text-label"
@@ -333,12 +333,16 @@ export function App() {
 
       <footer className="mt-24">
         <div className="border-t py-12">
-          <p className="font-heading text-h2">The Long Margin</p>
-          <p className="mt-2">
-            A free letter about slow work, sent every other Sunday to about
-            4,000 readers.
+          <p className="font-heading text-h2 text-foreground">
+            The Long Margin
           </p>
-          <p className={cn("mt-6", labelMuted)}>© 2026 The Long Margin</p>
+          <p className="mt-2">
+            A free letter about slow work, written by one person and sent every
+            other Sunday.
+          </p>
+          <p className={cn(label, "mt-6 tabular-nums")}>
+            © 2026 The Long Margin
+          </p>
         </div>
       </footer>
     </div>

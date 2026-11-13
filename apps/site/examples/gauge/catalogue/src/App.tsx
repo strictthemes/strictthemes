@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type KeyboardEvent } from "react"
+import { useMemo, useRef, useState, type KeyboardEvent, type Ref } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -34,18 +34,115 @@ type Part = {
 }
 
 const PARTS: Part[] = [
-  { number: "TVL-1026-ZZ", bore: 10, outside: 26, width: 8, load: 4.75, stock: "In stock", price: 1.42 },
-  { number: "TVL-1030-RS", bore: 10, outside: 30, width: 9, load: 5.5, stock: "In stock", price: 1.64 },
-  { number: "TVL-1232-RS", bore: 12, outside: 32, width: 10, load: 7.2, stock: "In stock", price: 1.78 },
-  { number: "TVL-1535-ZZ", bore: 15, outside: 35, width: 11, load: 8.1, stock: "Low stock", price: 1.96 },
-  { number: "TVL-1740-RS", bore: 17, outside: 40, width: 12, load: 9.9, stock: "In stock", price: 2.38 },
-  { number: "TVL-2047-RS", bore: 20, outside: 47, width: 14, load: 13.4, stock: "In stock", price: 2.94 },
-  { number: "TVL-2047-ZZ", bore: 20, outside: 47, width: 14, load: 13.4, stock: "Low stock", price: 2.71 },
-  { number: "TVL-2552-RS", bore: 25, outside: 52, width: 15, load: 14.6, stock: "In stock", price: 3.46, badge: "New" },
-  { number: "TVL-3062-RS", bore: 30, outside: 62, width: 16, load: 20.1, stock: "Made to order", price: 4.88 },
-  { number: "TVL-3572-ZZ", bore: 35, outside: 72, width: 17, load: 26.8, stock: "In stock", price: 6.52 },
-  { number: "TVL-4080-RS", bore: 40, outside: 80, width: 18, load: 32.2, stock: "Made to order", price: 8.15 },
-  { number: "TVL-4585-RS", bore: 45, outside: 85, width: 19, load: 34.9, stock: "Discontinued", price: 9.4 },
+  {
+    number: "TVL-1026-ZZ",
+    bore: 10,
+    outside: 26,
+    width: 8,
+    load: 4.75,
+    stock: "In stock",
+    price: 1.42,
+  },
+  {
+    number: "TVL-1030-RS",
+    bore: 10,
+    outside: 30,
+    width: 9,
+    load: 5.5,
+    stock: "In stock",
+    price: 1.64,
+  },
+  {
+    number: "TVL-1232-RS",
+    bore: 12,
+    outside: 32,
+    width: 10,
+    load: 7.2,
+    stock: "In stock",
+    price: 1.78,
+  },
+  {
+    number: "TVL-1535-ZZ",
+    bore: 15,
+    outside: 35,
+    width: 11,
+    load: 8.1,
+    stock: "Low stock",
+    price: 1.96,
+  },
+  {
+    number: "TVL-1740-RS",
+    bore: 17,
+    outside: 40,
+    width: 12,
+    load: 9.9,
+    stock: "In stock",
+    price: 2.38,
+  },
+  {
+    number: "TVL-2047-RS",
+    bore: 20,
+    outside: 47,
+    width: 14,
+    load: 13.4,
+    stock: "In stock",
+    price: 2.94,
+  },
+  {
+    number: "TVL-2047-ZZ",
+    bore: 20,
+    outside: 47,
+    width: 14,
+    load: 13.4,
+    stock: "Low stock",
+    price: 2.71,
+  },
+  {
+    number: "TVL-2552-RS",
+    bore: 25,
+    outside: 52,
+    width: 15,
+    load: 14.6,
+    stock: "In stock",
+    price: 3.46,
+    badge: "New",
+  },
+  {
+    number: "TVL-3062-RS",
+    bore: 30,
+    outside: 62,
+    width: 16,
+    load: 20.1,
+    stock: "Made to order",
+    price: 4.88,
+  },
+  {
+    number: "TVL-3572-ZZ",
+    bore: 35,
+    outside: 72,
+    width: 17,
+    load: 26.8,
+    stock: "In stock",
+    price: 6.52,
+  },
+  {
+    number: "TVL-4080-RS",
+    bore: 40,
+    outside: 80,
+    width: 18,
+    load: 32.2,
+    stock: "Made to order",
+    price: 8.15,
+  },
+  {
+    number: "TVL-4585-RS",
+    bore: 45,
+    outside: 85,
+    width: 19,
+    load: 34.9,
+    stock: "Discontinued",
+    price: 9.4,
+  },
 ]
 
 const BORE_OPTIONS = [
@@ -55,8 +152,8 @@ const BORE_OPTIONS = [
 ] as const
 
 const SEAL_OPTIONS = [
-  { id: "seal-rs", label: "Rubber seals, RS", suffix: "-RS" },
-  { id: "seal-zz", label: "Metal shields, ZZ", suffix: "-ZZ" },
+  { id: "seal-rs", label: "Rubber seals, RS", suffix: "RS" },
+  { id: "seal-zz", label: "Metal shields, ZZ", suffix: "ZZ" },
 ] as const
 
 type SortKey = "bore" | "number" | "load" | "price"
@@ -79,113 +176,131 @@ const CURRENT_SECTION = "/catalogue"
 
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
 const TEXT_LINK = cn(
   "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
   FOCUS
 )
-const LABEL = "font-mono text-label text-muted-foreground"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+
 const BUTTON_TEXT = "px-4 font-mono text-label"
 
-const STOCK_DOT: Record<StockState, string> = {
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+
+const DOT_CLASS: Record<StockState, string> = {
   "In stock": "bg-success",
   "Low stock": "bg-muted-foreground",
   "Made to order": "bg-muted-foreground",
   Discontinued: "bg-destructive",
 }
 
-function formatPrice(value: number) {
-  return value.toLocaleString("en-GB", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
+const priceFormat = new Intl.NumberFormat("en-GB", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 
 function byNumber(a: Part, b: Part) {
   return a.number < b.number ? -1 : a.number > b.number ? 1 : 0
 }
 
-const SORTERS: Record<SortKey, (a: Part, b: Part) => number> = {
-  bore: (a, b) => a.bore - b.bore || byNumber(a, b),
-  number: byNumber,
-  load: (a, b) => b.load - a.load || byNumber(a, b),
-  price: (a, b) => a.price - b.price || byNumber(a, b),
+function sortParts(parts: Part[], key: SortKey) {
+  const sorted = [...parts]
+  sorted.sort((a, b) => {
+    let diff = 0
+    if (key === "bore") diff = a.bore - b.bore
+    if (key === "load") diff = b.load - a.load
+    if (key === "price") diff = a.price - b.price
+    return diff !== 0 ? diff : byNumber(a, b)
+  })
+  return sorted
 }
 
-function NavLink({
-  label,
-  href,
-  className,
-}: {
-  label: string
-  href: string
-  className?: string
-}) {
-  const current = href === CURRENT_SECTION
-  return (
-    <a
-      href={href}
-      aria-current={current ? "true" : undefined}
-      className={cn(
-        "font-mono text-label transition-colors duration-150",
-        FOCUS,
-        current
-          ? "text-foreground underline underline-offset-4"
-          : "text-muted-foreground hover:text-foreground",
-        className
-      )}
-    >
-      {label}
-    </a>
+function navLinkClass(current: boolean) {
+  return cn(
+    "font-mono text-label transition-colors duration-150",
+    current
+      ? "text-foreground underline underline-offset-4"
+      : "text-muted-foreground hover:text-foreground",
+    FOCUS
   )
 }
 
-function StockStatus({ state }: { state: StockState }) {
+function StockLabel({ state }: { state: StockState }) {
   return (
     <span className="inline-flex items-center gap-2 whitespace-nowrap">
       <span
         aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", STOCK_DOT[state])}
+        className={cn("size-2 shrink-0 rounded-full", DOT_CLASS[state])}
       />
       <span className="text-body text-foreground">{state}</span>
     </span>
   )
 }
 
+type OptionProps = {
+  id: string
+  label: string
+  checked: boolean
+  onChange: (checked: boolean) => void
+  inputRef?: Ref<HTMLElement>
+}
+
+function Option({ id, label, checked, onChange, inputRef }: OptionProps) {
+  const textId = `${id}-text`
+  return (
+    <label className="flex items-center gap-2 text-body text-foreground">
+      <Checkbox
+        ref={inputRef}
+        className="rounded-sm"
+        checked={checked}
+        onCheckedChange={(value) => onChange(value === true)}
+        aria-labelledby={textId}
+      />
+      <span id={textId}>{label}</span>
+    </label>
+  )
+}
+
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
-
   const [bores, setBores] = useState<string[]>([])
   const [seals, setSeals] = useState<string[]>([])
   const [inStockOnly, setInStockOnly] = useState(false)
   const [sort, setSort] = useState<SortKey>("bore")
+
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
   const firstCheckboxRef = useRef<HTMLElement>(null)
 
   const filterSet = bores.length > 0 || seals.length > 0 || inStockOnly
 
   const rows = useMemo(() => {
-    const boreRanges = BORE_OPTIONS.filter((o) => bores.includes(o.id))
-    const sealSuffixes = SEAL_OPTIONS.filter((o) => seals.includes(o.id))
-    return PARTS.filter((part) => {
-      if (
-        boreRanges.length > 0 &&
-        !boreRanges.some((r) => part.bore >= r.min && part.bore <= r.max)
-      )
-        return false
-      if (
-        sealSuffixes.length > 0 &&
-        !sealSuffixes.some((s) => part.number.endsWith(s.suffix))
-      )
-        return false
+    const filtered = PARTS.filter((part) => {
+      if (bores.length > 0) {
+        const inRange = BORE_OPTIONS.some(
+          (option) =>
+            bores.includes(option.id) &&
+            part.bore >= option.min &&
+            part.bore <= option.max
+        )
+        if (!inRange) return false
+      }
+      if (seals.length > 0) {
+        const sealed = SEAL_OPTIONS.some(
+          (option) =>
+            seals.includes(option.id) &&
+            part.number.endsWith(`-${option.suffix}`)
+        )
+        if (!sealed) return false
+      }
       if (
         inStockOnly &&
         part.stock !== "In stock" &&
         part.stock !== "Low stock"
-      )
+      ) {
         return false
+      }
       return true
-    }).sort(SORTERS[sort])
+    })
+    return sortParts(filtered, sort)
   }, [bores, seals, inStockOnly, sort])
 
   const count = filterSet
@@ -229,7 +344,15 @@ export function App() {
             <ul className="flex gap-6">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <NavLink {...link} />
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_SECTION ? "true" : undefined
+                    }
+                    className={navLinkClass(link.href === CURRENT_SECTION)}
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -258,7 +381,18 @@ export function App() {
             <ul className="py-2">
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <NavLink {...link} className="block py-2" />
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_SECTION ? "true" : undefined
+                    }
+                    className={cn(
+                      navLinkClass(link.href === CURRENT_SECTION),
+                      "block py-2"
+                    )}
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -272,7 +406,7 @@ export function App() {
             <div className="flex flex-col gap-1">
               <nav aria-label="Breadcrumb">
                 <ol className="flex flex-wrap items-center gap-2 font-mono text-label">
-                  <li>
+                  <li className="flex items-center gap-2">
                     <a
                       href="/catalogue"
                       className={cn(
@@ -282,11 +416,11 @@ export function App() {
                     >
                       Catalogue
                     </a>
+                    <span aria-hidden="true" className="text-muted-foreground">
+                      /
+                    </span>
                   </li>
-                  <li aria-hidden="true" className="text-muted-foreground">
-                    /
-                  </li>
-                  <li>
+                  <li className="flex items-center gap-2">
                     <a
                       href="#"
                       className={cn(
@@ -296,9 +430,9 @@ export function App() {
                     >
                       Ball bearings
                     </a>
-                  </li>
-                  <li aria-hidden="true" className="text-muted-foreground">
-                    /
+                    <span aria-hidden="true" className="text-muted-foreground">
+                      /
+                    </span>
                   </li>
                   <li aria-current="page" className="text-foreground">
                     Deep groove
@@ -329,7 +463,7 @@ export function App() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
             <aside
               aria-label="Filters"
-              className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 lg:col-span-3"
+              className="flex min-w-0 flex-col gap-4 rounded-xl border border-border bg-card p-4 lg:col-span-3"
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-h2">Filters</h2>
@@ -345,81 +479,77 @@ export function App() {
 
               <div
                 role="group"
-                aria-labelledby="group-bore"
+                aria-labelledby="bore-label"
                 className="flex flex-col gap-2"
               >
-                <p id="group-bore" className={LABEL}>
+                <p
+                  id="bore-label"
+                  className="font-mono text-label text-muted-foreground"
+                >
                   Bore (mm)
                 </p>
                 {BORE_OPTIONS.map((option, index) => (
-                  <label
+                  <Option
                     key={option.id}
-                    className="flex items-center gap-2 text-body text-foreground"
-                  >
-                    <Checkbox
-                      ref={index === 0 ? firstCheckboxRef : undefined}
-                      className="rounded-sm"
-                      aria-labelledby={`${option.id}-text`}
-                      checked={bores.includes(option.id)}
-                      onCheckedChange={(checked) =>
-                        setBores((list) => toggle(list, option.id, checked))
-                      }
-                    />
-                    <span id={`${option.id}-text`}>{option.label}</span>
-                  </label>
+                    id={option.id}
+                    label={option.label}
+                    checked={bores.includes(option.id)}
+                    onChange={(checked) =>
+                      setBores((list) => toggle(list, option.id, checked))
+                    }
+                    inputRef={index === 0 ? firstCheckboxRef : undefined}
+                  />
                 ))}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="group-seals"
+                aria-labelledby="seal-label"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="group-seals" className={LABEL}>
+                <p
+                  id="seal-label"
+                  className="font-mono text-label text-muted-foreground"
+                >
                   Seals
                 </p>
                 {SEAL_OPTIONS.map((option) => (
-                  <label
+                  <Option
                     key={option.id}
-                    className="flex items-center gap-2 text-body text-foreground"
-                  >
-                    <Checkbox
-                      className="rounded-sm"
-                      aria-labelledby={`${option.id}-text`}
-                      checked={seals.includes(option.id)}
-                      onCheckedChange={(checked) =>
-                        setSeals((list) => toggle(list, option.id, checked))
-                      }
-                    />
-                    <span id={`${option.id}-text`}>{option.label}</span>
-                  </label>
+                    id={option.id}
+                    label={option.label}
+                    checked={seals.includes(option.id)}
+                    onChange={(checked) =>
+                      setSeals((list) => toggle(list, option.id, checked))
+                    }
+                  />
                 ))}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="group-stock"
+                aria-labelledby="stock-label"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="group-stock" className={LABEL}>
+                <p
+                  id="stock-label"
+                  className="font-mono text-label text-muted-foreground"
+                >
                   Stock
                 </p>
-                <label className="flex items-center gap-2 text-body text-foreground">
-                  <Checkbox
-                    className="rounded-sm"
-                    aria-labelledby="stock-only-text"
-                    checked={inStockOnly}
-                    onCheckedChange={(checked) => setInStockOnly(checked)}
-                  />
-                  <span id="stock-only-text">In stock only</span>
-                </label>
+                <Option
+                  id="stock-only"
+                  label="In stock only"
+                  checked={inStockOnly}
+                  onChange={setInStockOnly}
+                />
               </div>
 
               <div className="flex flex-col gap-3 border-t border-border pt-4">
                 <label
                   id="sort-label"
-                  htmlFor="sort-trigger"
-                  className={cn("block", LABEL)}
+                  htmlFor="sort"
+                  className="block font-mono text-label text-muted-foreground"
                 >
                   Sort by
                 </label>
@@ -431,10 +561,7 @@ export function App() {
                       if (value !== null) setSort(value as SortKey)
                     }}
                   >
-                    <SelectTrigger
-                      id="sort-trigger"
-                      aria-labelledby="sort-label"
-                    >
+                    <SelectTrigger id="sort" aria-labelledby="sort-label">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -449,11 +576,9 @@ export function App() {
               </div>
             </aside>
 
-            <div
-              className="overflow-hidden rounded-xl border border-border bg-card lg:col-span-9"
-            >
+            <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 className="text-h2">
+                <h2 id="parts-heading" className="text-h2">
                   Parts
                 </h2>
                 <p aria-live="polite" className={SMALL_FIGURE}>
@@ -464,23 +589,25 @@ export function App() {
               <Table label="Parts" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn("px-4", LABEL)}>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
                       Part number
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", LABEL)}>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Bore (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", LABEL)}>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Outside (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", LABEL)}>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Width (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", LABEL)}>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Load C (kN)
                     </TableHead>
-                    <TableHead className={cn("px-4", LABEL)}>Stock</TableHead>
-                    <TableHead className={cn("px-4 text-right", LABEL)}>
+                    <TableHead className="px-4 font-mono text-label text-muted-foreground">
+                      Stock
+                    </TableHead>
+                    <TableHead className="px-4 text-right font-mono text-label text-muted-foreground">
                       Unit price (£)
                     </TableHead>
                   </TableRow>
@@ -510,10 +637,12 @@ export function App() {
                     rows.map((part) => (
                       <TableRow key={part.number}>
                         <TableCell className="px-4 py-2">
-                          <span className="flex items-center gap-2">
+                          <div className="flex items-center gap-2">
                             <a
-                              href={part.number === "TVL-2047-RS" ? "/part" : "#"}
-                              className={cn(TEXT_LINK, "font-mono text-body")}
+                              href={
+                                part.number === "TVL-2047-RS" ? "/part" : "#"
+                              }
+                              className={cn("font-mono text-body", TEXT_LINK)}
                             >
                               {part.number}
                             </a>
@@ -525,7 +654,7 @@ export function App() {
                                 {part.badge}
                               </Badge>
                             ) : null}
-                          </span>
+                          </div>
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
                           {part.bore}
@@ -540,10 +669,10 @@ export function App() {
                           {part.load.toFixed(2)}
                         </TableCell>
                         <TableCell className="px-4 py-2">
-                          <StockStatus state={part.stock} />
+                          <StockLabel state={part.stock} />
                         </TableCell>
                         <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {formatPrice(part.price)}
+                          {priceFormat.format(part.price)}
                         </TableCell>
                       </TableRow>
                     ))
@@ -551,15 +680,12 @@ export function App() {
                 </TableBody>
               </Table>
 
-              <p
-                className={cn(
-                  "border-t border-border px-4 py-3",
-                  SMALL_FIGURE
-                )}
-              >
-                Unit prices are for 1 to 49 and exclude VAT. Price breaks for
-                larger quantities are on each part's page.
-              </p>
+              <div className="mt-auto border-t border-border px-4 py-3">
+                <p className={SMALL_FIGURE}>
+                  Unit prices are for 1 to 49 and exclude VAT. Price breaks for
+                  larger quantities are on each part&apos;s page.
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -568,8 +694,8 @@ export function App() {
       <footer className="border-t border-border">
         <div className="mx-auto w-full max-w-[1280px] px-4 py-6">
           <p className={SMALL_FIGURE}>
-            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A
-            demo: nothing is sold or sent.
+            Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
+            nothing is sold or sent.
           </p>
         </div>
       </footer>

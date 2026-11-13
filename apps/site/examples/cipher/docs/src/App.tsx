@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react"
+import * as React from "react"
 import { ArrowLeft, ArrowRight, Check, Info } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -20,129 +14,126 @@ import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
+const container = "mx-auto max-w-[1200px] px-4 md:px-6"
 const quietLink =
   "text-muted-foreground transition-colors duration-150 hover:text-foreground"
-
-const currentLink = "text-foreground underline underline-offset-4"
-
-const buttonClasses = "px-4 font-mono text-label"
-
-type DocLink = { label: string; href: string; command?: boolean }
-type DocGroup = { label: string; links: DocLink[] }
+const currentLink =
+  "text-foreground underline underline-offset-4 transition-colors duration-150"
+const inlineCode = "rounded-sm bg-muted px-1 py-0.5 font-mono"
+const panelCode = "rounded-sm bg-secondary/10 px-1 py-0.5 font-mono"
 
 const CURRENT_PAGE = "/docs/commands/deploy"
 
 const mainLinks = [
-  { label: "Docs", href: "/docs", current: true },
-  { label: "Changelog", href: "/changelog", current: false },
-  { label: "Pricing", href: "#", current: false },
+  { name: "Docs", href: "/docs", current: true },
+  { name: "Changelog", href: "/changelog", current: false },
+  { name: "Pricing", href: "#", current: false },
 ]
 
-const docGroups: DocGroup[] = [
+type DocLink = { name: string; href: string; mono?: boolean }
+
+const docGroups: { label: string; links: DocLink[] }[] = [
   {
     label: "Get started",
     links: [
-      { label: "Install", href: "/docs/get-started/install" },
-      { label: "Quick start", href: "/docs/get-started/quick-start" },
-      { label: "Configuration", href: "/docs/get-started/configuration" },
+      { name: "Install", href: "/docs/get-started/install" },
+      { name: "Quick start", href: "/docs/get-started/quick-start" },
+      { name: "Configuration", href: "/docs/get-started/configuration" },
     ],
   },
   {
     label: "Commands",
     links: [
-      { label: "plinth init", href: "/docs/commands/init", command: true },
-      { label: "plinth deploy", href: "/docs/commands/deploy", command: true },
-      { label: "plinth logs", href: "/docs/commands/logs", command: true },
-      {
-        label: "plinth rollback",
-        href: "/docs/commands/rollback",
-        command: true,
-      },
-      { label: "plinth env", href: "/docs/commands/env", command: true },
+      { name: "plinth init", href: "/docs/commands/init", mono: true },
+      { name: "plinth deploy", href: "/docs/commands/deploy", mono: true },
+      { name: "plinth logs", href: "/docs/commands/logs", mono: true },
+      { name: "plinth rollback", href: "/docs/commands/rollback", mono: true },
+      { name: "plinth env", href: "/docs/commands/env", mono: true },
     ],
   },
   {
     label: "Reference",
     links: [
       {
-        label: "plinth.toml",
+        name: "plinth.toml",
         href: "/docs/reference/plinth-toml",
-        command: true,
+        mono: true,
       },
       {
-        label: "Environment variables",
+        name: "Environment variables",
         href: "/docs/reference/environment-variables",
       },
-      { label: "Exit codes", href: "/docs/reference/exit-codes" },
+      { name: "Exit codes", href: "/docs/reference/exit-codes" },
     ],
   },
 ]
 
 const sections = [
-  { id: "usage", label: "Usage" },
-  { id: "flags", label: "Flags" },
-  { id: "examples", label: "Examples" },
-  { id: "exit-codes", label: "Exit codes" },
+  { id: "usage", title: "Usage" },
+  { id: "flags", title: "Flags" },
+  { id: "examples", title: "Examples" },
+  { id: "exit-codes", title: "Exit codes" },
 ]
 
 const flags: {
   flag: string
   short: string
-  def: string
-  description: ReactNode
+  default: string
+  description: React.ReactNode
 }[] = [
   {
     flag: "--env <name>",
     short: "-e",
-    def: "preview",
+    default: "preview",
     description: (
       <>
-        The environment to deploy to, such as{" "}
-        <span className="font-mono">preview</span> or{" "}
-        <span className="font-mono">production</span>.
+        The environment to deploy to, as named in{" "}
+        <code className={panelCode}>plinth.toml</code>.
       </>
     ),
   },
   {
     flag: "--prebuilt",
     short: "—",
-    def: "false",
-    description:
-      "Upload the build output as it is, without running the build command first.",
+    default: "false",
+    description: "Skip the build and upload the output folder as it is.",
   },
   {
     flag: "--message <text>",
     short: "-m",
-    def: "—",
+    default: "—",
     description:
-      "A note saved with the deploy. Without it, the message of the latest commit is used.",
+      "A note shown with the deploy. Without it, the message of the latest commit is used.",
   },
   {
     flag: "--wait",
     short: "—",
-    def: "false",
+    default: "false",
     description:
-      "Wait until the deploy is ready or has failed, and exit with its result.",
+      "Wait until the deploy is ready or has failed, then exit with its code.",
   },
   {
     flag: "--yes",
     short: "-y",
-    def: "false",
-    description: "Skip the confirmation that comes before a production deploy.",
+    default: "false",
+    description: "Skip the confirmation before a deploy to production.",
   },
   {
     flag: "--json",
     short: "—",
-    def: "false",
+    default: "false",
     description: "Print the result as JSON instead of text.",
   },
   {
     flag: "--token <token>",
     short: "—",
-    def: "$PLINTH_TOKEN",
-    description:
-      "The access token to deploy with. Without it, the token in the environment is used.",
+    default: "$PLINTH_TOKEN",
+    description: (
+      <>
+        The access token to use. Without it, the token in{" "}
+        <code className={panelCode}>PLINTH_TOKEN</code> is used.
+      </>
+    ),
   },
 ]
 
@@ -154,41 +145,29 @@ const exitCodes = [
   { code: "4", meaning: "It timed out while waiting." },
 ]
 
-function Code({ children }: { children: ReactNode }) {
-  return (
-    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
-      {children}
-    </code>
-  )
-}
-
-function PanelCode({ children }: { children: ReactNode }) {
-  return (
-    <code className="rounded-sm bg-secondary/10 px-1 py-0.5 font-mono">
-      {children}
-    </code>
-  )
-}
-
-type CopyState = "idle" | "copied" | "failed"
+type CodeLine = { text: string; comment?: boolean }
 
 function CodeBlock({
+  id,
   label,
   lines,
   className,
 }: {
+  id: string
   label: string
-  lines: string[]
+  lines: CodeLine[]
   className?: string
 }) {
-  const [state, setState] = useState<CopyState>("idle")
-  const timer = useRef<number | undefined>(undefined)
+  const [state, setState] = React.useState<"idle" | "copied" | "failed">("idle")
+  const timer = React.useRef<number | undefined>(undefined)
 
-  useEffect(() => () => window.clearTimeout(timer.current), [])
-
-  const code = lines.filter((line) => !line.startsWith("#")).join("\n")
+  React.useEffect(() => () => window.clearTimeout(timer.current), [])
 
   async function copy() {
+    const code = lines
+      .filter((line) => !line.comment)
+      .map((line) => line.text)
+      .join("\n")
     window.clearTimeout(timer.current)
     try {
       await navigator.clipboard.writeText(code)
@@ -199,38 +178,34 @@ function CodeBlock({
     timer.current = window.setTimeout(() => setState("idle"), 2000)
   }
 
+  const message =
+    state === "copied" ? "Copied" : state === "failed" ? "Copy failed" : ""
+
   return (
     <figure
+      aria-labelledby={id}
       className={cn(
         "overflow-hidden rounded-xl border border-border bg-card",
         className
       )}
     >
       <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-2">
-        <figcaption className="font-mono text-label text-muted-foreground">
+        <p id={id} className="font-mono text-label text-muted-foreground">
           {label}
-        </figcaption>
+        </p>
         <Button
           variant="outline"
           size="sm"
-          className={buttonClasses}
+          className="px-4 font-mono text-label"
           onClick={copy}
         >
           {state === "copied" && (
             <Check className="size-4" strokeWidth={1.5} aria-hidden="true" />
           )}
-          {state === "copied"
-            ? "Copied"
-            : state === "failed"
-              ? "Copy failed"
-              : "Copy"}
+          {state === "idle" ? "Copy" : message}
         </Button>
         <span role="status" className="sr-only">
-          {state === "copied"
-            ? "Copied"
-            : state === "failed"
-              ? "Copy failed"
-              : ""}
+          {message}
         </span>
       </div>
       <pre
@@ -239,84 +214,45 @@ function CodeBlock({
         aria-label={`Code: ${label}`}
         className="overflow-x-auto p-4 font-mono text-body focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid"
       >
-        {lines.map((line, i) => (
-          <span key={i}>
-            {i > 0 && "\n"}
-            {line.startsWith("#") ? (
-              <span className="text-muted-foreground">{line}</span>
-            ) : (
-              line
-            )}
-          </span>
-        ))}
+        <code>
+          {lines.map((line, i) => (
+            <span
+              key={i}
+              className={cn("block", line.comment && "text-muted-foreground")}
+            >
+              {line.text}
+            </span>
+          ))}
+        </code>
       </pre>
     </figure>
   )
 }
 
-function DocLinkList({
-  links,
-  linkClassName,
-}: {
-  links: DocLink[]
-  linkClassName: string
-}) {
-  return (
-    <ul>
-      {links.map((link) => {
-        const current = link.href === CURRENT_PAGE
-        return (
-          <li key={link.href}>
-            <a
-              href={link.href}
-              aria-current={current ? "page" : undefined}
-              className={cn(
-                "block text-body",
-                linkClassName,
-                link.command && "font-mono",
-                current ? currentLink : quietLink,
-                focusRing
-              )}
-            >
-              {link.label}
-            </a>
-          </li>
-        )
-      })}
-    </ul>
-  )
-}
-
 function useSectionInView(ids: string[]) {
-  const [active, setActive] = useState(ids[0])
+  const [active, setActive] = React.useState(ids[0])
 
-  useEffect(() => {
+  React.useEffect(() => {
     let frame = 0
-
     function update() {
       frame = 0
       const line = window.innerHeight / 3
-      const atEnd =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 1
-      if (atEnd) {
-        setActive(ids[ids.length - 1])
-        return
-      }
       let current = ids[0]
       for (const id of ids) {
         const heading = document.getElementById(id)
-        if (heading && heading.getBoundingClientRect().top < line) {
+        if (heading && heading.getBoundingClientRect().top <= line) {
           current = id
         }
       }
+      const atEnd =
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 1
+      if (atEnd) current = ids[ids.length - 1]
       setActive(current)
     }
-
     function schedule() {
       if (!frame) frame = window.requestAnimationFrame(update)
     }
-
     update()
     window.addEventListener("scroll", schedule, { passive: true })
     window.addEventListener("resize", schedule)
@@ -330,38 +266,45 @@ function useSectionInView(ids: string[]) {
   return active
 }
 
-const sectionIds = sections.map((section) => section.id)
+const sectionIds = sections.map((s) => s.id)
 
 export function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-  const activeSection = useSectionInView(sectionIds)
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const menuButton = React.useRef<HTMLButtonElement>(null)
+  const active = useSectionInView(sectionIds)
 
-  function onHeaderKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (!menuOpen || event.key !== "Escape") return
-    setMenuOpen(false)
-    menuButton.current?.focus()
+  function onHeaderKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (menuOpen && event.key === "Escape") {
+      setMenuOpen(false)
+      menuButton.current?.focus()
+    }
   }
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b border-border" onKeyDown={onHeaderKeyDown}>
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-6">
+        <div
+          className={cn(
+            container,
+            "flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
+          )}
+        >
           <div className="flex items-baseline gap-2">
             <a
               href="/"
-              className={cn("font-heading text-h2 text-foreground", focusRing)}
+              className={cn(
+                "font-heading text-h2 text-foreground transition-colors duration-150",
+                focusRing
+              )}
             >
               plinth
             </a>
-            <span className="font-mono text-label text-muted-foreground">
-              docs
-            </span>
+            <p className="font-mono text-label text-muted-foreground">docs</p>
           </div>
           <nav aria-label="Main" className="hidden gap-6 lg:flex">
             {mainLinks.map((link) => (
               <a
-                key={link.label}
+                key={link.name}
                 href={link.href}
                 aria-current={link.current ? "true" : undefined}
                 className={cn(
@@ -370,7 +313,7 @@ export function App() {
                   focusRing
                 )}
               >
-                {link.label}
+                {link.name}
               </a>
             ))}
           </nav>
@@ -379,7 +322,7 @@ export function App() {
               href="/deploys"
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                buttonClasses
+                "px-4 font-mono text-label"
               )}
             >
               Open console
@@ -388,56 +331,57 @@ export function App() {
           <Button
             ref={menuButton}
             variant="outline"
-            className={cn("ml-auto lg:hidden", buttonClasses)}
+            className="ml-auto px-4 font-mono text-label lg:hidden"
             aria-expanded={menuOpen}
-            aria-controls="site-menu"
+            aria-controls="docs-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="site-menu"
+          id="docs-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border lg:hidden"
         >
-          <div className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
-            <ul>
-              {mainLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    aria-current={link.current ? "true" : undefined}
-                    className={cn(
-                      "block py-2 font-mono text-label",
-                      link.current ? currentLink : quietLink,
-                      focusRing
-                    )}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-              <li>
-                <a
-                  href="/deploys"
-                  className={cn(
-                    "block py-2 font-mono text-label",
-                    quietLink,
-                    focusRing
-                  )}
-                >
-                  Open console
-                </a>
-              </li>
-            </ul>
+          <div className={cn(container, "py-2")}>
+            {mainLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                aria-current={link.current ? "true" : undefined}
+                className={cn(
+                  "block py-2 font-mono text-label",
+                  link.current ? currentLink : quietLink,
+                  focusRing
+                )}
+              >
+                {link.name}
+              </a>
+            ))}
+            <a
+              href="/deploys"
+              className={cn(
+                "block py-2 font-mono text-label",
+                quietLink,
+                focusRing
+              )}
+            >
+              Open console
+            </a>
             {docGroups.map((group) => (
               <div key={group.label}>
                 <p className="mt-4 font-mono text-label text-muted-foreground">
                   {group.label}
                 </p>
-                <DocLinkList links={group.links} linkClassName="py-2" />
+                <ul>
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <DocsLink link={link} spacing="py-2" />
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -445,59 +389,67 @@ export function App() {
       </header>
 
       <main>
-        <div className="mx-auto max-w-[1200px] px-4 md:px-6 lg:grid lg:grid-cols-12 lg:gap-6">
+        <div
+          className={cn(container, "grid grid-cols-1 gap-6 lg:grid-cols-12")}
+        >
           <nav
             aria-label="Docs"
             className="sticky top-0 -mx-1 hidden max-h-svh self-start overflow-y-auto px-1 pt-6 pb-6 lg:col-span-3 lg:block"
           >
             {docGroups.map((group, i) => (
-              <div key={group.label} className={cn(i > 0 && "mt-6")}>
+              <div key={group.label} className={i > 0 ? "mt-6" : undefined}>
                 <p className="font-mono text-label text-muted-foreground">
                   {group.label}
                 </p>
-                <div className="mt-2">
-                  <DocLinkList links={group.links} linkClassName="py-1" />
-                </div>
+                <ul className="mt-2">
+                  {group.links.map((link) => (
+                    <li key={link.href}>
+                      <DocsLink link={link} spacing="py-1" />
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </nav>
 
-          <div className="min-w-0 pt-6 lg:col-span-9 xl:col-span-7">
+          <article className="min-w-0 pt-6 lg:col-span-9 lg:col-start-4 xl:col-span-7">
             <p className="font-mono text-label text-muted-foreground">
               Commands / plinth deploy
             </p>
             <h1 className="mt-2 text-h1">plinth deploy</h1>
             <p className="mt-3 max-w-lg">
-              <Code>plinth deploy</Code> builds your project, uploads the result
-              and gives it an address. Without flags it makes a preview deploy
-              that only you and your team can see; with{" "}
-              <Code>--env production</Code> it replaces what your visitors see.
+              Builds the project in the current folder, uploads it to Plinth and
+              gives it its own address. A deploy goes to{" "}
+              <span className="font-mono">preview</span> unless you name another
+              environment, and the command prints the address once the deploy is
+              ready.
             </p>
 
             <h2 id="usage" className="mt-12 scroll-mt-6 text-h2">
               Usage
             </h2>
             <p className="mt-3 max-w-lg">
-              Run it from your project folder, or give it the folder to deploy.
+              Run it from the root of your project, or pass the folder to
+              deploy. Flags come after the path.
             </p>
             <CodeBlock
-              className="mt-6"
+              id="code-usage"
               label="shell"
-              lines={["plinth deploy [path] [flags]"]}
+              lines={[{ text: "plinth deploy [path] [flags]" }]}
+              className="mt-6"
             />
             <p className="mt-6 max-w-lg">
-              <Code>path</Code> is the folder to deploy, and defaults to the
-              current one. Plinth reads <Code>plinth.toml</Code> from that
-              folder, so the build command and output folder come from there.
+              <code className={inlineCode}>path</code> is the folder to deploy,
+              relative to where you run the command. It defaults to{" "}
+              <code className={inlineCode}>.</code>, the current folder, and
+              must hold a <code className={inlineCode}>plinth.toml</code>.
             </p>
 
             <h2 id="flags" className="mt-12 scroll-mt-6 text-h2">
               Flags
             </h2>
             <p className="mt-3 max-w-lg">
-              Flags can come before or after the path, and a flag given on the
-              command line wins over the same setting in{" "}
-              <Code>plinth.toml</Code>.
+              Every flag is optional and they can come in any order.
             </p>
             <div className="mt-6 overflow-hidden rounded-xl border border-border bg-card">
               <Table
@@ -506,12 +458,12 @@ export function App() {
               >
                 <TableHeader>
                   <TableRow>
-                    {["Flag", "Short", "Default", "Description"].map((head) => (
+                    {["Flag", "Short", "Default", "Description"].map((name) => (
                       <TableHead
-                        key={head}
+                        key={name}
                         className="px-3 font-mono text-label text-muted-foreground first:pl-6 last:pr-6"
                       >
-                        {head}
+                        {name}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -526,7 +478,7 @@ export function App() {
                         {row.short}
                       </TableCell>
                       <TableCell className="px-3 py-2 font-mono tabular-nums first:pl-6 last:pr-6">
-                        {row.def}
+                        {row.default}
                       </TableCell>
                       <TableCell className="px-3 py-2 whitespace-normal first:pl-6 last:pr-6">
                         {row.description}
@@ -542,10 +494,10 @@ export function App() {
                 note
               </p>
               <p className="mt-2 max-w-lg">
-                <PanelCode>--yes</PanelCode> skips the confirmation before a
-                production deploy. A deploy run with no terminal attached, as in
-                CI, needs it, or it stops with exit code{" "}
-                <span className="font-mono">2</span>.
+                <code className={panelCode}>--yes</code> skips the confirmation
+                before a deploy to <span className="font-mono">production</span>
+                . A deploy run with no terminal attached, as in CI, needs it, or
+                it stops with exit code <code className={panelCode}>2</code>.
               </p>
             </aside>
 
@@ -553,24 +505,31 @@ export function App() {
               Examples
             </h2>
             <p className="mt-3 max-w-lg">
-              Deploy the current folder as a preview and print its address.
+              Deploy the current folder to{" "}
+              <span className="font-mono">preview</span> and print its address.
             </p>
             <CodeBlock
-              className="mt-6"
+              id="code-preview"
               label="deploy a preview"
-              lines={["plinth deploy"]}
+              lines={[{ text: "plinth deploy" }]}
+              className="mt-6"
             />
             <p className="mt-6 max-w-lg">
-              Deploy to production from a script, and exit only once the deploy
-              is ready or has failed.
+              Deploy to <span className="font-mono">production</span> from a CI
+              job, with no confirmation, and exit only when the deploy is ready
+              or has failed.
             </p>
             <CodeBlock
-              className="mt-6"
+              id="code-production"
               label="deploy to production and wait"
               lines={[
-                "# Skip the confirmation and wait for the result",
-                "plinth deploy --env production --wait --yes",
+                {
+                  text: "# Skip the confirmation and wait for the result",
+                  comment: true,
+                },
+                { text: "plinth deploy --env production --wait --yes" },
               ]}
+              className="mt-6"
             />
 
             <h2 id="exit-codes" className="mt-12 scroll-mt-6 text-h2">
@@ -578,8 +537,8 @@ export function App() {
             </h2>
             <ul className="mt-3">
               {exitCodes.map((item, i) => (
-                <li key={item.code} className={cn(i > 0 && "mt-2")}>
-                  <Code>{item.code}</Code> {item.meaning}
+                <li key={item.code} className={i > 0 ? "mt-2" : undefined}>
+                  <code className={inlineCode}>{item.code}</code> {item.meaning}
                 </li>
               ))}
             </ul>
@@ -592,14 +551,14 @@ export function App() {
                 href="/docs/commands/init"
                 className={cn("group block", focusRing)}
               >
-                <span className="flex items-center gap-2 font-mono text-label text-muted-foreground">
+                <p className="flex items-center gap-2 font-mono text-label text-muted-foreground">
                   <ArrowLeft
                     className="size-4"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
                   Previous
-                </span>
+                </p>
                 <p className="mt-2 font-heading text-h2 text-foreground underline-offset-4 group-hover:underline">
                   plinth init
                 </p>
@@ -608,56 +567,58 @@ export function App() {
                 href="/docs/commands/logs"
                 className={cn("group ml-auto block text-right", focusRing)}
               >
-                <span className="flex items-center justify-end gap-2 font-mono text-label text-muted-foreground">
+                <p className="flex items-center justify-end gap-2 font-mono text-label text-muted-foreground">
                   Next
                   <ArrowRight
                     className="size-4"
                     strokeWidth={1.5}
                     aria-hidden="true"
                   />
-                </span>
+                </p>
                 <p className="mt-2 font-heading text-h2 text-foreground underline-offset-4 group-hover:underline">
                   plinth logs
                 </p>
               </a>
             </nav>
-          </div>
+          </article>
 
           <nav
             aria-label="On this page"
-            className="sticky top-0 hidden self-start pt-6 xl:col-span-2 xl:block"
+            className="sticky top-0 hidden self-start pt-6 xl:col-span-2 xl:col-start-11 xl:block"
           >
             <p className="font-mono text-label text-muted-foreground">
               On this page
             </p>
             <ul className="mt-2">
-              {sections.map((section, i) => {
-                const current = section.id === activeSection
-                return (
-                  <li key={section.id} className={cn(i > 0 && "mt-2")}>
-                    <a
-                      href={`#${section.id}`}
-                      aria-current={current ? "location" : undefined}
-                      className={cn(
-                        "font-mono text-label transition-colors duration-150",
-                        current
-                          ? currentLink
-                          : "text-muted-foreground hover:text-foreground",
-                        focusRing
-                      )}
-                    >
-                      {section.label}
-                    </a>
-                  </li>
-                )
-              })}
+              {sections.map((section, i) => (
+                <li key={section.id} className={i > 0 ? "mt-2" : undefined}>
+                  <a
+                    href={`#${section.id}`}
+                    aria-current={
+                      active === section.id ? "location" : undefined
+                    }
+                    className={cn(
+                      "font-mono text-label",
+                      active === section.id ? currentLink : quietLink,
+                      focusRing
+                    )}
+                  >
+                    {section.title}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </div>
       </main>
 
       <footer className="mt-12 border-t border-border">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 md:px-6">
+        <div
+          className={cn(
+            container,
+            "flex flex-wrap items-center gap-x-6 gap-y-2 py-6"
+          )}
+        >
           <p className="font-mono text-label text-muted-foreground">
             © 2026 Plinth Labs
           </p>
@@ -666,22 +627,47 @@ export function App() {
             className="ml-auto flex flex-wrap gap-x-6 gap-y-2"
           >
             {[
-              { label: "Edit this page", href: "#" },
-              { label: "Changelog", href: "/changelog" },
-              { label: "Status", href: "#" },
+              { name: "Edit this page", href: "#" },
+              { name: "Changelog", href: "/changelog" },
+              { name: "Status", href: "#" },
             ].map((link) => (
               <a
-                key={link.label}
+                key={link.name}
                 href={link.href}
                 className={cn("font-mono text-label", quietLink, focusRing)}
               >
-                {link.label}
+                {link.name}
               </a>
             ))}
           </nav>
         </div>
       </footer>
     </div>
+  )
+}
+
+function DocsLink({
+  link,
+  spacing,
+}: {
+  link: DocLink
+  spacing: "py-1" | "py-2"
+}) {
+  const current = link.href === CURRENT_PAGE
+  return (
+    <a
+      href={link.href}
+      aria-current={current ? "page" : undefined}
+      className={cn(
+        "block text-body",
+        spacing,
+        link.mono && "font-mono",
+        current ? currentLink : quietLink,
+        focusRing
+      )}
+    >
+      {link.name}
+    </a>
   )
 }
 

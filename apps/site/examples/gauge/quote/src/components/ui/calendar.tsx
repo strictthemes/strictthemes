@@ -10,11 +10,7 @@ import {
 } from "react-day-picker"
 
 import { Button, buttonVariants } from "@/components/ui/button"
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  ChevronDownIcon,
-} from "lucide-react"
+import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from "lucide-react"
 
 function Calendar({
   className,
@@ -122,7 +118,10 @@ function Calendar({
           "relative isolate z-0 rounded-r-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-muted",
           defaultClassNames.range_end
         ),
-        today: cn("text-foreground", defaultClassNames.today),
+        today: cn(
+          "text-foreground",
+          defaultClassNames.today
+        ),
         outside: cn(
           "text-muted-foreground aria-selected:text-muted-foreground",
           defaultClassNames.outside
@@ -148,21 +147,13 @@ function Calendar({
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === "left") {
             return (
-              <ChevronLeftIcon
-                strokeWidth={1.5}
-                className={cn("size-4", className)}
-                {...props}
-              />
+              <ChevronLeftIcon strokeWidth={1.5} className={cn("size-4", className)} {...props} />
             )
           }
 
           if (orientation === "right") {
             return (
-              <ChevronRightIcon
-                strokeWidth={1.5}
-                className={cn("size-4", className)}
-                {...props}
-              />
+              <ChevronRightIcon strokeWidth={1.5} className={cn("size-4", className)} {...props} />
             )
           }
 
@@ -219,7 +210,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 font-mono text-body leading-none font-normal tabular-nums group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:data-[selected-single=true]:hover:bg-primary dark:data-[selected-single=true]:hover:text-primary-foreground [&>span]:text-label [&>span]:opacity-70",
+        "relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground [&>span]:text-xs [&>span]:opacity-70 font-mono text-body tabular-nums group-data-[today=true]/day:border-foreground group-data-[today=true]/day:font-bold dark:data-[selected-single=true]:hover:bg-primary dark:data-[selected-single=true]:hover:text-primary-foreground",
         defaultClassNames.day,
         className
       )}

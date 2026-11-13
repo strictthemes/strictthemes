@@ -16,15 +16,17 @@ Build these sections in order.
 
 ### 1. Header
 
-A single row with a 1px bottom border. Left: the product name in `font-heading text-h2`. Middle or right: three text links as labels, Product, Pricing and Docs, none of them the current page. Far right: a "Sign in" label link and an `outline` button "Start free". Every one points to `#`. Below `md` the row holds only the product name, "Start free" and a "Menu" button; the three links and "Sign in" move into the menu.
+A single row with a 1px bottom border. Left: the product name in `font-heading text-h2`. After it: three text links as labels, Product, Pricing and Docs, none of them the current page. Far right: a "Sign in" label link and an `outline` button "Start free". Every one points to `#`. Below `md` the row holds only the product name, "Start free" and a "Menu" button; the menu lists Product, Pricing, Docs and "Sign in", in that order.
 
 ### 2. Hero
 
 - Columns 1–12: an eyebrow label, e.g. `SPREADSHEETS FOR TEAMS`.
 - Columns 1–10: the `<h1>` in `text-display` on `md` and up, `text-h1` below. Sample: "The spreadsheet everyone on the team can actually read."
 - Columns 1–6: one paragraph in `text-body`, two or three sentences.
-- Then, with `mt-8`, a row with the default button ("Start free") and one text link ("See how it works").
-- Then, with `mt-8`, across all 12 columns, a product figure: a `bg-card` panel with `p-8` (`p-4` below `md`), holding a plain `<table>` that follows the Tables note: a header row of labels and five data rows of plausible sample data in `text-body`, names in the inherited body font, numbers in `font-mono tabular-nums` aligned right, and their header cells aligned right too, rows divided by 1px borders, `first:pl-0 last:pr-0` on the cells. Below `md`, hide the less important columns so the table fits; it then needs no scroll box. Give the figure a caption.
+- Then, with `mt-8`, a row with the default button ("Start free") and one text link ("See how it works", pointing to `#how-it-works`, the How it works section's `id`).
+- Then, with `mt-8`, across all 12 columns, a product figure: a `bg-card` panel with `p-8` (`p-4` below `md`), holding a plain `<table>` that follows the Tables note: a header row of labels and five data rows of plausible sample data in `text-body`, names in the inherited body font, numbers in `font-mono tabular-nums` aligned right, and their header cells aligned right too, rows divided by 1px borders, `first:pl-0 last:pr-0` on the cells. Below `md`, hide the less important columns with `hidden md:table-cell` so the table fits; it then needs no scroll box. Hide middle columns only, never the first or the last, so `first:pl-0 last:pr-0` still land on visible cells: put the name first and the number columns last. Give the figure a caption.
+
+The grid has no `gap-y-*` here: space the hero's parts with margins, `mt-2` on the `<h1>`, `mt-4` on the paragraph and the two `mt-8`s.
 
 ### 3. Proof row
 
@@ -40,7 +42,7 @@ Section header: `02 / HOW IT WORKS`. Two rows, each with a 1px top border and `p
 
 ### 6. Quote
 
-One customer quote in a `<blockquote>`, set in `font-heading text-h1` across columns 1–10, with a 1px `border-foreground` top border above it, as wide as the container, and `pt-8`. Under it, with `mt-4`, a `<figcaption>` holding a label with the person's name, role and company; the quote and the caption sit in one `<figure>`. No avatar, no quotation-mark graphic.
+One customer quote in a `<blockquote>`, set in `font-heading text-h1` across columns 1–10, with a 1px `border-foreground` top border above it, as wide as the container, and `pt-8`. Under it, with `mt-4`, a `<figcaption>` holding a label with the person's name, role and company; the quote and the caption sit in one `<figure>`. The `<figure>` carries the top border and `pt-8` and is the 12-column grid; the `<blockquote>` and the `<figcaption>` both span columns 1–10. No avatar, no quotation-mark graphic.
 
 ### 7. Closing call to action
 

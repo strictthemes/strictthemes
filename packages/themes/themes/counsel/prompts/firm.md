@@ -36,12 +36,12 @@ A section with the `id` `practice-areas`, in the grid, with two parts:
 
 - **Heading**, a `<div>` in columns 1–4 (`md:col-span-4`): an `<h2>` in `text-h2`, "Practice areas", then with `mt-4` one sentence in `text-body`: "Five teams, each led by partners who have practised in Wexcombe for most of their careers."
 - **The list**, in columns 5–12 (`md:col-start-5 md:col-span-8`), with `mt-8 md:mt-0`: a `<ul>` as a list of entries (see the layout notes), which is itself the grid item and carries these classes, five entries, each with `py-8`. From `md` up each `<li>` is also `md:grid md:grid-cols-8 md:items-baseline md:gap-x-8`, with two parts:
-  - In columns 1–3 (`md:col-span-3`): the area's name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link. Only Commercial disputes links to `/practice/commercial-disputes`; the other four point to `#`.
+  - In columns 1–3 (`md:col-span-3`), a `<div>` that is the grid item, in every entry: the area's name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link. Only Commercial disputes links to `/practice/commercial-disputes`; the other four point to `#`.
   - In columns 4–8 (`md:col-span-5`), with `mt-2 md:mt-0`: one sentence in `text-body`, at most `max-w-xl`, saying what the team does.
 
   Entries, in this order: Corporate (sales and purchases of companies, investment, shareholder agreements), Commercial disputes (contract and supply claims, warranty claims after a sale, urgent court orders), Employment (contracts, restrictive covenants, team moves, tribunal claims), Real estate (leases, development sites, the property side of a sale), Private client (wills, trusts and succession for business owners).
 
-  In the Commercial disputes entry only, under its `<h3>` in the same grid item, a `<p>` with `mt-2` holding the page's one badge: "Ranked 2026". It is the page's one use of gold.
+  In the Commercial disputes entry only, under its `<h3>` in that `<div>`, a `<p>` with `mt-2` holding the page's one badge: "Ranked 2026". It is the page's one use of gold.
 
 ### 4. The firm in figures
 
@@ -58,16 +58,16 @@ A section that is not a grid:
 - With `mt-8`, a `<ul>` as a list of entries, three entries, each with `py-8`. Each `<li>` is also `md:grid md:grid-cols-12 md:items-baseline md:gap-x-8`, with three parts:
   - Columns 1–3 (`md:col-span-3`): a label line in `text-muted-foreground`, the year and the practice area, `2026 · Corporate`, with the year in a `<time dateTime="2026">`.
   - Columns 4–10 (`md:col-span-7`), with `mt-2 md:mt-0`: a `<div>` holding the matter's name as an `<h3>` in `text-h2`, not a link, and with `mt-2` one sentence in `text-body`, at most `max-w-xl`.
-  - Columns 11–12 (`md:col-span-2`), with `mt-2 md:mt-0`: the value, a `<p>` in `font-mono text-label uppercase tabular-nums text-foreground` with `md:text-right`.
+  - Columns 11–12 (`md:col-span-2`), with `mt-2 md:mt-0`: the value, a `<p>` in `font-mono text-label tabular-nums text-foreground` with `md:text-right`, and no `uppercase`, so a sum keeps its small `m`.
 
-  Entries, in this order: "Sale of Corran Marine" (`2026 · Corporate`, `£48m`): advised the founders of a boatbuilder on its sale to a Dutch shipping group. "Estley Mills v Brandreth Engineering" (`2026 · Commercial disputes`, `£6.2m`): won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification. "Wexcombe University, Quay Street" (`2026 · Real estate`, `11,000 m²`): acted for the university on the 25-year lease of its new research building. In `11,000 m²` the unit keeps its case: put `m²` in a `<span>` with `normal-case`.
+  Entries, in this order: "Sale of Corran Marine" (`2026 · Corporate`, `£48m`): advised the founders of a boatbuilder on its sale to a Dutch shipping group. "Estley Mills v Brandreth Engineering" (`2026 · Commercial disputes`, `£6.2m`): won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification. "Wexcombe University, Quay Street" (`2026 · Real estate`, `11,000 m²`): acted for the university on the 25-year lease of its new research building.
 
 ### 6. Partners
 
 A section that is not a grid:
 
 - A row with `flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2`: an `<h2>` in `text-h2`, "Partners", and an onward link from the layout notes, "All 14 partners", pointing to `#`. Here the link's `<p>` is not below the list: it is the second item of this row, at its right end.
-- With `mt-8`, a `<ul>` with `list-none` that is its own grid: `grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-8`. Here, instead of the Grid note's "never `gap-y-*`", this list of four people has `gap-y-8`, so the second row on a phone sits 32px under the first. Four `<li>`, each holding:
+- With `mt-8`, a `<ul>` with no markers that is its own grid: `grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-8`. Here, instead of the Grid note's "never `gap-y-*`", this list of four people has `gap-y-8`, so the second row on a phone sits 32px under the first. Four `<li>`, each holding:
   - A portrait from the layout notes, with the person's initials.
   - With `mt-4`, the name as an `<h3>` in `text-h2` holding a link, styled as a name that is a link: Ruth Calloway links to `/people/ruth-calloway`, the others to `#`.
   - With `mt-2`, the role, a label line in `text-muted-foreground`.

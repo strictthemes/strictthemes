@@ -12,7 +12,6 @@ const SHORT_MONTHS = [
   "Nov",
   "Dec",
 ]
-
 const LONG_MONTHS = [
   "January",
   "February",
@@ -28,36 +27,35 @@ const LONG_MONTHS = [
   "December",
 ]
 
-const pad = (n: number) => String(n).padStart(2, "0")
-
-/** 2026-11-27, for a <time>'s dateTime. */
 export function isoDate(date: Date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${date.getFullYear()}-${m}-${d}`
 }
 
-/** 27 Nov 2026, for a date that stands on its own. */
+/** 27 Nov 2026 */
 export function formatShortDate(date: Date) {
   return `${date.getDate()} ${SHORT_MONTHS[date.getMonth()]} ${date.getFullYear()}`
 }
 
-/** 27 November 2026, for a date inside a sentence. */
+/** 27 November 2026 */
 export function formatLongDate(date: Date) {
   return `${date.getDate()} ${LONG_MONTHS[date.getMonth()]} ${date.getFullYear()}`
 }
 
-export function sameDay(a: Date, b: Date) {
+export function isSameDay(a: Date, b: Date) {
   return isoDate(a) === isoDate(b)
 }
 
-/** Pence to £1,240.50, no sign. */
+/** Pence to £1,240.50 */
 export function formatMoney(pence: number) {
   const pounds = Math.floor(pence / 100)
-  const rest = pence % 100
-  return `£${pounds.toLocaleString("en-GB")}.${pad(rest)}`
+  const rest = String(pence % 100).padStart(2, "0")
+  return `£${pounds.toLocaleString("en-GB")}.${rest}`
 }
 
 const ONES = [
-  "",
+  "zero",
   "one",
   "two",
   "three",
@@ -78,7 +76,6 @@ const ONES = [
   "eighteen",
   "nineteen",
 ]
-
 const TENS = [
   "",
   "",
@@ -94,8 +91,8 @@ const TENS = [
 
 function underHundred(n: number) {
   if (n < 20) return ONES[n]
-  const units = n % 10
-  return units ? `${TENS[Math.floor(n / 10)]}-${ONES[units]}` : TENS[Math.floor(n / 10)]
+  const unit = n % 10
+  return TENS[Math.floor(n / 10)] + (unit ? `-${ONES[unit]}` : "")
 }
 
 function underThousand(n: number) {
@@ -107,30 +104,34 @@ function underThousand(n: number) {
 }
 
 function wholeNumber(n: number): string {
-  const groups: [number, string][] = [
-    [1_000_000, "million"],
-    [1_000, "thousand"],
-  ]
-  for (const [size, name] of groups) {
-    if (n >= size) {
-      const head = `${wholeNumber(Math.floor(n / size))} ${name}`
-      const rest = n % size
-      if (!rest) return head
-      return rest >= 100
-        ? `${head}, ${wholeNumber(rest)}`
-        : `${head} and ${underHundred(rest)}`
-    }
+  if (n >= 1_000_000) {
+    const millions = Math.floor(n / 1_000_000)
+    const rest = n % 1_000_000
+    const head = `${underThousand(millions)} million`
+    if (!rest) return head
+    return rest >= 100
+      ? `${head}, ${wholeNumber(rest)}`
+      : `${head} and ${underHundred(rest)}`
   }
-  return underThousand(n)
+  const thousands = Math.floor(n / 1000)
+  const rest = n % 1000
+  if (!thousands) return underThousand(rest)
+  const head = `${underThousand(thousands)} thousand`
+  if (!rest) return head
+  return rest >= 100
+    ? `${head}, ${underThousand(rest)}`
+    : `${head} and ${underHundred(rest)}`
 }
 
-/** Pence to "One thousand, two hundred and forty pounds and fifty pence". */
-export function amountInWords(pence: number) {
+/** 124050 -> "One thousand, two hundred and forty pounds and fifty pence" */
+export function moneyInWords(pence: number) {
   const pounds = Math.floor(pence / 100)
   const rest = pence % 100
   const parts: string[] = []
-  if (pounds) parts.push(`${wholeNumber(pounds)} ${pounds === 1 ? "pound" : "pounds"}`)
-  if (rest) parts.push(`${underHundred(rest)} ${rest === 1 ? "penny" : "pence"}`)
-  const words = parts.join(" and ") || "zero pounds"
-  return words.charAt(0).toUpperCase() + words.slice(1)
+  if (pounds)
+    parts.push(`${wholeNumber(pounds)} ${pounds === 1 ? "pound" : "pounds"}`)
+  if (rest)
+    parts.push(`${underHundred(rest)} ${rest === 1 ? "penny" : "pence"}`)
+  const text = parts.join(" and ")
+  return text.charAt(0).toUpperCase() + text.slice(1)
 }

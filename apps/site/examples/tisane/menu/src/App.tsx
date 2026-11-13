@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 type Mark = "Vegan" | "Gluten-free" | "Vegetarian"
-type Filter = "all" | "vegan" | "gluten-free"
 
 type Item = {
   name: string
@@ -22,7 +21,31 @@ type MenuSection = {
   items: Item[]
 }
 
-const menu: MenuSection[] = [
+type Filter = "all" | "vegan" | "gluten-free"
+
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const quietLink = cn(
+  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+
+const textLink = cn(
+  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  focusRing
+)
+
+const buttonClass = "h-auto rounded-md px-6 py-2 font-mono text-label"
+
+const navLinks = [
+  { label: "Menu", href: "/menu", current: true },
+  { label: "Book a table", href: "/booking", current: false },
+  { label: "Journal", href: "/journal", current: false },
+  { label: "Visit", href: "/visit", current: false },
+]
+
+const sections: MenuSection[] = [
   {
     id: "teas",
     title: "Teas",
@@ -30,32 +53,32 @@ const menu: MenuSection[] = [
     items: [
       {
         name: "Garden mint",
-        note: "Fresh leaves from the garden at the back",
+        note: "Fresh leaves from the garden at the back.",
         price: "£3.80",
         marks: ["Vegan", "Gluten-free"],
       },
       {
         name: "Lemon verbena",
-        note: "Dried on racks in the shop since August",
+        note: "Dried in the shed over the summer, bright and soft.",
         price: "£3.80",
         marks: ["Vegan", "Gluten-free"],
       },
       {
         name: "Pear and ginger",
-        note: "Made with this week's pears and fresh root",
+        note: "Dried pear from the orchard with a slice of fresh ginger.",
         price: "£4.20",
         marks: ["Vegan", "Gluten-free"],
         seasonal: true,
       },
       {
         name: "Roasted barley",
-        note: "Nutty and dark, with no caffeine",
+        note: "Toasty and nutty, with no caffeine at all.",
         price: "£3.60",
         marks: ["Vegan"],
       },
       {
         name: "Breakfast black with oat milk",
-        note: "A strong Assam blend, steeped for four minutes",
+        note: "A strong Assam blend, poured with a jug of oat milk.",
         price: "£3.40",
         marks: ["Vegan", "Gluten-free"],
       },
@@ -73,25 +96,25 @@ const menu: MenuSection[] = [
     items: [
       {
         name: "Roast squash and lentil soup with rye bread",
-        note: "A big bowl, with bread from the bakery on Church Row",
+        note: "Squash from Hollins Farm, roasted with thyme.",
         price: "£7.50",
         marks: ["Vegan"],
       },
       {
         name: "Baked eggs with spinach and yoghurt",
-        note: "Two eggs in a small dish, with chilli butter",
+        note: "Two eggs baked in the pan, with garlic yoghurt on top.",
         price: "£9.00",
         marks: ["Vegetarian", "Gluten-free"],
       },
       {
         name: "Mushrooms on sourdough toast",
-        note: "Field mushrooms with thyme and garlic",
+        note: "Field mushrooms with parsley on our own sourdough.",
         price: "£8.50",
         marks: ["Vegan"],
       },
       {
         name: "Beetroot, lentil and walnut salad",
-        note: "Roast beetroot, green lentils and a mustard dressing",
+        note: "Roasted beetroot, green lentils and a mustard dressing.",
         price: "£9.50",
         marks: ["Vegan", "Gluten-free"],
       },
@@ -104,25 +127,25 @@ const menu: MenuSection[] = [
     items: [
       {
         name: "Pear and cardamom loaf",
-        note: "A thick slice, sold by the piece or the loaf",
+        note: "Made with this week's pears.",
         price: "£3.60",
         marks: ["Vegetarian"],
       },
       {
         name: "Almond and orange cake",
-        note: "Ground almonds and whole oranges, no flour",
+        note: "Ground almonds and a whole boiled orange, no flour.",
         price: "£3.80",
         marks: ["Vegetarian", "Gluten-free"],
       },
       {
         name: "Oat and date slice",
-        note: "Sweetened with dates and a little maple syrup",
+        note: "Chewy, not too sweet, good with a pot of black tea.",
         price: "£3.20",
         marks: ["Vegan"],
       },
       {
         name: "Ginger parkin",
-        note: "Oats, black treacle and ginger, kept for three days",
+        note: "Dark and sticky, made with oatmeal and treacle.",
         price: "£3.20",
         marks: ["Vegetarian"],
       },
@@ -142,44 +165,25 @@ function matches(item: Item, filter: Filter) {
   return true
 }
 
-const focusOutline =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const chromeLink = cn(
-  "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusOutline
-)
-
-const textLink = cn(
-  "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusOutline
-)
-
-const navLinks = [
-  { label: "Menu", href: "/menu", current: true },
-  { label: "Book a table", href: "/booking", current: false },
-  { label: "Journal", href: "/journal", current: false },
-  { label: "Visit", href: "/visit", current: false },
-]
+function statusText(filter: Filter, count: number) {
+  const noun = count === 1 ? "item" : "items"
+  if (filter === "all") return `Showing all ${count} ${noun}`
+  return `Showing ${count} ${filter} ${noun}`
+}
 
 export function App() {
   const [filter, setFilter] = useState<Filter>("all")
 
-  const shownCount = menu.reduce(
+  const shownCount = sections.reduce(
     (total, section) =>
       total + section.items.filter((item) => matches(item, filter)).length,
     0
   )
-  const noun = shownCount === 1 ? "item" : "items"
-  const status =
-    filter === "all"
-      ? `Showing all ${shownCount} ${noun}`
-      : `Showing ${shownCount} ${filter} ${noun}`
 
   return (
     <div className="mx-auto max-w-[1120px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn(chromeLink, "font-heading text-h2")}>
+        <a href="/" className={cn("font-heading text-h2", quietLink)}>
           The Linden Room
         </a>
         <nav aria-label="Main">
@@ -190,8 +194,8 @@ export function App() {
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
                   className={cn(
-                    chromeLink,
                     "text-body",
+                    quietLink,
                     link.current && "underline"
                   )}
                 >
@@ -204,17 +208,17 @@ export function App() {
       </header>
 
       <main>
-        <section className="grid gap-6 pt-10 md:grid-cols-12">
+        <section className="grid grid-cols-1 gap-6 pt-10 md:grid-cols-12">
           <div className="md:col-span-8">
-            <p className="font-mono text-label text-muted-foreground">
+            <p className="font-mono text-label text-muted-foreground tabular-nums">
               Autumn menu · From{" "}
               <time dateTime="2026-11-02">2 November 2026</time>
             </p>
             <h1 className="mt-2 text-h1">Menu</h1>
             <p className="mt-4 max-w-xl">
-              We cook soups, plates and cakes from scratch each day in our own
-              kitchen, with vegetables from growers near Ashby Wold. Every tea
-              on this menu is also sold loose by weight at the counter.
+              Everything here is cooked in our own kitchen from what the season
+              brings in, with bread and cakes baked each morning. The teas on
+              this menu are also sold by weight at the counter.
             </p>
 
             <div className="mt-6">
@@ -230,7 +234,7 @@ export function App() {
                       key={option.value}
                       variant={chosen ? "secondary" : "outline"}
                       aria-pressed={chosen ? "true" : "false"}
-                      className="h-auto rounded-md px-6 py-2 font-mono text-label"
+                      className={buttonClass}
                       onClick={() => setFilter(option.value)}
                     >
                       {option.label}
@@ -240,17 +244,17 @@ export function App() {
               </div>
               <p
                 role="status"
-                className="mt-4 font-mono text-label text-muted-foreground"
+                className="mt-4 font-mono text-label text-muted-foreground tabular-nums"
               >
-                {status}
+                {statusText(filter, shownCount)}
               </p>
             </div>
           </div>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12 md:items-start">
-          <div className="md:col-span-8">
-            {menu.map((section, index) => {
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
+          <div className="min-w-0 md:col-span-8">
+            {sections.map((section, index) => {
               const shown = section.items.filter((item) =>
                 matches(item, filter)
               )
@@ -264,14 +268,10 @@ export function App() {
                   <h2 id={headingId} className="text-h2">
                     {section.title}
                   </h2>
-                  <p className="mt-2 font-mono text-label text-muted-foreground">
+                  <p className="mt-2 font-mono text-label text-muted-foreground tabular-nums">
                     {section.served}
                   </p>
-                  {shown.length === 0 ? (
-                    <p className="mt-4">
-                      Nothing in this section is {filter} today.
-                    </p>
-                  ) : (
+                  {shown.length > 0 ? (
                     <ul className="mt-4 divide-y">
                       {shown.map((item) => (
                         <li
@@ -296,12 +296,16 @@ export function App() {
                               </p>
                             )}
                           </div>
-                          <p className="shrink-0 font-mono text-label text-foreground tabular-nums">
+                          <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
                             {item.price}
-                          </p>
+                          </span>
                         </li>
                       ))}
                     </ul>
+                  ) : (
+                    <p className="mt-4">
+                      Nothing in this section is {filter} today.
+                    </p>
                   )}
                 </section>
               )
@@ -319,19 +323,19 @@ export function App() {
               Everything is made in one small kitchen that also uses nuts,
               gluten and milk. A mark means the recipe has none, not that the
               kitchen is free of it. If you have an allergy, please ask at the
-              counter before you order.
+              counter.
             </p>
           </aside>
         </section>
 
-        <section className="mt-18 grid gap-6 md:grid-cols-12">
+        <section className="mt-18 grid grid-cols-1 gap-6 md:grid-cols-12">
           <div className="md:col-span-8">
             <p className="max-w-xl">
+              Coming with friends or for a quiet lunch? You can{" "}
               <a href="/booking" className={textLink}>
-                Book a table
+                book a table
               </a>{" "}
-              up to four weeks ahead if you are coming with friends or at the
-              weekend, when the room fills by noon.
+              for any day we are open.
             </p>
           </div>
         </section>
@@ -339,11 +343,12 @@ export function App() {
 
       <footer className="mt-18">
         <div className="border-t py-10">
-          <div className="grid gap-6 md:grid-cols-12 md:items-start">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
               <p className="font-heading text-h2">The Linden Room</p>
-              <p className="mt-2 max-w-xl">
-                A tea room and shop in an old mill house, open since 2014.
+              <p className="mt-2">
+                A tea room and shop on Mill Lane, with loose tea by weight and
+                cakes from our own oven.
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8">
@@ -357,7 +362,7 @@ export function App() {
               </p>
             </div>
           </div>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
+          <p className="mt-6 font-mono text-label text-muted-foreground tabular-nums">
             © 2026 The Linden Room
           </p>
         </div>

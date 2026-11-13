@@ -7,7 +7,7 @@ colors:
   on-primary: "#FFFFFF"
   secondary: "#16242E"
   on-secondary: "#FFFFFF"
-  tertiary: "#F2A900"
+  tertiary: "#BF8200"
   on-tertiary: "#16242E"
   neutral: "#5B6B76"
   background: "#F3F6F8"
@@ -115,6 +115,8 @@ strict:
         on-primary: "#06262B"
         secondary: "#E7EEF2"
         on-secondary: "#16242E"
+        tertiary: "#F2A900"
+        on-tertiary: "#16242E"
         neutral: "#93A4AF"
         background: "#0C151B"
         surface: "#14212A"
@@ -135,7 +137,7 @@ when all is well and make the one thing that needs attention obvious.
 
 - **Primary (`#085F66`)** is teal, for the main action, the selected item and links.
 - **Secondary (`#16242E`)** is a deep blue-black for secondary buttons and headings.
-- **Tertiary (`#F2A900`)** is amber, a caution signal. Use it for badges and warnings, never as decoration.
+- **Tertiary (`#BF8200`)** is amber, a caution signal. Use it for badges and warnings, never as decoration. It is dark enough to stand alone as a dot or a bar on white (3.3:1); dark mode uses a brighter `#F2A900`.
 - **Neutral (`#5B6B76`)** sets labels, units and secondary text.
 - **Background (`#F3F6F8`)** is the cool grey of the page. **Surface (`#FFFFFF`)** is the panel that sits on it.
 - **Success (`#1E7B4B`) and Error (`#C2362B`)** report state. Pair them with an icon or a word; never rely on color alone.

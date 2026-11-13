@@ -1,8 +1,8 @@
 import * as React from "react"
 import { CalendarIcon } from "lucide-react"
 
-import { cn } from "@/lib/utils"
 import { formatLongDate, toDateTime } from "@/lib/dates"
+import { cn } from "@/lib/utils"
 import { Calendar } from "@/components/ui/calendar"
 import {
   Popover,
@@ -14,11 +14,12 @@ type DatePickerProps = {
   id: string
   labelId: string
   value: Date | undefined
-  onValueChange: (value: Date) => void
+  onValueChange: (value: Date | undefined) => void
   min?: Date
   "aria-invalid"?: boolean
   "aria-describedby"?: string
   ref?: React.Ref<HTMLButtonElement>
+  className?: string
 }
 
 function DatePicker({
@@ -30,6 +31,7 @@ function DatePicker({
   "aria-invalid": ariaInvalid,
   "aria-describedby": ariaDescribedBy,
   ref,
+  className,
 }: DatePickerProps) {
   const [open, setOpen] = React.useState(false)
   const calendarRef = React.useRef<HTMLDivElement>(null)
@@ -43,16 +45,16 @@ function DatePicker({
         aria-labelledby={`${labelId} ${valueId}`}
         aria-invalid={ariaInvalid || undefined}
         aria-describedby={ariaDescribedBy}
-        className="flex min-h-11 w-full items-center justify-between gap-2 rounded-md border border-muted-foreground bg-card px-4 py-1 text-left text-body outline-none focus-visible:border-ring focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-invalid:border-destructive"
+        className={cn(
+          "flex min-h-11 w-full items-center justify-between gap-2 rounded-md border border-muted-foreground bg-card px-4 py-1 text-left text-body outline-none focus-visible:border-ring focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-invalid:border-destructive",
+          className
+        )}
       >
-        <span
-          id={valueId}
-          className={cn(value ? undefined : "text-muted-foreground")}
-        >
+        <span id={valueId}>
           {value ? (
             <time dateTime={toDateTime(value)}>{formatLongDate(value)}</time>
           ) : (
-            "Choose a date"
+            <span className="text-muted-foreground">Choose a date</span>
           )}
         </span>
         <CalendarIcon
@@ -91,3 +93,4 @@ function DatePicker({
 }
 
 export { DatePicker }
+export type { DatePickerProps }

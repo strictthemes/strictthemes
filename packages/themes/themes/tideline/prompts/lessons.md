@@ -6,7 +6,7 @@ order: 2
 checks:
   - "Each of the three lesson cards has exactly one orange badge with its level, a description list with its length, group size and ages, a list of what is included, and its price in whole pounds."
   - "The three Book this lesson buttons are sun-yellow secondary links to /booking, each with an aria-label that names its lesson, and Book a lesson is the only default button on the page."
-  - "The kit hire prices are a table of six rows whose header cells have scope col, inside a box that scrolls sideways at 375px, can be reached with the keyboard and has an aria-label."
+  - "The kit hire prices are a table of six rows whose header cells have scope col and whose item cells are row headers with scope row, inside a box that scrolls sideways at 375px, can be reached with the keyboard and has an aria-label."
   - "The questions are headings with their answers under them as plain text, all visible, with no accordion."
   - "The opening block element carries bg-lagoon text-lagoon-foreground and the closing block element bg-coral text-coral-foreground, so their text stays deep-sea ink in dark mode, and the blocks hold no link, button or badge."
 ---
@@ -47,7 +47,7 @@ The three lessons, word for word:
 
 A section of parts side by side, from the layout notes, with its `aria-labelledby` pointing at the `<h2>` "Kit hire". Here the parts stand side by side only from `lg`: write `lg:` in place of `md:` in the grid's classes and in the spans (`grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-x-6 lg:items-start`).
 
-**First part,** `lg:col-span-8`: a `flex flex-col gap-6` holding a `flex flex-col gap-4` with the `<h2>` "Kit hire" and one paragraph in `text-body` with `max-w-xl`: "Surfed before? Hire what you need from the Boat Shed, with no need to book. Prices are for one item.", and then the table in its card, as the Tables note describes it, with `label="Kit hire"`. Four columns: Item, 2 hours, Half day, Full day. Six rows, the three prices with `tabular-nums` (the item takes its size from the table's `text-body`):
+**First part,** `lg:col-span-8`: a `flex flex-col gap-6` holding a `flex flex-col gap-4` with the `<h2>` "Kit hire" and one paragraph in `text-body` with `max-w-xl`: "Surfed before? Hire what you need from the Boat Shed, with no need to book. Prices are for one item.", and then the table in its card, as the Tables note describes it, with `label="Kit hire"`. Four columns: Item, 2 hours, Half day, Full day. Six rows, the three prices with `tabular-nums` (the item takes its size from the table's `text-body`). The item names its row: it is a `<th scope="row">` with the classes of a stock body cell and the notes' cell classes (`px-6 py-4 text-left align-middle font-normal whitespace-nowrap text-foreground`), not a `TableCell` and not a `TableHead`:
 
 | Item | 2 hours | Half day | Full day |
 |---|---|---|---|

@@ -1,21 +1,26 @@
-import { useRef, useState, type KeyboardEvent, type ReactNode } from "react"
+import * as React from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 type Kind = "added" | "changed" | "fixed" | "removed"
+type Filter = Kind | "all"
 
 type Change = { kind: Kind; text: string }
-
-type Release = {
-  version: string
-  date: string
-  changes: Change[]
-}
+type Release = { version: string; date: string; changes: Change[] }
 
 const KINDS: Kind[] = ["added", "changed", "fixed", "removed"]
 
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "added", label: "Added" },
+  { value: "changed", label: "Changed" },
+  { value: "fixed", label: "Fixed" },
+  { value: "removed", label: "Removed" },
+]
+
+// Newest first. Text between backticks is shown as inline code.
 const RELEASES: Release[] = [
   {
     version: "2.4.0",
@@ -23,19 +28,19 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "added",
-        text: "Every branch you push now gets its own preview deploy, with a stable URL printed at the end of `plinth deploy`.",
+        text: "Every branch you push now gets its own preview deploy, and `plinth deploy` prints its address when the upload finishes.",
       },
       {
         kind: "added",
-        text: "`plinth deploy --wait` blocks until the deploy is live and exits non-zero if it fails, so CI jobs can stop on a broken release.",
+        text: "`plinth deploy --wait` waits until the deploy is live and exits with an error if it fails, so a CI job can depend on it.",
       },
       {
         kind: "changed",
-        text: "Uploads now send only the files that changed since the last deploy, which makes a typical redeploy about three times faster.",
+        text: "Uploads now send only the files that changed since the last deploy, which makes most deploys several times faster.",
       },
       {
         kind: "fixed",
-        text: "`plinth logs --follow` no longer drops lines when the connection reconnects after a network change.",
+        text: "`plinth logs` keeps following the output after a network drop of a few seconds instead of exiting.",
       },
     ],
   },
@@ -45,11 +50,11 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "fixed",
-        text: "`plinth env pull` now keeps quotes around values that contain spaces when it writes `.env.local`.",
+        text: "`plinth deploy` no longer hangs on projects with more than ten thousand files.",
       },
       {
         kind: "fixed",
-        text: "A deploy from a folder with a symlinked `node_modules` no longer uploads the linked folder twice.",
+        text: "The upload progress line now reaches the end instead of stopping one file short.",
       },
     ],
   },
@@ -59,15 +64,11 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "fixed",
-        text: "`plinth login` opens the browser again on Linux systems where `xdg-open` is the only handler.",
+        text: "`plinth env pull` keeps the quotes around values that contain spaces when it writes `.env`.",
       },
       {
         kind: "fixed",
-        text: "The progress bar no longer overwrites the last line of output in terminals narrower than 60 columns.",
-      },
-      {
-        kind: "fixed",
-        text: "Exit code 2 is reserved for configuration errors again, as the docs describe, instead of being used for network timeouts.",
+        text: "On a machine without a browser, `plinth login` prints the sign-in link instead of failing.",
       },
     ],
   },
@@ -77,15 +78,15 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "added",
-        text: "`plinth env pull` downloads a project's environment variables into `.env.local`, so local runs match production.",
+        text: "`plinth env pull` writes the project's environment variables to a local `.env` file, so your dev server runs with the same settings as production.",
       },
       {
         kind: "changed",
-        text: "`plinth env set` now asks before it overwrites an existing value; pass `--force` to skip the question in scripts.",
+        text: "`plinth env list` hides secret values by default; pass `--reveal` to show them.",
       },
       {
         kind: "removed",
-        text: "The `plinth secrets` command is gone; use `plinth env set` and `plinth env pull`, which read and write the same values.",
+        text: "The `plinth secrets` command is gone: use `plinth env` for every variable, secret or not.",
       },
     ],
   },
@@ -95,11 +96,11 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "fixed",
-        text: "`plinth deploy` no longer fails with a checksum error on files larger than 2 GB.",
+        text: "`plinth deploy` reads `build.output` from `plinth.toml` again instead of falling back to `dist`.",
       },
       {
-        kind: "changed",
-        text: "The build step now times out after 20 minutes instead of 10; set `build.timeout` in `plinth.toml` to change it.",
+        kind: "fixed",
+        text: "The error for an expired token now tells you to run `plinth login`.",
       },
     ],
   },
@@ -109,15 +110,15 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "added",
-        text: "`plinth rollback` puts the previous deploy back live in a few seconds, without rebuilding it.",
+        text: "`plinth open` opens the latest deploy of the current project in your browser.",
       },
       {
         kind: "added",
-        text: "`plinth status --json` prints the current deploy as JSON for scripts and dashboards.",
+        text: "`plinth status --json` prints the state of the latest deploy as JSON for scripts.",
       },
       {
-        kind: "fixed",
-        text: "Ctrl-C during an upload now cancels the deploy on the server too, instead of leaving it half-built.",
+        kind: "changed",
+        text: "`plinth deploy` prints the deploy's address on the last line of its output, so a script can read it with `tail -n 1`.",
       },
     ],
   },
@@ -127,11 +128,15 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "added",
-        text: "`plinth init` detects Vite, Astro and Next.js projects and writes a matching `plinth.toml`.",
+        text: "`plinth rollback` puts the previous deploy back live without building again.",
       },
       {
-        kind: "changed",
-        text: "Output is no longer colored when it is piped or when `NO_COLOR` is set.",
+        kind: "added",
+        text: "Set `PLINTH_TOKEN` to sign in on CI without running `plinth login`.",
+      },
+      {
+        kind: "fixed",
+        text: "Deploys from Windows no longer upload files with backslashes in their paths.",
       },
     ],
   },
@@ -141,11 +146,11 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "fixed",
-        text: "`plinth deploy` reads `plinth.toml` from the project root again when it is run from a subfolder.",
+        text: "`plinth init` writes a valid `plinth.toml` when the project folder's name contains a dot.",
       },
       {
-        kind: "changed",
-        text: "The warning about a leftover `plinth.json` now names the file's path and says how to convert it.",
+        kind: "fixed",
+        text: "`plinth deploy` no longer warns about a missing `plinth.json` in a project that has moved to `plinth.toml`.",
       },
     ],
   },
@@ -155,33 +160,25 @@ const RELEASES: Release[] = [
     changes: [
       {
         kind: "added",
-        text: "`plinth migrate` converts an existing `plinth.json` to `plinth.toml` and keeps your comments.",
+        text: "`plinth migrate` turns an existing `plinth.json` into a `plinth.toml` in one step.",
       },
       {
         kind: "changed",
-        text: "Configuration now lives in `plinth.toml`, which allows comments and grouped sections for build and deploy settings.",
+        text: "Project settings now live in `plinth.toml`, which allows comments and is easier to read than JSON.",
+      },
+      {
+        kind: "changed",
+        text: "`plinth deploy` builds in a clean folder every time, so files left over from an old build are never uploaded.",
       },
       {
         kind: "removed",
-        text: "`plinth.json` is no longer read; run `plinth migrate` once before you upgrade a project's CI.",
-      },
-      {
-        kind: "removed",
-        text: "The `--legacy-upload` flag is gone, along with the upload path it switched on.",
+        text: "`plinth.json` is no longer read: run `plinth migrate` before you update, or your settings will be ignored.",
       },
     ],
   },
 ]
 
 const LATEST_VERSION = RELEASES[0].version
-
-const FILTERS: { value: Kind | "all"; label: string }[] = [
-  { value: "all", label: "All" },
-  { value: "added", label: "Added" },
-  { value: "changed", label: "Changed" },
-  { value: "fixed", label: "Fixed" },
-  { value: "removed", label: "Removed" },
-]
 
 const MONTHS = [
   "Jan",
@@ -203,172 +200,142 @@ function formatDate(iso: string) {
   return `${day} ${MONTHS[month - 1]} ${year}`
 }
 
-const focusOutline =
+const CONTAINER = "mx-auto max-w-[1200px] px-4 md:px-6"
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-
-const quietLink = cn(
-  "text-muted-foreground transition-colors duration-150 hover:text-foreground",
-  focusOutline
+const QUIET_LINK = cn(
+  "font-mono text-label text-muted-foreground transition-colors duration-150 hover:text-foreground",
+  FOCUS
 )
-
-const currentLink = cn(
-  "text-foreground underline underline-offset-4 transition-colors duration-150",
-  focusOutline
+const CURRENT_LINK = cn(
+  "font-mono text-label text-foreground underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+  FOCUS
 )
+const BUTTON_CLASSES = "px-4 font-mono text-label"
 
-const buttonClass = "px-4 font-mono text-label"
+const NAV_LINKS = [
+  { label: "Docs", href: "/docs" },
+  { label: "Changelog", href: "/changelog", current: true },
+  { label: "Pricing", href: "#" },
+]
 
-function InlineCode({ children }: { children: ReactNode }) {
-  return (
-    <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
-      {children}
-    </code>
-  )
-}
-
-function RichText({ text }: { text: string }) {
+function InlineText({ text }: { text: string }) {
   const parts = text.split("`")
   return (
     <>
       {parts.map((part, i) =>
-        i % 2 === 1 ? <InlineCode key={i}>{part}</InlineCode> : part
+        i % 2 === 1 ? (
+          <code key={i} className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+            {part}
+          </code>
+        ) : (
+          <React.Fragment key={i}>{part}</React.Fragment>
+        )
       )}
     </>
   )
 }
 
-const NAV_LINKS = [
-  { href: "/docs", label: "Docs" },
-  { href: "/changelog", label: "Changelog", current: true },
-  { href: "#", label: "Pricing" },
-]
-
 function SiteHeader() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
+  const [open, setOpen] = React.useState(false)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
 
-  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
+  function onKeyDown(event: React.KeyboardEvent<HTMLElement>) {
     if (open && event.key === "Escape") {
       setOpen(false)
-      menuButton.current?.focus()
+      menuButtonRef.current?.focus()
     }
   }
 
   return (
     <header className="border-b border-border" onKeyDown={onKeyDown}>
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3 md:px-6">
+      <div
+        className={cn(
+          CONTAINER,
+          "flex flex-wrap items-center gap-x-6 gap-y-2 py-3"
+        )}
+      >
         <a
           href="/"
-          className={cn("font-heading text-h2 text-foreground", focusOutline)}
+          className={cn(
+            "font-heading text-h2 text-foreground transition-colors duration-150",
+            FOCUS
+          )}
         >
           plinth
         </a>
-        <nav aria-label="Main" className="hidden md:flex">
-          <ul className="flex gap-6 font-mono text-label">
-            {NAV_LINKS.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={link.current ? currentLink : quietLink}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <nav aria-label="Main" className="hidden gap-6 md:flex">
+          {NAV_LINKS.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              aria-current={link.current ? "page" : undefined}
+              className={link.current ? CURRENT_LINK : QUIET_LINK}
+            >
+              {link.label}
+            </a>
+          ))}
         </nav>
         <div className="ml-auto hidden items-center gap-3 md:flex">
           <a
             href="/deploys"
-            className={cn(buttonVariants({ variant: "outline" }), buttonClass)}
+            className={cn(buttonVariants({ variant: "outline" }), BUTTON_CLASSES)}
           >
             Open console
           </a>
         </div>
         <Button
-          ref={menuButton}
+          ref={menuButtonRef}
           variant="outline"
-          className={cn("ml-auto md:hidden", buttonClass)}
+          className={cn("ml-auto md:hidden", BUTTON_CLASSES)}
           aria-expanded={open}
-          aria-controls="mobile-menu"
+          aria-controls="site-menu"
           onClick={() => setOpen((value) => !value)}
         >
           Menu
         </Button>
       </div>
       <nav
-        id="mobile-menu"
+        id="site-menu"
         aria-label="Main"
         hidden={!open}
         className="border-t border-border md:hidden"
       >
-        <ul className="mx-auto max-w-[1200px] px-4 py-2 font-mono text-label md:px-6">
+        <div className={cn(CONTAINER, "py-2")}>
           {NAV_LINKS.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                aria-current={link.current ? "page" : undefined}
-                className={cn(
-                  "block py-2",
-                  link.current ? currentLink : quietLink
-                )}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-          <li>
-            <a href="/deploys" className={cn("block py-2", quietLink)}>
-              Open console
+            <a
+              key={link.label}
+              href={link.href}
+              aria-current={link.current ? "page" : undefined}
+              className={cn(
+                "block py-2",
+                link.current ? CURRENT_LINK : QUIET_LINK
+              )}
+            >
+              {link.label}
             </a>
-          </li>
-        </ul>
+          ))}
+          <a href="/deploys" className={cn("block py-2", QUIET_LINK)}>
+            Open console
+          </a>
+        </div>
       </nav>
     </header>
-  )
-}
-
-function SiteFooter() {
-  const links = [
-    { href: "/docs", label: "Docs" },
-    { href: "#", label: "Status" },
-    { href: "#", label: "RSS feed" },
-  ]
-  return (
-    <footer className="mt-12 border-t border-border">
-      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 md:px-6">
-        <p className="font-mono text-label text-muted-foreground">
-          © 2026 Plinth Labs
-        </p>
-        <nav aria-label="Footer" className="ml-auto">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 font-mono text-label">
-            {links.map((link) => (
-              <li key={link.label}>
-                <a href={link.href} className={quietLink}>
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </footer>
   )
 }
 
 function ReleaseItem({
   release,
   kinds,
-  first,
+  isFirst,
 }: {
   release: Release
   kinds: Kind[]
-  first: boolean
+  isFirst: boolean
 }) {
   const id = `v${release.version.replaceAll(".", "-")}`
   return (
-    <li className={cn("border-t border-border pt-6", !first && "mt-12")}>
+    <li className={cn("border-t border-border pt-6", !isFirst && "mt-12")}>
       <article
         aria-labelledby={id}
         className="grid grid-cols-1 gap-6 lg:grid-cols-12"
@@ -391,9 +358,9 @@ function ReleaseItem({
             </p>
           )}
         </div>
-        <div className="max-w-lg lg:col-span-9">
+        <div className="max-w-lg min-w-0 lg:col-span-9">
           {kinds.map((kind, groupIndex) => (
-            <section key={kind} className={cn(groupIndex > 0 && "mt-6")}>
+            <div key={kind} className={cn(groupIndex > 0 && "mt-6")}>
               <h3 className="font-mono text-label text-muted-foreground">
                 {kind}
               </h3>
@@ -402,11 +369,11 @@ function ReleaseItem({
                   .filter((change) => change.kind === kind)
                   .map((change, i) => (
                     <li key={i} className={cn("text-body", i > 0 && "mt-2")}>
-                      <RichText text={change.text} />
+                      <InlineText text={change.text} />
                     </li>
                   ))}
               </ul>
-            </section>
+            </div>
           ))}
         </div>
       </article>
@@ -415,16 +382,16 @@ function ReleaseItem({
 }
 
 export function App() {
-  const [filter, setFilter] = useState<Kind | "all">("all")
+  const [filter, setFilter] = React.useState<Filter>("all")
 
-  const shown = RELEASES.map((release) => {
-    const kinds = KINDS.filter(
+  const shown = RELEASES.map((release) => ({
+    release,
+    kinds: KINDS.filter(
       (kind) =>
-        (filter === "all" || filter === kind) &&
+        (filter === "all" || kind === filter) &&
         release.changes.some((change) => change.kind === kind)
-    )
-    return { release, kinds }
-  }).filter((entry) => entry.kinds.length > 0)
+    ),
+  })).filter((entry) => entry.kinds.length > 0)
 
   const total = RELEASES.length
   const noun = total === 1 ? "release" : "releases"
@@ -436,14 +403,21 @@ export function App() {
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <SiteHeader />
+
       <main className="pt-12">
-        <div className="mx-auto max-w-[1200px] px-4 md:px-6">
+        <div className={CONTAINER}>
           <div className="max-w-lg">
             <h1 className="text-h1">Changelog</h1>
             <p className="mt-3">
-              Every release of the <InlineCode>plinth</InlineCode> command line,
-              newest first; run <InlineCode>plinth upgrade</InlineCode> to
-              update to the latest one.
+              Every release of the{" "}
+              <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                plinth
+              </code>{" "}
+              command line, newest first; run{" "}
+              <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
+                plinth upgrade
+              </code>{" "}
+              to update to the latest one.
             </p>
           </div>
 
@@ -460,7 +434,7 @@ export function App() {
                     key={option.value}
                     variant={chosen ? "secondary" : "outline"}
                     aria-pressed={chosen}
-                    className={buttonClass}
+                    className={BUTTON_CLASSES}
                     onClick={() => setFilter(option.value)}
                   >
                     {option.label}
@@ -476,19 +450,45 @@ export function App() {
             </p>
           </div>
 
-          <ol className="mt-12 list-none p-0">
+          <ol className="mt-12">
             {shown.map((entry, index) => (
               <ReleaseItem
                 key={entry.release.version}
                 release={entry.release}
                 kinds={entry.kinds}
-                first={index === 0}
+                isFirst={index === 0}
               />
             ))}
           </ol>
         </div>
       </main>
-      <SiteFooter />
+
+      <footer className="mt-12 border-t border-border">
+        <div
+          className={cn(
+            CONTAINER,
+            "flex flex-wrap items-center gap-x-6 gap-y-2 py-6"
+          )}
+        >
+          <p className="font-mono text-label text-muted-foreground">
+            © 2026 Plinth Labs
+          </p>
+          <nav
+            aria-label="Footer"
+            className="ml-auto flex flex-wrap gap-x-6 gap-y-2"
+          >
+            <a href="/docs" className={QUIET_LINK}>
+              Docs
+            </a>
+            <a href="#" className={QUIET_LINK}>
+              Status
+            </a>
+            <a href="#" className={QUIET_LINK}>
+              RSS feed
+            </a>
+          </nav>
+        </div>
+      </footer>
     </div>
   )
 }

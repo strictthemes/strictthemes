@@ -2,12 +2,12 @@ import { ArrowRight } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 
-const focus =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const chromeLink = `text-foreground decoration-1 underline-offset-4 hover:underline transition-colors duration-150 ${focus}`
+const chromeLink = `text-foreground decoration-1 underline-offset-4 hover:underline transition-colors duration-150 ${focusOutline}`
 
-const textLink = `text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground transition-colors duration-150 ${focus}`
+const textLink = `text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground transition-colors duration-150 ${focusOutline}`
 
 const navLinks = [
   { label: "Collection", href: "#" },
@@ -19,29 +19,26 @@ const pieces = [
   {
     name: "Lune wrap coat",
     price: "€1,480",
-    material: "Undyed wool · Lined in silk",
-    picture:
-      "A woman in a long undyed wool coat wrapped and tied at the waist, standing against a pale plaster wall.",
+    material: "Undyed wool",
     item: "md:col-start-1 md:col-span-4",
-    image: "aspect-3/4 bg-secondary",
+    picture: "aspect-3/4 bg-secondary",
+    alt: "A long wrap coat in undyed oatmeal wool, photographed from the front on a model standing still, its belt loosely tied at the waist.",
   },
   {
     name: "Ilse pleated skirt",
     price: "€640",
     material: "Black linen",
-    picture:
-      "A black linen skirt with deep pleats, caught mid-step so the pleats fan open below the knee.",
     item: "mt-16 md:col-start-6 md:col-span-3 md:mt-32",
-    image: "aspect-2/3 bg-card",
+    picture: "aspect-2/3 bg-card",
+    alt: "A black linen skirt with narrow pleats falling to mid-calf, seen from the side as the model takes a step.",
   },
   {
     name: "Mira silk shirt",
     price: "€520",
-    material: "Silk · Skin tone",
-    picture:
-      "A loose silk shirt the color of skin, seen from behind, its collar turned up and its sleeves rolled once.",
+    material: "Silk",
     item: "mt-16 md:col-start-10 md:col-span-3",
-    image: "aspect-3/4 bg-secondary",
+    picture: "aspect-3/4 bg-secondary",
+    alt: "A loose silk shirt the color of skin, buttoned to the collar, shown close up with light catching the folds of the sleeve.",
   },
 ]
 
@@ -73,18 +70,20 @@ export function App() {
           <h1 className="text-h1 md:col-span-10 md:text-display">
             Clothes cut slowly, to be worn for <em>years</em>
           </h1>
-          <figure className="mt-16 md:col-span-12 md:grid md:grid-cols-12 md:gap-x-8">
+          <figure className="mt-16 md:col-span-12 md:col-start-1 md:grid md:grid-cols-12 md:gap-x-8">
             <div
               role="img"
-              aria-label="A woman in the Lune wrap coat in undyed wool stands by a tall window, one hand holding the coat closed, the light falling across the folds."
+              aria-label="A model stands in a bare white studio wearing a long wrap coat in undyed wool, her face turned away from the camera toward a tall window."
               className="aspect-4/5 w-full bg-secondary md:col-span-8 md:col-start-5 md:row-start-1"
             />
-            <figcaption className="mt-2 font-mono text-label uppercase md:col-span-3 md:col-start-2 md:row-start-1 md:mt-0 md:self-end">
-              <p className="text-foreground">Look 01 · Still Water</p>
-              <p className="mt-1 text-muted-foreground">
+            <figcaption className="mt-2 md:col-span-3 md:col-start-2 md:row-start-1 md:mt-0 md:self-end">
+              <p className="font-mono text-label text-foreground uppercase tabular-nums">
+                Look 01 · Still Water
+              </p>
+              <p className="mt-1 font-mono text-label text-muted-foreground uppercase">
                 Lune wrap coat, undyed wool
               </p>
-              <p className="mt-1 text-muted-foreground">
+              <p className="mt-1 font-mono text-label text-muted-foreground uppercase">
                 Photograph · Tomas Reyl
               </p>
             </figcaption>
@@ -94,7 +93,7 @@ export function App() {
         <section className="mt-16 grid grid-cols-1 md:mt-32 md:grid-cols-12 md:gap-x-8">
           <div className="md:col-span-8 md:col-start-5">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className="font-mono text-label text-muted-foreground uppercase">
+              <p className="font-mono text-label text-muted-foreground uppercase tabular-nums">
                 Autumn–Winter 2026
               </p>
               <Badge className="h-auto rounded-none border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
@@ -106,7 +105,8 @@ export function App() {
             </h2>
             <p className="mt-4 max-w-md">
               Seven looks in undyed wool, black linen and silk the color of
-              skin, cut in our atelier in Lyon and made in small numbers.
+              skin, each cut by hand in our atelier in Lyon and made in small
+              numbers.
             </p>
           </div>
         </section>
@@ -121,10 +121,10 @@ export function App() {
                 <figure>
                   <div
                     role="img"
-                    aria-label={piece.picture}
-                    className={`w-full ${piece.image}`}
+                    aria-label={piece.alt}
+                    className={`w-full ${piece.picture}`}
                   />
-                  <figcaption className="mt-2 font-mono text-label uppercase">
+                  <figcaption className="mt-2">
                     <p className="flex items-baseline justify-between gap-4">
                       <a
                         href="#"
@@ -136,7 +136,7 @@ export function App() {
                         {piece.price}
                       </span>
                     </p>
-                    <p className="mt-1 text-muted-foreground">
+                    <p className="mt-1 font-mono text-label text-muted-foreground uppercase">
                       {piece.material}
                     </p>
                   </figcaption>
@@ -153,11 +153,7 @@ export function App() {
               className={`inline-flex items-center gap-2 font-mono text-label uppercase ${textLink}`}
             >
               See the whole collection
-              <ArrowRight
-                className="size-4"
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
+              <ArrowRight className="size-4" strokeWidth={1.5} aria-hidden="true" />
             </a>
           </p>
         </section>
@@ -167,7 +163,7 @@ export function App() {
         <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-8">
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Maison Ardelle</p>
-            <div className="mt-2 font-mono text-label text-muted-foreground uppercase">
+            <div className="mt-2 font-mono text-label text-muted-foreground uppercase tabular-nums">
               <p>7 rue Belvèze</p>
               <p>69001 Lyon</p>
             </div>
@@ -177,8 +173,8 @@ export function App() {
             className="mt-8 md:col-span-4 md:col-start-9 md:mt-0"
           >
             <ul>
-              {navLinks.map((link, index) => (
-                <li key={link.label} className={index > 0 ? "mt-2" : undefined}>
+              {navLinks.map((link, i) => (
+                <li key={link.label} className={i > 0 ? "mt-2" : undefined}>
                   <a
                     href={link.href}
                     className={`font-mono text-label uppercase ${chromeLink}`}
@@ -190,7 +186,7 @@ export function App() {
             </ul>
           </nav>
         </div>
-        <p className="mt-8 font-mono text-label text-muted-foreground uppercase">
+        <p className="mt-8 font-mono text-label text-muted-foreground uppercase tabular-nums">
           © 2026 Maison Ardelle
         </p>
       </footer>

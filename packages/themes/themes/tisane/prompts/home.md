@@ -21,7 +21,7 @@ The header from the layout notes. No link is the current page here: the name is 
 
 ### 2. Opening
 
-The first section, with `pt-10`, as a grid (`grid gap-6 md:grid-cols-12 md:items-center`; here `md:items-center` takes the place of the notes' `md:items-start`):
+The first section, with `pt-10`, as a grid (`grid grid-cols-1 gap-6 md:grid-cols-12 md:items-center`; here `md:items-center` takes the place of the notes' `md:items-start`):
 
 - In columns 1–6: a label, `Tea room and shop · Ashby Wold`, then with `mt-2` the `<h1>` in `text-h1 md:text-display`: a short phrase, for example "Tea, soup and cake, made slowly". With `mt-4` one sentence in `text-body` that says what the place is. With `mt-6`, in a `<p>`, the page's one default button: an `<a>` styled as a button, "Book a table", that goes to `/booking`.
 - In columns 8–12: a picture, `aspect-4/3`, with the `aria-label` "The window seat on a grey morning, a pot of tea on the sill" and a caption such as `The window seat, Mill Lane`.
@@ -30,7 +30,7 @@ On a phone the picture comes under the button, with the grid's `gap-6` between t
 
 ### 3. In season
 
-A section with `mt-18`: an `<h2>` "In season", then with `mt-4` one sentence that says what changes each month. Then with `mt-6` a grid of three cards (`grid gap-6 md:grid-cols-3`), stacked on a phone. This grid has no `md:items-start`: the cards stretch to the same height.
+A section with `mt-18`: an `<h2>` "In season", then with `mt-4` one sentence that says what changes each month. Then with `mt-6` a grid of three cards (`grid grid-cols-1 gap-6 md:grid-cols-3`), stacked on a phone. This grid has no `md:items-start`: the cards stretch to the same height.
 
 Each card is a card with a picture at its top, as the layout notes describe:
 
@@ -43,7 +43,7 @@ After the grid, with `mt-6`, a `<p>` holding a link in running text: "See the wh
 
 ### 4. The place
 
-A section with `mt-18`, in columns 1–8 of a grid (`grid gap-6 md:grid-cols-12`):
+A section with `mt-18`, in columns 1–8 of a grid (`grid grid-cols-1 gap-6 md:grid-cols-12`):
 
 - A label: `Since 2019`.
 - With `mt-2`, one or two sentences about the room as a `<p>` in `font-heading text-h2`, for example: the counter is the seed merchant's old one, the cups are thrown at a pottery two streets away, and the teas are weighed out at the same counter. This is a paragraph, not a heading.
@@ -58,7 +58,7 @@ A section with `mt-18`, in columns 1–6 of a grid: an `<h2>` "Opening hours", t
 - Sunday: `10:00–16:00`
 - Monday: `Closed`, the same label in `text-foreground`, as plain text with no `<time>`
 
-The day is `text-body`; the times are a label in `text-foreground` with each time in a `<time>` (`<time dateTime="09:00">9:00</time>`). Under the list, with `mt-4`, one sentence: lunch is served from 11:30 to 14:30, and cakes until they run out.
+The day is `text-body`; the times are a label in `text-foreground` with each time in a `<time>` (`<time dateTime="09:00">9:00</time>`). No row is marked as today on this page. Under the list, with `mt-4`, one sentence: lunch is served from 11:30 to 14:30, and cakes until they run out.
 
 ### 6. Newsletter
 
@@ -69,7 +69,7 @@ Inside the card:
 - A label: `Four letters a year`.
 - With `mt-2`, an `<h2>` "News from the room".
 - With `mt-4`, one sentence: a short letter when the season's teas come in, nothing else.
-- With `mt-6`, the form. Add the field with `npx shadcn@latest add input` if the project has none, and give the new file the edits the Added components note lists. The label "Email address", then with `mt-2` a row `<div>` with `md:flex md:gap-4` and no `items-*` class, so the button stretches to the field's 46px height instead of stopping short of its bottom. In the row: a `<div>` with `md:flex-1` holding the `Input` of type `email` (the `Input` has no margin of its own here: the row carries the `mt-2`), and the `secondary` button "Sign up", `type="submit"`, with `mt-4 md:mt-0` on the button itself. Here, instead of the notes' `<div>` with `mt-6`, the button carries `mt-4`, since it shares the row from `md` and on a phone sits right under its field. The error line sits under the row, with `mt-2`.
+- With `mt-6`, the form. Add the field with `npx shadcn@latest add input` if the project has none, and give the new file the edits the Added components note lists. The label "Email address", then with `mt-2` a row `<div>` with `md:flex md:gap-4` and no `items-*` class, so the button stretches to the field's 46px height instead of stopping short of its bottom. In the row: a `<div>` with `md:flex-1` holding the `Input` of type `email` (the `Input` has no margin of its own here: the row carries the `mt-2`), and the `secondary` button "Sign up", `type="submit"`, with `mt-4 md:mt-0` on the button itself. Here, instead of the notes' `<div>` with `mt-6`, the button carries `mt-4`, since it shares the row from `md` and on a phone sits right under its field, at its own width, not the field's. The error line sits under the row, with `mt-2`.
 - After the form, the empty `role="status"` element, as the layout notes describe.
 
 ### 7. Footer
