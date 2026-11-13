@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 340" font-family="IBM Plex Sans, system-ui, sans-serif">
+  <rect width="800" height="340" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">
+    <text x="24" y="34">TOKEN</text><text x="252" y="34">VALUE</text><text x="372" y="34">WHY IT GOT THE ROLE</text>
+  </g>
+  <g stroke="#E2E2E0"><path d="M24 46 H776"/><path d="M24 82 H776"/><path d="M24 118 H776"/><path d="M24 154 H776"/><path d="M24 190 H776"/><path d="M24 226 H776"/><path d="M24 262 H776"/><path d="M24 298 H776"/></g>
+  <g stroke="#E2E2E0">
+    <rect x="24" y="54" width="20" height="20" fill="#FFFFFF"/>
+    <rect x="24" y="90" width="20" height="20" fill="#1F3BFF"/>
+    <rect x="24" y="126" width="20" height="20" fill="#FFFFFF"/>
+    <rect x="24" y="162" width="20" height="20" fill="#F5F5F3"/>
+    <rect x="24" y="198" width="20" height="20" fill="#111111"/>
+    <rect x="24" y="234" width="20" height="20" fill="#6B6B6B"/>
+    <rect x="24" y="270" width="20" height="20" fill="#111111"/>
+    <rect x="24" y="306" width="20" height="20" fill="#E2E2E0"/>
+  </g>
+  <g font-size="16" fill="#111111" font-weight="600">
+    <text x="56" y="70">background</text><text x="56" y="106">primary</text><text x="56" y="142">on-primary</text><text x="56" y="178">secondary</text><text x="56" y="214">on-secondary</text><text x="56" y="250">neutral</text><text x="56" y="286">foreground</text><text x="56" y="322">border</text>
+  </g>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">
+    <text x="252" y="70">#FFFFFF</text><text x="252" y="106">#1F3BFF</text><text x="252" y="142">#FFFFFF</text><text x="252" y="178">#F5F5F3</text><text x="252" y="214">#111111</text><text x="252" y="250">#6B6B6B</text><text x="252" y="286">#111111</text><text x="252" y="322">#E2E2E0</text>
+  </g>
+  <g font-size="14" fill="#6B6B6B">
+    <text x="372" y="70">the page itself</text>
+    <text x="372" y="106">the fill of 1 link or button</text>
+    <text x="372" y="142">the text on the primary color</text>
+    <text x="372" y="178">the fill of 23 other links and buttons</text>
+    <text x="372" y="214">the text on the secondary color</text>
+    <text x="372" y="250">quieter text, 111 times</text>
+    <text x="372" y="286">the commonest text color, 100 times</text>
+    <text x="372" y="322">the commonest border, 81 times</text>
+  </g>
+</svg>

@@ -60,7 +60,7 @@ jobs:
           dir: apps/site
           spec: packages/themes/themes/strict-one/DESIGN.md
           dist: dist
-          paths: / /themes/ /spec/ /themes/strict-one/ /kit/ /kit/strict-one/ /guides/ /guides/design-md-from-your-site/ /404.html
+          paths: / /themes/ /spec/ /themes/strict-one/ /kit/ /kit/strict-one/ /guides/ /guides/design-md-from-your-site/ /guides/ai-slop-ui-tells/ /guides/contrast-for-non-designers/ /guides/dark-mode-with-tokens-tailwind-4/ /guides/design-md-agents-md-rules/ /guides/design-md-with-bootstrap/ /guides/design-skill-for-your-agent/ /guides/design-tokens-for-coding-agents/ /guides/design-tokens-in-html-email/ /guides/install-a-shadcn-theme/ /guides/pricing-page-three-themes/ /guides/publish-and-check-live-page/ /guides/shadcn-blocks-and-registries/ /guides/strict-check-in-ci/ /guides/what-is-design-md/ /404.html
           args: --exclude examples --exclude .kit --mode light
       # The agent kit, as the registry writes it for each theme: in every theme,
       # both color modes and two widths, with hover and focus.

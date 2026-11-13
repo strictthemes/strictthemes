@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" role="img" aria-label="The six steps of the Kiln spacing scale drawn to size">
+<rect width="800" height="480" fill="#FFFFFF"/>
+<text x="40" y="30" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Kiln’s spacing scale, drawn at full size (1 unit = 1px)</text>
+<text x="40" y="73" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">xs</text>
+<text x="88" y="73" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">4px</text>
+<rect x="150" y="66" width="4" height="4" fill="#111111"/>
+<text x="254" y="73" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">inside a badge, top and bottom</text>
+<text x="40" y="117" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">sm</text>
+<text x="88" y="117" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">8px</text>
+<rect x="150" y="108" width="8" height="8" fill="#111111"/>
+<text x="254" y="117" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">inside a button, top and bottom</text>
+<text x="40" y="161" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">md</text>
+<text x="88" y="161" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">16px</text>
+<rect x="150" y="148" width="16" height="16" fill="#111111"/>
+<text x="254" y="161" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">inside a button, left and right</text>
+<text x="40" y="205" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">lg</text>
+<text x="88" y="205" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">24px</text>
+<rect x="150" y="188" width="24" height="24" fill="#111111"/>
+<text x="254" y="205" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">inside a card; grid gutters</text>
+<text x="40" y="257" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">xl</text>
+<text x="88" y="257" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">40px</text>
+<rect x="150" y="232" width="40" height="40" fill="#111111"/>
+<text x="254" y="257" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">between blocks in a section</text>
+<text x="40" y="337" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">2xl</text>
+<text x="88" y="337" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">80px</text>
+<rect x="150" y="292" width="80" height="80" fill="#111111"/>
+<text x="254" y="337" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">between sections</text>
+<line x1="40" y1="402" x2="760" y2="402" stroke="#E2E2E0"/>
+<text x="40" y="432" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Not on the scale, so not allowed: 10px, 12px, 20px, 32px, 48px, 64px</text>
+<text x="40" y="456" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Allowed as well, by the strict block’s extra list: 0, 1px, 2px</text>
+</svg>

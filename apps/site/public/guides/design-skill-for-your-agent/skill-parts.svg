@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 470" role="img" aria-label="The parts of a SKILL.md file">
+  <rect width="800" height="470" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">
+    <text x="20" y="32" fill="#6B6B6B">.claude/skills/acme-design/SKILL.md</text>
+    <rect x="20" y="46" width="400" height="404" rx="2" fill="#FFFFFF" stroke="#E2E2E0"/>
+
+    <rect x="21" y="47" width="398" height="52" fill="#F5F5F3"/>
+    <text x="36" y="70">---</text>
+    <text x="36" y="90">name: acme-design</text>
+
+    <rect x="21" y="100" width="398" height="72" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+    <text x="36" y="124">description: "Build UI that</text>
+    <text x="36" y="144">  matches Acme ... Use it whenever</text>
+    <text x="36" y="164">  you add or change a page ..."</text>
+
+    <text x="36" y="196">---</text>
+    <line x1="20" y1="208" x2="420" y2="208" stroke="#E2E2E0"/>
+    <text x="36" y="234">## Before you start</text>
+    <text x="36" y="254" fill="#6B6B6B">1. Read DESIGN.md in full.</text>
+    <text x="36" y="274" fill="#6B6B6B">2. Wire the tokens into the code.</text>
+    <line x1="20" y1="290" x2="420" y2="290" stroke="#E2E2E0"/>
+    <text x="36" y="316">## Rules</text>
+    <text x="36" y="336" fill="#6B6B6B">- Only the colors in the spec.</text>
+    <text x="36" y="356" fill="#6B6B6B">- Missing a value? Stop and ask.</text>
+    <line x1="20" y1="372" x2="420" y2="372" stroke="#E2E2E0"/>
+    <text x="36" y="398">## Check before you finish</text>
+    <text x="36" y="418" fill="#6B6B6B">npx @strictthemes/check --dist dist</text>
+    <text x="36" y="438" fill="#6B6B6B">Run until it says Passed.</text>
+  </g>
+  <g stroke="#111111" stroke-width="1.5">
+    <line x1="420" y1="73" x2="456" y2="73"/>
+    <line x1="420" y1="136" x2="456" y2="136" stroke="#1F3BFF"/>
+    <line x1="420" y1="249" x2="456" y2="249"/>
+    <line x1="420" y1="331" x2="456" y2="331"/>
+    <line x1="420" y1="411" x2="456" y2="411"/>
+  </g>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="15" fill="#111111">
+    <text x="468" y="68" font-weight="600">Name</text>
+    <text x="468" y="88" font-size="14" fill="#6B6B6B">The folder's name. How you call it.</text>
+
+    <text x="468" y="122" font-weight="600" fill="#1F3BFF">Description: the trigger</text>
+    <text x="468" y="142" font-size="14" fill="#6B6B6B">Read at the start of every session.</text>
+    <text x="468" y="160" font-size="14" fill="#6B6B6B">It decides whether the rest is opened.</text>
+
+    <text x="468" y="244" font-weight="600">Steps</text>
+    <text x="468" y="264" font-size="14" fill="#6B6B6B">What to do first, in order.</text>
+
+    <text x="468" y="326" font-weight="600">Rules and stop conditions</text>
+    <text x="468" y="346" font-size="14" fill="#6B6B6B">What is not allowed. When to ask.</text>
+
+    <text x="468" y="406" font-weight="600">The check</text>
+    <text x="468" y="426" font-size="14" fill="#6B6B6B">A command that says done or not.</text>
+  </g>
+</svg>

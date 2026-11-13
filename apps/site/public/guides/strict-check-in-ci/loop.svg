@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" role="img" aria-label="The loop of a checked pull request">
+  <rect width="800" height="300" fill="#FFFFFF"/>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#111111"/></marker>
+  </defs>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="15" fill="#111111">
+    <g>
+      <rect x="20" y="60" width="136" height="96" rx="2" fill="#F5F5F3" stroke="#E2E2E0"/>
+      <text x="32" y="86" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">1</text>
+      <text x="32" y="112" font-weight="600">Agent opens</text>
+      <text x="32" y="132" font-weight="600">a pull request</text>
+    </g>
+    <g>
+      <rect x="176" y="60" width="136" height="96" rx="2" fill="#F5F5F3" stroke="#E2E2E0"/>
+      <text x="188" y="86" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">2</text>
+      <text x="188" y="112" font-weight="600">CI builds</text>
+      <text x="188" y="134" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">npm run build</text>
+    </g>
+    <g>
+      <rect x="332" y="60" width="136" height="96" rx="2" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+      <text x="344" y="86" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#1F3BFF">3</text>
+      <text x="344" y="112" font-weight="600">The check</text>
+      <text x="344" y="132" font-weight="600">measures pages</text>
+    </g>
+    <g>
+      <rect x="488" y="60" width="136" height="96" rx="2" fill="#F5F5F3" stroke="#E2E2E0"/>
+      <text x="500" y="86" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">4</text>
+      <text x="500" y="112" font-weight="600">Report</text>
+      <text x="500" y="134" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">exit 0, 1 or 2</text>
+    </g>
+    <g>
+      <rect x="644" y="60" width="136" height="96" rx="2" fill="#F5F5F3" stroke="#E2E2E0"/>
+      <text x="656" y="86" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">5</text>
+      <text x="656" y="112" font-weight="600">Fix what</text>
+      <text x="656" y="132" font-weight="600">it lists</text>
+    </g>
+    <g stroke="#111111" stroke-width="1.5" fill="none">
+      <path d="M156 108H174" marker-end="url(#a)"/>
+      <path d="M312 108H330" marker-end="url(#a)"/>
+      <path d="M468 108H486" marker-end="url(#a)"/>
+      <path d="M624 108H642" marker-end="url(#a)"/>
+      <path d="M712 156V214H244V158" marker-end="url(#a)"/>
+      <path d="M556 60V28" marker-end="url(#a)"/>
+    </g>
+    <text x="478" y="238" text-anchor="middle" font-size="14" fill="#6B6B6B">push the fix: the job runs again</text>
+    <text x="568" y="36" font-size="14" fill="#6B6B6B">exit 0: ready to merge</text>
+    <text x="20" y="282" font-size="14" fill="#6B6B6B">Steps 2 to 4 need no person. A reviewer reads the report, not the pixels.</text>
+  </g>
+</svg>

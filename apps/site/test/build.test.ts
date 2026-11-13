@@ -473,11 +473,24 @@ test("every guide has a page, a Markdown file, and a place in the list, the site
     assert.ok(list.includes(`href="/guides/${slug}/"`), slug)
     const markdown = read(`guides/${slug}.md`)
     assert.ok(markdown.startsWith("# "), slug)
-    assert.ok(!markdown.includes("\n---\n"), `${slug}: the facts at the top are not part of the text`)
+    assert.ok(!/^(kind|checked|tool): /m.test(markdown.split("\n## ")[0] ?? ""), `${slug}: the facts at the top are not part of the text`)
     assert.ok(read("llms.txt").includes(`(https://strictthemes.com/guides/${slug}.md)`), slug)
     assert.ok(read("sitemap.xml").includes(`<loc>https://strictthemes.com/guides/${slug}/</loc>`), slug)
   }
   assert.ok(read("index.html").includes('href="/guides"'))
+})
+
+test("every picture in a guide is a file the site serves, and says what it shows", () => {
+  for (const slug of GUIDES) {
+    const page = read(`guides/${slug}/index.html`)
+    const article = page.slice(page.indexOf("<article"))
+    for (const [, src, alt] of article.matchAll(/<img src="([^"]+)" alt="([^"]*)"/g)) {
+      assert.ok(src?.startsWith(`/guides/${slug}/`), `${slug}: ${src} is not in the guide's own folder`)
+      assert.ok(existsSync(join(dist, src ?? "")), `${slug}: ${src}`)
+      assert.ok((alt ?? "").length > 10, `${slug}: ${src} has no description`)
+    }
+    assert.ok(!/<p>!\[/.test(article), `${slug}: a picture was left as text`)
+  }
 })
 
 test("a guide names the version of Strict Check that is current", () => {

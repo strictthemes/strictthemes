@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 300" font-family="IBM Plex Sans, system-ui, sans-serif">
+  <rect width="800" height="300" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">
+    <text x="24" y="36">1  MEASURE</text>
+    <text x="296" y="36">2  WRITE</text>
+    <text x="568" y="36">3  HOLD TO IT</text>
+  </g>
+  <g fill="#F5F5F3" stroke="#E2E2E0">
+    <rect x="24" y="56" width="208" height="96" rx="2"/>
+    <rect x="296" y="56" width="208" height="96" rx="2"/>
+    <rect x="296" y="176" width="208" height="96" rx="2"/>
+    <rect x="568" y="56" width="208" height="96" rx="2"/>
+    <rect x="568" y="176" width="208" height="96" rx="2"/>
+  </g>
+  <g font-size="16" font-weight="600" fill="#111111">
+    <text x="40" y="92">Your live site</text>
+    <text x="312" y="92">DESIGN.md</text>
+    <text x="312" y="212">SKILL.md</text>
+    <text x="584" y="92">Strict Check</text>
+    <text x="584" y="212">Your coding agent</text>
+  </g>
+  <g font-size="14" fill="#6B6B6B">
+    <text x="40" y="116">Two or three pages,</text>
+    <text x="40" y="136">opened on your machine</text>
+    <text x="312" y="116">Tokens, notes and a</text>
+    <text x="312" y="136">strict block of rules</text>
+    <text x="312" y="236">Read the spec, use its</text>
+    <text x="312" y="256">values, run the check</text>
+    <text x="584" y="116">Measures pages against</text>
+    <text x="584" y="136">the spec, in CI too</text>
+    <text x="584" y="236">Builds the next page</text>
+    <text x="584" y="256">from the same values</text>
+  </g>
+  <g stroke="#111111" stroke-width="1.5" fill="none">
+    <path d="M232 104 H288"/><path d="M280 98 L288 104 L280 110"/>
+    <path d="M264 104 V224 H288"/><path d="M280 218 L288 224 L280 230"/>
+    <path d="M504 104 H560"/><path d="M552 98 L560 104 L552 110"/>
+    <path d="M504 224 H560"/><path d="M552 218 L560 224 L552 230"/>
+  </g>
+  <g stroke="#1F3BFF" stroke-width="1.5" fill="none">
+    <path d="M672 176 V160"/><path d="M666 168 L672 160 L678 168"/>
+  </g>
+  <text x="684" y="170" font-size="14" fill="#1F3BFF">checks its work</text>
+</svg>

@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 448">
+<rect width="800" height="448" fill="#FFFFFF"/>
+<text x="24" y="36" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">BUTTON COLOR</text>
+<text x="232" y="36" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">WHITE TEXT</text>
+<text x="520" y="36" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">DARK TEXT (#111111)</text>
+<text x="24" y="82" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Strict One primary</text>
+<text x="24" y="102" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#1F3BFF</text>
+<rect x="232" y="64" width="150" height="40" rx="2" fill="#1F3BFF"/>
+<text x="307" y="89" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="89" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">6.71:1</text>
+<rect x="520" y="64" width="150" height="40" rx="2" fill="#1F3BFF"/>
+<text x="595" y="89" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="89" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">2.81:1 fails</text>
+<text x="24" y="146" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Ember primary, dark</text>
+<text x="24" y="166" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#D00000</text>
+<rect x="232" y="128" width="150" height="40" rx="2" fill="#D00000"/>
+<text x="307" y="153" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="153" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">5.70:1</text>
+<rect x="520" y="128" width="150" height="40" rx="2" fill="#D00000"/>
+<text x="595" y="153" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="153" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">3.31:1 fails</text>
+<text x="24" y="210" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Voltage secondary, dark</text>
+<text x="24" y="230" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#5B5BFF</text>
+<rect x="232" y="192" width="150" height="40" rx="2" fill="#5B5BFF"/>
+<text x="307" y="217" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="217" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">4.79:1</text>
+<rect x="520" y="192" width="150" height="40" rx="2" fill="#5B5BFF"/>
+<text x="595" y="217" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="217" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">3.94:1 fails</text>
+<text x="24" y="274" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Strict One tertiary</text>
+<text x="24" y="294" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#FF4F00</text>
+<rect x="232" y="256" width="150" height="40" rx="2" fill="#FF4F00"/>
+<text x="307" y="281" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="281" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">3.30:1 fails</text>
+<rect x="520" y="256" width="150" height="40" rx="2" fill="#FF4F00"/>
+<text x="595" y="281" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="281" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">5.73:1</text>
+<text x="24" y="338" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Strict One primary, dark</text>
+<text x="24" y="358" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#8091FF</text>
+<rect x="232" y="320" width="150" height="40" rx="2" fill="#8091FF"/>
+<text x="307" y="345" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="345" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">2.83:1 fails</text>
+<rect x="520" y="320" width="150" height="40" rx="2" fill="#8091FF"/>
+<text x="595" y="345" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="345" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">6.66:1</text>
+<text x="24" y="402" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Relay primary</text>
+<text x="24" y="422" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#FFB703</text>
+<rect x="232" y="384" width="150" height="40" rx="2" fill="#FFB703"/>
+<text x="307" y="409" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#FFFFFF">Save changes</text>
+<text x="398" y="409" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">1.75:1 fails</text>
+<rect x="520" y="384" width="150" height="40" rx="2" fill="#FFB703"/>
+<text x="595" y="409" text-anchor="middle" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="16" font-weight="500" fill="#111111">Save changes</text>
+<text x="686" y="409" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">10.81:1</text>
+</svg>

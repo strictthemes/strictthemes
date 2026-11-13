@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 796" role="img" aria-label="The fifteen colors of the Kiln theme, grouped by role">
+<rect width="800" height="796" fill="#FFFFFF"/>
+<text x="40" y="34" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">The page</text>
+<rect x="40" y="46" width="144" height="84" fill="#F4ECE1" stroke="#E2E2E0" stroke-width="1"/>
+<text x="40" y="150" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">background</text>
+<text x="40" y="170" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#F4ECE1</text>
+<text x="40" y="190" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">the page</text>
+<rect x="192" y="46" width="144" height="84" fill="#FBF6EE" stroke="#E2E2E0" stroke-width="1"/>
+<text x="192" y="150" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">surface</text>
+<text x="192" y="170" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#FBF6EE</text>
+<text x="192" y="190" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">a card on the page</text>
+<rect x="344" y="46" width="144" height="84" fill="#2A1D14" stroke="#E2E2E0" stroke-width="1"/>
+<text x="344" y="150" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">foreground</text>
+<text x="344" y="170" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#2A1D14</text>
+<text x="344" y="190" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">text</text>
+<rect x="496" y="46" width="144" height="84" fill="#6B5B4E" stroke="#E2E2E0" stroke-width="1"/>
+<text x="496" y="150" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">neutral</text>
+<text x="496" y="170" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#6B5B4E</text>
+<text x="496" y="190" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">quieter text</text>
+<rect x="648" y="46" width="144" height="84" fill="#DBCDBA" stroke="#E2E2E0" stroke-width="1"/>
+<text x="648" y="150" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">border</text>
+<text x="648" y="170" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#DBCDBA</text>
+<text x="648" y="190" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">lines</text>
+<text x="40" y="228" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Fills that carry text, each with its on- color</text>
+<rect x="40" y="240" width="144" height="84" fill="#963614" stroke="#E2E2E0" stroke-width="1"/>
+<text x="50" y="312" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#FFF6EC">Aa on-primary</text>
+<text x="40" y="344" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">primary</text>
+<text x="40" y="364" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#963614</text>
+<text x="40" y="384" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">the main action</text>
+<rect x="192" y="240" width="144" height="84" fill="#2A1D14" stroke="#E2E2E0" stroke-width="1"/>
+<text x="202" y="312" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#FBF6EE">Aa on-secondary</text>
+<text x="192" y="344" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">secondary</text>
+<text x="192" y="364" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#2A1D14</text>
+<text x="192" y="384" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">other buttons</text>
+<rect x="344" y="240" width="144" height="84" fill="#2F4A7A" stroke="#E2E2E0" stroke-width="1"/>
+<text x="354" y="312" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#FBF6EE">Aa on-tertiary</text>
+<text x="344" y="344" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">tertiary</text>
+<text x="344" y="364" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#2F4A7A</text>
+<text x="344" y="384" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">a badge</text>
+<text x="40" y="422" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">State</text>
+<rect x="40" y="434" width="144" height="84" fill="#B3122D" stroke="#E2E2E0" stroke-width="1"/>
+<text x="40" y="538" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">error</text>
+<text x="40" y="558" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#B3122D</text>
+<text x="40" y="578" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">something failed</text>
+<rect x="192" y="434" width="144" height="84" fill="#2F6B3A" stroke="#E2E2E0" stroke-width="1"/>
+<text x="192" y="538" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">success</text>
+<text x="192" y="558" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#2F6B3A</text>
+<text x="192" y="578" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">something worked</text>
+<text x="40" y="616" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">The theme’s own</text>
+<rect x="40" y="628" width="144" height="84" fill="#F2EADC" stroke="#E2E2E0" stroke-width="1"/>
+<text x="40" y="732" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">glaze-pale</text>
+<text x="40" y="752" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#F2EADC</text>
+<text x="40" y="772" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">a drawn pot, pale</text>
+<rect x="192" y="628" width="144" height="84" fill="#5A4132" stroke="#E2E2E0" stroke-width="1"/>
+<text x="192" y="732" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111" font-weight="600">glaze-dark</text>
+<text x="192" y="752" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">#5A4132</text>
+<text x="192" y="772" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">a drawn pot, dark</text>
+</svg>

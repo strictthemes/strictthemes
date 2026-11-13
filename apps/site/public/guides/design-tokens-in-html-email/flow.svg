@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" role="img">
+  <rect width="800" height="400" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="#111111">
+    <!-- source -->
+    <rect x="24" y="112" width="232" height="176" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="40" y="140" font-size="16" font-weight="600">DESIGN.md</text>
+    <text x="40" y="160" font-size="14" fill="#6B6B6B">one set of tokens</text>
+    <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14">
+      <rect x="40" y="177" width="14" height="14" fill="#963614"/>
+      <text x="62" y="189">primary: "#963614"</text>
+      <text x="40" y="215">body: 16px, 1.6</text>
+      <text x="40" y="241">spacing.md: 16px</text>
+      <text x="40" y="267">rounded.md: 4px</text>
+    </g>
+    <!-- arrows -->
+    <g stroke="#111111" stroke-width="1.5" fill="none">
+      <path d="M256 160 H296 V92 H332"/>
+      <path d="M256 240 H296 V300 H332"/>
+    </g>
+    <path d="M332 86 L344 92 L332 98 Z"/>
+    <path d="M332 294 L344 300 L332 306 Z" fill="#1F3BFF"/>
+    <!-- web -->
+    <rect x="344" y="24" width="432" height="136" fill="#FFFFFF" stroke="#E2E2E0"/>
+    <text x="360" y="52" font-size="16" font-weight="600">Web page</text>
+    <text x="360" y="72" font-size="14" fill="#6B6B6B">named once in the CSS, used by name</text>
+    <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14">
+      <text x="360" y="102">--color-primary: #963614;</text>
+      <text x="360" y="124">--text-body: 16px;</text>
+      <text x="360" y="146">class="bg-primary text-body"</text>
+    </g>
+    <!-- email -->
+    <rect x="344" y="200" width="432" height="176" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+    <text x="360" y="228" font-size="16" font-weight="600">Email</text>
+    <text x="360" y="248" font-size="14" fill="#6B6B6B">a token sheet of literal values, written into every tag</text>
+    <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14">
+      <text x="360" y="278">style="background-color: #963614;</text>
+      <text x="360" y="300">  font-size: 16px; line-height: 25.6px;</text>
+      <text x="360" y="322">  padding: 8px 16px; border-radius: 4px;"</text>
+    </g>
+    <text x="360" y="356" font-size="14" fill="#6B6B6B">No names survive, so the values must be checked.</text>
+  </g>
+</svg>

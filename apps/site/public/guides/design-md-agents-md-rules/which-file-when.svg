@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 514" role="img" aria-label="Which instruction file is read when">
+<rect width="800" height="514" fill="#FFFFFF"/>
+<text x="40" y="30" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Loaded by the agent</text>
+<rect x="40" y="46" width="720" height="68" fill="#F5F5F3" stroke="#E2E2E0" stroke-width="1"/>
+<text x="56" y="74" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111" font-weight="600">Instruction file</text>
+<text x="56" y="98" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">AGENTS.md</text>
+<text x="330" y="74" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Every session</text>
+<text x="330" y="98" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Commands, conventions, one line pointing to the design</text>
+<rect x="40" y="124" width="720" height="68" fill="#F5F5F3" stroke="#E2E2E0" stroke-width="1"/>
+<text x="56" y="152" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111" font-weight="600">Scoped rule</text>
+<text x="56" y="176" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">.cursor/rules/ui.mdc</text>
+<text x="330" y="152" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">When a file matches its pattern</text>
+<text x="330" y="176" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">A reminder beside the UI code</text>
+<rect x="40" y="202" width="720" height="68" fill="#F5F5F3" stroke="#E2E2E0" stroke-width="1"/>
+<text x="56" y="230" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111" font-weight="600">Skill</text>
+<text x="56" y="254" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">.claude/skills/…/SKILL.md</text>
+<text x="330" y="230" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">When the task matches its description</text>
+<text x="330" y="254" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">The procedure: read, build, check, report</text>
+<rect x="40" y="280" width="720" height="68" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+<text x="56" y="308" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111" font-weight="600">Design spec</text>
+<text x="56" y="332" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#1F3BFF">DESIGN.md</text>
+<text x="330" y="308" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">When one of the three above says so</text>
+<text x="330" y="332" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Tokens, rules, and what each is for</text>
+<text x="40" y="376" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Read by a program</text>
+<rect x="40" y="392" width="720" height="68" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+<text x="56" y="420" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111" font-weight="600">The check</text>
+<text x="56" y="444" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#1F3BFF">npx @strictthemes/check</text>
+<text x="330" y="420" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">After a build, and in CI</text>
+<text x="330" y="444" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Reads DESIGN.md and measures the pages against it</text>
+<line x1="200" y1="348" x2="200" y2="392" stroke="#1F3BFF" stroke-width="2"/>
+<path d="M194 384 L200 392 L206 384" fill="none" stroke="#1F3BFF" stroke-width="2"/>
+<text x="40" y="490" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Only DESIGN.md is read by both. The other three are read by the agent alone.</text>
+</svg>

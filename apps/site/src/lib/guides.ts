@@ -57,7 +57,13 @@ export const guideMarkdown = (guide: Guide): string =>
 /** The guide's text as HTML, and its main headings for a list of contents. */
 export function renderGuide(guide: Guide): { html: string; contents: { id: string; title: string }[] } {
   const contents: { id: string; title: string }[] = []
-  const html = marked.parse(guide.body, { async: false }).replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
+  const html = marked
+    .parse(guide.body, { async: false })
+    // A picture that stands alone in a paragraph becomes a figure; its title is the caption.
+    .replace(/<p><img src="([^"]+)" alt="([^"]*)"(?: title="([^"]*)")?\s*\/?><\/p>/g, (_, src: string, alt: string, caption?: string) =>
+      `<figure><a href="${src}"><img src="${src}" alt="${alt}" loading="lazy"></a>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`
+    )
+    .replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
     const title = inner.replace(/<[^>]+>/g, "")
     const id = title
       .toLowerCase()

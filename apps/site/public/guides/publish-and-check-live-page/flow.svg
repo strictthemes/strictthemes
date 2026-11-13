@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 330" role="img" aria-label="From the dist folder to a host to the live check">
+  <rect width="800" height="330" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="#111111">
+    <!-- boxes -->
+    <rect x="20" y="40" width="220" height="150" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <rect x="290" y="40" width="220" height="150" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <rect x="560" y="40" width="220" height="150" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+
+    <text x="36" y="70" font-size="14" fill="#6B6B6B">1. Your machine</text>
+    <text x="36" y="100" font-size="18" font-weight="600">The built folder</text>
+    <text x="36" y="130" font-size="14" font-family="IBM Plex Mono, ui-monospace, monospace">dist/index.html</text>
+    <text x="36" y="152" font-size="14" font-family="IBM Plex Mono, ui-monospace, monospace">dist/assets/…</text>
+    <text x="36" y="176" font-size="14" fill="#6B6B6B">checked with --dist</text>
+
+    <text x="306" y="70" font-size="14" fill="#6B6B6B">2. A static host</text>
+    <text x="306" y="100" font-size="18" font-weight="600">The same files,</text>
+    <text x="306" y="124" font-size="18" font-weight="600">at an address</text>
+    <text x="306" y="152" font-size="14" fill="#6B6B6B">its folder, its cache,</text>
+    <text x="306" y="174" font-size="14" fill="#6B6B6B">its rules for missing files</text>
+
+    <text x="576" y="70" font-size="14" fill="#6B6B6B">3. Your machine again</text>
+    <text x="576" y="100" font-size="18" font-weight="600">The live check</text>
+    <text x="576" y="130" font-size="14" font-family="IBM Plex Mono, ui-monospace, monospace">--url https://…</text>
+    <text x="576" y="152" font-size="14" font-family="IBM Plex Mono, ui-monospace, monospace">--no-source</text>
+    <text x="576" y="176" font-size="14" fill="#6B6B6B">what visitors are served</text>
+
+    <!-- arrows -->
+    <g stroke="#111111" stroke-width="1.5" fill="none">
+      <path d="M240 115 H284"/><path d="M277 109 L285 115 L277 121"/>
+      <path d="M510 115 H554"/><path d="M547 109 L555 115 L547 121"/>
+    </g>
+    <text x="265" y="28" font-size="14" text-anchor="middle" fill="#6B6B6B">upload</text>
+    <text x="535" y="28" font-size="14" text-anchor="middle" fill="#6B6B6B">open</text>
+
+    <!-- what can change -->
+    <path d="M400 190 V222" stroke="#E2E2E0" stroke-width="1.5"/>
+    <rect x="20" y="222" width="760" height="88" fill="#FFFFFF" stroke="#E2E2E0"/>
+    <text x="36" y="250" font-size="14" fill="#6B6B6B">What can differ between box 1 and box 3</text>
+    <text x="36" y="276" font-size="14">The folder the site sits in. A file that did not arrive. An old page from a cache.</text>
+    <text x="36" y="298" font-size="14">What the host answers when a file is missing. Fonts that do not load.</text>
+  </g>
+</svg>

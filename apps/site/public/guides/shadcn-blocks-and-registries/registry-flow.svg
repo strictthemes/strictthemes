@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 440" role="img" aria-label="Registry items are fetched by the shadcn CLI and written as files into your project">
+  <rect width="800" height="440" fill="#FFFFFF"/>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="#111111">
+    <text x="24" y="38" font-size="16" font-weight="600">1. A registry</text>
+    <text x="24" y="58" font-size="14" fill="#6B6B6B">JSON files at web addresses</text>
+    <text x="288" y="38" font-size="16" font-weight="600">2. The shadcn CLI</text>
+    <text x="288" y="58" font-size="14" fill="#6B6B6B">fetches, resolves, writes</text>
+    <text x="540" y="38" font-size="16" font-weight="600">3. Your project</text>
+    <text x="540" y="58" font-size="14" fill="#6B6B6B">plain files you own</text>
+  </g>
+
+  <g font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14">
+    <rect x="24" y="76" width="224" height="72" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="34" y="104" fill="#111111">/r/kiln.json</text>
+    <text x="34" y="130" fill="#6B6B6B">registry:theme</text>
+
+    <rect x="24" y="164" width="224" height="72" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="34" y="192" fill="#111111">/r/font-dm-sans-sans.json</text>
+    <text x="34" y="218" fill="#6B6B6B">registry:font</text>
+
+    <rect x="24" y="252" width="224" height="72" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="34" y="280" fill="#111111">/r/kiln-shop.json</text>
+    <text x="34" y="306" fill="#6B6B6B">registry:block</text>
+
+    <rect x="288" y="76" width="212" height="248" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+    <text x="302" y="106" fill="#111111">npx shadcn@latest</text>
+    <text x="318" y="128" fill="#111111">add &lt;url&gt; &lt;url&gt;</text>
+    <line x1="302" y1="146" x2="486" y2="146" stroke="#E2E2E0"/>
+    <g font-family="IBM Plex Sans, system-ui, sans-serif" fill="#111111">
+      <text x="302" y="174">reads</text>
+      <text x="302" y="218">follows</text>
+      <text x="302" y="262">installs</text>
+      <text x="302" y="306">writes each file's content</text>
+    </g>
+    <text x="302" y="194" fill="#6B6B6B">components.json</text>
+    <text x="302" y="238" fill="#6B6B6B">registryDependencies</text>
+    <text x="302" y="282" fill="#6B6B6B">dependencies</text>
+
+    <rect x="540" y="76" width="236" height="72" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="552" y="104" fill="#111111">src/index.css</text>
+    <text x="552" y="130" fill="#6B6B6B">colors, type, fonts</text>
+
+    <rect x="540" y="164" width="236" height="72" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="552" y="192" fill="#111111">package.json</text>
+    <text x="552" y="218" fill="#6B6B6B">npm packages</text>
+
+    <rect x="540" y="252" width="236" height="116" fill="#F5F5F3" stroke="#E2E2E0"/>
+    <text x="552" y="280" fill="#111111">src/components/</text>
+    <text x="568" y="302" fill="#111111">kiln-shop/page.tsx</text>
+    <text x="568" y="324" fill="#111111">ui/button.tsx ...</text>
+    <text x="552" y="350" fill="#111111">src/lib/utils.ts</text>
+  </g>
+
+  <g stroke="#111111" stroke-width="1.5" fill="none">
+    <line x1="248" y1="112" x2="279" y2="112"/>
+    <line x1="248" y1="200" x2="279" y2="200"/>
+    <line x1="248" y1="288" x2="279" y2="288"/>
+    <line x1="500" y1="112" x2="531" y2="112"/>
+    <line x1="500" y1="200" x2="531" y2="200"/>
+    <line x1="500" y1="288" x2="531" y2="288"/>
+  </g>
+  <g fill="#111111">
+    <path d="M287 112 l-9 -5 v10 z"/><path d="M287 200 l-9 -5 v10 z"/><path d="M287 288 l-9 -5 v10 z"/>
+    <path d="M539 112 l-9 -5 v10 z"/><path d="M539 200 l-9 -5 v10 z"/><path d="M539 288 l-9 -5 v10 z"/>
+  </g>
+  <g font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">
+    <text x="24" y="398">The theme names its fonts as registryDependencies, so the CLI fetches them too.</text>
+    <text x="24" y="420">After the command, nothing in the project points back at the registry.</text>
+  </g>
+</svg>

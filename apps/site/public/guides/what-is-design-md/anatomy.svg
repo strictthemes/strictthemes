@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 682" role="img" aria-label="The parts of a DESIGN.md file">
+<rect width="800" height="682" fill="#FFFFFF"/>
+<text x="40" y="30" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="16" fill="#111111" font-weight="600">DESIGN.md</text>
+<text x="380" y="30" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">What it holds, with Kiln’s numbers</text>
+<text x="40" y="48" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">---</text>
+<text x="80" y="48" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">front matter: YAML, read by tools</text>
+<rect x="40" y="56" width="300" height="252" fill="#F5F5F3" stroke="#E2E2E0" stroke-width="1"/>
+<text x="56" y="79" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">name, description</text>
+<line x1="340" y1="74" x2="372" y2="74" stroke="#E2E2E0"/>
+<text x="380" y="79" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">What the theme is, in a sentence</text>
+<line x1="40" y1="92" x2="340" y2="92" stroke="#E2E2E0"/>
+<text x="56" y="115" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">colors</text>
+<line x1="340" y1="110" x2="372" y2="110" stroke="#E2E2E0"/>
+<text x="380" y="115" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">15 named colors, as roles</text>
+<line x1="40" y1="128" x2="340" y2="128" stroke="#E2E2E0"/>
+<text x="56" y="151" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">typography</text>
+<line x1="340" y1="146" x2="372" y2="146" stroke="#E2E2E0"/>
+<text x="380" y="151" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">5 text styles: family, size, weight, line height</text>
+<line x1="40" y1="164" x2="340" y2="164" stroke="#E2E2E0"/>
+<text x="56" y="187" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">rounded</text>
+<line x1="340" y1="182" x2="372" y2="182" stroke="#E2E2E0"/>
+<text x="380" y="187" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">3 corner sizes</text>
+<line x1="40" y1="200" x2="340" y2="200" stroke="#E2E2E0"/>
+<text x="56" y="223" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">spacing</text>
+<line x1="340" y1="218" x2="372" y2="218" stroke="#E2E2E0"/>
+<text x="380" y="223" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">6 steps for padding, margin and gap</text>
+<line x1="40" y1="236" x2="340" y2="236" stroke="#E2E2E0"/>
+<text x="56" y="259" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">components</text>
+<line x1="340" y1="254" x2="372" y2="254" stroke="#E2E2E0"/>
+<text x="380" y="259" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">6 pairings of the tokens above</text>
+<line x1="40" y1="272" x2="340" y2="272" stroke="#E2E2E0"/>
+<rect x="40" y="272" width="300" height="36" fill="#FFFFFF" stroke="#1F3BFF" stroke-width="2"/>
+<text x="56" y="295" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#1F3BFF" font-weight="600">strict</text>
+<line x1="340" y1="290" x2="372" y2="290" stroke="#1F3BFF"/>
+<text x="380" y="295" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">The rules, and the dark mode’s colors</text>
+<text x="40" y="328" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#6B6B6B">---</text>
+<text x="80" y="328" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">prose: Markdown, read by the agent</text>
+<rect x="40" y="336" width="300" height="288" fill="#F5F5F3" stroke="#E2E2E0" stroke-width="1"/>
+<text x="56" y="359" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Overview</text>
+<line x1="340" y1="354" x2="372" y2="354" stroke="#E2E2E0"/>
+<text x="380" y="359" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Who it is for, how it should feel</text>
+<line x1="40" y1="372" x2="340" y2="372" stroke="#E2E2E0"/>
+<text x="56" y="395" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Colors</text>
+<line x1="340" y1="390" x2="372" y2="390" stroke="#E2E2E0"/>
+<text x="380" y="395" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">What each color is for, and not for</text>
+<line x1="40" y1="408" x2="340" y2="408" stroke="#E2E2E0"/>
+<text x="56" y="431" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Typography</text>
+<line x1="340" y1="426" x2="372" y2="426" stroke="#E2E2E0"/>
+<text x="380" y="431" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Which font does which job</text>
+<line x1="40" y1="444" x2="340" y2="444" stroke="#E2E2E0"/>
+<text x="56" y="467" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Layout</text>
+<line x1="340" y1="462" x2="372" y2="462" stroke="#E2E2E0"/>
+<text x="380" y="467" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Grid, widths, where the steps go</text>
+<line x1="40" y1="480" x2="340" y2="480" stroke="#E2E2E0"/>
+<text x="56" y="503" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Elevation &amp; Depth</text>
+<line x1="340" y1="498" x2="372" y2="498" stroke="#E2E2E0"/>
+<text x="380" y="503" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Shadows, borders, layers</text>
+<line x1="40" y1="516" x2="340" y2="516" stroke="#E2E2E0"/>
+<text x="56" y="539" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Shapes</text>
+<line x1="340" y1="534" x2="372" y2="534" stroke="#E2E2E0"/>
+<text x="380" y="539" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">Which corner goes on what</text>
+<line x1="40" y1="552" x2="340" y2="552" stroke="#E2E2E0"/>
+<text x="56" y="575" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Components</text>
+<line x1="340" y1="570" x2="372" y2="570" stroke="#E2E2E0"/>
+<text x="380" y="575" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">When to use each one</text>
+<line x1="40" y1="588" x2="340" y2="588" stroke="#E2E2E0"/>
+<text x="56" y="611" font-family="IBM Plex Mono, ui-monospace, monospace" font-size="14" fill="#111111">## Do’s and Don’ts</text>
+<line x1="340" y1="606" x2="372" y2="606" stroke="#E2E2E0"/>
+<text x="380" y="611" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#111111">What a reviewer would say</text>
+<text x="40" y="658" font-family="IBM Plex Sans, system-ui, sans-serif" font-size="14" fill="#6B6B6B">Kiln: 191 lines in all. 130 lines of front matter, 585 words of prose.</text>
+</svg>

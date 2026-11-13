@@ -11,6 +11,8 @@ A coding agent that has never seen your site will build its next page in its own
 
 A `DESIGN.md` fixes that. It is one file in the project's root that lists your colors, text sizes, spacing steps and corners, and says which values are allowed. This guide makes one from a site that is already live, in about a minute, and then puts it to work.
 
+![A diagram in three steps. Measure: your live site. Write: a DESIGN.md with tokens, notes and rules, and a SKILL.md. Hold to it: Strict Check measures pages against the spec, and your coding agent builds from the same values and checks its work.](/guides/design-md-from-your-site/flow.svg "What this guide sets up")
+
 You need Node 20 or later and Google Chrome (or Edge, or Chromium) on your machine. Nothing is sent anywhere: the pages are opened by the browser you already have.
 
 ## 1. Measure the site
@@ -68,6 +70,12 @@ Each color got the role the pages give it most often, and the file says why:
 | `surface` | A fill one step away from the page, such as a card. |
 | `border` | The commonest border color. |
 | `blue`, `grey-2`, … | Whatever is left, named by its hue. |
+
+Here is what that came to for this site, with the reason the file gives for each role:
+
+![A table of the eight colors measured on strictthemes.com with a swatch of each: background white, primary blue as the fill of 1 link or button, secondary light grey as the fill of 23 other links and buttons, neutral grey for quieter text, foreground near-black, and the border grey.](/guides/design-md-from-your-site/roles.svg "The roles measured on this site, and why each color got its role")
+
+Look at `primary` and `secondary`. The blue fills one button on those two pages and the light grey fills 23, yet blue is `primary`. That is deliberate: a color wins over a grey for the main action, because most sites have one colored button and many quiet ones. It is also the rule most likely to be wrong for your site, which is why the reasons are written down.
 
 Check the roles before you trust them. The command counts; it does not know what you meant. Two things to look for:
 

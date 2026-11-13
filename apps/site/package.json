@@ -10,7 +10,7 @@
     "dev": "astro dev",
     "build": "astro build && node scripts/build-examples.ts && node scripts/build-kit.ts",
     "brand": "node scripts/build-brand.ts",
-    "strict-check": "node ../../packages/check/dist/cli.js . --spec ../../packages/themes/themes/strict-one/DESIGN.md --dist dist --exclude examples --exclude .kit --mode light --path / --path /themes/ --path /spec/ --path /themes/strict-one/ --path /kit/ --path /kit/strict-one/ --path /guides/ --path /guides/design-md-from-your-site/ --path /404.html",
+    "strict-check": "node ../../packages/check/dist/cli.js . --spec ../../packages/themes/themes/strict-one/DESIGN.md --dist dist --exclude examples --exclude .kit --mode light --path / --path /themes/ --path /spec/ --path /themes/strict-one/ --path /kit/ --path /kit/strict-one/ --path /guides/ --path /guides/design-md-from-your-site/ --path /guides/ai-slop-ui-tells/ --path /guides/contrast-for-non-designers/ --path /guides/dark-mode-with-tokens-tailwind-4/ --path /guides/design-md-agents-md-rules/ --path /guides/design-md-with-bootstrap/ --path /guides/design-skill-for-your-agent/ --path /guides/design-tokens-for-coding-agents/ --path /guides/design-tokens-in-html-email/ --path /guides/install-a-shadcn-theme/ --path /guides/pricing-page-three-themes/ --path /guides/publish-and-check-live-page/ --path /guides/shadcn-blocks-and-registries/ --path /guides/strict-check-in-ci/ --path /guides/what-is-design-md/ --path /404.html",
     "strict-check:kit": "node scripts/check-kit.ts",
     "preview": "astro preview",
     "astro": "astro",

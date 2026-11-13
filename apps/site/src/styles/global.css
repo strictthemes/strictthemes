@@ -213,9 +213,15 @@
   .prose a { color: var(--link); text-decoration: underline; text-underline-offset: 4px; }
   .prose code { background: var(--card); border: 1px solid var(--border); padding: 0 4px; border-radius: 2px; }
   .prose pre { background: var(--card); border: 1px solid var(--border); padding: 16px; overflow-x: auto; border-radius: var(--radius); font-size: var(--text-body); line-height: var(--text-body--line-height); }
+  /* A long address or path in a sentence breaks where it must, so the page never scrolls sideways. */
+  .prose :not(pre) > code { overflow-wrap: anywhere; }
   .prose pre code { background: none; border: 0; padding: 0; font-size: inherit; }
   .prose table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
   .prose th { text-align: left; font-family: var(--theme-font-mono); font-size: var(--text-label); line-height: var(--text-label--line-height); letter-spacing: var(--text-label--letter-spacing); text-transform: uppercase; font-weight: 500; color: var(--muted-foreground); }
+  .prose figure { margin-top: 32px; margin-bottom: 32px; }
+  .prose figure img { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: var(--radius); }
+  .prose figcaption { margin-top: 8px; font-family: var(--theme-font-mono); font-size: var(--text-label); line-height: var(--text-label--line-height); letter-spacing: var(--text-label--letter-spacing); text-transform: uppercase; font-weight: 500; color: var(--muted-foreground); }
+  .prose blockquote { border-left: 2px solid var(--border); padding-left: 16px; color: var(--muted-foreground); }
   .prose th, .prose td { border-bottom: 1px solid var(--border); padding: 8px 16px 8px 0; vertical-align: top; }
 }
 
