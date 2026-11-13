@@ -1,6 +1,6 @@
 {
   "name": "@strictthemes/check",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Check a project's UI against a Strict design spec: its source and its rendered pages. Or measure a site and write the spec from it.",
   "keywords": [
     "design-md",

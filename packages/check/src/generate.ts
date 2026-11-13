@@ -563,7 +563,7 @@ export function generateSpec(measured: MeasuredPage[], options: GenerateOptions)
     "## Do's and Don'ts",
     '',
     '- Do use only the colors, sizes, spacing steps and corners above.',
-    `- Do keep text at ${ratio(foreground, background) >= 7 ? '7:1' : '4.5:1'} or more against what is behind it.`,
+    '- Do keep text at 4.5:1 or more against what is behind it.',
     "- Don't add a color, a text size or a font for one page.",
     "- Don't leave this list as it is: add what your team would say in a review.",
     '',
@@ -603,12 +603,13 @@ export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
   })
   const scale = (group: Record<string, unknown>): string => Object.entries(group).map(([token, value]) => `${token} ${String(value)}`).join(', ')
   const rules: string[] = []
-  if (strict?.colors.allow === 'tokens') rules.push('Use only the colors above. No other hex value, no opacity that makes a new color of text or fill.')
-  if (strict?.typography.allow === 'scale') rules.push('Set text in the sizes above only, each with its own weight, line height and letter spacing.')
+  if (strict?.colors.allow === 'tokens') rules.push('Use only the colors above, by token. No other hex value.')
+  if (strict?.typography.allow === 'scale') rules.push('Set text in the sizes above only, each with its own weight, line height and letter spacing. A size has one weight: for emphasis use a larger size or a color, not bold. On a narrow screen step a heading down to the next size in the list.')
   if (strict?.typography.fonts === 'declared') rules.push('Use only the fonts above.')
   if (strict?.spacing.allow === 'scale') rules.push(`Padding, margin and gap come from the spacing steps${strict.spacing.extra.length > 0 ? `, or ${strict.spacing.extra.join(', ')}` : ''}.`)
   if (strict?.rounded.allow === 'scale') rules.push(`Corners come from the list above${strict.rounded.full ? `. A box up to ${strict.rounded.full} across may be fully round` : ', and nothing is fully round'}.`)
-  rules.push(`Text needs a contrast of ${strict?.contrast === 'AAA' ? '7:1' : '4.5:1'} or more against what is behind it${Object.keys(dark).length > 0 ? ', in light and in dark mode' : ''}.`)
+  rules.push(`Text needs a contrast of ${strict?.contrast === 'AAA' ? '7:1 (4.5:1 for large text)' : '4.5:1 (3:1 for large text)'} or more against what is behind it${Object.keys(dark).length > 0 ? ', in light and in dark mode' : ''}. Put text on a fill only in that fill's \`on-\` color; a fill without one is not for text.`)
+  rules.push('Hover and focus are checked too. A hover or focus color has to be one of the colors above, and every link, button and field needs a focus mark that can be seen.')
   const tells = Object.entries(strict?.tells ?? {}).filter(([, level]) => level !== 'off').map(([tell]) => tell.replace(/-/g, ' '))
   if (tells.length > 0) rules.push(`Avoid: ${tells.join(', ')}.`)
   const body = [
@@ -620,7 +621,10 @@ export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
     '',
     `1. Read \`${options.specPath}\` in full. Its front matter is the tokens; its sections say how they are used.`,
     '2. Look at how the project names the tokens in code (CSS variables, Tailwind classes) and use those names, not raw values.',
-    '3. Look at a page that exists before you build a new one, and lay yours out the same way.',
+    `3. If the tokens are not in the code yet, put them there first. For Tailwind 4, \`npx @strictthemes/spec export ${options.specPath} --format tailwind\` prints them as a \`@theme\` block, with the dark mode: color classes named after the tokens (\`bg-surface\`, \`text-on-primary\`), a text class for each size (\`text-h1\`), the corners and the spacing steps. Remove a default palette, text sizes and fonts the project came with, and restyle stock components that use them.`,
+    "4. Load each font under the exact family name the spec gives it. A package that registers the font as \"Name Variable\" needs its own `@font-face` with the spec's name.",
+    '5. Run `npx @strictthemes/check --rules` to see what the check allows, as values and as classes.',
+    '6. Look at a page that exists before you build a new one, and lay yours out the same way. If there is none, or a section of the spec is still a note asking to be written, choose a layout yourself and tell the user which choices were yours.',
     '',
     '## The tokens in short',
     '',

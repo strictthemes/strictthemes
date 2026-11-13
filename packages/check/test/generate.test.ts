@@ -131,6 +131,8 @@ test('generate: the command writes the file, and does not replace one without --
     assert.match(text, /- \*\*h1:\*\* 40px, Georgia, weight 700, line height 1\.1, letter spacing -0\.02em/)
     assert.match(text, /\*\*Spacing:\*\* xs 4px, sm 8px, md 16px, lg 24px, xl 32px/)
     assert.match(text, /in light and in dark mode/)
+    assert.match(text, /npx @strictthemes\/spec export .*DESIGN\.md --format tailwind/)
+    assert.match(text, /Hover and focus are checked too/)
     assert.match(text, /npx @strictthemes\/check --spec .*DESIGN\.md --dist dist/)
     assert.equal((await run(server.url, '--out', out, '--skill-out', skill)).status, 2)
 

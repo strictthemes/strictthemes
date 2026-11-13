@@ -599,8 +599,14 @@ of a `DESIGN.md` and a list of notes. The `generate` command is those two.
   exactly, this repo's home page, and the home pages of three public sites,
   where some roles needed a read. No one outside this repo is known to have
   run it.
-- **The skill was read, not run.** No agent has built a page from a
-  generated skill yet.
+- **The skill was run once.** A fresh agent was given a stock shadcn
+  project, a spec and skill generated from two example pages, and a request
+  for a pricing page. It passed the check on the first run at 100% of 3,389
+  values, in both modes and on hover and focus. It had to wire the tokens
+  into the project itself and choose the layout, and it listed where the
+  skill left it guessing; the skill now covers the larger of those (wiring
+  the tokens, font names, hover and focus). The changed skill has not been
+  run again.
 - **It reads one width.** What changes on a phone is not measured.
 - **It cannot name intent.** A color used once on a badge and a brand color
   look the same to it apart from how often they appear.
