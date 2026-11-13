@@ -121,9 +121,24 @@ test('generate: the command writes the file, and does not replace one without --
     assert.match(first.stdout, /100% of \d+ measured values follow it/)
     assert.match(first.stdout, /with a dark mode/)
 
-    const second = await run(server.url, '--out', out)
-    assert.equal(second.status, 2)
-    assert.match(second.stderr, /is there already/)
+    // With --skill-out, a skill that names the spec and its tokens is written too.
+    const skill = join(dir, 'skill', 'SKILL.md')
+    const withSkill = await run(server.url, '--out', out, '--name', 'Pots & Pans', '--skill-out', skill, '--force')
+    assert.equal(withSkill.status, 0, withSkill.stderr)
+    const text = readFileSync(skill, 'utf8')
+    assert.match(text, /^---\nname: pots-pans-design\ndescription: "/)
+    assert.match(text, /- \*\*primary:\*\* #B4371A \(#E8704F in dark mode\)/)
+    assert.match(text, /- \*\*h1:\*\* 40px, Georgia, weight 700, line height 1\.1, letter spacing -0\.02em/)
+    assert.match(text, /\*\*Spacing:\*\* xs 4px, sm 8px, md 16px, lg 24px, xl 32px/)
+    assert.match(text, /in light and in dark mode/)
+    assert.match(text, /npx @strictthemes\/check --spec .*DESIGN\.md --dist dist/)
+    assert.equal((await run(server.url, '--out', out, '--skill-out', skill)).status, 2)
+
+    const second = await run(server.url, '--out', join(dir, 'other.md'), '--force')
+    assert.equal(second.status, 0)
+    const third = await run(server.url, '--out', out)
+    assert.equal(third.status, 2)
+    assert.match(third.stderr, /is there already/)
     assert.equal((await run(server.url, '--out', out, '--force')).status, 0)
 
     assert.equal((await run()).status, 2)

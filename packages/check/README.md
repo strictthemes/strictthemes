@@ -85,6 +85,8 @@ strict-check generate <url> [options]
 --path <path>      A page to measure. Repeat for more. Default: the url's own path.
 --out <file>       Where to write the spec. Default: DESIGN.md
 --name <name>      The spec's name. Default: the site's host name.
+--skill            Also write a skill for coding agents, to .claude/skills/<name>-design/SKILL.md.
+--skill-out <file> Write the skill to this file instead.
 --browser <path>   A Chromium-based browser to use.
 --force            Replace the file when it is there.
 ```
@@ -94,6 +96,13 @@ follows it, and lists what it could not settle. A tidy site comes out near
 100%. A site with many one-off values does not, and the list says which
 colors, sizes and spacings were left out: add the ones that belong, or fix
 the rest on the site.
+
+With `--skill` it also writes a skill: a `SKILL.md` that tells a coding agent
+to read the spec before it builds, lists the tokens and the rules of the
+`strict` block, and ends with the check to run. `.claude/skills/` is where
+Claude Code looks for a project's skills; `--skill-out` puts it elsewhere.
+The skill repeats the tokens of the spec at the time it was written, so
+write it again after you change the spec.
 
 The spec is a starting point. It records what the pages do, not what was
 meant: its prose sections say what was measured and ask for your words. Read
@@ -263,7 +272,7 @@ strict-check:
     - npm run build
     # The rendered check needs a browser, and the image has none.
     - apt-get update -qq && apt-get install -y -qq --no-install-recommends chromium > /dev/null
-    - npx --yes @strictthemes/check@0.5 --dist dist --report strict-check.txt --report strict-check.json
+    - npx --yes @strictthemes/check@0.7 --dist dist --report strict-check.txt --report strict-check.json
   artifacts:
     when: always
     paths:
@@ -313,14 +322,14 @@ jobs:
 | `paths` | `/` | The pages to open, separated by spaces or one on a line. |
 | `spec` | `DESIGN.md` in `dir` | The spec to check against. |
 | `args` | | Other options of the command, such as `--mode light --exclude examples`. |
-| `version` | `0.5` | The version of this package to run. |
+| `version` | `0.7` | The version of this package to run. |
 | `command` | | The command that runs the check, when it should not come from npm, such as `npx strict-check` for the version in the project's lock file. |
 | `report` | `strict-check.txt` | Where the text report goes. The JSON report gets the same name ending in `.json`. |
 | `summary` | `true` | Show the report on the run's page. |
 
 Its outputs are `report` and `json` (the two paths) and `passed` (`true` or
 `false`). Without the action, the step is one line:
-`npx --yes @strictthemes/check@0.5 --dist dist --report strict-check.txt`.
+`npx --yes @strictthemes/check@0.7 --dist dist --report strict-check.txt`.
 
 ### Notes for both
 
@@ -328,7 +337,7 @@ Its outputs are `report` and `json` (the two paths) and `passed` (`true` or
   for each page that matters.
 - **A site without a dark mode** is reported as `mode-not-applied`. Pass
   `--mode light`.
-- **A monorepo.** Give the project's folder first (`@strictthemes/check@0.5
+- **A monorepo.** Give the project's folder first (`@strictthemes/check@0.7
   apps/web --dist dist`, or `dir: apps/web` in the action), and `--spec` when
   its `DESIGN.md` lives elsewhere.
 - **A fixed version.** Add the package to the project
@@ -510,6 +519,7 @@ browser involved.
 `measurePages(url, { paths })` measures a site's pages in light and dark,
 and `generateSpec(measured, { name, source, date })` turns that into the text
 of a `DESIGN.md` and a list of notes. The `generate` command is those two.
+`generateSkill(spec, { specPath })` writes the skill for any linted spec.
 
 ## What was tested
 
@@ -589,6 +599,8 @@ of a `DESIGN.md` and a list of notes. The `generate` command is those two.
   exactly, this repo's home page, and the home pages of three public sites,
   where some roles needed a read. No one outside this repo is known to have
   run it.
+- **The skill was read, not run.** No agent has built a page from a
+  generated skill yet.
 - **It reads one width.** What changes on a phone is not measured.
 - **It cannot name intent.** A color used once on a badge and a brand color
   look the same to it apart from how often they appear.

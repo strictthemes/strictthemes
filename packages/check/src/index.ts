@@ -4,7 +4,7 @@ export { checkSource, sourceFiles, type SourceOptions } from './source.ts'
 export { collect, type CollectOptions, type ElementData, type PageData, type Rgba } from './collect.ts'
 export { evaluatePage, type PageContext } from './evaluate.ts'
 export { checkRendered, measurePages, serveStatic, type MeasureOptions, type RenderOptions } from './render.ts'
-export { generateSpec, type GeneratedSpec, type GenerateOptions, type MeasuredPage } from './generate.ts'
+export { generateSkill, generateSpec, skillName, type GeneratedSpec, type GenerateOptions, type MeasuredPage, type SkillOptions } from './generate.ts'
 export { formatJson, formatText, groupFindings, summarize, type FindingGroup, type Report, type Summary } from './report.ts'
 export {
   CATEGORIES,

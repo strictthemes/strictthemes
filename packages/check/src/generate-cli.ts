@@ -1,8 +1,8 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
-import { dirname, resolve } from 'node:path'
+import { dirname, relative, resolve, sep } from 'node:path'
 import { lintSpec } from '@strictthemes/spec'
 import { evaluatePage } from './evaluate.ts'
-import { generateSpec } from './generate.ts'
+import { generateSkill, generateSpec, skillName } from './generate.ts'
 import { measurePages } from './render.ts'
 import { groupFindings, summarize } from './report.ts'
 import { rulesFor } from './rules.ts'
@@ -20,6 +20,9 @@ Options:
   --path <path>      A page to measure, such as /pricing. Repeat for more. Default: the url's own path.
   --out <file>       Where to write the spec. Default: DESIGN.md
   --name <name>      The spec's name. Default: the site's host name.
+  --skill            Also write a skill for coding agents, to .claude/skills/<name>-design/SKILL.md.
+                     It tells an agent to read the spec, lists the tokens and rules, and ends with the check.
+  --skill-out <file> Write the skill to this file instead.
   --browser <path>   A Chromium-based browser to use. Default: the Chrome on this machine.
   --force            Replace the file when it is there.
 
@@ -34,13 +37,15 @@ export async function generate(argv: string[]): Promise<number> {
   const values: Record<string, string[]> = {}
   const positional: string[] = []
   let force = false
+  let wantSkill = false
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i] ?? ''
-    if (['--path', '--out', '--name', '--browser'].includes(arg)) {
+    if (['--path', '--out', '--name', '--browser', '--skill-out'].includes(arg)) {
       const value = argv[++i]
       if (value === undefined) throw new UsageError(`${arg} needs a value.\n\n${USAGE}`)
       ;(values[arg] ??= []).push(value)
     } else if (arg === '--force') force = true
+    else if (arg === '--skill') wantSkill = true
     else if (arg === '--help' || arg === '-h') {
       process.stdout.write(USAGE)
       return 0
@@ -57,11 +62,14 @@ export async function generate(argv: string[]): Promise<number> {
   const out = resolve(values['--out']?.[0] ?? 'DESIGN.md')
   if (existsSync(out) && !force) throw new UsageError(`${out} is there already. Pass --force to replace it, or --out for another file.`)
 
+  const name = values['--name']?.[0] ?? url.hostname.replace(/^www\./, '')
+  const skillOut = values['--skill-out']?.[0] !== undefined ? resolve(values['--skill-out'][0]) : wantSkill ? resolve('.claude', 'skills', skillName(name), 'SKILL.md') : undefined
+  if (skillOut !== undefined && existsSync(skillOut) && !force) throw new UsageError(`${skillOut} is there already. Pass --force to replace it, or --skill-out for another file.`)
+
   const paths = values['--path'] ?? [url.pathname + url.search]
   const browser = values['--browser']?.[0]
   process.stderr.write(`Measuring ${paths.map((path) => new URL(path, url).href).join(', ')}\n`)
   const measured = await measurePages(url.href, { paths, ...(browser !== undefined ? { browser } : {}) })
-  const name = values['--name']?.[0] ?? url.hostname.replace(/^www\./, '')
   const { source, notes } = generateSpec(measured, { name, source: url.origin, date: new Date().toISOString().slice(0, 10) })
 
   const lint = lintSpec(source)
@@ -69,8 +77,17 @@ export async function generate(argv: string[]): Promise<number> {
   mkdirSync(dirname(out), { recursive: true })
   writeFileSync(out, source)
 
-  const lines: string[] = [`Wrote ${out}`, '']
+  const lines: string[] = [`Wrote ${out}`]
   const spec = lint.spec
+  if (skillOut !== undefined) {
+    // The skill names the spec as an agent in the project would open it.
+    const fromHere = relative(process.cwd(), out)
+    const specPath = fromHere.startsWith('..') ? out : fromHere.split(sep).join('/')
+    mkdirSync(dirname(skillOut), { recursive: true })
+    writeFileSync(skillOut, generateSkill(spec, { specPath, source: url.origin }))
+    lines.push(`Wrote ${skillOut}`)
+  }
+  lines.push('')
   const count = (group: unknown): number => (group && typeof group === 'object' ? Object.keys(group).length : 0)
   lines.push(
     `  colors      ${count(spec.colors)}${measured.some((page) => page.dark) && spec.strict?.modes ? ', with a dark mode' : ''}`,

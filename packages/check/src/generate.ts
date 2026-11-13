@@ -1,4 +1,4 @@
-import { contrastRatio, deltaE, formatHex, parseColor, rgbToOklch, type Rgb } from '@strictthemes/spec'
+import { contrastRatio, deltaE, formatHex, parseColor, rgbToOklch, type Rgb, type StrictSpec } from '@strictthemes/spec'
 import type { ElementData, PageData, Rgba } from './collect.ts'
 
 /** What was measured on one page, in each color mode it has. */
@@ -569,4 +569,92 @@ export function generateSpec(measured: MeasuredPage[], options: GenerateOptions)
     '',
   ]
   return { source: `${yaml.join('\n')}\n${prose.join('\n')}`, notes }
+}
+
+export interface SkillOptions {
+  /** Where the spec is, as the agent should open it: `DESIGN.md` for one in the project's root. */
+  specPath: string
+  /** The site the spec was measured from, for the description. */
+  source?: string
+}
+
+/** A name a skill may have: lower-case letters, digits and hyphens. */
+export const skillName = (name: string): string =>
+  `${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'site'}-design`
+
+/**
+ * Writes a skill (SKILL.md) for a spec: when to use it, the tokens in short,
+ * the rules its `strict` block sets, and the check to run before finishing.
+ * The spec stays the source of the values; the skill tells an agent to read it.
+ */
+export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
+  const name = skillName(spec.name ?? 'site')
+  const title = spec.name ?? 'This site'
+  const strict = spec.strict
+  const dark = strict?.modes.dark?.colors ?? {}
+  const description = [
+    `Build UI that matches ${title}${options.source ? ` (${options.source})` : ''}: its colors, type, spacing and corners, as written in ${options.specPath}.`,
+    `Use it whenever you add or change a page, a section or a component in this project.`,
+    'It names the tokens, says what is not allowed, and checks the result with Strict Check.',
+  ].join(' ')
+  const type = Object.entries(spec.typography).map(([token, value]) => {
+    const parts = [value.fontSize, value.fontFamily, value.fontWeight !== undefined ? `weight ${value.fontWeight}` : undefined, value.lineHeight !== undefined ? `line height ${value.lineHeight}` : undefined, value.letterSpacing !== undefined ? `letter spacing ${value.letterSpacing}` : undefined]
+    return `- **${token}:** ${parts.filter((part) => part !== undefined).join(', ')}`
+  })
+  const scale = (group: Record<string, unknown>): string => Object.entries(group).map(([token, value]) => `${token} ${String(value)}`).join(', ')
+  const rules: string[] = []
+  if (strict?.colors.allow === 'tokens') rules.push('Use only the colors above. No other hex value, no opacity that makes a new color of text or fill.')
+  if (strict?.typography.allow === 'scale') rules.push('Set text in the sizes above only, each with its own weight, line height and letter spacing.')
+  if (strict?.typography.fonts === 'declared') rules.push('Use only the fonts above.')
+  if (strict?.spacing.allow === 'scale') rules.push(`Padding, margin and gap come from the spacing steps${strict.spacing.extra.length > 0 ? `, or ${strict.spacing.extra.join(', ')}` : ''}.`)
+  if (strict?.rounded.allow === 'scale') rules.push(`Corners come from the list above${strict.rounded.full ? `. A box up to ${strict.rounded.full} across may be fully round` : ', and nothing is fully round'}.`)
+  rules.push(`Text needs a contrast of ${strict?.contrast === 'AAA' ? '7:1' : '4.5:1'} or more against what is behind it${Object.keys(dark).length > 0 ? ', in light and in dark mode' : ''}.`)
+  const tells = Object.entries(strict?.tells ?? {}).filter(([, level]) => level !== 'off').map(([tell]) => tell.replace(/-/g, ' '))
+  if (tells.length > 0) rules.push(`Avoid: ${tells.join(', ')}.`)
+  const body = [
+    `# ${title}: design`,
+    '',
+    `This skill is for building UI in this project. \`${options.specPath}\` holds the design: every color, text size, spacing step and corner, and a \`strict\` block that says what is allowed.`,
+    '',
+    '## Before you start',
+    '',
+    `1. Read \`${options.specPath}\` in full. Its front matter is the tokens; its sections say how they are used.`,
+    '2. Look at how the project names the tokens in code (CSS variables, Tailwind classes) and use those names, not raw values.',
+    '3. Look at a page that exists before you build a new one, and lay yours out the same way.',
+    '',
+    '## The tokens in short',
+    '',
+    '**Colors**',
+    '',
+    ...Object.entries(spec.colors).map(([token, value]) => `- **${token}:** ${String(value)}${dark[token] !== undefined && dark[token] !== value ? ` (${String(dark[token])} in dark mode)` : ''}`),
+    '',
+    '**Type**',
+    '',
+    ...type,
+    '',
+    `**Spacing:** ${scale(spec.spacing)}`,
+    '',
+    `**Corners:** ${scale(spec.rounded)}`,
+    '',
+    `If this list and \`${options.specPath}\` differ, the spec is right.`,
+    '',
+    '## Rules',
+    '',
+    ...rules.map((rule) => `- ${rule}`),
+    '- Need a value that is not in the spec? Stop and ask. Do not add a token on your own.',
+    '',
+    '## Check before you finish',
+    '',
+    'Build the project, then measure it against the spec with Strict Check:',
+    '',
+    '```bash',
+    `npx @strictthemes/check${options.specPath === 'DESIGN.md' ? '' : ` --spec ${options.specPath}`} --dist dist`,
+    '```',
+    '',
+    '`dist` is the folder the build wrote. Add `--path /pricing` for each page you touched other than `/`. Fix every error it lists by using a value the spec allows, and run it again until the last line starts with `Passed`. Do not mark code `strict-ignore` to get there.',
+    '',
+    'Then tell the user what you built, what the check reported, and anything you could not verify.',
+    '',
+  ].join('\n')
+  return ['---', `name: ${name}`, `description: ${JSON.stringify(description)}`, '---', '', body].join('\n')
 }

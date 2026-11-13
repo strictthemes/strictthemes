@@ -12,7 +12,8 @@ Usage:
   strict-check [dir] [options]   Check a project.
   strict-check generate <url>    Measure a site and write a DESIGN.md from what its pages use.
                                  --path <path> for each page (default /), --out <file> (default DESIGN.md),
-                                 --name <name>, --browser <path>, --force to replace a file that is there.
+                                 --name <name>, --skill to also write a skill for agents, --browser <path>,
+                                 --force to replace a file that is there.
   strict-check mcp               Serve the check and the Strict themes as an MCP server over stdio, for coding agents.
   strict-check mcp --http        Serve the Strict themes alone as an MCP server over HTTP, to host for others.
                                  --port <n> (default 8787) and --host <address> (default 127.0.0.1).
