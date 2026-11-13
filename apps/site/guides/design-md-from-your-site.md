@@ -35,7 +35,7 @@ Wrote .claude/skills/strict-design/SKILL.md
   spacing     5 steps
   corners     2
 
-Checked against the pages it was measured from: 100% of 2845 measured values follow it.
+Checked against the pages it was measured from: 100% of 2885 measured values follow it.
 ```
 
 The last line matters most. After writing the spec, the command checks the same pages against it and says how much of them it covers.
@@ -123,7 +123,7 @@ Now run the check on the live site:
 npx @strictthemes/check --spec DESIGN.md --url https://your-site.example --no-source
 ```
 
-It opens the page in every color mode the spec has, at 1280px and 375px, and also on hover and on focus, which the first measurement did not cover. For this site it reported 100% of 6,417 values. Expect it to find a few things the generator could not see: a hover color that is used nowhere else, a size that only appears on a phone. For each one, decide: add it to the spec, or fix it on the site.
+It opens the page in every color mode the spec has, at 1280px and 375px, and also on hover and on focus, which the first measurement did not cover. For this site it reported 100% of 6,513 values. Expect it to find a few things the generator could not see: a hover color that is used nowhere else, a size that only appears on a phone. For each one, decide: add it to the spec, or fix it on the site.
 
 ## 6. Hand it to your agent
 

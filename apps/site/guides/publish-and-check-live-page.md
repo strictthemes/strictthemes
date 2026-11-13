@@ -139,16 +139,16 @@ npx @strictthemes/check --spec DESIGN.md --url https://strictthemes.com \
 Strict Check: Kiln
 
 Rendered pages: /themes/kiln/prompts/shop/build/, /themes/kiln/prompts/product/build/, /themes/kiln/prompts/basket/build/ in light and dark mode at 1280px and 375px, also on hover and focus
-  colors        2462 checked  all on theme
+  colors        2458 checked  all on theme
   spacing       1382 checked  all on theme
-  typography    5186 checked  all on theme
+  typography    5166 checked  all on theme
   corners        402 checked  all on theme
-  contrast      1110 checked  all on theme
-  tells         1138 checked  all on theme
+  contrast      1106 checked  all on theme
+  tells         1134 checked  all on theme
   layout          12 checked  all on theme
   states         254 checked  all on theme
 
-Passed: 100% of 11946 measured values follow the theme. 0 errors, 0 warnings.
+Passed: 100% of 11914 measured values follow the theme. 0 errors, 0 warnings.
 ```
 
 A page that is not there stops the check. We asked for a path that does not exist and got one line and exit code `2`, which means the check could not run:
@@ -163,9 +163,9 @@ Timed on a Mac with Chrome, with `npx` starting the package included:
 
 | What was checked | Runs | Time |
 |---|---|---|
-| One page on the live site (4,328 values) | 3 | 6.7 to 9.4 seconds |
-| Three pages on the live site (11,946 values) | 2 | 14.7 and 13.1 seconds |
-| One page at a local address (3,306 values) | 3 | 4.5 to 5.8 seconds |
+| One page on the live site (4,328 values) | 3 | 9.6 to 9.9 seconds |
+| Three pages on the live site (11,914 values) | 3 | 17.8 to 19.4 seconds |
+| One page at a local address (3,306 values) | 3 | 3.9 to 6.2 seconds |
 
 Each page is loaded four times: two color modes, two widths. Over a network that is most of the difference.
 
