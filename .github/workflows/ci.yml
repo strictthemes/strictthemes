@@ -60,7 +60,7 @@ jobs:
           dir: apps/site
           spec: packages/themes/themes/strict-one/DESIGN.md
           dist: dist
-          paths: / /themes/ /spec/ /themes/strict-one/ /kit/ /kit/strict-one/ /404.html
+          paths: / /themes/ /spec/ /themes/strict-one/ /kit/ /kit/strict-one/ /guides/ /guides/design-md-from-your-site/ /404.html
           args: --exclude examples --exclude .kit --mode light
       # The agent kit, as the registry writes it for each theme: in every theme,
       # both color modes and two widths, with hover and focus.

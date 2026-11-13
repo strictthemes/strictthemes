@@ -1,8 +1,9 @@
 import type { APIRoute } from "astro"
+import { guides, guideUrls } from "@/lib/guides"
 import { exampleFor, kitUrls, promptUrls, SITE_URL, themes } from "@/lib/themes"
 
 // The pages a search engine should know about, each at its canonical address:
-// the home page, the catalog, the spec, every theme page and every preview of
+// the home page, the catalog, the spec, the guides, every theme page and every preview of
 // a page prompt. Left out: the built example pages (they say "noindex"
 // themselves), the 404 page, and the files a tool fetches (.md, .css, .json).
 export const GET: APIRoute = () => {
@@ -11,6 +12,8 @@ export const GET: APIRoute = () => {
     "/themes/",
     "/spec/",
     "/kit/",
+    "/guides/",
+    ...guides.map((guide) => guideUrls(guide.slug).page),
     ...themes.map((theme) => kitUrls(theme.slug).page),
     ...themes.flatMap((theme) => [
       `/themes/${theme.slug}/`,

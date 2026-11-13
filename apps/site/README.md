@@ -99,6 +99,33 @@ runs Strict Check on every one of them against its own theme, in both color
 modes at two widths with hover and focus, and fails on any error or warning.
 The workflow runs it after the site's own check.
 
+## Guides
+
+`/guides/` lists the guides and `/guides/<slug>/` shows one. A guide is one
+Markdown file in [guides/](guides), with a few facts on top:
+
+```
+---
+title: Make a DESIGN.md from a site you already have
+description: One or two sentences, used on the list, in search results and in llms.txt.
+kind: How to
+date: 2026-11-13
+checked: 2026-11-13
+tool: "@strictthemes/check 0.7.1"
+---
+```
+
+`kind` is "How to", "Explained" or "Worked example". `checked` is the day the
+guide's commands were last run, and `tool` the version they were run with;
+leave `tool` out of a guide with no commands. Adding a file is all it takes:
+the page, the list, the sitemap, `llms.txt` and a plain `/guides/<slug>.md`
+follow from it.
+
+Run every command before you write it down, and paste what it printed. A
+test fails when a guide names an older minor version of Strict Check than the
+package has, so a guide is run again when the tool moves on. A main heading
+(`##`) becomes an entry in the guide's list of contents.
+
 ## Theme cards
 
 The home page and `/themes` show every theme as a card

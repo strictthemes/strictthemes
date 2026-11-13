@@ -1,3 +1,4 @@
+import { guides, guideUrls } from "@/lib/guides"
 import type { APIRoute } from "astro"
 import { CHECK_DOCS_URL, MCP_URL, NPM_URL, REPO_URL } from "@/lib/brand"
 import { kitBlocks, SITE_URL, themes } from "@/lib/themes"
@@ -44,6 +45,10 @@ export const GET: APIRoute = () => {
     "## Docs",
     "",
     `- [The Strict spec format](${SITE_URL}/spec): DESIGN.md plus the \`strict\` block, lint rules and exports.`,
+    "",
+    "## Guides",
+    "",
+    ...guides.map((guide) => `- [${guide.title}](${SITE_URL}${guideUrls(guide.slug).markdown}): ${guide.description}`),
     "",
     "## Tools",
     "",

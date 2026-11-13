@@ -34,6 +34,11 @@ const PAGES: [slug: string, name: string, pages: string[]][] = [
   ["primer", "Primer", ["catalogue", "course", "lesson", "progress", "plans"]],
 ]
 const THEMES = PAGES.map(([slug]) => slug)
+// The guides, by the name of each one's file in `guides/`.
+const guidesDir = join(import.meta.dirname, "..", "guides")
+const GUIDES = readdirSync(guidesDir)
+  .filter((name) => name.endsWith(".md"))
+  .map((name) => name.replace(/\.md$/, ""))
 
 test("every page is built", () => {
   for (const page of ["index.html", "themes/index.html", "spec/index.html", "404.html"]) {
@@ -168,7 +173,8 @@ test("the sitemap lists every page a search engine may show, and no other", () =
   assert.deepEqual([...listed].sort(), canonical)
   // The home page, the catalog, the spec, the agent kit, and for each theme its page, its
   // five previews and the kit in it.
-  assert.equal(listed.length, 4 + THEMES.length * 7)
+  // ... and the guides: their list and one page each.
+  assert.equal(listed.length, 4 + THEMES.length * 7 + 1 + GUIDES.length)
   assert.equal(listed[0], "https://strictthemes.com/")
   assert.ok(!listed.some((url) => url.includes("/404") || url.endsWith("/build/")))
 
@@ -453,4 +459,34 @@ test("the header links to the code, and buttons that copy can be told apart", ()
   const labels = [...read("themes/index.html").matchAll(/data-copy aria-label="([^"]+)"/g)].map((match) => match[1])
   assert.equal(labels.length, THEMES.length)
   assert.equal(new Set(labels).size, labels.length)
+})
+
+test("every guide has a page, a Markdown file, and a place in the list, the sitemap and llms.txt", () => {
+  assert.ok(GUIDES.length > 0)
+  const list = read("guides/index.html")
+  for (const slug of GUIDES) {
+    const page = read(`guides/${slug}/index.html`)
+    const title = /<h1[^>]*>([^<]+)<\/h1>/.exec(page)?.[1] ?? ""
+    assert.ok(title.length > 10, slug)
+    assert.match(page, /Last checked <time datetime="\d{4}-\d{2}-\d{2}">/, slug)
+    assert.ok(page.includes(`href="/guides/${slug}.md"`), slug)
+    assert.ok(list.includes(`href="/guides/${slug}/"`), slug)
+    const markdown = read(`guides/${slug}.md`)
+    assert.ok(markdown.startsWith("# "), slug)
+    assert.ok(!markdown.includes("\n---\n"), `${slug}: the facts at the top are not part of the text`)
+    assert.ok(read("llms.txt").includes(`(https://strictthemes.com/guides/${slug}.md)`), slug)
+    assert.ok(read("sitemap.xml").includes(`<loc>https://strictthemes.com/guides/${slug}/</loc>`), slug)
+  }
+  assert.ok(read("index.html").includes('href="/guides"'))
+})
+
+test("a guide names the version of Strict Check that is current", () => {
+  // A guide's commands were run with the version it names. When the package moves on,
+  // this fails until the guide is run again and its facts are brought up to date.
+  const version = (JSON.parse(readFileSync(join(import.meta.dirname, "..", "..", "..", "packages", "check", "package.json"), "utf8")) as { version: string }).version
+  const minor = version.split(".").slice(0, 2).join(".")
+  for (const slug of GUIDES) {
+    const tool = /^tool:\s*"?@strictthemes\/check (\d+\.\d+)\.\d+"?$/m.exec(readFileSync(join(guidesDir, `${slug}.md`), "utf8"))
+    if (tool) assert.equal(tool[1], minor, `${slug} was last run with ${tool[1]}; Strict Check is ${version}`)
+  }
 })

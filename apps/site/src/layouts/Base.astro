@@ -17,8 +17,9 @@ const shareImage = new URL("/og.png", SITE_URL).href
 const nav = [
   { href: "/themes", label: "Themes" },
   { href: "/kit", label: "Kit" },
-  { href: "/spec", label: "Spec" },
-  // Left out on a phone, where the header has no room for it: the footer has it too.
+  { href: "/guides", label: "Guides" },
+  // Left out on a phone, where the header has no room for them: the footer has both.
+  { href: "/spec", label: "Spec", wide: true },
   { href: REPO_URL, label: "GitHub", wide: true },
 ]
 const footer = [
@@ -28,6 +29,7 @@ const footer = [
       { href: "/themes", label: "Themes" },
       { href: "/kit", label: "Agent kit" },
       { href: "/spec", label: "The spec format" },
+      { href: "/guides", label: "Guides" },
       { href: "/r/registry.json", label: "Registry index" },
       { href: "/llms.txt", label: "llms.txt" },
     ],
