@@ -107,11 +107,9 @@
     --sidebar-ring: #0E5A40;
     --tertiary: #B98A2F;
     --tertiary-foreground: #14211B;
-    color-scheme: light;
 }
 
 .dark {
-    color-scheme: dark;
     --background: #0D1512;
     --foreground: #E9EFE9;
     --card: #15201B;

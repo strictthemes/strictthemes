@@ -7,6 +7,7 @@ checks:
   - The page has exactly one "Menu" button below `lg`, and it opens the search, the header links and the sidebar.
   - The sidebar marks the current page with `aria-current="page"`, and the mark is visible without relying on color alone.
   - Every code block has a working "Copy" button that confirms the copy in text.
+  - The search field is the theme's `Input` with `type="search"`, and with text in it shows no clear button drawn by the browser.
   - The "on this page" links jump to their headings and mark the one in view.
   - The "Menu" button and the sheet it opens work with the keyboard.
   - Code blocks and tables scroll sideways inside their own box on small screens.
@@ -18,7 +19,7 @@ Build these parts.
 
 ### 1. Header
 
-A single row with a 1px bottom border: the product name in `font-heading text-h2` with a `DOCS` label in `text-muted-foreground` beside it, the two in a `flex items-baseline gap-2`, then label links, Guides, API and Changelog, none of them the current page and each pointing to `#`, and a search `Input` with the placeholder "Search the docs", `w-64` at the row's right end (`ml-auto`). In the sheet the field keeps the stock `w-full`. The search only needs to filter the sidebar links as the user types. Below `lg` the row holds only the product name, the `DOCS` label and a "Menu" button. The row's gap switches with that layout: `gap-4` below `lg`, `gap-8` from `lg` up, here instead of the notes' `md`. The header and the footer run across the whole window, above and below the three columns, so both lines are full width.
+A single row with a 1px bottom border: the product name in `font-heading text-h2` with a `DOCS` label in `text-muted-foreground` beside it, the two in a `flex items-baseline gap-2`, then label links, Guides, API and Changelog, none of them the current page and each pointing to `#`, and a search `Input` with `type="search"` and the placeholder "Search the docs", `w-64` at the row's right end (`ml-auto`). In the sheet the field keeps the stock `w-full`. The search only needs to filter the sidebar links as the user types. Below `lg` the row holds only the product name, the `DOCS` label and a "Menu" button. The row's gap switches with that layout: `gap-4` below `lg`, `gap-8` from `lg` up, here instead of the notes' `md`. The header and the footer run across the whole window, above and below the three columns, so both lines are full width.
 
 ### 2. Page layout
 

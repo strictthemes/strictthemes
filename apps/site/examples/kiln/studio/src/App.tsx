@@ -1,29 +1,37 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { FormEvent } from "react"
 import { CircleAlert, CircleCheck, ShoppingBag } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { cn } from "@/lib/utils"
 
 const STUDIO = "Whitlow Pottery"
-const CONTAINER = "mx-auto max-w-[1120px] px-4 md:px-6"
-const FOCUS =
+const BASKET_COUNT = 3
+
+const container = "mx-auto max-w-[1120px] px-4 md:px-6"
+
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const CODE_FOCUS =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const NAV_LINK = cn(
+
+const quietLink = cn(
   "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
+  focusOutline
 )
-const TEXT_LINK = cn(
-  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  FOCUS
-)
-const BUTTON = "h-auto px-4 py-2 font-mono text-label"
-const LABEL = "font-mono text-label"
-const MUTED_LABEL = "font-mono text-label text-muted-foreground"
-const TIME = "font-mono tabular-nums"
+
+const label = "font-mono text-label"
+const mutedLabel = "font-mono text-label text-muted-foreground"
+const buttonClasses = "h-auto px-4 py-2 font-mono text-label"
+const fieldClasses = "mt-2 h-auto px-4 py-2 text-body md:text-body"
+const fieldLabel = "block font-mono text-label text-foreground"
 
 const mainLinks = [
   { label: "Shop", href: "/" },
@@ -44,22 +52,19 @@ const people = [
     initials: "NV",
     name: "Nell Varga",
     role: "Potter, co-founder",
-    about:
-      "Nell throws all of the tableware, about forty pieces on a good day. She also keeps the glaze notebooks, one page for every firing since 2019.",
+    text: "Nell throws the tableware, about forty pieces on a good day at the wheel. She also keeps the glaze notebooks, one line for every test tile since 2019.",
   },
   {
     initials: "TR",
     name: "Tomas Reid",
     role: "Glazes and kiln, co-founder",
-    about:
-      "Tomas mixes the glazes from raw materials in the old cold room. He loads and fires the gas kiln and stays up with it until it reaches temperature.",
+    text: "Tomas mixes the glazes from raw materials, a bucket at a time. He packs and fires the kiln, and sits up with it on the night of a glaze firing.",
   },
   {
     initials: "IO",
     name: "Ines Okafor",
     role: "Orders and the Saturday class",
-    about:
-      "Ines packs every order in paper and straw from the yard. On Saturday mornings she runs the class for six people at three wheels.",
+    text: "Ines packs every order in paper and wood wool, and has not lost a plate in the post yet. She runs the Saturday class, six people at six wheels.",
   },
 ]
 
@@ -67,169 +72,70 @@ const steps = [
   {
     time: "1 hour",
     name: "Wedging the clay",
-    text: "We knead each bag of clay on a plaster bench to push out the air and even out the moisture. Air left in the clay can crack a piece in the kiln.",
+    text: "A 12.5 kg bag of stoneware clay is cut, slammed and kneaded on a plaster slab until no air is left in it. Then it is weighed into balls, 450 g for a mug and 900 g for a dinner plate.",
   },
   {
     time: "20 minutes a piece",
     name: "Throwing on the wheel",
-    text: "Each piece is thrown by hand to a set weight, so a set of mugs holds the same amount. Lids and handles are made on the same day so they shrink together.",
+    text: "Nell centres each ball and pulls it up against a gauge, so that six mugs come out as one set. The pieces are cut from the wheel with a wire and left on boards overnight.",
   },
   {
     time: "7 days",
     name: "Trimming and drying",
-    text: "When the clay is leather hard we trim the foot and smooth the rim. Then the pieces dry slowly on boards under plastic, so they do not warp.",
+    text: "The next day, when the clay is as firm as cheese, each piece goes back on the wheel upside down and its foot is cut. Then it dries on the racks for a week, turned once, away from the door.",
   },
   {
     time: "1 day",
     name: "The bisque firing, to 1,000°C",
-    text: "The first firing turns dry clay into hard, porous ware that takes glaze well. The kiln heats for about ten hours and cools overnight.",
+    text: "The dry pieces are stacked in the electric kiln and fired slowly to 1,000°C. They come out hard but still thirsty, which is what makes a glaze hold on to them.",
   },
   {
     time: "2 days",
     name: "Glazing and the glaze firing, to 1,260°C",
-    text: "We dip each piece in glaze and wipe the foot clean by hand. The gas kiln then fires for twelve hours and cools for a day and a half before we open it.",
+    text: "Each piece is dipped in one of four glazes, and its foot is wiped clean so it does not stick to the shelf. The gas kiln takes fourteen hours to reach 1,260°C and a day and a half to cool before it can be opened.",
   },
 ]
 
-type Hours = { open: boolean; classTime?: boolean }
-const hours: [string, Hours][] = [
-  ["Monday", { open: false }],
-  ["Tuesday", { open: false }],
-  ["Wednesday", { open: false }],
-  ["Thursday", { open: true }],
-  ["Friday", { open: true }],
-  ["Saturday", { open: true, classTime: true }],
-  ["Sunday", { open: false }],
+const OPEN = { from: "10:00", to: "16:00" }
+
+const hours: {
+  day: string
+  open?: { from: string; to: string }
+  lesson?: { from: string; to: string }
+}[] = [
+  { day: "Monday" },
+  { day: "Tuesday" },
+  { day: "Wednesday" },
+  { day: "Thursday", open: OPEN },
+  { day: "Friday", open: OPEN },
+  { day: "Saturday", open: OPEN, lesson: { from: "10:00", to: "12:00" } },
+  { day: "Sunday" },
 ]
 
-function TimeRange({ from, to }: { from: string; to: string }) {
-  return (
-    <>
-      <time dateTime={from} className={TIME}>
-        {from}
-      </time>{" "}
-      to{" "}
-      <time dateTime={to} className={TIME}>
-        {to}
-      </time>
-    </>
-  )
-}
-
-function SiteHeader() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false)
-        menuButton.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [open])
-
-  const links = (itemClass?: string) =>
-    mainLinks.map((link) => (
-      <li key={link.href}>
-        <a
-          href={link.href}
-          aria-current={link.current ? "page" : undefined}
-          className={cn(NAV_LINK, link.current && "underline", itemClass)}
-        >
-          {link.label}
-        </a>
-      </li>
-    ))
-
-  return (
-    <header className="border-b">
-      <div
-        className={cn(
-          CONTAINER,
-          "flex flex-wrap items-center gap-x-4 gap-y-2 py-4 md:gap-x-6"
-        )}
-      >
-        <a href="/" className={cn(NAV_LINK, "font-heading text-h2")}>
-          {STUDIO}
-        </a>
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex gap-6">{links()}</ul>
-        </nav>
-        <div className="ml-auto flex items-center gap-4">
-          <Button
-            ref={menuButton}
-            variant="outline"
-            className={cn(BUTTON, "md:hidden")}
-            aria-expanded={open}
-            aria-controls="mobile-menu"
-            onClick={() => setOpen((value) => !value)}
-          >
-            Menu
-          </Button>
-          <a
-            href="/basket"
-            aria-label="Basket, 3 pieces"
-            className={cn(NAV_LINK, "inline-flex items-center gap-2")}
-          >
-            <ShoppingBag
-              aria-hidden="true"
-              className="size-4"
-              strokeWidth={1.5}
-            />
-            <span className="hidden md:inline">Basket</span>
-            <span className="font-mono tabular-nums">(3)</span>
-          </a>
-        </div>
-      </div>
-      <nav
-        id="mobile-menu"
-        aria-label="Main"
-        className="border-t md:hidden"
-        hidden={!open}
-      >
-        <ul className={cn(CONTAINER, "py-2")}>{links("block py-2")}</ul>
-      </nav>
-    </header>
-  )
-}
-
-function SiteFooter() {
-  return (
-    <footer className="border-t">
-      <div className={cn(CONTAINER, "py-10")}>
-        <div className="flex flex-col gap-6 md:flex-row md:justify-between">
-          <div>
-            <p className="font-heading text-h2">{STUDIO}</p>
-            <address className="mt-2 not-italic">
-              Unit 3, Coldharbour Yard
-              <br />
-              Bramwick BW4 2LT
-            </address>
-          </div>
-          <nav aria-label="Footer">
-            <ul className="flex flex-col gap-2">
-              {footerLinks.map((link) => (
-                <li key={link.href}>
-                  <a href={link.href} className={NAV_LINK}>
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-        <p className={cn(MUTED_LABEL, "mt-6")}>© 2026 {STUDIO}</p>
-      </div>
-    </footer>
-  )
-}
+const topics = [
+  { value: "commission", label: "A commission" },
+  { value: "order", label: "An order" },
+  { value: "class", label: "The Saturday class" },
+  { value: "other", label: "Something else" },
+]
 
 type Field = "name" | "email" | "topic" | "message"
 type Errors = Partial<Record<Field, string>>
+
+const fieldOrder: Field[] = ["name", "email", "topic", "message"]
+
+function basketLabel(count: number) {
+  if (count === 0) return "Basket, empty"
+  return `Basket, ${count} ${count === 1 ? "piece" : "pieces"}`
+}
+
+function Clock({ value }: { value: string }) {
+  return (
+    <time dateTime={value} className="font-mono tabular-nums">
+      {value}
+    </time>
+  )
+}
 
 function ErrorLine({ id, children }: { id: string; children: string }) {
   return (
@@ -238,9 +144,9 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
       className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
     >
       <CircleAlert
-        aria-hidden="true"
         className="size-4 shrink-0"
         strokeWidth={1.5}
+        aria-hidden="true"
       />
       <span>{children}</span>
     </p>
@@ -248,26 +154,24 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
 }
 
 function ContactForm() {
-  const [values, setValues] = useState<Record<Field, string>>({
-    name: "",
-    email: "",
-    topic: "",
-    message: "",
-  })
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [topic, setTopic] = useState<string | null>(null)
+  const [message, setMessage] = useState("")
   const [errors, setErrors] = useState<Errors>({})
   const [sent, setSent] = useState(false)
+
   const nameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
-  const topicRef = useRef<HTMLSelectElement>(null)
-  const textRef = useRef<HTMLTextAreaElement>(null)
-  const messageRef = useRef<HTMLDivElement>(null)
+  const topicRef = useRef<HTMLButtonElement>(null)
+  const messageRef = useRef<HTMLTextAreaElement>(null)
+  const confirmationRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
-    if (sent) messageRef.current?.focus()
+    if (sent) confirmationRef.current?.focus()
   }, [sent])
 
-  function update(field: Field, value: string) {
-    setValues((current) => ({ ...current, [field]: value }))
+  function clearError(field: Field) {
     setErrors((current) => {
       if (!current[field]) return current
       const next = { ...current }
@@ -276,140 +180,173 @@ function ContactForm() {
     })
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const next: Errors = {}
-    if (!values.name.trim()) next.name = "Enter your name."
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim()))
-      next.email = "Enter an email address, like name@example.com."
-    if (!values.topic) next.topic = "Choose what your message is about."
-    if (values.message.trim().length < 20)
-      next.message = "Write a little more: at least 20 characters."
-    setErrors(next)
-    const order: Field[] = ["name", "email", "topic", "message"]
-    const first = order.find((field) => next[field])
+
+    const found: Errors = {}
+    if (name.trim() === "") {
+      found.name = "Enter your name."
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      found.email = "Enter an email address, like name@example.com."
+    }
+    if (topic === null) {
+      found.topic = "Choose what your message is about."
+    }
+    if (message.trim().length < 20) {
+      found.message = "Write a little more: at least 20 characters."
+    }
+    setErrors(found)
+
+    const first = fieldOrder.find((field) => found[field])
     if (first) {
-      const target = {
+      const refs = {
         name: nameRef,
         email: emailRef,
         topic: topicRef,
-        message: textRef,
-      }[first]
-      target.current?.focus()
+        message: messageRef,
+      }
+      refs[first].current?.focus()
       return
     }
     setSent(true)
   }
 
-  const fieldProps = (field: Field) => ({
-    id: `contact-${field}`,
-    "aria-invalid": errors[field] ? true : undefined,
-    "aria-describedby": errors[field] ? `contact-${field}-error` : undefined,
-  })
-  const labelClass = cn(LABEL, "block text-foreground")
-  const inputClass = "mt-2 h-auto px-4 py-2 text-body md:text-body"
-
   return (
     <div className="mt-6">
       {!sent && (
-        <form noValidate onSubmit={onSubmit}>
+        <form noValidate onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="contact-name" className={labelClass}>
+            <label htmlFor="contact-name" className={fieldLabel}>
               Your name
             </label>
             <Input
               ref={nameRef}
-              {...fieldProps("name")}
+              id="contact-name"
+              name="name"
               autoComplete="name"
-              value={values.name}
-              onChange={(event) => update("name", event.target.value)}
-              className={inputClass}
+              value={name}
+              onChange={(event) => {
+                setName(event.target.value)
+                clearError("name")
+              }}
+              aria-invalid={errors.name ? true : undefined}
+              aria-describedby={errors.name ? "contact-name-error" : undefined}
+              className={fieldClasses}
             />
             {errors.name && (
               <ErrorLine id="contact-name-error">{errors.name}</ErrorLine>
             )}
           </div>
+
           <div className="mt-6">
-            <label htmlFor="contact-email" className={labelClass}>
+            <label htmlFor="contact-email" className={fieldLabel}>
               Email address
             </label>
             <Input
               ref={emailRef}
-              {...fieldProps("email")}
+              id="contact-email"
+              name="email"
               type="email"
               autoComplete="email"
-              value={values.email}
-              onChange={(event) => update("email", event.target.value)}
-              className={inputClass}
+              value={email}
+              onChange={(event) => {
+                setEmail(event.target.value)
+                clearError("email")
+              }}
+              aria-invalid={errors.email ? true : undefined}
+              aria-describedby={
+                errors.email ? "contact-email-error" : undefined
+              }
+              className={fieldClasses}
             />
             {errors.email && (
               <ErrorLine id="contact-email-error">{errors.email}</ErrorLine>
             )}
           </div>
+
           <div className="mt-6">
-            <label htmlFor="contact-topic" className={labelClass}>
+            <label htmlFor="contact-topic" className={fieldLabel}>
               What it is about
             </label>
-            <div className="mt-2 w-full md:w-1/2">
-              <select
+            <Select
+              items={topics}
+              value={topic}
+              onValueChange={(value) => {
+                if (value === null) return
+                setTopic(value)
+                clearError("topic")
+              }}
+            >
+              <SelectTrigger
                 ref={topicRef}
-                {...fieldProps("topic")}
-                value={values.topic}
-                onChange={(event) => update("topic", event.target.value)}
-                className={cn(
-                  "h-auto w-full rounded-lg border border-input bg-card px-4 py-2 text-body aria-invalid:border-destructive",
-                  FOCUS
-                )}
+                id="contact-topic"
+                aria-invalid={errors.topic ? true : undefined}
+                aria-describedby={
+                  errors.topic ? "contact-topic-error" : undefined
+                }
+                className="mt-2"
               >
-                <option value="">Choose one</option>
-                <option value="commission">A commission</option>
-                <option value="order">An order</option>
-                <option value="class">The Saturday class</option>
-                <option value="other">Something else</option>
-              </select>
-            </div>
+                <SelectValue placeholder="Choose one" />
+              </SelectTrigger>
+              <SelectContent>
+                {topics.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             {errors.topic && (
               <ErrorLine id="contact-topic-error">{errors.topic}</ErrorLine>
             )}
           </div>
+
           <div className="mt-6">
-            <label htmlFor="contact-message" className={labelClass}>
+            <label htmlFor="contact-message" className={fieldLabel}>
               Message
             </label>
             <Textarea
-              ref={textRef}
-              {...fieldProps("message")}
-              value={values.message}
-              onChange={(event) => update("message", event.target.value)}
-              className={cn(inputClass, "min-h-40")}
+              ref={messageRef}
+              id="contact-message"
+              name="message"
+              value={message}
+              onChange={(event) => {
+                setMessage(event.target.value)
+                clearError("message")
+              }}
+              aria-invalid={errors.message ? true : undefined}
+              aria-describedby={
+                errors.message ? "contact-message-error" : undefined
+              }
+              className={cn(fieldClasses, "min-h-40 resize-none")}
             />
             {errors.message && (
               <ErrorLine id="contact-message-error">{errors.message}</ErrorLine>
             )}
           </div>
-          <div className="mt-6">
-            <Button type="submit" className={BUTTON}>
-              Send message
-            </Button>
-          </div>
+
+          <Button type="submit" className={cn(buttonClasses, "mt-6")}>
+            Send message
+          </Button>
         </form>
       )}
       <div role="status">
         {sent && (
-          <div
-            ref={messageRef}
+          <p
+            ref={confirmationRef}
             tabIndex={-1}
-            className={cn("flex items-start gap-2 text-body", CODE_FOCUS)}
+            className="flex items-start gap-2 text-body focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
           >
             <CircleCheck
-              aria-hidden="true"
               className="mt-1 size-4 shrink-0 text-success"
               strokeWidth={1.5}
+              aria-hidden="true"
             />
-            <p className="text-foreground">
+            <span className="text-foreground">
               Thank you. Nell will answer within two working days.
-            </p>
-          </div>
+            </span>
+          </p>
         )}
       </div>
     </div>
@@ -417,35 +354,136 @@ function ContactForm() {
 }
 
 export function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [menuOpen])
+
   return (
     <div className="bg-background text-body text-foreground">
-      <SiteHeader />
-      <main className={cn(CONTAINER, "flex flex-col gap-20 pt-10 pb-20")}>
+      <header className="border-b">
+        <div
+          className={cn(
+            container,
+            "flex flex-wrap items-center gap-x-4 gap-y-2 py-4 md:gap-x-6"
+          )}
+        >
+          <a href="/" className={cn(quietLink, "font-heading text-h2")}>
+            {STUDIO}
+          </a>
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex gap-6">
+              {mainLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "page" : undefined}
+                    className={cn(quietLink, link.current && "underline")}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="ml-auto flex items-center gap-4">
+            <Button
+              ref={menuButtonRef}
+              variant="outline"
+              aria-expanded={menuOpen}
+              aria-controls="small-screen-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+              className={cn(buttonClasses, "md:hidden")}
+            >
+              Menu
+            </Button>
+            <a
+              href="/basket"
+              aria-label={basketLabel(BASKET_COUNT)}
+              className={cn(quietLink, "inline-flex items-center gap-2")}
+            >
+              <ShoppingBag
+                className="size-4"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              <span className="hidden md:inline">Basket</span>
+              <span className="font-mono tabular-nums">({BASKET_COUNT})</span>
+            </a>
+          </div>
+        </div>
+        <nav
+          id="small-screen-menu"
+          aria-label="Main"
+          hidden={!menuOpen}
+          className="border-t md:hidden"
+        >
+          <ul className={cn(container, "py-2")}>
+            {mainLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  aria-current={link.current ? "page" : undefined}
+                  className={cn(
+                    quietLink,
+                    "block py-2",
+                    link.current && "underline"
+                  )}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
+
+      <main className={cn(container, "flex flex-col gap-20 pt-10 pb-20")}>
         <section className="grid gap-x-6 md:grid-cols-12 md:items-start">
           <div className="md:col-span-7">
-            <p className={MUTED_LABEL}>The studio</p>
+            <p className={mutedLabel}>The studio</p>
             <h1 className="mt-2 text-h1">
               Two potters, one gas kiln and an old dairy in Bramwick
             </h1>
             <p className="mt-6 max-w-lg">
-              Nell Varga and Tomas Reid started {STUDIO} in 2019 in a dairy that
-              closed in 1994. They had one wheel, a borrowed electric kiln and
-              the cold room for drying, and they sold their first mugs from a
-              table by the yard gate.
+              Nell Varga and Tomas Reid started {STUDIO} in 2019, in a dairy at
+              Coldharbour Yard that had stood empty since it closed in 1994.
+              They had one wheel and an electric kiln borrowed from Nell’s old
+              college, and for the first winter they sold from a table in the
+              yard.
             </p>
             <p className="mt-4 max-w-lg">
-              We make stoneware for the table: mugs, bowls, plates, jugs and a
-              few vases. We work in small batches of thirty or forty pieces, so
-              every piece is thrown, trimmed and glazed by one of us, and we can
-              change a glaze when a firing teaches us something.
+              They make stoneware for the table: mugs, bowls, plates, jugs and a
+              few vases, in four glazes. A firing holds about 120 pieces, and
+              each one passes through the same two pairs of hands, so a batch is
+              as many as the two of them can throw, trim and glaze well in three
+              weeks.
             </p>
             <p className="mt-4 max-w-lg">
-              In 2021 we built a gas kiln in the yard. It holds four times as
-              much as the electric one and fires hotter, which gave us the deep
-              iron and ash glazes we use now. We fire it about once a month.{" "}
-              <a href="/" className={TEXT_LINK}>
+              In 2021 they built a gas kiln in the yard, brick by brick, over
+              one summer. It fires hotter and with less air than the electric
+              one, which turned the Iron glaze from flat brown to a deep,
+              speckled rust and gave the Ash glaze its grey edge.{" "}
+              <a
+                href="/"
+                className={cn(
+                  "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
+                  focusOutline
+                )}
+              >
                 See what came out of the last firing
               </a>
+              .
             </p>
           </div>
           <figure className="mt-10 md:col-span-4 md:col-start-9 md:mt-0">
@@ -456,7 +494,7 @@ export function App() {
             >
               <div className="h-3/5 w-1/2 border border-foreground/40 bg-glaze-dark" />
             </div>
-            <figcaption className={cn(MUTED_LABEL, "mt-2")}>
+            <figcaption className={cn(mutedLabel, "mt-2")}>
               The gas kiln, built in 2021
             </figcaption>
           </figure>
@@ -468,20 +506,20 @@ export function App() {
             {people.map((person) => (
               <li key={person.initials}>
                 <div className="flex items-center gap-4">
-                  <span
+                  <div
                     aria-hidden="true"
                     className="flex size-10 shrink-0 items-center justify-center rounded-full border bg-card font-heading text-body"
                   >
                     {person.initials}
-                  </span>
+                  </div>
                   <div>
                     <h3 className="font-sans text-body font-medium">
                       {person.name}
                     </h3>
-                    <p className={cn(MUTED_LABEL, "mt-1")}>{person.role}</p>
+                    <p className={cn(mutedLabel, "mt-1")}>{person.role}</p>
                   </div>
                 </div>
-                <p className="mt-4 max-w-lg">{person.about}</p>
+                <p className="mt-4 max-w-lg">{person.text}</p>
               </li>
             ))}
           </ul>
@@ -500,8 +538,8 @@ export function App() {
                 className="border-t py-6 last:border-b md:grid md:grid-cols-12 md:gap-x-6"
               >
                 <div className="md:col-span-3">
-                  <p className={MUTED_LABEL}>Step {index + 1}</p>
-                  <p className={cn(LABEL, "mt-1 text-foreground tabular-nums")}>
+                  <p className={mutedLabel}>Step {index + 1}</p>
+                  <p className={cn(label, "mt-1 text-foreground tabular-nums")}>
                     {step.time}
                   </p>
                 </div>
@@ -528,35 +566,40 @@ export function App() {
                 Bramwick BW4 2LT
               </address>
               <p className="mt-4 max-w-lg">
-                The yard has three parking spaces, and the door is step-free.
-                The shop shelf is in the kiln room, right by the kiln.
+                The yard has three parking spaces, straight ahead as you come
+                through the gate. The door is step-free, and the shop shelf is
+                by the kiln, at the back of the room.
               </p>
             </div>
             <div className="mt-10 md:col-span-6 md:col-start-7 md:mt-0">
-              <p className={MUTED_LABEL}>Opening hours</p>
+              <p className={mutedLabel}>Opening hours</p>
               <dl className="mt-2">
-                {hours.map(([day, info]) => (
+                {hours.map((row) => (
                   <div
-                    key={day}
+                    key={row.day}
                     className="grid grid-cols-3 items-baseline gap-x-4 border-t py-2 last:border-b"
                   >
-                    <dt className={MUTED_LABEL}>{day}</dt>
+                    <dt className={mutedLabel}>{row.day}</dt>
                     <dd className="col-span-2 text-body">
-                      {info.open ? (
-                        <TimeRange from="10:00" to="16:00" />
+                      {row.open ? (
+                        <>
+                          <Clock value={row.open.from} /> to{" "}
+                          <Clock value={row.open.to} />
+                        </>
                       ) : (
                         "Closed"
                       )}
-                      {info.classTime && (
-                        <span className={cn(MUTED_LABEL, "block")}>
-                          class <TimeRange from="10:00" to="12:00" />
+                      {row.lesson && (
+                        <span className={cn(mutedLabel, "block")}>
+                          class <Clock value={row.lesson.from} /> to{" "}
+                          <Clock value={row.lesson.to} />
                         </span>
                       )}
                     </dd>
                   </div>
                 ))}
               </dl>
-              <p className={cn(MUTED_LABEL, "mt-4")}>
+              <p className={cn(mutedLabel, "mt-4")}>
                 Closed from <time dateTime="2026-12-24">24 December</time> to{" "}
                 <time dateTime="2027-01-02">2 January</time>, both days
                 included.
@@ -569,14 +612,40 @@ export function App() {
           <div className="md:col-span-7">
             <h2 className="text-h2">Write to us</h2>
             <p className="mt-4 max-w-lg">
-              Nell reads every message and answers within two working days.
-              Commissions are booked from February.
+              Nell reads every message and answers within two working days, and
+              commissions are booked from February.
             </p>
             <ContactForm />
           </div>
         </section>
       </main>
-      <SiteFooter />
+
+      <footer className="border-t">
+        <div className={cn(container, "py-10")}>
+          <div className="flex flex-col gap-6 md:flex-row md:justify-between">
+            <div>
+              <p className="font-heading text-h2">{STUDIO}</p>
+              <address className="mt-2 not-italic">
+                Unit 3, Coldharbour Yard
+                <br />
+                Bramwick BW4 2LT
+              </address>
+            </div>
+            <nav aria-label="Footer">
+              <ul className="flex flex-col gap-2">
+                {footerLinks.map((link) => (
+                  <li key={link.href}>
+                    <a href={link.href} className={quietLink}>
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+          <p className={cn(mutedLabel, "mt-6")}>© 2026 {STUDIO}</p>
+        </div>
+      </footer>
     </div>
   )
 }

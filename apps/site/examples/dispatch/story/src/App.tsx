@@ -1,28 +1,33 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useId, useRef, useState } from "react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const container = "mx-auto max-w-[1280px] px-4 md:px-6"
+
 const label = "font-mono text-label uppercase"
+
 const labelLink = cn(
   "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
+  focusOutline
 )
+
 const headlineLink = cn(
   "text-foreground decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
+  focusOutline
 )
+
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusRing
+  focusOutline
 )
-const mastheadLink = cn(
-  "font-heading text-foreground uppercase decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
+
 const buttonClasses = "h-auto px-4 py-2 font-mono text-label uppercase"
+
+const paragraph = "max-w-xl text-body"
 
 const sections = [
   "News",
@@ -34,71 +39,180 @@ const sections = [
   "Culture",
   "Opinion",
 ]
+
 const currentSection = "News"
 
-function Header() {
-  const [open, setOpen] = useState(false)
+const latest = [
+  {
+    headline: "Ferry queue reaches Quay Steps",
+    time: "09:52",
+    isNew: true,
+  },
+  {
+    headline: "Tollgate Road jams back to the ring road",
+    time: "09:31",
+    isNew: false,
+  },
+  {
+    headline: "Schools told to expect late buses",
+    time: "09:05",
+    isNew: false,
+  },
+  {
+    headline: "Traders ask council for rate relief",
+    time: "08:40",
+    isNew: false,
+  },
+  {
+    headline: "Harbour police add patrols at crossing",
+    time: "08:12",
+    isNew: false,
+  },
+]
+
+const related = [
+  {
+    kicker: "Transport",
+    headline: "Bridge closed as cracks found",
+    byline: "By Hana Lindqvist",
+    day: "Tue 10 Nov",
+    dateTime: "2026-11-10",
+    alt: "Council workers in orange jackets set a steel barrier across the road at the west end of the Kessel Street Bridge",
+    caption:
+      "Barriers go up on Kessel Street on Tuesday · Photograph: Odile Marsh",
+  },
+  {
+    kicker: "City",
+    headline: "Foot ferry returns to the channel",
+    byline: "By Oskar Pellegrin",
+    day: "Tue 10 Nov",
+    dateTime: "2026-11-10",
+    alt: "A small white passenger boat tied up at a stone landing, with a line of people waiting on the steps above it",
+    caption: "The ferry at Quay Steps · Photograph: Tamsin Harlow",
+  },
+  {
+    kicker: "Politics",
+    headline: "Seafront road bill rises again",
+    byline: "By Ilse Brandt",
+    day: "Mon 9 Nov",
+    dateTime: "2026-11-09",
+    alt: "A fenced stretch of coast road with diggers parked beside a sea wall under a grey sky",
+    caption: "Works on Marine Parade · Photograph: Odile Marsh",
+  },
+]
+
+const facts = [
+  { term: "Opened", value: "1964" },
+  { term: "Crossings a day", value: "40,000" },
+  { term: "Closed for", value: "6 months" },
+  { term: "Repair cost", value: "£48m" },
+]
+
+function SiteHeader() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuId = useId()
   const menuButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (!open) return
-    function onKeyDown(event: KeyboardEvent) {
+    if (!menuOpen) {
+      return undefined
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        setOpen(false)
+        setMenuOpen(false)
         menuButton.current?.focus()
       }
     }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [open])
+
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+    }
+  }, [menuOpen])
 
   return (
     <header>
-      <div className="mx-auto max-w-[1280px] px-4 md:px-6">
+      <div className={container}>
         <div className="flex items-center justify-between gap-4 py-2">
-          <p className={cn(label, "text-muted-foreground")}>
-            <time dateTime="2026-11-11" className="font-mono tabular-nums">
-              WEDNESDAY 11 NOVEMBER 2026
-            </time>
-          </p>
-          <a href="#" className={cn(buttonVariants(), buttonClasses)}>
+          <time
+            dateTime="2026-11-11"
+            className={cn(label, "text-muted-foreground tabular-nums")}
+          >
+            Wednesday 11 November 2026
+          </time>
+          <a
+            href="#"
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              buttonClasses
+            )}
+          >
             Subscribe
           </a>
         </div>
+
         <div className="flex items-center justify-between gap-4 border-t-2 py-4">
-          <a href="/" className={cn(mastheadLink, "text-h2")}>
+          <a
+            href="/"
+            className={cn("font-heading text-h2 uppercase", headlineLink)}
+          >
             The Port Avery Ledger
           </a>
           <Button
             ref={menuButton}
             variant="outline"
             className={cn(buttonClasses, "md:hidden")}
-            aria-expanded={open}
-            aria-controls="mobile-sections"
-            onClick={() => setOpen((value) => !value)}
+            aria-expanded={menuOpen}
+            aria-controls={menuId}
+            onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
-        <nav aria-label="Sections" className="hidden border-y py-2 md:block">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {sections.map((section) => (
-              <li key={section}>
-                <SectionLink section={section} />
-              </li>
-            ))}
-          </ul>
-        </nav>
+
         <nav
-          id="mobile-sections"
+          id={menuId}
           aria-label="Sections"
-          hidden={!open}
+          hidden={!menuOpen}
           className="border-b py-2 md:hidden"
         >
           <ul>
             {sections.map((section) => (
               <li key={section}>
-                <SectionLink section={section} block />
+                <a
+                  href="#"
+                  aria-current={section === currentSection ? "page" : undefined}
+                  className={cn(
+                    "block py-2",
+                    label,
+                    labelLink,
+                    section === currentSection && "underline decoration-2"
+                  )}
+                >
+                  {section}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <nav aria-label="Sections" className="hidden border-y py-2 md:block">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {sections.map((section) => (
+              <li key={section}>
+                <a
+                  href="#"
+                  aria-current={section === currentSection ? "page" : undefined}
+                  className={cn(
+                    label,
+                    labelLink,
+                    section === currentSection && "underline decoration-2"
+                  )}
+                >
+                  {section}
+                </a>
               </li>
             ))}
           </ul>
@@ -108,75 +222,10 @@ function Header() {
   )
 }
 
-function SectionLink({
-  section,
-  block = false,
-}: {
-  section: string
-  block?: boolean
-}) {
-  const current = section === currentSection
-  return (
-    <a
-      href="#"
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        label,
-        current
-          ? cn(
-              "text-foreground underline decoration-2 underline-offset-4 transition-colors duration-150",
-              focusRing
-            )
-          : labelLink,
-        block && "block py-2"
-      )}
-    >
-      {section}
-    </a>
-  )
-}
-
-function Footer() {
-  return (
-    <footer>
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-4 border-t-2 px-4 py-6 md:px-6">
-        <a href="/" className={cn(mastheadLink, "self-start text-h2")}>
-          The Port Avery Ledger
-        </a>
-        <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {sections.map((section) => (
-              <li key={section}>
-                <a href="#" className={cn(label, labelLink)}>
-                  {section}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <p className={cn(label, "text-muted-foreground")}>
-          © <span className="tabular-nums">2026</span> The Port Avery Ledger ·
-          Port Avery
-        </p>
-      </div>
-    </footer>
-  )
-}
-
-function Picture({
-  description,
-  caption,
-}: {
-  description: string
-  caption: string
-}) {
+function Picture({ alt, caption }: { alt: string; caption: string }) {
   return (
     <figure className="flex flex-col gap-2">
-      <div
-        role="img"
-        aria-label={description}
-        className="aspect-3/2 w-full bg-muted"
-      />
+      <div role="img" aria-label={alt} className="aspect-3/2 w-full bg-muted" />
       <figcaption className={cn(label, "text-muted-foreground")}>
         {caption}
       </figcaption>
@@ -186,7 +235,7 @@ function Picture({
 
 function StoryHead() {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
+    <div className="grid grid-cols-1 lg:grid-cols-12">
       <div className="flex flex-col gap-4 lg:col-span-10">
         <p className={label}>
           <a href="#" className={labelLink}>
@@ -203,8 +252,8 @@ function StoryHead() {
           Bridge shut for six months
         </h1>
         <p className="max-w-3xl font-sans text-h2 font-normal text-foreground">
-          Cracked bearings close the Kessel Street Bridge until May, and
-          councillors vote tonight on a £48m plan to fix it.
+          Inspectors found cracked bearings under the Kessel Street Bridge on
+          Tuesday. The council votes tonight on a £48m repair.
         </p>
         <div className="flex flex-col gap-1">
           <p className={cn(label, "text-foreground")}>
@@ -222,93 +271,82 @@ function StoryHead() {
   )
 }
 
-function LeadPicture() {
+function StoryBody() {
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
-      <div className="lg:col-span-8">
-        <Picture
-          description="The Kessel Street Bridge seen from the south bank, with red and white barriers across both lanes and the road beyond them empty."
-          caption="The Kessel Street Bridge on Tuesday, with barriers across both lanes · Photograph: Odile Marsh"
-        />
-      </div>
-    </div>
-  )
-}
+    <div className="flex min-w-0 flex-col gap-4 lg:col-span-8 lg:pr-6">
+      <p className={paragraph}>
+        The Kessel Street Bridge, the main road crossing over the Avery Channel,
+        will stay closed for at least six months after inspectors found cracks
+        in four of the steel bearings that carry its deck. Port Avery council
+        shut the bridge to all traffic at 4pm on Tuesday, two hours after the
+        engineers reported what they had seen, and barriers now stand across
+        both ends.
+      </p>
+      <p className={paragraph}>
+        The cracks were found during a routine check that takes place every two
+        years. According to{" "}
+        <a href="#" className={textLink}>
+          the inspectors&rsquo; report
+        </a>
+        , published on Tuesday night, the bearings on the two piers nearest the
+        east bank have worn through and can no longer be trusted to carry the
+        weight of buses and lorries. Reuben Achterberg, the council&rsquo;s
+        transport chief, said there had been no choice. &ldquo;We closed it
+        within two hours of the call,&rdquo; he said. &ldquo;Nobody was going to
+        drive over that bridge on my watch.&rdquo;
+      </p>
+      <p className={paragraph}>
+        About 40,000 people cross the bridge each day, by car, bus and bicycle
+        and on foot, and the footways are shut along with the road. From this
+        morning, drivers are sent north to the Tollgate Road crossing, a detour
+        of four miles that added 35 minutes to the journey at the height of the
+        rush hour. Bus routes 4, 11 and 27 stop short at Kessel Street and start
+        again on the far bank, and the council has put on a free foot ferry from
+        Quay Steps, running every 15 minutes from 6am to 10pm.
+      </p>
+      <p className={paragraph}>
+        For the businesses at the foot of the bridge, the closure came without
+        warning. Selin Duraković has run the Slipway Café on the east side for
+        11 years and says most of her morning trade walks over from the west
+        bank. &ldquo;By nine I had sold 14 coffees. On a normal Wednesday it is
+        closer to 90,&rdquo; she said. &ldquo;I can last six weeks like this,
+        perhaps. I cannot last six months.&rdquo;
+      </p>
 
-const facts = [
-  { term: "Opened", value: "1964" },
-  { term: "Crossings a day", value: "40,000" },
-  { term: "Closed for", value: "6 months" },
-  { term: "Repair cost", value: "£48m" },
-]
-
-function Body() {
-  return (
-    <div className="flex flex-col gap-4 lg:col-span-8 lg:pr-6">
-      <p className="max-w-xl">
-        The Kessel Street Bridge will stay closed to all traffic for at least
-        six months after inspectors found cracked bearings beneath its central
-        span, Port Avery council said on Tuesday. The bridge, which carries the
-        city’s busiest road across the River Mell, was shut at 14:00 with barely
-        an hour’s warning.
-      </p>
-      <p className="max-w-xl">
-        The inspection that found the cracks was a routine one, carried out
-        every five years. Engineers working under the deck on Monday saw that
-        two of the steel bearings that let the bridge expand and contract had
-        split. When they checked the others, they found smaller cracks in four
-        more. Their report says the bridge was not at risk of falling but could
-        no longer safely carry heavy traffic.
-      </p>
-      <p className="max-w-xl">
-        Councillors vote tonight on a{" "}
-        <mark className="bg-tertiary px-0.5 text-tertiary-foreground">
-          £48m
-        </mark>{" "}
-        repair plan that would replace all twelve bearings and strengthen the
-        deck. If the plan passes, work would start in January and the bridge
-        would reopen to cars, buses and cyclists in May.
-      </p>
-      <p className="max-w-xl">
-        About 40,000 people cross the bridge on an ordinary weekday, on foot, by
-        bike, by bus and by car. From this morning they are being sent the long
-        way round, over the Harbour Road bridge two kilometres downstream, or
-        across the water on the ferry from Quay Steps. The first rush hour of
-        the closure brought queues of up to 50 minutes on Harbour Road, and
-        several bus routes ran late all morning.
-      </p>
       <blockquote className="max-w-xl border-t-2 border-b py-4">
         <p className="font-sans text-h2 font-normal text-foreground italic">
-          We would rather annoy forty thousand people for six months than take a
-          chance with any one of them.
+          Nobody was going to drive over that bridge on my watch
         </p>
         <footer className={cn(label, "mt-2 text-muted-foreground not-italic")}>
-          Reuben Achterberg, Transport Chief
+          Reuben Achterberg, transport chief
         </footer>
       </blockquote>
-      <p className="max-w-xl">
-        For the businesses at either end of the bridge, the closure came without
-        warning. Selin Duraković has run the Bridgefoot Café on the south bank
-        for eleven years, and she says most of her morning trade walks over from
-        the north side. “Yesterday afternoon the street went quiet, and this
-        morning it stayed quiet,” she said. “Six months is a long time to wait
-        for customers who can’t reach you.”
+
+      <p className={paragraph}>
+        Councillors meet at 7pm tonight to vote on a repair that officers put at{" "}
+        <mark className="bg-tertiary px-0.5 text-tertiary-foreground">
+          £48m
+        </mark>
+        . The plan is to lift the deck a span at a time and replace all 16
+        bearings, not only the four that failed, and to renew the joints and the
+        road surface while the bridge is empty. Mr Achterberg said doing the
+        whole job at once would cost less than coming back for the others within
+        a decade.
       </p>
-      <p className="max-w-xl">
-        Reuben Achterberg, the council’s transport chief, said the decision to
-        close the bridge at once was his. “I read the report at lunchtime and
-        the barriers were up within the hour,” he said. “We would rather annoy
-        forty thousand people for six months than take a chance with any one of
-        them.”
+      <p className={paragraph}>
+        The council would borrow £30m and take the rest from its reserves, and
+        has asked the government for a grant towards the cost. Maren Oyelaran,
+        the leader of the council, said the bridge had been checked on schedule
+        and that the system had worked as it should. &ldquo;The inspection found
+        the fault before anything gave way,&rdquo; she said. &ldquo;That is what
+        inspections are for.&rdquo;
       </p>
+
       <aside
-        aria-labelledby="bridge-facts"
+        aria-labelledby="bridge-in-numbers"
         className="flex max-w-xl flex-col gap-4 border bg-card p-4 md:p-6"
       >
-        <h2
-          id="bridge-facts"
-          className="font-mono text-label text-foreground uppercase"
-        >
+        <h2 id="bridge-in-numbers" className={cn(label, "text-foreground")}>
           The bridge in numbers
         </h2>
         <dl className="flex flex-col gap-4">
@@ -324,71 +362,51 @@ function Body() {
           ))}
         </dl>
       </aside>
-      <p className="max-w-xl">
-        The council has added extra buses on the 14 and 22 routes, which now
-        cross at Harbour Road, and from today the ferry runs every ten minutes
-        instead of every twenty, with fares cut to £1. People on foot and on
-        bikes will be able to use a temporary footbridge from next week. Every
-        change to routes and times is listed on{" "}
-        <a href="#" className={textLink}>
-          the council’s closure page
-        </a>
-        .
+
+      <p className={paragraph}>
+        The opposition does not accept that. Tobias Verhagen, who leads the
+        Harbour Alliance group, pointed to a survey from 2021 that rated the
+        same bearings as poor and advised replacing them within five years. The
+        work was put back twice, in 2023 and again last year, when the money
+        went to the seafront road. &ldquo;This was not found on Tuesday,&rdquo;
+        he said. &ldquo;It was known, it was costed and it was put off.&rdquo;
       </p>
-      <p className="max-w-xl">
-        The opposition on the council says the cracks should have been found
-        sooner. Ilse Brandvold, who leads the Harbour Party group, said a report
-        in 2023 had already asked for the bearings to be checked. “This did not
-        come out of nowhere,” she said. “The council knew this bridge was
-        getting old and <em>chose</em> to wait.” Her group will back the repair
-        plan tonight, but it will also ask for an independent review of how the
-        bridge has been looked after.
+      <p className={paragraph}>
+        Mr Verhagen said his group would vote for the repair but would ask for
+        an independent review of how the delay was decided, and for rate relief
+        for shops and cafés within 500 metres of the bridge. Ms Oyelaran said
+        she would not oppose a review.
       </p>
+
       <h2 className="mt-6 max-w-xl text-h2 text-foreground uppercase">
         What happens next
       </h2>
-      <p className="max-w-xl">
-        If councillors approve the plan, the council will hire a contractor
-        before Christmas. The repair would be paid for from the city’s transport
-        budget and a loan, which the council says would mean putting off the
-        resurfacing of the ring road by two years. If the plan is voted down,
-        the bridge stays shut while officers draw up a new one.
+
+      <p className={paragraph}>
+        If the vote passes, the contractor, Harlow Marine, starts on site on
+        Monday 23 November. The council&rsquo;s timetable has the deck lifted by
+        January, the new bearings in place by March and the bridge open again in
+        the middle of May. Mr Achterberg said that date depended on the weather
+        over the winter and on what the engineers find when the other 12
+        bearings come out.
       </p>
-      <p className="max-w-xl">
-        Achterberg said the council would publish a weekly update on the work
-        and on traffic at the other crossings. “People deserve to know where we
-        are, every week, in plain words,” he said. The vote starts at 19:00 at
-        the city hall and will be shown live on the council’s website.
-      </p>
-      <p className="max-w-xl">
-        Duraković says she will watch it from the café. “I’ll keep the lights
-        on,” she said. “Somebody has to be here when they open it again.”
+      <p className={paragraph}>
+        The foot ferry will run for as long as the bridge is shut, and a second
+        boat joins it next week. A temporary bus lane on Tollgate Road is due by
+        Friday. The council will hold a public meeting at the Corn Exchange on
+        Thursday at 6pm, where residents can put questions to the engineers, and
+        has promised a progress report on the first Monday of each month until
+        the bridge reopens.
       </p>
     </div>
   )
 }
 
-const latest = [
-  { headline: "Ferry to run every ten minutes", time: "09:52", isNew: true },
-  { headline: "Harbour Road queues hit 50 minutes", time: "09:10" },
-  { headline: "School buses take the long way round", time: "08:35" },
-  { headline: "Quay Steps market moves to Sunday", time: "07:50" },
-  { headline: "Rain due by the evening rush", time: "07:05" },
-]
-
 function Rail() {
   return (
-    <section
-      aria-labelledby="latest-heading"
-      className="flex flex-col gap-4 lg:col-span-4 lg:border-l lg:pl-6"
-    >
+    <div className="flex min-w-0 flex-col gap-4 lg:col-span-4 lg:border-l lg:pl-6">
       <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
-        <h2
-          id="latest-heading"
-          className="font-mono text-label text-foreground uppercase"
-        >
-          Latest
-        </h2>
+        <h2 className={cn(label, "text-foreground")}>Latest</h2>
       </div>
       <ul className="flex flex-col gap-4">
         {latest.map((story, index) => (
@@ -423,51 +441,15 @@ function Rail() {
           </li>
         ))}
       </ul>
-    </section>
+    </div>
   )
 }
 
-const related = [
-  {
-    kicker: "City",
-    headline: "How the city keeps its bridges up",
-    byline: "By Tomas Ekwall",
-    day: "Mon 9 Nov",
-    date: "2026-11-09",
-    description:
-      "Two engineers in hard hats on a walkway under a bridge deck, shining torches at the steelwork.",
-    caption: "Inspectors under the Harbour Road bridge · Photograph: Odile Marsh",
-  },
-  {
-    kicker: "Politics",
-    headline: "Council budget gap grows to £12m",
-    byline: "By Hana Lindqvist",
-    day: "Sun 8 Nov",
-    date: "2026-11-08",
-    description:
-      "The council chamber from the public gallery, with councillors seated in a horseshoe of wooden benches.",
-    caption: "The council chamber at the city hall · Photograph: Jonas Pell",
-  },
-  {
-    kicker: "Business",
-    headline: "South bank shops ask for rate relief",
-    byline: "By Marit Oyelaran",
-    day: "Fri 6 Nov",
-    date: "2026-11-06",
-    description:
-      "A row of small shopfronts on a quiet street by the river, one with a hand-written sign in the window.",
-    caption: "Shops on Mell Parade · Photograph: Jonas Pell",
-  },
-]
-
 function Related() {
   return (
-    <section aria-labelledby="related-heading" className="flex flex-col gap-4">
+    <section aria-labelledby="related" className="flex flex-col gap-4">
       <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
-        <h2
-          id="related-heading"
-          className="font-mono text-label text-foreground uppercase"
-        >
+        <h2 id="related" className={cn(label, "text-foreground")}>
           Related
         </h2>
       </div>
@@ -476,13 +458,13 @@ function Related() {
           <article
             key={story.headline}
             className={cn(
-              "flex flex-col gap-2",
+              "flex min-w-0 flex-col gap-2",
               index > 0 &&
                 "border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6",
               index < related.length - 1 && "md:pr-6"
             )}
           >
-            <Picture description={story.description} caption={story.caption} />
+            <Picture alt={story.alt} caption={story.caption} />
             <p className={cn(label, "text-foreground")}>{story.kicker}</p>
             <h3 className="text-h2 uppercase">
               <a href="#" className={headlineLink}>
@@ -490,8 +472,9 @@ function Related() {
               </a>
             </h3>
             <p className={cn(label, "text-muted-foreground")}>
-              {story.byline} ·{" "}
-              <time dateTime={story.date} className="tabular-nums">
+              {story.byline}
+              {" · "}
+              <time dateTime={story.dateTime} className="tabular-nums">
                 {story.day}
               </time>
             </p>
@@ -502,24 +485,66 @@ function Related() {
   )
 }
 
+function SiteFooter() {
+  return (
+    <footer>
+      <div className={cn(container, "flex flex-col gap-4 border-t-2 py-6")}>
+        <a
+          href="/"
+          className={cn(
+            "self-start font-heading text-h2 uppercase",
+            headlineLink
+          )}
+        >
+          The Port Avery Ledger
+        </a>
+        <nav aria-label="Footer">
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {sections.map((section) => (
+              <li key={section}>
+                <a href="#" className={cn(label, labelLink)}>
+                  {section}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <p className={cn(label, "text-muted-foreground")}>
+          © 2026 The Port Avery Ledger · Port Avery
+        </p>
+      </div>
+    </footer>
+  )
+}
+
 export function App() {
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <Header />
+      <SiteHeader />
       <main>
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 pt-6 pb-12 md:px-6">
+        <div className={cn(container, "flex flex-col gap-12 pt-6 pb-12")}>
           <article className="flex flex-col gap-12">
             <StoryHead />
-            <LeadPicture />
+
+            <div className="grid grid-cols-1 lg:grid-cols-12">
+              <div className="lg:col-span-8">
+                <Picture
+                  alt="Steel barriers and a road closed sign stand across the empty roadway of the Kessel Street Bridge, with the channel and the east bank behind"
+                  caption="The Kessel Street Bridge on Tuesday evening · Photograph: Odile Marsh"
+                />
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
-              <Body />
+              <StoryBody />
               <Rail />
             </div>
+
             <Related />
           </article>
         </div>
       </main>
-      <Footer />
+      <SiteFooter />
     </div>
   )
 }

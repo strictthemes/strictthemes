@@ -11,12 +11,6 @@ type Dish = {
   letters: Letter[]
 }
 
-type Course = {
-  id: string
-  title: string
-  dishes: Dish[]
-}
-
 const KEY: { letter: Letter; word: string }[] = [
   { letter: "V", word: "Vegetarian" },
   { letter: "VG", word: "Vegan" },
@@ -31,161 +25,139 @@ const WORDS: Record<Letter, string> = {
   DF: "No dairy",
 }
 
-const BREAKFAST: Course[] = [
+const COOKED: Dish[] = [
   {
-    id: "cooked-to-order",
-    title: "Cooked to order",
-    dishes: [
-      {
-        name: "The harbour breakfast",
-        description:
-          "Bacon, a pork sausage, a fried egg, tomato, mushrooms and fried bread",
-        price: "£13.50",
-        letters: [],
-      },
-      {
-        name: "The garden breakfast",
-        description:
-          "Field mushrooms, tomatoes, spinach, beans and a potato cake",
-        price: "£12.00",
-        letters: ["VG"],
-      },
-      {
-        name: "Smoked haddock kedgeree",
-        description: "With a soft egg, parsley and lemon",
-        price: "£11.50",
-        letters: ["GF"],
-      },
-      {
-        name: "Grilled kipper",
-        description:
-          "From the smokehouse on the quay, with brown butter and brown bread",
-        price: "£9.50",
-        letters: [],
-      },
-      {
-        name: "Soft-boiled eggs and soldiers",
-        description: "Two eggs from the farm on the hill",
-        price: "£7.00",
-        letters: ["V"],
-      },
-    ],
+    name: "The harbour breakfast",
+    description:
+      "Bacon, a pork sausage, a fried egg, tomato, mushrooms and fried bread",
+    price: "£13.50",
+    letters: [],
   },
   {
-    id: "from-the-sideboard",
-    title: "From the sideboard",
-    dishes: [
-      {
-        name: "Porridge",
-        description: "Pinhead oats soaked overnight, with cream and honey",
-        price: "£6.50",
-        letters: ["V"],
-      },
-      {
-        name: "Yoghurt, rhubarb and toasted oats",
-        description: "The rhubarb is from the garden",
-        price: "£6.00",
-        letters: ["V"],
-      },
-      {
-        name: "Toast and the house marmalade",
-        description: "Sourdough or soda bread, with salted butter",
-        price: "£4.00",
-        letters: ["V"],
-      },
-    ],
+    name: "The garden breakfast",
+    description: "Field mushrooms, tomatoes, spinach, beans and a potato cake",
+    price: "£12.00",
+    letters: ["VG"],
+  },
+  {
+    name: "Smoked haddock kedgeree",
+    description: "With a soft egg, parsley and lemon",
+    price: "£11.50",
+    letters: ["GF"],
+  },
+  {
+    name: "Grilled kipper",
+    description:
+      "From the smokehouse on the quay, with brown butter and brown bread",
+    price: "£9.50",
+    letters: [],
+  },
+  {
+    name: "Soft-boiled eggs and soldiers",
+    description: "Two eggs from the farm on the hill",
+    price: "£7.00",
+    letters: ["V"],
   },
 ]
 
-const SUPPER: Course[] = [
+const SIDEBOARD: Dish[] = [
   {
-    id: "to-start",
-    title: "To start",
-    dishes: [
-      {
-        name: "Crab on toast",
-        description: "White and brown meat, lemon and cayenne",
-        price: "£9.50",
-        letters: [],
-      },
-      {
-        name: "Leek and potato soup",
-        description: "With soda bread and salted butter",
-        price: "£7.00",
-        letters: ["V"],
-      },
-      {
-        name: "Beetroot, lentil and dill salad",
-        description: "Served warm, with a mustard dressing",
-        price: "£7.50",
-        letters: ["VG", "GF"],
-      },
-    ],
+    name: "Porridge",
+    description: "Pinhead oats soaked overnight, with cream and honey",
+    price: "£6.50",
+    letters: ["V"],
   },
   {
-    id: "mains",
-    title: "Mains",
-    dishes: [
-      {
-        name: "Hake with mussels and cider",
-        description: "From the morning’s boats, with new potatoes",
-        price: "£19.50",
-        letters: ["GF"],
-      },
-      {
-        name: "Lamb shoulder with white beans",
-        description: "Cooked slowly overnight, with mint and garlic",
-        price: "£21.00",
-        letters: ["GF", "DF"],
-      },
-      {
-        name: "Baked squash with chard and hazelnuts",
-        description: "With barley, sage and a sharp green sauce",
-        price: "£16.50",
-        letters: ["VG"],
-      },
-    ],
+    name: "Yoghurt, rhubarb and toasted oats",
+    description: "The rhubarb is from the garden",
+    price: "£6.00",
+    letters: ["V"],
   },
   {
-    id: "puddings",
-    title: "Puddings",
-    dishes: [
-      {
-        name: "Treacle tart",
-        description: "With clotted cream",
-        price: "£7.50",
-        letters: ["V"],
-      },
-      {
-        name: "Baked apple and oat crumble",
-        description: "With custard or cream",
-        price: "£7.00",
-        letters: ["V"],
-      },
-      {
-        name: "Three cheeses from the county",
-        description: "With oatcakes and quince paste",
-        price: "£9.00",
-        letters: ["V"],
-      },
-    ],
+    name: "Toast and the house marmalade",
+    description: "Sourdough or soda bread, with salted butter",
+    price: "£4.00",
+    letters: ["V"],
   },
 ]
 
-const FOCUS =
+const STARTERS: Dish[] = [
+  {
+    name: "Crab on toast",
+    description: "White and brown meat, lemon and cayenne",
+    price: "£9.50",
+    letters: [],
+  },
+  {
+    name: "Leek and potato soup",
+    description: "With soda bread and salted butter",
+    price: "£7.00",
+    letters: ["V"],
+  },
+  {
+    name: "Beetroot, lentil and dill salad",
+    description: "Served warm, with a mustard dressing",
+    price: "£7.50",
+    letters: ["VG", "GF"],
+  },
+]
+
+const MAINS: Dish[] = [
+  {
+    name: "Hake with mussels and cider",
+    description: "From the morning’s boats, with new potatoes",
+    price: "£19.50",
+    letters: ["GF"],
+  },
+  {
+    name: "Lamb shoulder with white beans",
+    description: "Cooked slowly overnight, with mint and garlic",
+    price: "£21.00",
+    letters: ["GF", "DF"],
+  },
+  {
+    name: "Baked squash with chard and hazelnuts",
+    description: "With barley, sage and a sharp green sauce",
+    price: "£16.50",
+    letters: ["VG"],
+  },
+]
+
+const PUDDINGS: Dish[] = [
+  {
+    name: "Treacle tart",
+    description: "With clotted cream",
+    price: "£7.50",
+    letters: ["V"],
+  },
+  {
+    name: "Baked apple and oat crumble",
+    description: "With custard or cream",
+    price: "£7.00",
+    letters: ["V"],
+  },
+  {
+    name: "Three cheeses from the county",
+    description: "With oatcakes and quince paste",
+    price: "£9.00",
+    letters: ["V"],
+  },
+]
+
+const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const HEADER_LINK = cn(
+const chromeLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
+  focus
 )
 
-const TEXT_LINK = cn(
+const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  FOCUS
+  focus
 )
 
-const LABEL = "font-mono text-label uppercase"
+const label = "font-mono text-label uppercase"
 
 const NAV = [
   { label: "Rooms", href: "/rooms" },
@@ -194,29 +166,21 @@ const NAV = [
   { label: "Reserve", href: "/reserve" },
 ]
 
-function Hours({ from, to }: { from: string; to: string }) {
-  return (
-    <>
-      <time dateTime={from}>{from}</time>–<time dateTime={to}>{to}</time>
-    </>
-  )
-}
+const sectionRule = "mt-12 border-t border-border pt-6 md:mt-26"
 
 function Letters({ letters }: { letters: Letter[] }) {
   return (
-    <p className={cn("mt-2", LABEL, "text-muted-foreground")}>
+    <p className={cn("mt-2", label, "text-muted-foreground")}>
       {letters.map((letter, i) => {
         const last = i === letters.length - 1
         return (
           <span key={letter}>
-            <span aria-hidden="true">
-              {letter}
-              {last ? "" : " · "}
-            </span>
-            <span className="sr-only normal-case">
+            <span aria-hidden="true">{letter}</span>
+            <span className="sr-only">
               {WORDS[letter]}
               {last ? "." : ", "}
             </span>
+            {!last && <span aria-hidden="true"> · </span>}
           </span>
         )
       })}
@@ -237,7 +201,7 @@ function DishList({ dishes }: { dishes: Dish[] }) {
             />
             <p
               className={cn(
-                LABEL,
+                label,
                 "shrink-0 whitespace-nowrap text-foreground tabular-nums"
               )}
             >
@@ -252,18 +216,28 @@ function DishList({ dishes }: { dishes: Dish[] }) {
   )
 }
 
-function Courses({ courses }: { courses: Course[] }) {
+function Course({
+  title,
+  dishes,
+  className,
+}: {
+  title: string
+  dishes: Dish[]
+  className?: string
+}) {
   return (
-    <div className="md:col-span-7 md:col-start-6">
-      {courses.map((course, i) => (
-        <div key={course.id} className={i > 0 ? "mt-12" : undefined}>
-          <h3 id={course.id} className={cn(LABEL, "text-foreground")}>
-            {course.title}
-          </h3>
-          <DishList dishes={course.dishes} />
-        </div>
-      ))}
-    </div>
+    <>
+      <h3 className={cn(label, "text-foreground", className)}>{title}</h3>
+      <DishList dishes={dishes} />
+    </>
+  )
+}
+
+function Hours({ from, to }: { from: string; to: string }) {
+  return (
+    <>
+      <time dateTime={from}>{from}</time>–<time dateTime={to}>{to}</time>
+    </>
   )
 }
 
@@ -271,21 +245,17 @@ export function App() {
   return (
     <div className="mx-auto max-w-[1160px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-4 border-b border-border py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", HEADER_LINK)}>
+        <a href="/" className={cn("font-heading text-h2", chromeLink)}>
           Kittiwake House
         </a>
         <nav aria-label="Main">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+          <ul className="flex list-none flex-wrap gap-x-6 gap-y-2 p-0">
             {NAV.map((item) => (
               <li key={item.href}>
                 <a
                   href={item.href}
                   aria-current={item.current ? "page" : undefined}
-                  className={cn(
-                    LABEL,
-                    HEADER_LINK,
-                    item.current && "underline"
-                  )}
+                  className={cn(label, chromeLink, item.current && "underline")}
                 >
                   {item.label}
                 </a>
@@ -297,14 +267,14 @@ export function App() {
 
       <main>
         <section
-          aria-labelledby="menu-heading"
+          aria-labelledby="menu-title"
           className="grid gap-6 pt-12 md:grid-cols-12 md:items-start"
         >
           <div className="md:col-span-7">
-            <p className={cn(LABEL, "text-muted-foreground")}>
+            <p className={cn(label, "text-muted-foreground")}>
               Spring menu · From <time dateTime="2027-04-01">1 April 2027</time>
             </p>
-            <h1 id="menu-heading" className="mt-2 text-h1 lg:text-display">
+            <h1 id="menu-title" className="mt-2 text-h1 lg:text-display">
               Breakfast <span className="italic">and supper</span>
             </h1>
             <p className="mt-4 max-w-xl text-body">
@@ -314,10 +284,14 @@ export function App() {
               the day before.
             </p>
             <dl className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-              {KEY.map(({ letter, word }) => (
-                <div key={letter} className="flex items-baseline gap-2">
-                  <dt className={cn(LABEL, "text-foreground")}>{letter}</dt>
-                  <dd className={cn(LABEL, "text-muted-foreground")}>{word}</dd>
+              {KEY.map((entry) => (
+                <div key={entry.letter} className="flex items-baseline gap-2">
+                  <dt className={cn(label, "text-foreground")}>
+                    {entry.letter}
+                  </dt>
+                  <dd className={cn(label, "text-muted-foreground")}>
+                    {entry.word}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -328,23 +302,23 @@ export function App() {
           </div>
 
           <div className="rounded-xl bg-clay p-6 text-clay-foreground md:col-span-4 md:col-start-9">
-            <h2 className={LABEL}>When we serve</h2>
+            <h2 className={label}>When we serve</h2>
             <dl className="mt-4">
               <div>
                 <dt className="text-body">Breakfast, every day</dt>
-                <dd className={cn("mt-2", LABEL, "tabular-nums")}>
+                <dd className={cn("mt-2 tabular-nums", label)}>
                   <Hours from="08:00" to="10:00" />
                 </dd>
               </div>
               <div className="mt-4">
                 <dt className="text-body">Breakfast on Sundays</dt>
-                <dd className={cn("mt-2", LABEL, "tabular-nums")}>
+                <dd className={cn("mt-2 tabular-nums", label)}>
                   <Hours from="08:00" to="10:30" />
                 </dd>
               </div>
               <div className="mt-4">
                 <dt className="text-body">Supper, Thursday to Saturday</dt>
-                <dd className={cn("mt-2", LABEL, "tabular-nums")}>
+                <dd className={cn("mt-2 tabular-nums", label)}>
                   <Hours from="18:30" to="20:30" />
                 </dd>
               </div>
@@ -358,59 +332,75 @@ export function App() {
 
         <section
           id="breakfast"
-          aria-labelledby="breakfast-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
+          aria-labelledby="breakfast-title"
+          className={cn(
+            sectionRule,
+            "grid gap-6 md:grid-cols-12 md:items-start"
+          )}
         >
           <div className="md:col-span-4">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-              <p className={cn(LABEL, "text-muted-foreground")}>
+              <p className={cn(label, "text-muted-foreground")}>
                 Every day · <Hours from="08:00" to="10:00" />
               </p>
               <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
                 Included for guests
               </Badge>
             </div>
-            <h2 id="breakfast-heading" className="mt-2 text-h2 md:text-h1">
+            <h2 id="breakfast-title" className="mt-2 text-h2 md:text-h1">
               Breakfast
             </h2>
             <p className="mt-4 max-w-xl text-body">
-              We serve breakfast on the veranda, looking out over the bay. Order
-              as much or as little as you like: for guests of the house the
-              prices do not apply.
+              We serve breakfast on the veranda. Order as much or as little as
+              you like: for guests of the house, the prices do not apply.
             </p>
           </div>
-          <Courses courses={BREAKFAST} />
+          <div className="md:col-span-7 md:col-start-6">
+            <Course title="Cooked to order" dishes={COOKED} />
+            <Course
+              title="From the sideboard"
+              dishes={SIDEBOARD}
+              className="mt-12"
+            />
+          </div>
         </section>
 
         <section
           id="supper"
-          aria-labelledby="supper-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12 md:items-start"
+          aria-labelledby="supper-title"
+          className={cn(
+            sectionRule,
+            "grid gap-6 md:grid-cols-12 md:items-start"
+          )}
         >
           <div className="md:col-span-4">
-            <p className={cn(LABEL, "text-muted-foreground")}>
+            <p className={cn(label, "text-muted-foreground")}>
               Thursday to Saturday · <Hours from="18:30" to="20:30" />
             </p>
-            <h2 id="supper-heading" className="mt-2 text-h2 md:text-h1">
+            <h2 id="supper-title" className="mt-2 text-h2 md:text-h1">
               Supper
             </h2>
             <p className="mt-4 max-w-xl text-body">
-              Three courses or one, at the long table in the breakfast room. The
-              fish comes in on that morning’s boats.
+              Three courses or one, at the long table in the breakfast room,
+              with the fish from that morning’s boats.
             </p>
           </div>
-          <Courses courses={SUPPER} />
+          <div className="md:col-span-7 md:col-start-6">
+            <Course title="To start" dishes={STARTERS} />
+            <Course title="Mains" dishes={MAINS} className="mt-12" />
+            <Course title="Puddings" dishes={PUDDINGS} className="mt-12" />
+          </div>
         </section>
 
         <section
-          aria-labelledby="table-heading"
-          className="mt-12 grid gap-6 border-t border-border pt-6 md:mt-26 md:grid-cols-12"
+          aria-labelledby="table-title"
+          className={cn(sectionRule, "grid gap-6 md:grid-cols-12")}
         >
           <div className="md:col-span-7">
-            <p className={cn(LABEL, "text-muted-foreground")}>
+            <p className={cn(label, "text-muted-foreground")}>
               Guests and visitors
             </p>
-            <h2 id="table-heading" className="mt-2 text-h2 md:text-h1">
+            <h2 id="table-title" className="mt-2 text-h2 md:text-h1">
               A table for supper
             </h2>
             <p className="mt-4 max-w-xl text-body">
@@ -428,9 +418,9 @@ export function App() {
               >
                 Write to us
               </a>
-              <p className={cn(LABEL, "text-foreground")}>
+              <p className={cn(label, "text-foreground")}>
                 Or call{" "}
-                <a href="tel:+441632960352" className={TEXT_LINK}>
+                <a href="tel:+441632960352" className={textLink}>
                   01632 960 352
                 </a>
               </p>
@@ -454,21 +444,21 @@ export function App() {
               <span className="block">Port Lowan LW6 3QT</span>
             </address>
             <p className="mt-4 text-body">
-              <a href="tel:+441632960352" className={HEADER_LINK}>
+              <a href="tel:+441632960352" className={chromeLink}>
                 01632 960 352
               </a>
             </p>
             <p className="mt-2 text-body">
               <a
                 href="mailto:stay@kittiwakehouse.example"
-                className={HEADER_LINK}
+                className={chromeLink}
               >
                 stay@kittiwakehouse.example
               </a>
             </p>
           </div>
         </div>
-        <p className={cn("mt-6", LABEL, "text-muted-foreground")}>
+        <p className={cn("mt-6", label, "text-muted-foreground")}>
           © 2027 Kittiwake House · Open all year
         </p>
       </footer>

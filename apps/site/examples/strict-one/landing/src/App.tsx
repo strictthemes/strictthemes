@@ -5,208 +5,132 @@ import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const buttonClass = "rounded-sm px-4 font-mono text-label uppercase"
-const label = "font-mono text-label uppercase"
-const mutedLabel = cn(label, "text-muted-foreground")
-const container = "mx-auto w-full max-w-[1200px] px-4 md:px-8"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-const navLink = cn(
-  label,
-  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
+
+const buttonClasses = "rounded-sm px-4 font-mono text-label uppercase"
+
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusRing
 )
-const footerLink = cn(
-  "text-body text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+
+const navLink = cn(
+  "font-mono text-label text-foreground uppercase underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
 
+const footerLink = cn(
+  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+  focusRing
+)
+
+const container = "mx-auto w-full max-w-[1200px] px-4 md:px-8"
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+const label = "font-mono text-label text-muted-foreground uppercase"
+const figureEntry = "font-mono text-label text-muted-foreground"
+
 const headerLinks = ["Product", "Pricing", "Docs"]
 
-const budgetRows = [
+const accounts = [
   {
-    team: "Customer support",
-    owner: "Dana Whitlock",
-    updated: "2026-10-28",
-    spent: "9,840",
-    budget: "12,400",
+    name: "Harbour Freight",
+    owner: "Ines Varga",
+    region: "North",
+    seats: 48,
+    mrr: "4,320",
+    change: "+6.2%",
   },
   {
-    team: "Field sales",
-    owner: "Ravi Okonjo",
-    updated: "2026-10-27",
-    spent: "21,310",
-    budget: "24,000",
+    name: "Lindqvist Dental",
+    owner: "Tomas Reyes",
+    region: "West",
+    seats: 12,
+    mrr: "1,080",
+    change: "+1.4%",
   },
   {
-    team: "Design",
-    owner: "Mira Halvorsen",
-    updated: "2026-10-24",
-    spent: "4,120",
-    budget: "6,500",
+    name: "Orchard Schools",
+    owner: "Ines Varga",
+    region: "South",
+    seats: 130,
+    mrr: "9,750",
+    change: "+12.8%",
   },
   {
-    team: "Platform",
-    owner: "Tobias Lunde",
-    updated: "2026-10-22",
-    spent: "17,905",
-    budget: "18,000",
+    name: "Pemberton Labs",
+    owner: "Ada Okafor",
+    region: "East",
+    seats: 27,
+    mrr: "2,430",
+    change: "−3.1%",
   },
   {
-    team: "People ops",
-    owner: "Ines Carvalho",
-    updated: "2026-10-19",
-    spent: "2,760",
-    budget: "5,200",
-  },
-]
-
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-]
-
-function formatDate(iso: string) {
-  const [year, month, day] = iso.split("-").map(Number)
-  return `${day} ${months[month - 1]} ${year}`
-}
-
-const features = [
-  {
-    label: "Views",
-    title: "One sheet, many clean views",
-    text: "Pick the columns and rows each team needs and hide the rest. The source sheet stays as it is; everyone else sees a tidy table they can read at a glance.",
-  },
-  {
-    label: "Comments",
-    title: "Questions sit next to the number",
-    text: "Comment on a single cell or a whole row. The thread stays attached when the sheet is sorted, filtered or re-imported, so nobody asks which line you meant.",
-  },
-  {
-    label: "History",
-    title: "Every change, with a name on it",
-    text: "Each edit is saved as a version with who made it and when. Compare any two versions side by side and restore an old value in one step.",
+    name: "Quayside Rentals",
+    owner: "Tomas Reyes",
+    region: "North",
+    seats: 1,
+    mrr: "90",
+    change: "0.0%",
   },
 ]
 
 const comments = [
   {
-    name: "Ravi Okonjo",
-    time: "2026-10-28T09:12",
-    shown: "09:12",
-    text: "Field sales is at 21,310 of 24,000. Does that include the October travel claims?",
+    name: "Ada Okafor",
+    time: "2026-11-10T09:12",
+    shown: "10 November 2026, 09:12",
+    text: "Pemberton is down this month. Is that the seat cut they asked for in October?",
   },
   {
-    name: "Dana Whitlock",
-    time: "2026-10-28T09:40",
-    shown: "09:40",
-    text: "Not yet. Finance adds them on Friday, so expect about 1,900 more.",
+    name: "Tomas Reyes",
+    time: "2026-11-10T09:40",
+    shown: "10 November 2026, 09:40",
+    text: "Yes. They moved three people to the free plan. It should recover in January.",
   },
   {
-    name: "Ravi Okonjo",
-    time: "2026-10-28T09:44",
-    shown: "09:44",
-    text: "Thanks. I will hold the conference booking until then.",
+    name: "Ines Varga",
+    time: "2026-11-10T10:05",
+    shown: "10 November 2026, 10:05",
+    text: "Thanks. I have added a note to the account row so finance sees it too.",
   },
 ]
 
 const versions = [
   {
-    name: "Version 14 · Tobias Lunde",
-    time: "2026-10-22T16:05",
-    shown: "22 October 2026, 16:05",
-    text: "Changed the Platform budget from 16,500 to 18,000.",
+    name: "Version 14, Ines Varga",
+    time: "2026-11-12T16:30",
+    shown: "12 November 2026, 16:30",
+    text: "Changed seats for Orchard Schools from 118 to 130.",
   },
   {
-    name: "Version 13 · Mira Halvorsen",
-    time: "2026-10-21T11:30",
-    shown: "21 October 2026, 11:30",
-    text: "Added 1 row: Design, owner Mira Halvorsen.",
+    name: "Version 13, Tomas Reyes",
+    time: "2026-11-11T11:02",
+    shown: "11 November 2026, 11:02",
+    text: "Added the Quayside Rentals account.",
   },
   {
-    name: "Version 12 · Dana Whitlock",
-    time: "2026-10-20T08:58",
-    shown: "20 October 2026, 08:58",
-    text: "Imported the October export from the finance sheet. 3 rows updated.",
+    name: "Version 12, Ada Okafor",
+    time: "2026-11-09T08:47",
+    shown: "9 November 2026, 08:47",
+    text: "Renamed the column Revenue to MRR (€).",
   },
 ]
 
 const footerGroups = [
   { title: "Product", links: ["Views", "Comments", "History", "Pricing"] },
-  { title: "Company", links: ["About", "Customers", "Careers", "Contact"] },
+  { title: "Company", links: ["About", "Careers", "Blog", "Contact"] },
   { title: "Legal", links: ["Terms", "Privacy", "Security", "Cookies"] },
 ]
 
-function SectionHeader({
-  id,
-  eyebrow,
-  title,
-}: {
-  id: string
-  eyebrow: string
-  title: string
-}) {
-  return (
-    <div className={cn(grid, "gap-y-2 border-t border-foreground pt-4")}>
-      <p className={cn(mutedLabel, "md:col-span-3")}>{eyebrow}</p>
-      <h2 id={id} className="text-h1 md:col-span-9">
-        {title}
-      </h2>
-    </div>
-  )
-}
-
-type Entry = { name: string; time: string; shown: string; text: string }
-
-function EntryFigure({
-  entries,
-  caption,
-}: {
-  entries: Entry[]
-  caption: string
-}) {
-  return (
-    <figure>
-      <div className="rounded-md border border-border bg-card p-4 md:p-8">
-        <ol className="flex flex-col gap-4">
-          {entries.map((entry) => (
-            <li key={entry.time} className="flex flex-col gap-2">
-              <p className="font-mono text-label text-muted-foreground">
-                {entry.name} · <time dateTime={entry.time}>{entry.shown}</time>
-              </p>
-              <p className="max-w-lg">{entry.text}</p>
-            </li>
-          ))}
-        </ol>
-      </div>
-      <figcaption className={cn(mutedLabel, "mt-2")}>{caption}</figcaption>
-    </figure>
-  )
-}
-
-function Header() {
+function SiteHeader() {
   const [open, setOpen] = useState(false)
-  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (!open) return
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setOpen(false)
-        menuButtonRef.current?.focus()
+        menuButton.current?.focus()
       }
     }
     document.addEventListener("keydown", onKeyDown)
@@ -219,14 +143,11 @@ function Header() {
         <div className="flex flex-wrap items-center gap-4 py-4 md:gap-8">
           <a
             href="#"
-            className={cn(
-              "font-heading text-h2 text-foreground transition-colors duration-150",
-              focusRing
-            )}
+            className={cn("font-heading text-h2 text-foreground", focusRing)}
           >
             Plainsheet
           </a>
-          <nav aria-label="Main" className="hidden md:block">
+          <nav aria-label="Main" className="hidden md:ml-auto md:block">
             <ul className="flex items-center gap-8">
               {headerLinks.map((link) => (
                 <li key={link}>
@@ -237,7 +158,7 @@ function Header() {
               ))}
             </ul>
           </nav>
-          <div className="ml-auto flex items-center gap-4 md:gap-8">
+          <div className="ml-auto flex items-center gap-4 md:ml-0">
             <a href="#" className={cn(navLink, "hidden md:inline")}>
               Sign in
             </a>
@@ -245,15 +166,15 @@ function Header() {
               href="#"
               className={cn(
                 buttonVariants({ variant: "outline" }),
-                buttonClass
+                buttonClasses
               )}
             >
               Start free
             </a>
             <Button
-              ref={menuButtonRef}
+              ref={menuButton}
               variant="outline"
-              className={cn(buttonClass, "md:hidden")}
+              className={cn(buttonClasses, "md:hidden")}
               aria-expanded={open}
               aria-controls="mobile-menu"
               onClick={() => setOpen((value) => !value)}
@@ -264,7 +185,7 @@ function Header() {
         </div>
         <nav
           id="mobile-menu"
-          aria-label="Menu"
+          aria-label="Main"
           hidden={!open}
           className="border-t border-border py-2 md:hidden"
         >
@@ -283,288 +204,388 @@ function Header() {
   )
 }
 
-export function App() {
+function SectionHeader({
+  id,
+  eyebrow,
+  title,
+}: {
+  id: string
+  eyebrow: string
+  title: string
+}) {
   return (
-    <div className="min-h-svh bg-background text-body text-foreground">
-      <Header />
-      <main>
-        {/* Hero */}
-        <section aria-labelledby="hero-title" className="pt-16 pb-16">
-          <div className={cn(container, grid)}>
-            <p className={cn(mutedLabel, "md:col-span-12")}>
-              Spreadsheets for teams
-            </p>
-            <h1
-              id="hero-title"
-              className="mt-2 text-h1 md:col-span-10 md:text-display"
-            >
-              The spreadsheet everyone on the team can actually read.
-            </h1>
-            <p className="mt-4 max-w-lg md:col-span-6">
-              Plainsheet turns a messy spreadsheet into a clean shared view.
-              Your team reads the numbers, asks questions on the rows they care
-              about, and sees every change with a name and a time on it.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center gap-4 md:col-span-12">
-              <a
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  buttonClass
-                )}
-              >
-                Start free
-              </a>
-              <a href="#how-it-works" className={textLink}>
-                See how it works
-              </a>
-            </div>
-            <figure className="mt-8 md:col-span-12">
-              <div className="rounded-md border border-border bg-card p-4 md:p-8">
-                <table className="w-full text-body">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th
-                        scope="col"
-                        className={cn(
-                          mutedLabel,
-                          "px-4 py-2 text-left first:pl-0 last:pr-0"
-                        )}
-                      >
-                        Team
-                      </th>
-                      <th
-                        scope="col"
-                        className={cn(
-                          mutedLabel,
-                          "hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell"
-                        )}
-                      >
-                        Owner
-                      </th>
-                      <th
-                        scope="col"
-                        className={cn(
-                          mutedLabel,
-                          "hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell"
-                        )}
-                      >
-                        Updated
-                      </th>
-                      <th
-                        scope="col"
-                        className={cn(
-                          mutedLabel,
-                          "px-4 py-2 text-right first:pl-0 last:pr-0"
-                        )}
-                      >
-                        Spent
-                      </th>
-                      <th
-                        scope="col"
-                        className={cn(
-                          mutedLabel,
-                          "px-4 py-2 text-right first:pl-0 last:pr-0"
-                        )}
-                      >
-                        Budget
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {budgetRows.map((row) => (
-                      <tr key={row.team}>
-                        <td className="px-4 py-2 first:pl-0 last:pr-0">
-                          {row.team}
-                        </td>
-                        <td className="hidden px-4 py-2 whitespace-nowrap first:pl-0 last:pr-0 md:table-cell">
-                          {row.owner}
-                        </td>
-                        <td className="hidden px-4 py-2 whitespace-nowrap first:pl-0 last:pr-0 md:table-cell">
-                          <time dateTime={row.updated}>
-                            {formatDate(row.updated)}
-                          </time>
-                        </td>
-                        <td className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
-                          {row.spent}
-                        </td>
-                        <td className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
-                          {row.budget}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <figcaption className={cn(mutedLabel, "mt-2")}>
-                Shared view: Q4 team budgets, EUR
-              </figcaption>
-            </figure>
-          </div>
-        </section>
+    <div className={cn(grid, "gap-y-2 border-t border-foreground pt-4")}>
+      <p className={cn(label, "md:col-span-3")}>{eyebrow}</p>
+      <h2 id={id} className="text-h1 md:col-span-9">
+        {title}
+      </h2>
+    </div>
+  )
+}
 
-        {/* Proof row */}
-        <section aria-label="Customers" className="pb-8">
-          <div className={container}>
-            <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
-              <p className={mutedLabel}>Used by teams at</p>
-              <span className="font-heading text-h2">Northwind Freight</span>
-              <span className="font-heading text-h2">Kestrel Labs</span>
-              <span className="font-heading text-h2">Halden &amp; Moss</span>
-              <span className="font-heading text-h2">Brightwater</span>
-              <span className="font-heading text-h2">Oakline Studio</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Features */}
-        <section aria-labelledby="features-title" className="pb-16">
-          <div className={container}>
-            <SectionHeader
-              id="features-title"
-              eyebrow="01 / Features"
-              title="Built for the people who read the sheet"
-            />
-            <div className={cn(grid, "mt-8 gap-y-8")}>
-              {features.map((feature) => (
-                <div
-                  key={feature.label}
-                  className="flex flex-col border-t border-border pt-4 md:col-span-4"
-                >
-                  <p className={mutedLabel}>{feature.label}</p>
-                  <h3 className="mt-2 text-h2">{feature.title}</h3>
-                  <p className="mt-4 max-w-lg">{feature.text}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section
-          id="how-it-works"
-          aria-labelledby="how-title"
-          className="pb-16"
+function Hero() {
+  return (
+    <section aria-labelledby="hero-title" className="pt-16 pb-16">
+      <div className={cn(container, grid)}>
+        <p className={cn(label, "md:col-span-12")}>Spreadsheets for teams</p>
+        <h1
+          id="hero-title"
+          className="mt-2 text-h1 md:col-span-10 md:text-display"
         >
-          <div className={container}>
-            <SectionHeader
-              id="how-title"
-              eyebrow="02 / How it works"
-              title="From a shared file to a shared answer"
-            />
-            <div className="mt-8 flex flex-col gap-8">
-              <div className={cn(grid, "gap-y-8 border-t border-border pt-8")}>
-                <div className="flex flex-col md:col-span-5">
-                  <p className={mutedLabel}>Step 01</p>
-                  <h3 className="mt-2 text-h2">
-                    Ask about a number where it sits
-                  </h3>
-                  <p className="mt-4 max-w-lg">
-                    Open the view, click a row and write your question. The
-                    owner of that row gets a note, and the answer stays on the
-                    row for the next person who wonders the same thing.
-                  </p>
-                </div>
-                <div className="md:col-span-6 md:col-start-7">
-                  <EntryFigure
-                    entries={comments}
-                    caption="Comments on the Field sales row"
-                  />
-                </div>
-              </div>
-              <div className={cn(grid, "gap-y-8 border-t border-border pt-8")}>
-                <div className="flex flex-col md:col-span-5">
-                  <p className={mutedLabel}>Step 02</p>
-                  <h3 className="mt-2 text-h2">
-                    See who changed what, and when
-                  </h3>
-                  <p className="mt-4 max-w-lg">
-                    Every import and every edit becomes a version. Read the list
-                    to see what moved this week, and restore any earlier value
-                    without digging through old copies of the file.
-                  </p>
-                </div>
-                <div className="md:col-span-6 md:col-start-7">
-                  <EntryFigure
-                    entries={versions}
-                    caption="Version history of Q4 team budgets"
-                  />
-                </div>
-              </div>
-            </div>
+          The spreadsheet everyone on the team can actually read.
+        </h1>
+        <p className="mt-4 max-w-lg md:col-span-6">
+          Plainsheet turns a crowded workbook into a clean view that shows only
+          the rows and columns each person needs. Your team reads it, comments
+          on the numbers and sees every change, while the sheet underneath stays
+          exactly as it was.
+        </p>
+        <div className="mt-8 flex flex-wrap items-center gap-4 md:col-span-12">
+          <a
+            href="#"
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              buttonClasses
+            )}
+          >
+            Start free
+          </a>
+          <a href="#how-it-works" className={textLink}>
+            See how it works
+          </a>
+        </div>
+        <figure className="mt-8 md:col-span-12">
+          <div className="rounded-md border border-border bg-card p-4 md:p-8">
+            <table className="w-full text-body">
+              <thead>
+                <tr>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "px-4 py-2 text-left first:pl-0 last:pr-0"
+                    )}
+                  >
+                    Account
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell"
+                    )}
+                  >
+                    Owner
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell"
+                    )}
+                  >
+                    Region
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "px-4 py-2 text-right first:pl-0 last:pr-0"
+                    )}
+                  >
+                    Seats
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "px-4 py-2 text-right first:pl-0 last:pr-0"
+                    )}
+                  >
+                    MRR (€)
+                  </th>
+                  <th
+                    scope="col"
+                    className={cn(
+                      label,
+                      "hidden px-4 py-2 text-right first:pl-0 last:pr-0 md:table-cell"
+                    )}
+                  >
+                    Change
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.map((row) => (
+                  <tr key={row.name} className="border-t border-border">
+                    <td className="px-4 py-2 text-left first:pl-0 last:pr-0">
+                      {row.name}
+                    </td>
+                    <td className="hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell">
+                      {row.owner}
+                    </td>
+                    <td className="hidden px-4 py-2 text-left first:pl-0 last:pr-0 md:table-cell">
+                      {row.region}
+                    </td>
+                    <td className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
+                      {row.seats}
+                    </td>
+                    <td className="px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0">
+                      {row.mrr}
+                    </td>
+                    <td className="hidden px-4 py-2 text-right font-mono tabular-nums first:pl-0 last:pr-0 md:table-cell">
+                      {row.change}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </section>
+          <figcaption className={cn(label, "mt-2")}>
+            A shared view of the accounts sheet, November 2026
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
 
-        {/* Quote */}
-        <section aria-label="Customer quote" className="pb-16">
-          <div className={container}>
-            <figure className={cn(grid, "border-t border-foreground pt-8")}>
-              <blockquote className="font-heading text-h1 md:col-span-10">
-                <p>
-                  We stopped emailing spreadsheets around. Finance keeps the
-                  master sheet, and every team lead reads the same clean view.
-                </p>
-              </blockquote>
-              <figcaption className={cn(mutedLabel, "mt-4 md:col-span-12")}>
-                Hanna Lindqvist, Head of Finance, Northwind Freight
-              </figcaption>
-            </figure>
-          </div>
-        </section>
+function ProofRow() {
+  return (
+    <section aria-label="Customers" className="pb-8">
+      <div className={container}>
+        <div className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
+          <p className={label}>Used by teams at</p>
+          {[
+            "Northwind Ferries",
+            "Calder & Moss",
+            "Brightwater",
+            "Okapi Studio",
+            "Fenwick Health",
+          ].map((name) => (
+            <p key={name} className="font-heading text-h2">
+              {name}
+            </p>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
-        {/* Closing call to action */}
-        <section aria-labelledby="cta-title" className="pb-16">
-          <div className={container}>
-            <div className={cn(grid, "border-t border-border pt-16")}>
-              <h2 id="cta-title" className="text-h1 md:col-span-8">
-                Give your team a sheet they can read
-              </h2>
-              <p className="mt-4 max-w-lg md:col-span-8">
-                Connect a spreadsheet and share your first clean view in about
-                ten minutes, free for up to 5 people.
-              </p>
-              <a
-                href="#"
-                className={cn(
-                  buttonVariants({ variant: "default" }),
-                  buttonClass,
-                  "mt-8 justify-self-start md:col-span-12"
-                )}
-              >
-                Start free
-              </a>
-            </div>
-          </div>
-        </section>
-      </main>
+function Features() {
+  const features = [
+    {
+      label: "Views",
+      title: "Show only what matters",
+      text: "Pick the rows and columns a team needs and give the view its own link. The source sheet keeps every formula and hidden tab; nobody has to scroll past them.",
+    },
+    {
+      label: "Comments",
+      title: "Talk about a number in place",
+      text: "Leave a comment on a cell, a row or the whole view. Questions stay next to the figure they are about, instead of in a long email thread.",
+    },
+    {
+      label: "History",
+      title: "See every change, undo any",
+      text: "Each edit is saved as a version with a name and a time. Compare two versions side by side and restore one in a single step.",
+    },
+  ]
 
-      <footer className="border-t border-border py-16">
-        <div className={container}>
-          <div className={cn(grid, "gap-y-8")}>
-            <div className="flex flex-col gap-4 md:col-span-3">
-              <p className="font-heading text-h2">Plainsheet</p>
-              <p className="max-w-lg">Spreadsheets your whole team can read.</p>
+  return (
+    <section aria-labelledby="features-title" className="pb-16">
+      <div className={container}>
+        <SectionHeader
+          id="features-title"
+          eyebrow="01 / Features"
+          title="Three things a spreadsheet never did well."
+        />
+        <div className={cn(grid, "mt-8 gap-y-8")}>
+          {features.map((feature) => (
+            <div
+              key={feature.label}
+              className="flex flex-col border-t border-border pt-4 md:col-span-4"
+            >
+              <p className={label}>{feature.label}</p>
+              <h3 className="mt-2 text-h2">{feature.title}</h3>
+              <p className="mt-4 max-w-lg">{feature.text}</p>
             </div>
-            {footerGroups.map((group) => (
-              <div key={group.title} className="md:col-span-3">
-                <h2 className={cn(label, "text-foreground")}>{group.title}</h2>
-                <ul className="mt-4 flex flex-col gap-2">
-                  {group.links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className={footerLink}>
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Entries({
+  items,
+}: {
+  items: { name: string; time: string; shown: string; text: string }[]
+}) {
+  return (
+    <ol className="flex flex-col gap-4">
+      {items.map((item) => (
+        <li key={item.time} className="flex flex-col gap-2">
+          <p className={figureEntry}>
+            {item.name}, <time dateTime={item.time}>{item.shown}</time>
+          </p>
+          <p>{item.text}</p>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+function HowItWorks() {
+  const steps = [
+    {
+      step: "Step 01",
+      title: "Ask about a figure where it sits",
+      text: "Open the view, select a cell and write your question. Everyone who can see the view gets the thread, and the answer stays attached to the row.",
+      caption: "3 comments on the Pemberton Labs row",
+      items: comments,
+    },
+    {
+      step: "Step 02",
+      title: "Keep every version of the sheet",
+      text: "Plainsheet records each change with who made it and when. If a number looks wrong next week, open the history and restore the version that was right.",
+      caption: "History of the accounts view",
+      items: versions,
+    },
+  ]
+
+  return (
+    <section id="how-it-works" aria-labelledby="how-title" className="pb-16">
+      <div className={container}>
+        <SectionHeader
+          id="how-title"
+          eyebrow="02 / How it works"
+          title="From a shared sheet to a clear answer in two steps."
+        />
+        <div className="mt-8 flex flex-col gap-8">
+          {steps.map((step) => (
+            <div
+              key={step.step}
+              className={cn(grid, "gap-y-8 border-t border-border pt-8")}
+            >
+              <div className="flex flex-col md:col-span-5">
+                <p className={label}>{step.step}</p>
+                <h3 className="mt-2 text-h2">{step.title}</h3>
+                <p className="mt-4 max-w-lg">{step.text}</p>
               </div>
-            ))}
-          </div>
-          <div className="mt-8 border-t border-border pt-4">
-            <p className={mutedLabel}>© 2026 Plainsheet Ltd.</p>
+              <figure className="md:col-span-6 md:col-start-7">
+                <div className="rounded-md border border-border bg-card p-4 md:p-8">
+                  <Entries items={step.items} />
+                </div>
+                <figcaption className={cn(label, "mt-2")}>
+                  {step.caption}
+                </figcaption>
+              </figure>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function Quote() {
+  return (
+    <section aria-label="Customer quote" className="pb-16">
+      <div className={container}>
+        <figure className={cn(grid, "border-t border-foreground pt-8")}>
+          <blockquote className="font-heading text-h1 md:col-span-10">
+            <p>
+              We stopped sending the budget workbook around. Now the whole
+              office reads one view, and the questions come to the cell instead
+              of my inbox.
+            </p>
+          </blockquote>
+          <figcaption className={cn(label, "mt-4 md:col-span-12")}>
+            Marta Lindgren, Finance lead, Northwind Ferries
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+  )
+}
+
+function ClosingCta() {
+  return (
+    <section aria-labelledby="cta-title" className="pb-16">
+      <div className={container}>
+        <div className={cn(grid, "border-t border-border pt-16")}>
+          <h2 id="cta-title" className="text-h1 md:col-span-8">
+            Give your team a sheet they can read.
+          </h2>
+          <p className="mt-4 max-w-lg md:col-span-8">
+            Connect a spreadsheet and share your first view in a few minutes,
+            free for teams of up to five people.
+          </p>
+          <div className="mt-8 md:col-span-12">
+            <a
+              href="#"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                buttonClasses
+              )}
+            >
+              Start free
+            </a>
           </div>
         </div>
-      </footer>
+      </div>
+    </section>
+  )
+}
+
+function SiteFooter() {
+  return (
+    <footer className="border-t border-border py-16">
+      <div className={container}>
+        <div className={cn(grid, "gap-y-8")}>
+          <div className="flex flex-col gap-4 md:col-span-3">
+            <p className="font-heading text-h2">Plainsheet</p>
+            <p>Spreadsheets your whole team can read.</p>
+          </div>
+          {footerGroups.map((group) => (
+            <div key={group.title} className="md:col-span-3">
+              <h2 className="font-mono text-label text-foreground uppercase">
+                {group.title}
+              </h2>
+              <ul className="mt-4 flex flex-col gap-2">
+                {group.links.map((link) => (
+                  <li key={link}>
+                    <a href="#" className={footerLink}>
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <p className={cn(label, "mt-8 border-t border-border pt-4")}>
+          © 2026 Plainsheet Ltd. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  )
+}
+
+export function App() {
+  return (
+    <div className="text-body">
+      <SiteHeader />
+      <main>
+        <Hero />
+        <ProofRow />
+        <Features />
+        <HowItWorks />
+        <Quote />
+        <ClosingCta />
+      </main>
+      <SiteFooter />
     </div>
   )
 }

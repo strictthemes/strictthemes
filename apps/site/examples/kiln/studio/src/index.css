@@ -72,11 +72,11 @@
     --color-tertiary-foreground: var(--tertiary-foreground);
     --color-success: var(--success);
     --color-success-foreground: var(--success-foreground);
-    --font-mono: 'DM Mono', monospace;
     --color-glaze-pale: var(--glaze-pale);
     --color-glaze-pale-foreground: var(--glaze-pale-foreground);
     --color-glaze-dark: var(--glaze-dark);
     --color-glaze-dark-foreground: var(--glaze-dark-foreground);
+    --font-mono: 'DM Mono', monospace;
 }
 
 :root {
@@ -180,11 +180,4 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
     }
-}
-:root {
-  color-scheme: light;
-}
-
-.dark {
-  color-scheme: dark;
 }

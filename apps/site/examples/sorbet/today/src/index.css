@@ -73,15 +73,6 @@
     --font-mono: 'Sometype Mono Variable', monospace;
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-  .dark {
-    color-scheme: dark;
-  }
-}
-
 :root {
     --background: #FFF6F1;
     --foreground: #2B1721;

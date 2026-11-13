@@ -9,10 +9,10 @@ function Table({
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       tabIndex={0}
       role="region"
       aria-label={label}
+      className="relative w-full overflow-x-auto focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <table
         data-slot="table"

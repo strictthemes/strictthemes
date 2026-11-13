@@ -72,15 +72,14 @@
     --color-tertiary-foreground: var(--tertiary-foreground);
     --color-success: var(--success);
     --color-success-foreground: var(--success-foreground);
-    --font-mono: 'DM Mono', monospace;
     --color-glaze-pale: var(--glaze-pale);
     --color-glaze-pale-foreground: var(--glaze-pale-foreground);
     --color-glaze-dark: var(--glaze-dark);
     --color-glaze-dark-foreground: var(--glaze-dark-foreground);
+    --font-mono: 'DM Mono', monospace;
 }
 
 :root {
-    color-scheme: light;
     --background: #F4ECE1;
     --foreground: #2A1D14;
     --card: #FBF6EE;
@@ -124,7 +123,6 @@
 }
 
 .dark {
-    color-scheme: dark;
     --background: #1A130E;
     --foreground: #F1E6D8;
     --card: #241A13;

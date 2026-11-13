@@ -1,6 +1,12 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Check, X } from "lucide-react"
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -10,27 +16,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
+import { cn } from "@/lib/utils"
 
-const focus =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const label = "font-mono text-label font-bold uppercase"
-const textLink = `text-foreground underline underline-offset-4 hover:decoration-2 ${focus}`
-const panel = "flex flex-col rounded-xl border border-border bg-card p-5"
 const container = "mx-auto max-w-[1200px] px-3 md:px-5"
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label font-bold uppercase text-foreground"
+const panel = "flex flex-col gap-3 rounded-xl border border-border bg-card p-5"
+const textLink = cn(
+  "text-foreground underline underline-offset-4 hover:decoration-2",
+  focusRing
+)
 
-const navLinks = [
+const navItems = [
   { href: "/line-up", text: "Line-up" },
   { href: "/tickets", text: "Tickets" },
   { href: "/info", text: "Info", current: true },
 ]
 
-function DateRange() {
+function navLinkClass(current?: boolean) {
+  return cn(
+    label,
+    "underline-offset-4",
+    current ? "underline decoration-2" : "hover:underline",
+    focusRing
+  )
+}
+
+function FestivalDates() {
   return (
     <>
       <time dateTime="2026-12-04">4</time>–
@@ -39,31 +52,7 @@ function DateRange() {
   )
 }
 
-function NavLink({
-  href,
-  text,
-  current,
-  className = "",
-}: {
-  href: string
-  text: string
-  current?: boolean
-  className?: string
-}) {
-  return (
-    <a
-      href={href}
-      aria-current={current ? "page" : undefined}
-      className={`${label} text-foreground underline-offset-4 hover:underline ${
-        current ? "underline decoration-2" : ""
-      } ${focus} ${className}`}
-    >
-      {text}
-    </a>
-  )
-}
-
-function Header() {
+function SiteHeader() {
   const [open, setOpen] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -82,42 +71,62 @@ function Header() {
   return (
     <header className="border-b border-border">
       <div
-        className={`${container} flex flex-wrap items-center gap-x-8 gap-y-3 py-3`}
+        className={cn(
+          container,
+          "flex flex-wrap items-center gap-x-8 gap-y-3 py-3"
+        )}
       >
         <a
           href="/"
-          className={`font-heading text-h2 text-foreground underline-offset-4 hover:underline ${focus}`}
+          className={cn(
+            "font-heading text-h2 text-foreground underline-offset-4 hover:underline",
+            focusRing
+          )}
         >
           Tremor Days
         </a>
         <nav aria-label="Main" className="hidden gap-5 md:flex">
-          {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} />
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              aria-current={item.current ? "page" : undefined}
+              className={navLinkClass(item.current)}
+            >
+              {item.text}
+            </a>
           ))}
         </nav>
-        <p className={`${label} ml-auto hidden md:block`}>
-          <DateRange />
+        <p className={cn(label, "ml-auto hidden md:block")}>
+          <FestivalDates />
         </p>
         <Button
           ref={buttonRef}
           variant="outline"
           aria-expanded={open}
-          aria-controls="mobile-nav"
+          aria-controls="mobile-menu"
           onClick={() => setOpen((value) => !value)}
-          className={`h-auto px-5 py-2 ${label} ml-auto md:hidden`}
+          className="ml-auto h-auto px-5 py-2 font-mono text-label font-bold uppercase md:hidden"
         >
           Menu
         </Button>
       </div>
       <nav
-        id="mobile-nav"
+        id="mobile-menu"
         aria-label="Main"
         hidden={!open}
         className="border-t border-border md:hidden"
       >
-        <div className={`${container} py-2`}>
-          {navLinks.map((link) => (
-            <NavLink key={link.href} {...link} className="block py-2" />
+        <div className={cn(container, "py-2")}>
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              aria-current={item.current ? "page" : undefined}
+              className={cn(navLinkClass(item.current), "block py-2")}
+            >
+              {item.text}
+            </a>
           ))}
         </div>
       </nav>
@@ -125,25 +134,34 @@ function Header() {
   )
 }
 
+function SectionHeading({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex flex-wrap items-end justify-between gap-3">
+      <h2 className="text-h2 md:text-h1">{children}</h2>
+    </div>
+  )
+}
+
 const routes = [
   {
     title: "By train",
     fact: "12 min walk from Varsby Central",
-    details: (
+    text: (
       <>
-        Take the east exit at Varsby Central and follow the yellow signs along
-        the quay to the main gate. After both nights the last train from Varsby
-        Central leaves at <time dateTime="01:40">01:40</time>.
+        Trains stop at Varsby Central every ten minutes, and the walk to the
+        docks follows the yellow signs along the quay. After both nights the
+        last train from Varsby Central leaves at{" "}
+        <time dateTime="01:40">01:40</time>.
       </>
     ),
   },
   {
     title: "By tram",
     fact: "Tram 4 · Docks Gate stop",
-    details: (
+    text: (
       <>
-        Tram 4 runs every 8 minutes from the city centre and stops right outside
-        the gate. After both nights the last tram 4 back to the centre leaves at{" "}
+        Tram 4 runs from the city centre every eight minutes and stops right at
+        the gate. After both nights the last tram 4 leaves Docks Gate at{" "}
         <time dateTime="01:55">01:55</time>.
       </>
     ),
@@ -151,11 +169,10 @@ const routes = [
   {
     title: "By bike",
     fact: "400 bike stands at the north gate",
-    details: (
+    text: (
       <>
-        The harbour cycle path runs all the way to the north gate, where the
-        stands are lit and watched all night. Bring your own lock, and leave
-        cargo bikes in the marked bays by the fence.
+        The stands are free, lit and watched by stewards until the site closes.
+        Bring your own lock, as there is no bike hire at the docks.
       </>
     ),
   },
@@ -166,20 +183,20 @@ const days = [
     name: "Friday 4 December",
     date: "2026-12-04",
     times: [
-      ["2026-12-04T16:00+01:00", "16:00"],
-      ["2026-12-04T17:00+01:00", "17:00"],
-      ["2026-12-05T00:30+01:00", "00:30"],
-      ["2026-12-04T22:00+01:00", "22:00"],
+      ["16:00", "2026-12-04T16:00+01:00"],
+      ["17:00", "2026-12-04T17:00+01:00"],
+      ["00:30", "2026-12-05T00:30+01:00"],
+      ["22:00", "2026-12-04T22:00+01:00"],
     ],
   },
   {
     name: "Saturday 5 December",
     date: "2026-12-05",
     times: [
-      ["2026-12-05T12:00+01:00", "12:00"],
-      ["2026-12-05T13:00+01:00", "13:00"],
-      ["2026-12-06T01:00+01:00", "01:00"],
-      ["2026-12-05T22:00+01:00", "22:00"],
+      ["12:00", "2026-12-05T12:00+01:00"],
+      ["13:00", "2026-12-05T13:00+01:00"],
+      ["01:00", "2026-12-06T01:00+01:00"],
+      ["22:00", "2026-12-05T22:00+01:00"],
     ],
   },
 ]
@@ -197,8 +214,8 @@ const bring = [
   "A photo ID if you are 13 to 17",
   "Earplugs",
   "A warm layer for the outdoor stage",
-  "A card or phone to pay, as the site takes no cash",
-  "An empty bottle to fill at the water taps",
+  "A card or phone to pay, since the site takes no cash",
+  "An empty bottle to fill at the water points",
 ]
 
 const leave = [
@@ -206,49 +223,56 @@ const leave = [
   "Large bags, bigger than 30 × 20 cm",
   "Umbrellas with a point",
   "Drones",
-  "Your own food, beyond a snack",
+  "Your own food beyond a snack",
   "Professional cameras with a removable lens",
+]
+
+const access = [
+  "A raised viewing platform at both music stages",
+  "A quiet room in the Drawing Office, open all day",
+  "Accessible toilets at every bar",
+  "Sign language interpreters at every talk",
+  "Assistance dogs welcome everywhere on site",
+  "Sets that use strobe lighting: Ossa Bloom and Sister Antenna",
 ]
 
 const questions = [
   {
     q: "Can I leave and come back?",
-    a: "Yes. Your wristband lets you leave and come back as often as you like until 22:00, the last entry each day.",
+    a: "Yes. Your wristband lets you leave and come back as often as you like until 22:00, which is also last entry. If you leave after that, you cannot get back in that night.",
   },
   {
     q: "What happens if it rains?",
-    a: "The festival goes on. Most stages are indoors in the old harbour halls, and the Crane Stage outdoors has a roof.",
+    a: "The festival goes ahead in any weather. Most stages are indoors in the old harbour halls, and the Crane Stage is outdoors under a roof, so bring a warm layer rather than an umbrella.",
   },
   {
     q: "Is there a cloakroom?",
-    a: "Yes, next to the main gate. It costs €3 per item and stays open until the last set ends.",
+    a: "Yes, in the entrance hall by the main gate. It costs €3 per item and stays open until the last set ends.",
   },
   {
     q: "Can I bring a camera?",
-    a: "Phones and compact cameras are fine. Professional cameras with a removable lens stay at home.",
+    a: "Phone cameras and compact cameras are fine. Professional cameras with a removable lens stay at home.",
   },
   {
     q: "Can I change the name on my ticket?",
-    a: "Yes, until 1 December. Write to us with your order number and the new name, and we send a new ticket.",
+    a: "Yes, until 1 December. Write to us with your order number and the new name, and we send you a new ticket.",
   },
   {
     q: "Do children need a ticket?",
-    a: "Children under 13 go free with an adult who has a ticket. Visitors from 13 to 17 need their own ticket and a photo ID.",
+    a: "Children under 13 go free with an adult who has a ticket. Anyone aged 13 to 17 needs their own ticket and a photo ID.",
   },
 ]
-
-const sectionRow = "flex flex-wrap items-end justify-between gap-3"
-const sectionHeading = "text-h2 md:text-h1"
 
 export function App() {
   return (
     <div className="min-h-screen bg-background font-sans text-body text-foreground">
-      <Header />
-      <main className={`${container} flex flex-col gap-16 py-8 md:py-16`}>
+      <SiteHeader />
+
+      <main className={cn(container, "flex flex-col gap-16 py-8 md:py-16")}>
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-2">
             <p className={label}>
-              Tremor Days · <DateRange />
+              Tremor Days · <FestivalDates />
             </p>
             <h1 className="text-h1 md:text-display">Before you go</h1>
           </div>
@@ -258,25 +282,21 @@ export function App() {
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className={sectionRow}>
-            <h2 className={sectionHeading}>Getting there</h2>
-          </div>
+          <SectionHeading>Getting there</SectionHeading>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
             {routes.map((route) => (
-              <div key={route.title} className={`${panel} gap-3 md:col-span-4`}>
+              <div key={route.title} className={cn(panel, "md:col-span-4")}>
                 <h3 className="text-h2">{route.title}</h3>
                 <p className={label}>{route.fact}</p>
-                <p>{route.details}</p>
+                <p className="max-w-xl">{route.text}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className={sectionRow}>
-            <h2 className={sectionHeading}>Opening times</h2>
-          </div>
-          <div className={`${panel} gap-5`}>
+          <SectionHeading>Opening times</SectionHeading>
+          <div className={cn(panel, "gap-5")}>
             <Table label="Opening times" className="text-body">
               <TableHeader>
                 <TableRow>
@@ -284,7 +304,7 @@ export function App() {
                     <TableHead
                       key={column}
                       scope="col"
-                      className={`px-3 first:pl-0 last:pr-0 ${label} text-muted-foreground`}
+                      className="px-3 font-mono text-label font-bold text-muted-foreground uppercase first:pl-0 last:pr-0"
                     >
                       {column}
                     </TableHead>
@@ -300,7 +320,7 @@ export function App() {
                     >
                       <time dateTime={day.date}>{day.name}</time>
                     </th>
-                    {day.times.map(([dateTime, text]) => (
+                    {day.times.map(([time, dateTime]) => (
                       <TableCell
                         key={dateTime}
                         className="px-3 py-2 first:pl-0 last:pr-0"
@@ -309,7 +329,7 @@ export function App() {
                           dateTime={dateTime}
                           className="font-mono tabular-nums"
                         >
-                          {text}
+                          {time}
                         </time>
                       </TableCell>
                     ))}
@@ -324,54 +344,55 @@ export function App() {
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className={sectionRow}>
-            <h2 className={sectionHeading}>What to bring</h2>
-          </div>
+          <SectionHeading>What to bring</SectionHeading>
           <div className="grid grid-cols-1 gap-5 md:grid-cols-12">
-            {[
-              { title: "Bring", items: bring, Icon: Check },
-              { title: "Leave at home", items: leave, Icon: X },
-            ].map(({ title, items, Icon }) => (
-              <div key={title} className={`${panel} gap-5 md:col-span-6`}>
-                <h3 className="text-h2">{title}</h3>
-                <ul className="flex list-none flex-col gap-3 p-0">
-                  {items.map((item) => (
-                    <li key={item} className="flex items-start gap-2">
-                      <Icon
-                        className="mt-1 size-4 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            <div className={cn(panel, "gap-5 md:col-span-6")}>
+              <h3 className="text-h2">Bring</h3>
+              <ul className="flex list-none flex-col gap-3 p-0">
+                {bring.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <Check
+                      aria-hidden="true"
+                      className="mt-1 size-4 shrink-0"
+                    />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className={cn(panel, "gap-5 md:col-span-6")}>
+              <h3 className="text-h2">Leave at home</h3>
+              <ul className="flex list-none flex-col gap-3 p-0">
+                {leave.map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <X aria-hidden="true" className="mt-1 size-4 shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className={sectionRow}>
-            <h2 className={sectionHeading}>Access</h2>
-          </div>
-          <div className={`${panel} gap-5`}>
+          <SectionHeading>Access</SectionHeading>
+          <div className={cn(panel, "gap-5")}>
             <div className="flex flex-col gap-3">
               <p className="max-w-xl">
-                The whole site is step-free, on hard ground from the gates to
-                every stage, bar and toilet.
+                The whole site is step-free, on hard, level ground from the tram
+                stop to every stage, bar and toilet. Ramps lead up to the
+                harbour halls, and the paths between them are lit after dark.
               </p>
               <p className="max-w-xl">
                 Any ticket comes with a free ticket for a companion on request.
-                Ask for it when you book, or write to us before the festival.
+                Ask for it when you write to us, and we add the companion ticket
+                to your order.
               </p>
             </div>
             <ul className="flex list-disc flex-col gap-3 pl-5">
-              <li>A raised viewing platform at both music stages</li>
-              <li>A quiet room in the Drawing Office, open all day</li>
-              <li>Accessible toilets at every bar</li>
-              <li>Sign language interpreters at every talk</li>
-              <li>Assistance dogs welcome</li>
-              <li>Sets with strobe lighting: Ossa Bloom and Sister Antenna</li>
+              {access.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
             <p className="max-w-xl">
               Write to{" "}
@@ -384,18 +405,16 @@ export function App() {
         </section>
 
         <section className="flex flex-col gap-8">
-          <div className={sectionRow}>
-            <h2 className={sectionHeading}>Questions</h2>
-          </div>
-          <div className={`${panel} gap-0`}>
+          <SectionHeading>Questions</SectionHeading>
+          <div className={cn(panel, "gap-0")}>
             <Accordion multiple>
-              {questions.map(({ q, a }) => (
-                <AccordionItem key={q} value={q}>
+              {questions.map((item) => (
+                <AccordionItem key={item.q} value={item.q}>
                   <AccordionTrigger className="items-center gap-3 py-3 font-sans text-body font-bold">
-                    {q}
+                    {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="pb-3 text-body">
-                    <p>{a}</p>
+                    <p>{item.a}</p>
                   </AccordionContent>
                 </AccordionItem>
               ))}
@@ -403,15 +422,16 @@ export function App() {
           </div>
         </section>
       </main>
+
       <footer className="border-t border-border">
-        <div className={`${container} flex flex-col gap-3 py-8`}>
+        <div className={cn(container, "flex flex-col gap-3 py-8")}>
           <p className="font-heading text-h2">Tremor Days</p>
-          <p className="text-body">
+          <p>
             A two-day music and design festival in the old harbour halls of
             Varsby Docks.
           </p>
           <p className={label}>
-            Varsby Docks · <DateRange /> · © 2026 Tremor Days
+            Varsby Docks · <FestivalDates /> · © 2026 Tremor Days
           </p>
         </div>
       </footer>

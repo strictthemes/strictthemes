@@ -8,6 +8,7 @@ checks:
   - Exactly one plan, Regular, has the "Recommended" badge, which is the page's only badge; the plans are not enlarged, lifted or tinted.
   - The page has one default (gold) button, "Join the Vesper", and asks for no card or bank details.
   - An empty name, or an empty or malformed email address, shows a sentence with an icon under the field, sets `aria-invalid` and moves focus to the first field with an error.
+  - 'The plan field is the theme''s `Select`, with no native `<select>` on the page: its trigger looks like the text fields above it, its list opens under it in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
   - A good sign-up replaces the form with a confirmation in a `role="status"` element that names the plan, the price and the start date, and says no payment was taken.
 ---
 
@@ -53,7 +54,7 @@ The form, with `noValidate`:
 
 1. "Full name", an `Input` with `autoComplete="name"` (add the component with `npx shadcn@latest add input`).
 2. With `mt-6`, "Email address", an `Input` with `type="email"` and `autoComplete="email"`, and helper text: "We send your membership card here."
-3. With `mt-6`, "Plan", a native `<select>` with Friend, Regular and Patron. Regular is chosen at first.
+3. With `mt-6`, "Plan", a `Select` from the layout notes with Friend, Regular and Patron. Regular is chosen at first.
 4. With `mt-6`, a summary line, a `<p>` with `aria-live="polite"` in `text-body`, built from the plan and the billing period: "Regular, billed monthly: £12 a month, starting Wednesday 11 November 2026." or "Regular, billed yearly: £120 a year, starting Wednesday 11 November 2026."
 5. With `mt-6`, the default `Button` "Join the Vesper", with `type="submit"`. It is the page's one gold action.
 
@@ -63,7 +64,7 @@ The footer from the layout notes.
 
 ### Behavior
 
-- The billing period and the chosen plan are component state. The prices, the billing notes, the `/ month` or `/ year` labels and the summary line all read from them, and the `<select>` and the "Choose" buttons both set the plan.
+- The billing period and the chosen plan are component state. The prices, the billing notes, the `/ month` or `/ year` labels and the summary line all read from them, and the `Select` and the "Choose" buttons both set the plan.
 - A "Choose" button sets the plan and moves focus to the "Full name" field, which scrolls the form into view. It does not submit anything. Once the confirmation is shown, the form does not come back: a "Choose" button then only moves focus to the confirmation's `<h3>`, and the confirmation keeps the plan, period and price that were sent, whatever is switched after.
 - When the form is sent, check it in code: the name must not be empty ("Enter your full name."), and the email must not be empty and must look like an address, with one `@` and a dot after it ("Enter an email address such as name@example.com."). Show every error at once, and move focus to the first field with an error.
 - A good form is replaced by the confirmation. Its `<h3>`: "Welcome to the Vesper, Mara", with the first word of the name the person typed and no full stop. Under it, with `mt-4`, these sentences: "Your Regular membership, billed monthly at £12 a month, starts on Wednesday 11 November 2026." (yearly: "billed yearly at £120") "Your card will reach you by email. This was a demo: no payment was taken." After the status element, in the shared wrapper as the layout notes say, a text link "See what's on" to `/`.

@@ -8,6 +8,7 @@ checks:
   - The preview of the app is drawn from plain elements, with `role="img"` and an `aria-label` that says what it shows, and no image file is loaded.
   - An empty name or a malformed email gets a message in words with an icon, tied to its field with `aria-describedby`, and focus moves to the first field with an error.
   - After a good sign-up, the form is replaced by a confirmation that a screen reader announces, and focus moves to it.
+  - 'The "Your first habit" field is the theme''s `Select`, with no native `<select>` on the page: its trigger is a pill as tall as the inputs, its list opens under it as a sheet in the card''s color with a 1px border, the chosen row has a raspberry check, and the arrow keys, Enter and Escape work in it.'
   - At 375px the preview sits under the opening text, and the page does not scroll sideways.
 ---
 
@@ -63,7 +64,7 @@ Its second item, `md:col-span-7`, is a card that is the wrapper for the form and
 
 - "Your first name": an `Input` (add it with `npx shadcn@latest add input`) with `autoComplete="given-name"`.
 - "Email": an `Input` with `type="email"` and `autoComplete="email"`, with helper text `We send one email to confirm, and nothing else.`
-- A `<select>` "Your first habit", full width: the five habits in the sample's order, then "I will choose later". "Drink 8 glasses of water", the first, is chosen at the start.
+- A `Select` from the layout notes, "Your first habit", full width: the five habits in the sample's order, then "I will choose later". "Drink 8 glasses of water", the first, is chosen at the start.
 - The default `Button` with `type="submit"`, "Create my account", full width below `md` (`w-full md:w-auto md:self-start`).
 
 The sign-up button is the second raspberry button on the page; it is far below the opening and never on screen with it.

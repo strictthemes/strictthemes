@@ -4,17 +4,17 @@ import { cn } from "@/lib/utils"
 const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLink = cn(
-  "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focus
-)
-
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
   focus
 )
 
-const pages = [
+const navLink = cn(
+  "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+  focus
+)
+
+const navItems = [
   { label: "Approach", href: "/approach" },
   { label: "About", href: "/about" },
   { label: "Fees", href: "/fees" },
@@ -54,24 +54,24 @@ const notOffered = [
   "Reports for courts, employers or insurers.",
 ]
 
-function PageLinks({ className }: { className?: string }) {
+function NavLinks() {
   return (
-    <ul className={className}>
-      {pages.map((page) => {
-        const isCurrent = page.href === current
+    <>
+      {navItems.map((item) => {
+        const isCurrent = item.href === current
         return (
-          <li key={page.href}>
+          <li key={item.href}>
             <a
-              href={page.href}
+              href={item.href}
               aria-current={isCurrent ? "page" : undefined}
               className={cn(navLink, isCurrent && "underline")}
             >
-              {page.label}
+              {item.label}
             </a>
           </li>
         )
       })}
-    </ul>
+    </>
   )
 }
 
@@ -89,7 +89,9 @@ export function App() {
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <PageLinks className="flex flex-wrap gap-x-4 md:gap-x-7" />
+          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
+            <NavLinks />
+          </ul>
         </nav>
       </header>
 
@@ -126,8 +128,8 @@ export function App() {
               On this page
             </h2>
             <ol className="mt-4 list-none p-0">
-              {contents.map((item, index) => (
-                <li key={item.id} className={cn(index > 0 && "mt-2")}>
+              {contents.map((item, i) => (
+                <li key={item.id} className={cn(i > 0 && "mt-2")}>
                   <a href={`#${item.id}`} className={cn(textLink, "text-body")}>
                     {item.label}
                   </a>
@@ -136,7 +138,7 @@ export function App() {
             </ol>
           </nav>
 
-          <div className="mt-12 md:col-span-7 md:col-start-1 md:row-start-1 md:mt-0">
+          <div className="mt-12 md:col-span-7 md:row-start-1 md:mt-0">
             <h2 id="before" className="scroll-mt-7 text-h2">
               Before we meet
             </h2>
@@ -171,7 +173,7 @@ export function App() {
                   <p className="font-mono text-label text-muted-foreground md:col-span-2">
                     {step.label}
                   </p>
-                  <p className="mt-2 text-body md:col-span-5 md:mt-0">
+                  <p className="mt-2 max-w-xl text-body md:col-span-5 md:mt-0">
                     {step.text}
                   </p>
                 </li>
@@ -206,9 +208,9 @@ export function App() {
               <blockquote className="border-0 p-0">
                 <p className="font-heading text-h2 italic">
                   “I kept waiting to be told what was wrong with me. It took a
-                  few weeks to notice that nobody was going to, and that I could
-                  put things down in that room that I had carried everywhere
-                  else.”
+                  few weeks to notice that nobody was going to, and that I
+                  could put things down in that room that I had carried
+                  everywhere else.”
                 </p>
               </blockquote>
               <figcaption className="mt-4 font-mono text-label text-muted-foreground">
@@ -227,9 +229,9 @@ export function App() {
             <p className="mt-4 max-w-xl text-body">
               It is better to know this before you write.
             </p>
-            <ul className="mt-7 max-w-xl list-disc pl-7">
-              {notOffered.map((item, index) => (
-                <li key={item} className={cn("text-body", index > 0 && "mt-2")}>
+            <ul className="mt-7 max-w-xl list-disc pl-7 text-body">
+              {notOffered.map((item, i) => (
+                <li key={item} className={cn(i > 0 && "mt-2")}>
                   {item}
                 </li>
               ))}
@@ -292,7 +294,9 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <PageLinks />
+            <ul>
+              <NavLinks />
+            </ul>
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

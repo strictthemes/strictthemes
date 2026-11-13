@@ -7,61 +7,65 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const column = "mx-auto max-w-lg"
-const focus =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const plainLink = `text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focus}`
+
+const headerLink = `text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline ${focusRing}`
+
+const textLink = `text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground ${focusRing}`
+
 const label = "font-mono text-label text-muted-foreground"
-const cell = "px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0"
+
+const cellClass = "px-4 py-2 align-top whitespace-normal first:pl-0 last:pr-0"
 
 const sections = [
-  { id: "never-made", title: "A decision you cannot find was never made" },
+  { id: "why-write-it-down", title: "Why a decision needs a page" },
   { id: "where-notes-live", title: "Where each kind of note lives" },
-  { id: "writing-it-down", title: "How to write a decision down" },
+  { id: "writing-a-record", title: "How to write a decision record" },
   { id: "keeping-it-alive", title: "Keeping the record alive" },
 ]
 
 const notes = [
   {
     kind: "Decisions",
-    where: "The decision log, one page per record",
-    who: "Everyone, and every newcomer in their first week",
+    where: "The decision log, one page with the newest entry first",
+    who: "Everyone, and every new hire in their first week",
   },
   {
     kind: "Meeting notes",
-    where: "The shared folder for that meeting",
-    who: "The people who were invited",
+    where: "A shared folder, one document per meeting",
+    who: "The people who were there, and anyone who missed it",
   },
   {
-    kind: "How we work",
-    where: "The team handbook",
-    who: "Everyone, whenever something in it changes",
+    kind: "How we do things",
+    where: "The team handbook, edited in place",
+    who: "Anyone doing the task for the first time",
   },
   {
-    kind: "Project plans",
-    where: "The project’s own page",
-    who: "The people on the project and whoever funds it",
+    kind: "Quick updates",
+    where: "Team chat, and nowhere else",
+    who: "Whoever is online that day",
   },
 ]
 
-const template = `Decision:           Move the weekly planning call from Monday 9:00 to Tuesday 10:00, from the first week of May.
-Date:               14 April 2026
-Who decided:        Ines Marlow (team lead), with Tomas Reyes and Priya Anand
-Why:                Monday mornings go to clearing the weekend's support queue, so the call kept starting late.
-When to look again: 30 June 2026, after the first full quarter on the new day.`
+const template = `Decision:           Move all customer email to the shared support inbox and close the three personal aliases.
+Date:               4 March 2026
+Who decided:        Priya Okafor (support lead) and Tomas Reyes (founder)
+Why:                Replies went missing when someone was away. We turned down a forwarding rule because it hid who had answered.
+When to look again: 4 September 2026, or sooner if first replies take longer than a working day.`
 
 export function App() {
   return (
     <div className="mx-auto max-w-3xl px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-y-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={`font-heading text-h2 ${plainLink}`}>
+        <a href="/" className={`font-heading text-h2 ${headerLink}`}>
           A Handbook for Small Teams
         </a>
-        <nav aria-label="Main" className="flex gap-6 text-body">
-          <a href="/contents" className={plainLink}>
+        <nav aria-label="Main" className="flex gap-6">
+          <a href="/contents" className={headerLink}>
             Contents
           </a>
-          <a href="/about" className={plainLink}>
+          <a href="/about" className={headerLink}>
             About
           </a>
         </nav>
@@ -69,19 +73,16 @@ export function App() {
 
       <main>
         <article>
-          <div className={`${column} pt-24`}>
+          <div className="mx-auto max-w-lg pt-24">
             <p className={label}>Chapter 3 of 9</p>
-            <h1 className="mt-4 text-h1 md:text-display">
-              Writing things down
-            </h1>
+            <h1 className="mt-4 text-h1 md:text-display">Writing things down</h1>
             <p className="mt-6 font-heading text-h2 font-normal italic">
-              A decision is not made until it is written where the team can find
-              it. This chapter shows where to write each kind of note, and how
-              to keep the record worth reading.
+              A decision is not made until it is written where the team can
+              find it. This chapter shows where to write it, and how.
             </p>
           </div>
 
-          <div className={`${column} mt-12`}>
+          <div className="mx-auto mt-12 max-w-lg">
             <nav
               aria-labelledby="in-this-chapter"
               className="border-t border-b py-6"
@@ -92,7 +93,7 @@ export function App() {
               <ol className="mt-4 list-decimal pl-6">
                 {sections.map((section) => (
                   <li key={section.id} className="mt-2 first:mt-0">
-                    <a href={`#${section.id}`} className={plainLink}>
+                    <a href={`#${section.id}`} className={headerLink}>
                       {section.title}
                     </a>
                   </li>
@@ -101,63 +102,62 @@ export function App() {
             </nav>
           </div>
 
-          <div className={`${column} mt-12`}>
+          <div className="mx-auto mt-12 max-w-lg">
             <h2 id={sections[0].id} className="scroll-mt-6 text-h2">
               {sections[0].title}
             </h2>
             <p className="mt-4">
-              Most small teams make good decisions. They make them in a call, in
-              a corridor, or in a thread that runs to forty replies, and
-              everyone who was there leaves knowing what was agreed. Two weeks
-              later the person who missed the call asks the same question, and
-              the team spends another hour arriving at the same answer, or at a
-              slightly different one.
+              Most small teams decide things all day: in a call, in a chat
+              thread, in the five minutes after a meeting when two people stay
+              behind. The decision feels made, because everyone in the room
+              agreed. A week later someone who was not in the room asks the same
+              question, and the team either decides again or argues about what it
+              decided the first time.
             </p>
             <p className="mt-6">
-              This chapter rests on one rule: a decision is <em>not made</em>{" "}
-              until it is written down where the team can find it. Agreeing is
-              the easy half. The record is what lets someone act on the decision
-              without asking, and what lets the team change its mind on purpose
-              rather than by accident.
+              This chapter takes a narrow view. A decision is not made until it
+              is written down somewhere the whole team can find it without
+              asking. Until then it is a conversation, and conversations fade.
+              People remember the outcome they wanted, not the one they agreed
+              to, and almost nobody remembers the reasons.
             </p>
             <p className="mt-6">
-              At five people you can get away without it, because everyone hears
-              everything. Somewhere past eight that stops being true. People
-              join, people go on leave, and the one person who knew why the
-              invoice run moved to the third of the month is suddenly on a beach
-              without signal. What was common knowledge turns into folklore, and
-              folklore is hard to argue with.
+              Writing things down is not record-keeping for its own sake. In a
+              team of eight, the cost of a missing note is small each time and
+              large over a year: the same debate held three times, a new hire who
+              repeats an old mistake, a customer told two different things. A
+              short note takes a few minutes. Not writing it costs those hours{" "}
+              <em>again and again</em>.
             </p>
-            <aside className="my-12 rounded-xl border bg-card p-6">
-              <p className={label}>Try this</p>
-              <p className="mt-2">
-                Pick one decision your team made in the last fortnight that
-                lives only in a chat thread. Write it up in five lines using the
-                template in this chapter, and post the link back in the thread.
-                Then count how many people open it.
+            <blockquote className="my-12 border-l-2 border-primary pl-6">
+              <p className="font-heading text-h2 font-normal italic">
+                We stopped arguing about the past the week we started writing it
+                down.
               </p>
-            </aside>
+              <footer className={`mt-4 not-italic ${label}`}>
+                Ines Halvorsen, operations lead at Tallow &amp; Finch
+              </footer>
+            </blockquote>
             <p className="mt-6">
-              None of this needs a new tool. It needs a habit, a place, and a
-              short shape for each note, so that writing one takes two minutes
-              and reading one takes less.
+              The rest of this chapter covers where each kind of note belongs,
+              how to write a decision so that it holds up later, and how to keep
+              the record from going stale. If your team already keeps good
+              meeting notes, the habits from{" "}
+              <a href="#" className={textLink}>
+                chapter 2
+              </a>{" "}
+              carry over almost unchanged.
             </p>
 
             <h2 id={sections[1].id} className="mt-12 scroll-mt-6 text-h2">
               {sections[1].title}
             </h2>
             <p className="mt-4">
-              Teams lose notes in two ways: they write them nowhere, or they
-              write them everywhere. The second is almost as bad as the first,
-              because a reader who finds three versions of the holiday policy
-              has to guess which one is current. The fix is to agree, once,
-              where each kind of note goes and who is expected to read it.
-            </p>
-            <p className="mt-6">
-              Keep the list short. Most teams of our size need four places at
-              most, and the table below is the set we see working most often.
-              Yours may differ; what matters is that the team agrees on it and
-              that a newcomer can learn it in their first week.
+              A team that writes things down in five places has the same problem
+              as a team that writes nothing: no one knows where to look. Pick one
+              home for each kind of note and say it out loud, once, at a team
+              meeting. The table below is the split that most of the teams in
+              this handbook settled on.
             </p>
           </div>
 
@@ -167,13 +167,13 @@ export function App() {
               <Table label="What to write where" className="min-w-lg text-body">
                 <TableHeader>
                   <TableRow className="hover:bg-transparent">
-                    <TableHead className={`h-auto ${cell} ${label}`}>
+                    <TableHead className={`h-auto ${cellClass} ${label}`}>
                       Kind of note
                     </TableHead>
-                    <TableHead className={`h-auto ${cell} ${label}`}>
+                    <TableHead className={`h-auto ${cellClass} ${label}`}>
                       Where it lives
                     </TableHead>
-                    <TableHead className={`h-auto ${cell} ${label}`}>
+                    <TableHead className={`h-auto ${cellClass} ${label}`}>
                       Who reads it
                     </TableHead>
                   </TableRow>
@@ -181,9 +181,9 @@ export function App() {
                 <TableBody>
                   {notes.map((note) => (
                     <TableRow key={note.kind} className="hover:bg-transparent">
-                      <TableCell className={cell}>{note.kind}</TableCell>
-                      <TableCell className={cell}>{note.where}</TableCell>
-                      <TableCell className={cell}>{note.who}</TableCell>
+                      <TableCell className={cellClass}>{note.kind}</TableCell>
+                      <TableCell className={cellClass}>{note.where}</TableCell>
+                      <TableCell className={cellClass}>{note.who}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -191,108 +191,108 @@ export function App() {
             </div>
           </div>
 
-          <div className={column}>
+          <div className="mx-auto max-w-lg">
             <p className="mt-6">
-              Chat is missing from the table on purpose. It is good for deciding
-              and bad for keeping. When a thread reaches a decision, someone
-              copies the outcome to where it belongs and posts the link back
-              into the thread, so the next person to scroll up finds the record
-              and not just the argument.
+              Chat is the one place that should hold nothing you need next month.
+              It is fast and it scrolls away, which is right for a note that you
+              are running ten minutes late and wrong for a note that you are
+              dropping the annual plan. When a thread ends in a decision, the
+              person who closed it copies the outcome into the decision log and
+              posts the link back in the thread.
+            </p>
+            <p className="mt-6">
+              Keep the decision log in the same tool as the rest of your shared
+              documents, not in a special app. If it takes a new login to find a
+              decision, people will stop looking. A single page with the newest
+              entry at the top is enough for most teams for their first two
+              years.
             </p>
 
             <h2 id={sections[2].id} className="mt-12 scroll-mt-6 text-h2">
               {sections[2].title}
             </h2>
             <p className="mt-4">
-              A decision record should be short enough that nobody puts off
-              writing it. One screen is plenty. It says what was decided, when,
-              by whom, why, and when the team should look at it again. That last
-              line is the one most teams skip, and it is the one that keeps old
-              decisions from turning into rules nobody remembers choosing.
+              A good record is short. It answers the questions someone will ask
+              six months from now, when the people who made the call may be on
+              holiday or gone. Long write-ups get skimmed; a record of five lines
+              gets read.
             </p>
-            <p className="mt-6">
-              The <em>why</em> matters more than it seems on the day. Six months
-              on, the people who decided may have moved on, and the reason is
-              the only thing that lets someone tell whether the decision still
-              holds or whether the ground under it has shifted.
-            </p>
-            <p className="mt-6">
-              When a decision is made, whoever led the conversation takes these
-              four steps before the end of the day:
-            </p>
+            <p className="mt-6">To write one, do these four things in order:</p>
             <ol className="mt-6 list-decimal pl-6">
-              <li>Copy the template below into the team’s decision log.</li>
-              <li className="mt-2">
-                Fill in each line in plain words, as if for someone who was not
-                there.
+              <li>
+                Write the decision as one sentence that starts with a verb, such
+                as &ldquo;Move all customer email to the shared inbox.&rdquo;
               </li>
               <li className="mt-2">
-                Ask one other person who was in the room to read it and correct
-                it.
+                Add the date and the names of the people who decided, not
+                everyone who was in the room.
               </li>
               <li className="mt-2">
-                Post the link wherever the conversation happened.
+                Give the reason in two or three sentences, including the option
+                you turned down.
+              </li>
+              <li className="mt-2">
+                Set a date to look at it again, even if that date is a year away.
               </li>
             </ol>
             <div className="my-12">
-              <p className={label}>Decision record template</p>
+              <p className={label}>Decision record</p>
               <pre
                 tabIndex={0}
                 role="region"
                 aria-label="Decision record template"
-                className={`mt-2 overflow-x-auto rounded-xl border bg-card p-6 font-mono text-label text-foreground ${focus}`}
+                className={`mt-2 overflow-x-auto rounded-xl border bg-card p-6 font-mono text-label text-foreground ${focusRing}`}
               >
                 {template}
               </pre>
             </div>
             <p className="mt-6">
-              Writing the record falls to whoever led the conversation, not to a
-              dedicated note-taker. That keeps the job small and spread out, and
-              the person who ran the discussion is usually the one who knows
-              best what was settled and what was left open.
+              The last line matters more than it looks. Most decisions are right
+              for a while and then quietly stop being right. A review date turns
+              &ldquo;we have always done it this way&rdquo; into a question
+              someone is expected to ask. When the date comes, confirm the
+              decision in one line or write a new record that replaces it. Do not
+              edit the old one: the history of <em>why</em> you changed your mind
+              is part of the record.
             </p>
 
             <h2 id={sections[3].id} className="mt-12 scroll-mt-6 text-h2">
               {sections[3].title}
             </h2>
             <p className="mt-4">
-              A log nobody reads decays quickly. Once a month, take ten minutes
-              at the end of a regular meeting to look at the records whose
-              review date has passed. For each one, the team either confirms it,
-              changes it with a new record that links to the old one, or retires
-              it.
+              A log that nobody reads dies within a quarter. The fix is not a
+              rule that people must read it, but habits that make it useful. Link
+              to the record whenever the question comes up again, instead of
+              answering from memory. Start each planning meeting by reading out
+              the decisions due for review. Ask new people to read the last
+              twenty entries in their first week; it is the fastest history of
+              the team they will get.
             </p>
-            <p className="mt-6">
-              Never edit an old record to say something new. Mark it as replaced
-              and point to the record that replaces it. The history of how a
-              team changed its mind is useful on its own: it shows newcomers
-              which questions have already been argued, and it saves everyone
-              from having the argument again.
-            </p>
-            <blockquote className="my-12 border-l-2 border-primary pl-6">
-              <p className="font-heading text-h2 font-normal italic">
-                We stopped arguing about the same things twice, and that alone
-                gave us back an afternoon a week.
+            <aside className="my-12 rounded-xl border bg-card p-6">
+              <p className={label}>Try this</p>
+              <p className="mt-2">
+                Pick one decision your team made by talking this week and write
+                it up as a record, five lines and no more. Share the link where
+                the decision was first discussed. Then see how many people open
+                it before Friday.
               </p>
-              <footer className={`mt-4 not-italic ${label}`}>
-                Rosa Kettering, operations lead at Linden &amp; Hale
-              </footer>
-            </blockquote>
+            </aside>
             <p className="mt-6">
-              Expect the first month to feel slow. People forget, records come
-              out too long, and someone will ask whether this is really needed
-              for a team this size. Keep going. By the third month the log is
-              the first place people look, and questions that used to start a
-              meeting are answered with a link.
+              It also helps to name an owner for the log. That person does not
+              write every entry. They notice when a meeting ended in a decision
+              and no record followed, and they ask, kindly, who is writing it. In
+              most small teams this takes an hour a month and saves a good deal
+              more.
             </p>
             <p className="mt-6">
-              The next chapter turns to handing work over: what to write down
-              when a task changes hands, so the person picking it up does not
-              have to start from the beginning.
+              Finally, accept that some records will turn out wrong. The point is
+              not to be right forever. It is to make each decision visible enough
+              that the team can see when it has stopped working, and change it on
+              purpose rather than by drift.
             </p>
           </div>
 
-          <div className={`${column} mt-12`}>
+          <div className="mx-auto mt-12 max-w-lg">
             <section
               aria-labelledby="in-short"
               className="mb-12 rounded-xl border bg-card p-6"
@@ -302,30 +302,30 @@ export function App() {
               </h2>
               <ul className="mt-4 list-disc pl-6">
                 <li>
-                  A decision is made only when it is written where the team can
-                  find it.
+                  A decision is not made until it is written where the whole team
+                  can find it.
                 </li>
                 <li className="mt-2">
-                  Agree once where each kind of note lives, and use chat for
-                  deciding, not for keeping.
+                  Give each kind of note one home, and keep decisions out of
+                  chat.
                 </li>
                 <li className="mt-2">
-                  Give every record a date to look at it again, and replace old
-                  records instead of editing them.
+                  Write each decision in five lines, with a date to look at it
+                  again.
                 </li>
               </ul>
             </section>
           </div>
         </article>
 
-        <div className={`${column} mt-24`}>
+        <div className="mx-auto mt-24 max-w-lg">
           <nav
             aria-label="Chapters"
             className="grid grid-cols-2 gap-6 border-t pt-6"
           >
             <a
               href="#"
-              className={`group justify-self-start text-foreground transition-colors duration-150 ${focus}`}
+              className={`group justify-self-start text-foreground transition-colors duration-150 ${focusRing}`}
             >
               <span className={`block ${label}`}>Previous</span>
               <span className="mt-2 block text-body text-foreground decoration-1 underline-offset-4 group-hover:underline">
@@ -334,7 +334,7 @@ export function App() {
             </a>
             <a
               href="#"
-              className={`group justify-self-end text-right text-foreground transition-colors duration-150 ${focus}`}
+              className={`group justify-self-end text-right text-foreground transition-colors duration-150 ${focusRing}`}
             >
               <span className={`block ${label}`}>Next</span>
               <span className="mt-2 block text-body text-foreground decoration-1 underline-offset-4 group-hover:underline">
@@ -349,12 +349,10 @@ export function App() {
         <div className="border-t py-12">
           <p className="font-heading text-h2">A Handbook for Small Teams</p>
           <p className="mt-2">
-            A practical guide for teams of five to fifteen people, written by
-            people who have run them.
+            A practical guide to working well in a team of five to fifteen
+            people, one habit per chapter.
           </p>
-          <p className={`mt-6 ${label}`}>
-            © 2026 Ferrow Press · All rights reserved
-          </p>
+          <p className={`mt-6 ${label}`}>© 2026 Harrow Lane Press</p>
         </div>
       </footer>
     </div>

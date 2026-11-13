@@ -1,8 +1,16 @@
-import { useMemo, useRef, useState, type KeyboardEvent } from "react"
+import { useRef, useState } from "react"
+import type { KeyboardEvent } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -23,8 +31,8 @@ type Part = {
   load: number
   stock: StockState
   price: number
-  badge?: string
   href: string
+  badge?: string
 }
 
 const PARTS: Part[] = [
@@ -106,8 +114,8 @@ const PARTS: Part[] = [
     load: 14.6,
     stock: "In stock",
     price: 3.46,
-    badge: "New",
     href: "#",
+    badge: "New",
   },
   {
     number: "TVL-3062-RS",
@@ -151,191 +159,145 @@ const PARTS: Part[] = [
   },
 ]
 
-const BORE_RANGES = [
+const NAV_LINKS = [
+  { label: "Catalogue", href: "/catalogue", current: true },
+  { label: "Compare", href: "/compare", current: false },
+  { label: "Downloads", href: "/downloads", current: false },
+  { label: "Quote", href: "/quote", current: false },
+]
+
+const BORE_OPTIONS = [
   { id: "bore-10-17", label: "10 to 17", min: 10, max: 17 },
   { id: "bore-20-30", label: "20 to 30", min: 20, max: 30 },
   { id: "bore-35-45", label: "35 to 45", min: 35, max: 45 },
-] as const
+]
 
-const SEALS = [
+const SEAL_OPTIONS = [
   { id: "seal-rs", label: "Rubber seals, RS", suffix: "RS" },
   { id: "seal-zz", label: "Metal shields, ZZ", suffix: "ZZ" },
-] as const
+]
 
-type SortKey = "bore" | "number" | "load" | "price"
+const STOCK_OPTION = { id: "stock-only", label: "In stock only" }
 
-const SORTS: { value: SortKey; label: string }[] = [
+const SORT_ITEMS = [
   { value: "bore", label: "Bore, smallest first" },
   { value: "number", label: "Part number, A to Z" },
   { value: "load", label: "Load rating, highest first" },
   { value: "price", label: "Unit price, lowest first" },
 ]
 
-const NAV = [
-  { label: "Catalogue", href: "/catalogue" },
-  { label: "Compare", href: "/compare" },
-  { label: "Downloads", href: "/downloads" },
-  { label: "Quote", href: "/quote" },
-]
-const CURRENT_NAV = "Catalogue"
+const STOCK_DOT: Record<StockState, string> = {
+  "In stock": "bg-success",
+  "Low stock": "bg-muted-foreground",
+  "Made to order": "bg-muted-foreground",
+  Discontinued: "bg-destructive",
+}
 
-const focusRing =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const textLink = cn(
+const TEXT_LINK = cn(
   "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
-  focusRing
+  FOCUS
 )
-const buttonClass = "px-4 font-mono text-label"
-const labelClass = "font-mono text-label text-muted-foreground"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-
-const twoDecimals = new Intl.NumberFormat("en-GB", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
+const LABEL = "font-mono text-label text-muted-foreground"
+const SMALL_FIGURE = "font-mono text-label text-muted-foreground tabular-nums"
+const BUTTON = "px-4 font-mono text-label"
+const HEAD = "px-4 font-mono text-label text-muted-foreground"
+const FIGURE_CELL = "px-4 py-2 text-right font-mono tabular-nums"
 
 function byNumber(a: Part, b: Part) {
   return a.number < b.number ? -1 : a.number > b.number ? 1 : 0
 }
 
-function StockLabel({ state }: { state: StockState }) {
-  const dot =
-    state === "In stock"
-      ? "bg-success"
-      : state === "Discontinued"
-        ? "bg-destructive"
-        : "bg-muted-foreground"
-  return (
-    <span className="inline-flex items-center gap-2 whitespace-nowrap">
-      <span
-        aria-hidden="true"
-        className={cn("size-2 shrink-0 rounded-full", dot)}
-      />
-      <span className="text-body text-foreground">{state}</span>
-    </span>
-  )
-}
-
-function CheckOption({
-  id,
-  label,
-  checked,
-  onChange,
-  inputRef,
-}: {
-  id: string
-  label: string
-  checked: boolean
-  onChange: (checked: boolean) => void
-  inputRef?: React.Ref<HTMLElement>
-}) {
-  const textId = `${id}-text`
-  return (
-    <label className="flex items-center gap-2 text-body text-foreground">
-      <Checkbox
-        ref={inputRef}
-        className="rounded-sm"
-        checked={checked}
-        onCheckedChange={(value) => onChange(value)}
-        aria-labelledby={textId}
-      />
-      <span id={textId}>{label}</span>
-    </label>
-  )
-}
-
-function NavLinks({ itemClass }: { itemClass?: string }) {
-  return NAV.map((item) => {
-    const current = item.label === CURRENT_NAV
-    return (
-      <li key={item.href}>
-        <a
-          href={item.href}
-          aria-current={current ? "true" : undefined}
-          className={cn(
-            "font-mono text-label transition-colors duration-150",
-            focusRing,
-            current
-              ? "text-foreground underline underline-offset-4"
-              : "text-muted-foreground hover:text-foreground",
-            itemClass
-          )}
-        >
-          {item.label}
-        </a>
-      </li>
-    )
+function sortParts(parts: Part[], sort: string) {
+  const sorted = [...parts]
+  sorted.sort((a, b) => {
+    let order = 0
+    if (sort === "bore") order = a.bore - b.bore
+    else if (sort === "load") order = b.load - a.load
+    else if (sort === "price") order = a.price - b.price
+    return order !== 0 ? order : byNumber(a, b)
   })
+  return sorted
+}
+
+function navLinkClass(current: boolean) {
+  return cn(
+    "font-mono text-label transition-colors duration-150",
+    current
+      ? "text-foreground underline underline-offset-4"
+      : "text-muted-foreground hover:text-foreground",
+    FOCUS
+  )
 }
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [checked, setChecked] = useState<string[]>([])
+  const [sort, setSort] = useState("bore")
   const menuButtonRef = useRef<HTMLButtonElement>(null)
   const firstCheckboxRef = useRef<HTMLElement>(null)
 
-  const [bores, setBores] = useState<string[]>([])
-  const [seals, setSeals] = useState<string[]>([])
-  const [inStockOnly, setInStockOnly] = useState(false)
-  const [sort, setSort] = useState<SortKey>("bore")
+  const filterSet = checked.length > 0
 
-  const filterSet = bores.length > 0 || seals.length > 0 || inStockOnly
+  const bores = BORE_OPTIONS.filter((option) => checked.includes(option.id))
+  const seals = SEAL_OPTIONS.filter((option) => checked.includes(option.id))
+  const stockOnly = checked.includes(STOCK_OPTION.id)
 
-  const rows = useMemo(() => {
-    const boreRanges = BORE_RANGES.filter((r) => bores.includes(r.id))
-    const suffixes = SEALS.filter((s) => seals.includes(s.id)).map(
-      (s) => s.suffix
+  const rows = sortParts(
+    PARTS.filter(
+      (part) =>
+        (bores.length === 0 ||
+          bores.some((b) => part.bore >= b.min && part.bore <= b.max)) &&
+        (seals.length === 0 ||
+          seals.some((s) => part.number.endsWith(`-${s.suffix}`))) &&
+        (!stockOnly || part.stock === "In stock" || part.stock === "Low stock")
+    ),
+    sort
+  )
+
+  const total = PARTS.length
+  const noun = total === 1 ? "part" : "parts"
+  const count = filterSet
+    ? `${rows.length} of ${total} ${noun}`
+    : `${total} ${noun}`
+
+  function toggle(id: string, on: boolean) {
+    setChecked((current) =>
+      on
+        ? [...current.filter((item) => item !== id), id]
+        : current.filter((item) => item !== id)
     )
-    const filtered = PARTS.filter((part) => {
-      if (
-        boreRanges.length > 0 &&
-        !boreRanges.some((r) => part.bore >= r.min && part.bore <= r.max)
-      ) {
-        return false
-      }
-      if (
-        suffixes.length > 0 &&
-        !suffixes.some((s) => part.number.endsWith(`-${s}`))
-      ) {
-        return false
-      }
-      if (
-        inStockOnly &&
-        part.stock !== "In stock" &&
-        part.stock !== "Low stock"
-      ) {
-        return false
-      }
-      return true
-    })
-    return [...filtered].sort((a, b) => {
-      let diff = 0
-      if (sort === "bore") diff = a.bore - b.bore
-      else if (sort === "load") diff = b.load - a.load
-      else if (sort === "price") diff = a.price - b.price
-      return diff !== 0 ? diff : byNumber(a, b)
-    })
-  }, [bores, seals, inStockOnly, sort])
-
-  const count = !filterSet
-    ? `${PARTS.length} ${PARTS.length === 1 ? "part" : "parts"}`
-    : `${rows.length} of ${PARTS.length} parts`
-
-  function toggle(list: string[], id: string, on: boolean) {
-    return on ? [...list, id] : list.filter((x) => x !== id)
   }
 
   function clearFilters() {
-    setBores([])
-    setSeals([])
-    setInStockOnly(false)
+    setChecked([])
     firstCheckboxRef.current?.focus()
   }
 
-  function onMenuKeyDown(event: KeyboardEvent) {
+  function closeMenuOnEscape(event: KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape" && menuOpen) {
       setMenuOpen(false)
       menuButtonRef.current?.focus()
     }
+  }
+
+  function option(id: string, label: string, first = false) {
+    return (
+      <label
+        key={id}
+        className="flex items-center gap-2 text-body text-foreground"
+      >
+        <Checkbox
+          ref={first ? firstCheckboxRef : undefined}
+          className="rounded-sm"
+          checked={checked.includes(id)}
+          onCheckedChange={(on) => toggle(id, on)}
+          aria-labelledby={`${id}-text`}
+        />
+        <span id={`${id}-text`}>{label}</span>
+      </label>
+    )
   }
 
   return (
@@ -344,43 +306,60 @@ export function App() {
         <div className="mx-auto flex w-full max-w-[1280px] items-center gap-6 px-4 py-3">
           <a
             href="/catalogue"
-            className={cn(
-              "font-heading text-h2 text-foreground transition-colors duration-150",
-              focusRing
-            )}
+            className={cn("font-heading text-h2 text-foreground", FOCUS)}
           >
             Torvale
           </a>
           <nav aria-label="Main" className="hidden md:block">
             <ul className="flex gap-6">
-              <NavLinks />
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "true" : undefined}
+                    className={navLinkClass(link.current)}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
-          <p className={cn("ml-auto hidden md:block", smallFigure)}>
+          <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
             Sales 01632 960 418
           </p>
           <Button
             ref={menuButtonRef}
             variant="secondary"
-            className={cn("ml-auto md:hidden", buttonClass)}
+            className={cn(BUTTON, "ml-auto md:hidden")}
             aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
+            aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
-            onKeyDown={onMenuKeyDown}
+            onKeyDown={closeMenuOnEscape}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-menu"
+          id="main-menu"
           aria-label="Main"
           hidden={!menuOpen}
-          className="w-full border-t border-border md:hidden"
-          onKeyDown={onMenuKeyDown}
+          className="border-t border-border md:hidden"
+          onKeyDown={closeMenuOnEscape}
         >
           <div className="mx-auto w-full max-w-[1280px] px-4">
             <ul className="py-2">
-              <NavLinks itemClass="block py-2" />
+              {NAV_LINKS.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "true" : undefined}
+                    className={cn("block py-2", navLinkClass(link.current))}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </nav>
@@ -397,7 +376,7 @@ export function App() {
                       href="/catalogue"
                       className={cn(
                         "text-muted-foreground underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                        focusRing
+                        FOCUS
                       )}
                     >
                       Catalogue
@@ -411,7 +390,7 @@ export function App() {
                       href="#"
                       className={cn(
                         "text-muted-foreground underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-                        focusRing
+                        FOCUS
                       )}
                     >
                       Ball bearings
@@ -430,10 +409,7 @@ export function App() {
             <div className="flex flex-wrap gap-2">
               <a
                 href="/downloads"
-                className={cn(
-                  buttonVariants({ variant: "secondary" }),
-                  buttonClass
-                )}
+                className={cn(buttonVariants({ variant: "secondary" }), BUTTON)}
               >
                 Range documents
               </a>
@@ -455,7 +431,7 @@ export function App() {
                 <h2 className="text-h2">Filters</h2>
                 <Button
                   variant="secondary"
-                  className={buttonClass}
+                  className={BUTTON}
                   disabled={!filterSet}
                   onClick={clearFilters}
                 >
@@ -465,127 +441,145 @@ export function App() {
 
               <div
                 role="group"
-                aria-labelledby="group-bore"
+                aria-labelledby="bore-label"
                 className="flex flex-col gap-2"
               >
-                <p id="group-bore" className={labelClass}>
+                <p id="bore-label" className={LABEL}>
                   Bore (mm)
                 </p>
-                {BORE_RANGES.map((range, index) => (
-                  <CheckOption
-                    key={range.id}
-                    id={range.id}
-                    label={range.label}
-                    checked={bores.includes(range.id)}
-                    onChange={(on) =>
-                      setBores((list) => toggle(list, range.id, on))
-                    }
-                    inputRef={index === 0 ? firstCheckboxRef : undefined}
-                  />
-                ))}
+                {BORE_OPTIONS.map((item, index) =>
+                  option(item.id, item.label, index === 0)
+                )}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="group-seals"
+                aria-labelledby="seals-label"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="group-seals" className={labelClass}>
+                <p id="seals-label" className={LABEL}>
                   Seals
                 </p>
-                {SEALS.map((seal) => (
-                  <CheckOption
-                    key={seal.id}
-                    id={seal.id}
-                    label={seal.label}
-                    checked={seals.includes(seal.id)}
-                    onChange={(on) =>
-                      setSeals((list) => toggle(list, seal.id, on))
-                    }
-                  />
-                ))}
+                {SEAL_OPTIONS.map((item) => option(item.id, item.label))}
               </div>
 
               <div
                 role="group"
-                aria-labelledby="group-stock"
+                aria-labelledby="stock-label"
                 className="flex flex-col gap-2 border-t border-border pt-4"
               >
-                <p id="group-stock" className={labelClass}>
+                <p id="stock-label" className={LABEL}>
                   Stock
                 </p>
-                <CheckOption
-                  id="stock-only"
-                  label="In stock only"
-                  checked={inStockOnly}
-                  onChange={setInStockOnly}
-                />
+                {option(STOCK_OPTION.id, STOCK_OPTION.label)}
               </div>
 
               <div className="flex flex-col gap-3 border-t border-border pt-4">
-                <label htmlFor="sort" className={cn("block", labelClass)}>
+                <label htmlFor="sort-by" className={cn("block", LABEL)}>
                   Sort by
                 </label>
-                <div className="flex w-full flex-col gap-2">
-                  <select
-                    id="sort"
+                <div className="flex flex-col gap-2">
+                  <Select
+                    items={SORT_ITEMS}
                     value={sort}
-                    onChange={(event) => setSort(event.target.value as SortKey)}
-                    className={cn(
-                      "h-8 w-full rounded-lg border border-input bg-card px-2 text-body text-foreground aria-invalid:border-destructive",
-                      focusRing
-                    )}
+                    onValueChange={(value) => {
+                      if (value !== null) setSort(value)
+                    }}
                   >
-                    {SORTS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="sort-by">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SORT_ITEMS.map((item) => (
+                        <SelectItem key={item.value} value={item.value}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </aside>
 
-            <section
-              aria-labelledby="parts-heading"
-              className="min-w-0 overflow-hidden rounded-xl border border-border bg-card lg:col-span-9"
-            >
+            <div className="overflow-hidden rounded-xl border border-border bg-card lg:col-span-9">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
-                <h2 id="parts-heading" className="text-h2">
-                  Parts
-                </h2>
-                <p aria-live="polite" className={smallFigure}>
+                <h2 className="text-h2">Parts</h2>
+                <p aria-live="polite" className={SMALL_FIGURE}>
                   {count}
                 </p>
               </div>
-
               <Table label="Parts" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn("px-4", labelClass)}>
-                      Part number
-                    </TableHead>
-                    <TableHead className={cn("px-4 text-right", labelClass)}>
+                    <TableHead className={HEAD}>Part number</TableHead>
+                    <TableHead className={cn(HEAD, "text-right")}>
                       Bore (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", labelClass)}>
+                    <TableHead className={cn(HEAD, "text-right")}>
                       Outside (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", labelClass)}>
+                    <TableHead className={cn(HEAD, "text-right")}>
                       Width (mm)
                     </TableHead>
-                    <TableHead className={cn("px-4 text-right", labelClass)}>
+                    <TableHead className={cn(HEAD, "text-right")}>
                       Load C (kN)
                     </TableHead>
-                    <TableHead className={cn("px-4", labelClass)}>
-                      Stock
-                    </TableHead>
-                    <TableHead className={cn("px-4 text-right", labelClass)}>
+                    <TableHead className={HEAD}>Stock</TableHead>
+                    <TableHead className={cn(HEAD, "text-right")}>
                       Unit price (£)
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
+                  {rows.map((part) => (
+                    <TableRow key={part.number}>
+                      <TableCell className="px-4 py-2">
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={part.href}
+                            className={cn("font-mono text-body", TEXT_LINK)}
+                          >
+                            {part.number}
+                          </a>
+                          {part.badge ? (
+                            <Badge
+                              variant="outline"
+                              className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
+                            >
+                              {part.badge}
+                            </Badge>
+                          ) : null}
+                        </div>
+                      </TableCell>
+                      <TableCell className={FIGURE_CELL}>{part.bore}</TableCell>
+                      <TableCell className={FIGURE_CELL}>
+                        {part.outside}
+                      </TableCell>
+                      <TableCell className={FIGURE_CELL}>
+                        {part.width}
+                      </TableCell>
+                      <TableCell className={FIGURE_CELL}>
+                        {part.load.toFixed(2)}
+                      </TableCell>
+                      <TableCell className="px-4 py-2">
+                        <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "size-2 shrink-0 rounded-full",
+                              STOCK_DOT[part.stock]
+                            )}
+                          />
+                          <span className="text-body text-foreground">
+                            {part.stock}
+                          </span>
+                        </span>
+                      </TableCell>
+                      <TableCell className={FIGURE_CELL}>
+                        {part.price.toFixed(2)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                   {rows.length === 0 ? (
                     <TableRow>
                       <TableCell
@@ -593,12 +587,12 @@ export function App() {
                         className="px-4 py-12 whitespace-normal"
                       >
                         <div className="flex flex-col items-start gap-3">
-                          <p className="text-body text-foreground">
+                          <p className="text-body">
                             No parts match these filters.
                           </p>
                           <Button
                             variant="secondary"
-                            className={buttonClass}
+                            className={BUTTON}
                             onClick={clearFilters}
                           >
                             Clear filters
@@ -606,65 +600,23 @@ export function App() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    rows.map((part) => (
-                      <TableRow key={part.number}>
-                        <TableCell className="px-4 py-2">
-                          <span className="flex items-center gap-2">
-                            <a
-                              href={part.href}
-                              className={cn("font-mono text-body", textLink)}
-                            >
-                              {part.number}
-                            </a>
-                            {part.badge ? (
-                              <Badge
-                                variant="outline"
-                                className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
-                              >
-                                {part.badge}
-                              </Badge>
-                            ) : null}
-                          </span>
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {part.bore}
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {part.outside}
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {part.width}
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {twoDecimals.format(part.load)}
-                        </TableCell>
-                        <TableCell className="px-4 py-2">
-                          <StockLabel state={part.stock} />
-                        </TableCell>
-                        <TableCell className="px-4 py-2 text-right font-mono tabular-nums">
-                          {twoDecimals.format(part.price)}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                  ) : null}
                 </TableBody>
               </Table>
-
               <div className="border-t border-border px-4 py-3">
-                <p className={smallFigure}>
+                <p className={SMALL_FIGURE}>
                   Unit prices are for 1 to 49 and exclude VAT. Price breaks for
                   larger quantities are on each part&apos;s page.
                 </p>
               </div>
-            </section>
+            </div>
           </div>
         </div>
       </main>
 
       <footer className="border-t border-border">
         <div className="mx-auto w-full max-w-[1280px] px-4 py-6">
-          <p className={smallFigure}>
+          <p className={SMALL_FIGURE}>
             Torvale Bearings Ltd · Brigholt works · Prices exclude VAT · A demo:
             nothing is sold or sent.
           </p>

@@ -2,24 +2,27 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focus =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 const navLink = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focus
+  focusRing
 )
 
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focus
+  focusRing
 )
 
-const label = "font-mono text-label"
 const card = "rounded-xl border border-border bg-card p-7"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
 
-const links = [
+const label = "font-mono text-label"
+
+const badge =
+  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground"
+
+const navItems = [
   { label: "Approach", href: "/approach" },
   { label: "About", href: "/about" },
   { label: "Fees", href: "/fees" },
@@ -72,22 +75,31 @@ const steps = [
 ]
 
 const inShort = [
-  { term: "In person", value: "The Garden Room, 14 Orchard Row, Larkmere" },
-  { term: "Online", value: "By video, with a link I send the day before" },
-  { term: "Evenings", value: "On Wednesdays, until 20:00" },
+  {
+    term: "In person",
+    value: "The Garden Room, 14 Orchard Row, Larkmere",
+  },
+  {
+    term: "Online",
+    value: "By video, with a link I send the day before",
+  },
+  {
+    term: "Evenings",
+    value: "On Wednesdays, until 20:00",
+  },
 ]
 
-function NavList() {
+function NavList({ vertical = false }: { vertical?: boolean }) {
   return (
-    <>
-      {links.map((link) => (
-        <li key={link.href}>
-          <a href={link.href} className={navLink}>
-            {link.label}
+    <ul className={vertical ? undefined : "flex flex-wrap gap-x-4 md:gap-x-7"}>
+      {navItems.map((item) => (
+        <li key={item.href}>
+          <a href={item.href} className={navLink}>
+            {item.label}
           </a>
         </li>
       ))}
-    </>
+    </ul>
   )
 }
 
@@ -99,20 +111,21 @@ export function App() {
           href="/"
           className={cn(
             "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
-            focus
+            focusRing
           )}
         >
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
-            <NavList />
-          </ul>
+          <NavList />
         </nav>
       </header>
 
       <main>
-        <section aria-labelledby="opening-heading" className={cn(grid, "mt-12 md:mt-28")}>
+        <section
+          aria-labelledby="opening-heading"
+          className="mt-12 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-7"
+        >
           <p className={cn(label, "text-muted-foreground md:col-span-12")}>
             Psychotherapy · Larkmere and online
           </p>
@@ -122,19 +135,22 @@ export function App() {
           >
             A quiet room, and <em className="italic">time to think</em>
           </h1>
-          <p className="mt-7 max-w-xl md:col-start-1 md:col-span-7">
+          <p className="mt-7 max-w-xl md:col-span-7 md:col-start-1">
             I am Nora Ellingham, a psychotherapist. I work with adults, one to
             one, in a garden room in Larkmere and online. You do not need to
             know what to say before you come.
           </p>
-          <p className="mt-7 md:col-start-1 md:col-span-7">
+          <p className="mt-7 md:col-span-7 md:col-start-1">
             <a href="#how-it-starts" className={textLink}>
               How it starts
             </a>
           </p>
         </section>
 
-        <section aria-labelledby="bring-heading" className={cn(grid, "mt-28")}>
+        <section
+          aria-labelledby="bring-heading"
+          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+        >
           <div className="md:col-span-4">
             <h2 id="bring-heading" className="text-h2">
               What people bring
@@ -144,7 +160,7 @@ export function App() {
               name yet. Both are fine.
             </p>
           </div>
-          <div className="mt-7 md:col-start-6 md:col-span-7 md:mt-0">
+          <div className="mt-7 md:col-span-7 md:col-start-6 md:mt-0">
             <ul className="list-none border-b border-border p-0">
               {concerns.map((item) => (
                 <li key={item.title} className="border-t border-border py-4">
@@ -162,16 +178,16 @@ export function App() {
 
         <section
           id="how-it-starts"
-          aria-labelledby="starts-heading"
+          aria-labelledby="how-heading"
           className="mt-28 scroll-mt-7"
         >
-          <h2 id="starts-heading" className="text-h2">
+          <h2 id="how-heading" className="text-h2">
             How it starts
           </h2>
           <p className="mt-4 max-w-xl">
             Three steps, at your own pace. You can stop after any of them.
           </p>
-          <ol className={cn(grid, "mt-7 list-none p-0")}>
+          <ol className="mt-7 grid list-none grid-cols-1 p-0 md:grid-cols-12 md:gap-x-7">
             {steps.map((step, index) => (
               <li
                 key={step.title}
@@ -194,7 +210,10 @@ export function App() {
           </ol>
         </section>
 
-        <section aria-labelledby="who-heading" className={cn(grid, "mt-28")}>
+        <section
+          aria-labelledby="who-heading"
+          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+        >
           <div className="md:col-span-7">
             <h2 id="who-heading" className="text-h2">
               Who you would be talking to
@@ -228,15 +247,15 @@ export function App() {
               </a>
             </p>
           </div>
-          <div className={cn(card, "mt-12 md:col-start-9 md:col-span-4 md:mt-0")}>
+          <div
+            className={cn(card, "mt-12 md:col-span-4 md:col-start-9 md:mt-0")}
+          >
             <h3 className="text-h2">In short</h3>
             <dl className="mt-4">
               {inShort.map((row, index) => (
-                <div key={row.term} className={cn(index > 0 && "mt-4")}>
+                <div key={row.term} className={index > 0 ? "mt-4" : undefined}>
                   <dt>
-                    <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground">
-                      {row.term}
-                    </Badge>
+                    <Badge className={badge}>{row.term}</Badge>
                   </dt>
                   <dd className="mt-2">{row.value}</dd>
                 </div>
@@ -245,7 +264,10 @@ export function App() {
           </div>
         </section>
 
-        <section aria-labelledby="fee-heading" className={cn(grid, "mt-28")}>
+        <section
+          aria-labelledby="fee-heading"
+          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+        >
           <div className="md:col-span-8">
             <p className={cn(label, "text-muted-foreground")}>
               Fees from{" "}
@@ -257,9 +279,8 @@ export function App() {
               A session is 50 minutes and costs £68
             </h2>
             <p className="mt-4 max-w-xl">
-              The first call is 20 minutes and free. I send one invoice a
-              month, and there is no charge if you cancel with 48 hours&rsquo;
-              notice.
+              The first call is 20 minutes and free. I send one invoice a month,
+              and there is no charge if you cancel with 48 hours' notice.
             </p>
             <p className="mt-7">
               <a href="/fees" className={textLink}>
@@ -269,7 +290,10 @@ export function App() {
           </div>
         </section>
 
-        <section aria-labelledby="ready-heading" className={cn(grid, "mt-28")}>
+        <section
+          aria-labelledby="ready-heading"
+          className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
+        >
           <div className={cn(card, "md:col-span-8")}>
             <h2 id="ready-heading" className="text-h2">
               When you are ready
@@ -294,13 +318,13 @@ export function App() {
       </main>
 
       <footer className="mt-28 border-t border-border py-12">
-        <div className={grid}>
+        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
           <div className="md:col-span-7">
             <p className="font-heading text-h2">Nora Ellingham</p>
             <p className={cn(label, "mt-2 text-muted-foreground")}>
               Registered psychotherapist · Larkmere and online
             </p>
-            <address className="mt-7 not-italic">
+            <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
             <p className="mt-2">
@@ -311,11 +335,9 @@ export function App() {
           </div>
           <nav
             aria-label="Footer"
-            className="mt-7 md:col-start-9 md:col-span-4 md:mt-0"
+            className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <ul className="list-none p-0">
-              <NavList />
-            </ul>
+            <NavList vertical />
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

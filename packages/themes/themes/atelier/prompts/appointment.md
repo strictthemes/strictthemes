@@ -5,7 +5,8 @@ description: a page for booking a fitting at a fashion house's atelier, with its
 order: 5
 checks:
   - The address is in an `<address>` element, and the opening hours are a `<dl>` with each time in a `<time>` element.
-  - Every field has a visible label, the time is a native `<select>` whose first option is an empty prompt, and a Sunday or a Monday in the date field gets its own error when the form is sent.
+  - Every field has a visible label, and a Sunday or a Monday chosen as the date gets its own error when the form is sent.
+  - 'The date is picked from the theme''s `Calendar` in a `Popover` and the time from the theme''s `Select`, with no `<input type="date">` and no native `<select>` on the page: both open under their fields as square boxes with a black hairline and no shadow, the chosen time has a check, today is underlined in the calendar, and the arrow keys, Enter and Escape work in both.'
   - Sending the form empty shows a message in words with an icon under each required field, and focus moves to the first of them.
   - A good booking is replaced by a confirmation in a `role="status"` element that was on the page from the start, and the confirmation repeats the date and the time.
 ---
@@ -43,10 +44,10 @@ A section in the grid with two parts.
 
 - An `<h2>` in `text-h2`: "Book a fitting".
 - With `mt-4`, one sentence in `text-body`: a tailor will confirm by email within a day.
-- With `mt-8`, the fields, `mt-8` apart (`npx shadcn@latest add input textarea`):
+- With `mt-8`, the fields, `mt-8` apart (`npx shadcn@latest add input textarea select calendar popover`):
   - "Your name": an `Input`.
   - "Email address": an `Input` of type `email`.
-  - A row with the date and the time: `md:grid md:grid-cols-2 md:gap-x-8`, each field in its own wrapper, the time's wrapper with `mt-8 md:mt-0`. On a phone the two stack. "Date": an `Input` of type `date`, with a `min` of tomorrow's date by the clock. The browser cannot refuse a weekday, so closed days are caught when the form is sent (see Behavior). "Time": a native `<select>` with the options `Choose a time` (empty value), `10:00`, `11:30`, `14:00`, `15:30` and `17:00`. Both follow the Date fields and Selects notes.
+  - A row with the date and the time: `xl:grid xl:grid-cols-2 xl:gap-x-8`, each field in its own wrapper, the time's wrapper with `mt-8 xl:mt-0`. Below `xl` the two stack: a date written out in full needs more room than half the form has before that. "Date": the `DatePicker` of the Date fields note, with no day chosen at first. A day before tomorrow by the clock cannot be chosen: give it `disabled={{ before: tomorrow }}` and `startMonth={tomorrow}`, where `tomorrow` is a `Date` at local midnight. Closed days can be chosen and are caught when the form is sent (see Behavior), where a message says why. "Time": a `Select` as the Selects note describes it, with the placeholder `Choose a time` and the choices `10:00`, `11:30`, `14:00`, `15:30` and `17:00`.
   - "Note (optional)": a `Textarea` with `min-h-32`. Under the label, with `mt-2`, a helper line: a `<p>` in `font-mono text-label text-muted-foreground`, not uppercased, "Tell us what you would like to try, or your size.", with an `id` (`note-help`) that the textarea's `aria-describedby` names at all times. Here, instead of the Inputs note's `mt-2` under the label, the textarea has `mt-2` under the helper line.
 - With `mt-8`, the default button "Request a fitting", `type="submit"`. The page's only default button.
 
@@ -56,11 +57,11 @@ The footer from the layout notes.
 
 ### On a phone
 
-The atelier's details come first and the form after them, at the full width, with `mt-16` between. The date and time fields stack. The form keeps its `p-8`. Inputs and the select take the full width of the form. The send button is `w-full md:w-auto`: full width on a phone, its own width from `md` up.
+The atelier's details come first and the form after them, at the full width, with `mt-16` between. The date and time fields stack. The form keeps its `p-8`. Inputs, the date field and the select take the full width of the form. The send button is `w-full md:w-auto`: full width on a phone, its own width from `md` up.
 
 ### Behavior
 
 - **Sending:** check each field in code, in this order. Empty name: "Write your name." Empty or malformed email: "Write an email address such as name@example.com." No date: "Choose a day." A date before tomorrow (tomorrow itself is fine): "Choose a day from tomorrow on." A Sunday or a Monday: "The atelier is closed on Sundays and Mondays. Choose another day." No time: "Choose a time." A Saturday with 17:00, under the time field: "On Saturdays the last fitting is at 15:30." Show one error per field, the first that applies, under that field. The Saturday error is also removed when the date changes, as the Errors note says. Focus moves to the first field with an error. The note is not checked: its `aria-describedby` names only its helper line.
-- **Reading the date:** read the date field's value (`2026-11-19`) as a calendar date, not through `new Date()` on the string, which would read it in UTC and can shift the day.
+- **Reading the date:** the date field's value is a `Date` at local midnight, or `undefined`. Read the weekday with `getDay()` and compare it with tomorrow as two local dates; never go through `toISOString()` or `new Date()` on a string such as `2026-11-19`, which read in UTC and can shift the day.
 - **Confirmation:** when all is good, the form is replaced by the message in the status element, drawn as the Confirmations note says: an `<h2>` in `text-h2`, "Your fitting is requested", with `tabIndex={-1}` and focus moved to it, then with `mt-4` a sentence in `text-body` that repeats the day and the time as `<time>` elements with `dateTime` and the email address as written: "Thursday 19 November 2026 at 11:30. We will confirm to ines@example.com within a day." After the status element, in the same wrapper and only while the message shows, an `outline` button with `mt-8`, "Book another fitting", which empties the status element, brings the empty form back and moves focus to the name field.
 - Nothing is sent anywhere: the confirmation is shown in the page.

@@ -1,19 +1,34 @@
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focus =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const label = "font-mono text-label uppercase"
-const labelLink = `${label} text-foreground hover:underline underline-offset-4 transition-colors duration-150 ${focus}`
-const headlineLink = `text-foreground hover:underline decoration-2 underline-offset-4 transition-colors duration-150 ${focus}`
-const mastheadLink = `font-heading uppercase text-foreground hover:underline decoration-2 underline-offset-4 transition-colors duration-150 ${focus}`
-const buttonClasses = "h-auto px-4 py-2 font-mono text-label uppercase"
-const num = "font-mono tabular-nums"
 
-const sections = [
+const CONTAINER = "mx-auto max-w-[1280px] px-4 md:px-6"
+
+const LABEL = "font-mono text-label uppercase"
+
+const BUTTON = "h-auto px-4 py-2 font-mono text-label uppercase"
+
+const HEADLINE_LINK = cn(
+  "text-foreground decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
+  FOCUS
+)
+
+const LABEL_LINK = cn(
+  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+  FOCUS
+)
+
+const MASTHEAD = cn(
+  "font-heading text-foreground uppercase decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
+  FOCUS
+)
+
+const SECTIONS = [
   "News",
   "Politics",
   "City",
@@ -24,105 +39,115 @@ const sections = [
   "Opinion",
 ]
 
-type Picture = { scene: string; caption: string }
+type When = { text: string; dateTime: string }
+
+type Picture = { alt: string; caption: string; credit: string }
 
 type Story = {
   kicker: string
   headline: string
-  text: string
+  sentence: string
   byline: string
-  time: string
-  dateTime: string
+  when: When
   picture?: Picture
-  extra?: ReactNode
+  labelLink?: string
 }
 
-const sideStories: Story[] = [
+const today = (time: string): When => ({
+  text: time,
+  dateTime: `2026-11-11T${time}`,
+})
+
+const TOP_STORIES: Story[] = [
   {
-    kicker: "Travel",
-    headline: "Buses fill gap as bridge closes",
-    text: "Six extra routes will run over the Mill Lane crossing from Thursday, the transport office said.",
+    kicker: "Traffic",
+    headline: "Queues reach two miles at North Quay",
+    sentence:
+      "Drivers heading for the Tannery Road crossing waited up to 50 minutes this morning, in the first full rush hour of the detour.",
     byline: "Priya Venkataraman",
-    time: "08:10",
-    dateTime: "2026-11-11T08:10",
+    when: today("08:10"),
     picture: {
-      scene: "A line of red buses queueing on Harbour Road in the morning rain",
-      caption: "BUSES ON HARBOUR ROAD ON WEDNESDAY · PHOTOGRAPH: ODILE MARSH",
+      alt: "Two lanes of cars and vans standing still on North Quay, with the river on the left",
+      caption: "Traffic on North Quay this morning",
+      credit: "Odile Marsh",
     },
   },
   {
+    kicker: "Council",
+    headline: "Leader faces revolt over £48m bill",
+    sentence:
+      "Four members of the ruling group say they will not back the repair unless the harbour board pays a share of it.",
+    byline: "Tomas Reye",
+    when: today("09:40"),
+  },
+  {
+    kicker: "Business",
+    headline: "Quay traders ask for rates relief",
+    sentence:
+      "Shops on Kessel Street say their takings fell by a third on the first day without the bridge.",
+    byline: "Marit Okafor",
+    when: today("10:25"),
+  },
+  {
     kicker: "Health",
-    headline: "New clinic for East Quay",
-    text: "The East Quay health centre opens on Monday with eight doctors and a walk-in service.",
-    byline: "Tomas Argyle",
-    time: "07:50",
-    dateTime: "2026-11-11T07:50",
-  },
-  {
-    kicker: "Courts",
-    headline: "Landlord fined £60,000",
-    text: "A Fennick Road landlord left 14 flats without heating for most of last winter.",
-    byline: "Maren Cole",
-    time: "07:20",
-    dateTime: "2026-11-11T07:20",
-  },
-  {
-    kicker: "Weather",
-    headline: "Gales due on Friday",
-    text: "Forecasters expect gusts of up to 70mph along the harbour wall from Friday afternoon.",
-    byline: "Jonas Pell",
-    time: "06:55",
-    dateTime: "2026-11-11T06:55",
+    headline: "Ambulances get a base south of river",
+    sentence:
+      "Two crews move to the old depot on Coldharbour Lane today, so that calls south of the river are not held up by the detour.",
+    byline: "Elias Brandt",
+    when: today("11:05"),
   },
   {
     kicker: "Schools",
-    headline: "Two schools to merge",
-    text: "St Brede's and Harbour Lane primary schools will share one site from September 2027.",
-    byline: "Ada Okonjo",
-    time: "06:30",
-    dateTime: "2026-11-11T06:30",
+    headline: "Bus passes free for 900 pupils",
+    sentence:
+      "Pupils who walked over the bridge to Saint Orrin's School get a free pass for the 14 bus from Thursday.",
+    byline: "Nadia Ferreira",
+    when: today("12:30"),
   },
 ]
 
-const frontSections: { name: string; all: string; stories: Story[] }[] = [
+const PAGE_SECTIONS: { name: string; all: string; stories: Story[] }[] = [
   {
     name: "Politics",
     all: "All politics",
     stories: [
       {
         kicker: "Budget",
-        headline: "Opposition sets out £12m budget plan",
-        text: "The Harbour Party would cut the council's office costs to pay for free school buses.",
-        byline: "Owen Tallis",
-        time: "09:40",
-        dateTime: "2026-11-11T09:40",
+        headline: "Rivals would freeze rents for a year",
+        sentence:
+          "The opposition's budget plan would hold council rents for twelve months and pay for it by selling the Marlowe Road offices.",
+        byline: "Tomas Reye",
+        when: today("07:20"),
         picture: {
-          scene: "Opposition leader Clara Voss speaking at a lectern in the Guildhall",
-          caption: "CLARA VOSS AT THE GUILDHALL · PHOTOGRAPH: ODILE MARSH",
+          alt: "A woman in a grey coat holding a printed budget plan on the steps of the Guildhall",
+          caption: "Corin Ashdown at the Guildhall",
+          credit: "Lena Voss",
         },
       },
       {
-        kicker: "Election",
-        headline: "Northgate votes on 3 December",
-        text: "A by-election will choose a new councillor after Ian Raffe stood down in October.",
+        kicker: "By-election",
+        headline: "Eastquay vote set for 3 December",
+        sentence:
+          "Voters in Eastquay ward choose a new councillor on Thursday 3 December, after Bram Holloway stood down in October.",
+        byline: "Marit Okafor",
+        when: today("09:05"),
+        picture: {
+          alt: "The brick front of Eastquay Library, with a polling station sign by the door",
+          caption: "Eastquay Library, a polling station",
+          credit: "Odile Marsh",
+        },
+      },
+      {
+        kicker: "Council pay",
+        headline: "Row as chief's pay rises by £18,000",
+        sentence:
+          "Unions call the chief executive's rise an insult in a year when the council froze the pay of 1,400 staff.",
         byline: "Hana Lindqvist",
-        time: "10:05",
-        dateTime: "2026-11-11T10:05",
+        when: today("11:45"),
         picture: {
-          scene: "A polling station sign outside Northgate community hall",
-          caption: "NORTHGATE COMMUNITY HALL · PHOTOGRAPH: BEN ORRELL",
-        },
-      },
-      {
-        kicker: "Council",
-        headline: "Row over 9% rise in council pay",
-        text: "Councillors vote next week on raising their own allowances to £14,800 a year.",
-        byline: "Owen Tallis",
-        time: "11:20",
-        dateTime: "2026-11-11T11:20",
-        picture: {
-          scene: "The empty council chamber with its rows of green benches",
-          caption: "THE COUNCIL CHAMBER · PHOTOGRAPH: BEN ORRELL",
+          alt: "Union members with banners outside the council offices on Marlowe Road",
+          caption: "Union members on Marlowe Road",
+          credit: "Lena Voss",
         },
       },
     ],
@@ -133,46 +158,42 @@ const frontSections: { name: string; all: string; stories: Story[] }[] = [
     stories: [
       {
         kicker: "Football",
-        headline: "Harriers see off Saltgate in derby",
-        text: "A late header from Dani Reyes settled the derby in front of 11,400 fans at Quayside Park.",
-        byline: "Felix Morrow",
-        time: "07:05",
-        dateTime: "2026-11-11T07:05",
+        headline: "Harriers take derby with late goal",
+        sentence:
+          "Port Avery Harriers beat Saltgate United 2-1 at Mill Lane on Tuesday night, after Jory Pell scored in the 88th minute.",
+        byline: "Dell Armitage",
+        when: today("08:30"),
+        labelLink: "Results",
         picture: {
-          scene: "Port Avery Harriers players celebrating a goal in front of a packed stand",
-          caption: "DANI REYES CELEBRATES THE WINNER · PHOTOGRAPH: SAM KEEL",
+          alt: "A footballer in a striped shirt running towards the crowd with both arms raised",
+          caption: "Jory Pell after his goal",
+          credit: "Sem Dacre",
         },
-        extra: (
-          <>
-            {" · "}
-            <a href="#" className={labelLink}>
-              Results
-            </a>
-          </>
-        ),
       },
       {
         kicker: "Swimming",
-        headline: "Nell Ashby sets 200m record",
-        text: "The 19-year-old swam the 200m butterfly in 2:06.41 at the national championships.",
-        byline: "Greta Holm",
-        time: "TUE 10 NOV",
-        dateTime: "2026-11-10",
+        headline: "Teenager breaks city 400m record",
+        sentence:
+          "Ines Carrow, 17, swam the 400m freestyle in 4:09.31 at the Dockside Pool, the fastest time by a Port Avery swimmer.",
+        byline: "Ruth Anselm",
+        when: { text: "Tue 10 Nov", dateTime: "2026-11-10" },
         picture: {
-          scene: "A swimmer in a white cap touching the wall at the end of a race",
-          caption: "NELL ASHBY AT THE FINISH · PHOTOGRAPH: SAM KEEL",
+          alt: "A swimmer in a white cap resting on the lane rope and looking up at the clock",
+          caption: "Ines Carrow at the Dockside Pool",
+          credit: "Sem Dacre",
         },
       },
       {
         kicker: "Football",
-        headline: "Westmere name new manager",
-        text: "Former Harriers coach Leon Banda has signed a three-year deal at Westmere Athletic.",
-        byline: "Felix Morrow",
-        time: "12:30",
-        dateTime: "2026-11-11T12:30",
+        headline: "Westmere name Hale as new manager",
+        sentence:
+          "Westmere Athletic have given Gideon Hale a contract to the end of next season, eight days after Paul Strand left.",
+        byline: "Dell Armitage",
+        when: today("12:15"),
         picture: {
-          scene: "Leon Banda holding a Westmere Athletic scarf on the touchline",
-          caption: "LEON BANDA AT WESTMERE ROAD · PHOTOGRAPH: SAM KEEL",
+          alt: "A man in a dark club jacket standing at the edge of an empty pitch",
+          caption: "Gideon Hale at Fenner Park",
+          credit: "Lena Voss",
         },
       },
     ],
@@ -183,326 +204,355 @@ const frontSections: { name: string; all: string; stories: Story[] }[] = [
     stories: [
       {
         kicker: "Markets",
-        headline: "Last day for Canal Street market",
-        text: "Traders close their stalls on Saturday after 140 years, and the hall will become flats.",
-        byline: "Maren Cole",
-        time: "08:45",
-        dateTime: "2026-11-11T08:45",
+        headline: "Last day for the Fish Quay market",
+        sentence:
+          "The Fish Quay market trades for the last time today after 112 years, before its hall is turned into flats.",
+        byline: "Nadia Ferreira",
+        when: today("07:50"),
         picture: {
-          scene: "Fruit and vegetable stalls under the iron roof of Canal Street market",
-          caption: "CANAL STREET MARKET ON WEDNESDAY · PHOTOGRAPH: ODILE MARSH",
+          alt: "A fishmonger weighing mackerel at a stall under the iron roof of the market hall",
+          caption: "A stall at the Fish Quay market",
+          credit: "Odile Marsh",
         },
       },
       {
         kicker: "Ferries",
-        headline: "Ferry times change on Monday",
-        text: "The Saltgate ferry will run every 20 minutes at peak hours while the bridge is shut.",
-        byline: "Jonas Pell",
-        time: "09:15",
-        dateTime: "2026-11-11T09:15",
+        headline: "First ferry moves to 05:40 from Monday",
+        sentence:
+          "The Saltgate ferry starts 35 minutes earlier and runs every 20 minutes at peak times while the bridge is shut.",
+        byline: "Elias Brandt",
+        when: today("10:10"),
         picture: {
-          scene: "A small passenger ferry leaving the pier with the harbour behind it",
-          caption: "THE SALTGATE FERRY AT WEST PIER · PHOTOGRAPH: BEN ORRELL",
+          alt: "A small white ferry leaving the Saltgate landing stage in grey morning light",
+          caption: "The Saltgate ferry at the landing stage",
+          credit: "Sem Dacre",
         },
       },
       {
         kicker: "Housing",
-        headline: "Winter night shelter opens early",
-        text: "The shelter at St Anne's Hall opens a week early with 40 beds and 60 volunteers.",
-        byline: "Ada Okonjo",
-        time: "10:50",
-        dateTime: "2026-11-11T10:50",
+        headline: "Night shelter opens with 60 beds",
+        sentence:
+          "The winter night shelter at Saint Orrin's Hall opens tonight, three weeks earlier than last year.",
+        byline: "Priya Venkataraman",
+        when: today("13:20"),
         picture: {
-          scene: "Rows of camp beds with folded blankets in a church hall",
-          caption: "ST ANNE'S HALL ON TUESDAY · PHOTOGRAPH: BEN ORRELL",
+          alt: "Rows of made-up camp beds in a church hall with tall windows",
+          caption: "Beds at Saint Orrin's Hall",
+          credit: "Odile Marsh",
         },
       },
     ],
   },
 ]
 
-function Figure({ picture, aspect = "aspect-3/2" }: { picture: Picture; aspect?: string }) {
+function Figure({
+  picture,
+  ratio,
+}: {
+  picture: Picture
+  ratio: "aspect-3/2" | "aspect-video"
+}) {
   return (
     <figure className="flex flex-col gap-2">
-      <div role="img" aria-label={picture.scene} className={cn(aspect, "w-full bg-muted")} />
-      <figcaption className={`${label} text-muted-foreground`}>{picture.caption}</figcaption>
+      <div
+        role="img"
+        aria-label={picture.alt}
+        className={cn("w-full bg-muted", ratio)}
+      />
+      <figcaption className={cn(LABEL, "text-muted-foreground")}>
+        {picture.caption} · Photograph: {picture.credit}
+      </figcaption>
     </figure>
   )
 }
 
 function LabelLine({ story }: { story: Story }) {
   return (
-    <p className={`${label} text-muted-foreground`}>
+    <p className={cn(LABEL, "text-muted-foreground")}>
       By {story.byline} ·{" "}
-      <time dateTime={story.dateTime} className={num}>
-        {story.time}
+      <time dateTime={story.when.dateTime} className="font-mono tabular-nums">
+        {story.when.text}
       </time>
-      {story.extra}
+      {story.labelLink ? (
+        <>
+          {" "}
+          ·{" "}
+          <a href="#" className={LABEL_LINK}>
+            {story.labelLink}
+          </a>
+        </>
+      ) : null}
     </p>
   )
 }
 
 function StoryUnit({
   story,
-  headlineClass,
-  pictureAspect,
+  size,
+  ratio,
+  className,
 }: {
   story: Story
-  headlineClass: string
-  pictureAspect?: string
+  size: "small" | "h2"
+  ratio: "aspect-3/2" | "aspect-video"
+  className?: string
 }) {
   return (
-    <article className="flex flex-col gap-2">
-      {story.picture && <Figure picture={story.picture} aspect={pictureAspect} />}
-      <p className={`${label} text-foreground`}>{story.kicker}</p>
-      <h3 className={headlineClass}>
-        <a href="#" className={headlineLink}>
+    <article className={cn("flex flex-col gap-2", className)}>
+      {story.picture ? <Figure picture={story.picture} ratio={ratio} /> : null}
+      <p className={cn(LABEL, "text-foreground")}>{story.kicker}</p>
+      <h3
+        className={
+          size === "h2"
+            ? "text-h2 uppercase"
+            : "font-heading text-body font-bold uppercase"
+        }
+      >
+        <a href="#" className={HEADLINE_LINK}>
           {story.headline}
         </a>
       </h3>
-      <p className="max-w-xl text-body">{story.text}</p>
+      <p className="max-w-xl text-body">{story.sentence}</p>
       <LabelLine story={story} />
     </article>
   )
 }
 
-function Masthead({ className }: { className: string }) {
+function SectionLinks({ className }: { className: string }) {
   return (
-    <a href="/" className={cn(mastheadLink, className)}>
-      The Port Avery Ledger
-    </a>
-  )
-}
-
-function Header() {
-  const [open, setOpen] = useState(false)
-  const buttonRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!open) return
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false)
-        buttonRef.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
-  }, [open])
-
-  return (
-    <header>
-      <div className="mx-auto max-w-[1280px] px-4 md:px-6">
-        <div className="flex items-center justify-between gap-4 py-2">
-          <time dateTime="2026-11-11" className={`${label} ${num} text-muted-foreground`}>
-            Wednesday 11 November 2026
-          </time>
-          <a href="#" className={cn(buttonVariants(), buttonClasses)}>
-            Subscribe
+    <>
+      {SECTIONS.map((name) => (
+        <li key={name}>
+          <a href="#" className={cn(LABEL, LABEL_LINK, className)}>
+            {name}
           </a>
-        </div>
-        <div className="flex items-center justify-between gap-4 border-t-2 py-4 md:justify-center">
-          <Masthead className="text-h2 md:text-h1" />
-          <Button
-            ref={buttonRef}
-            variant="outline"
-            className={cn(buttonClasses, "md:hidden")}
-            aria-expanded={open}
-            aria-controls="mobile-sections"
-            onClick={() => setOpen((value) => !value)}
-          >
-            Menu
-          </Button>
-        </div>
-        <nav aria-label="Sections" className="hidden border-y py-2 md:block">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {sections.map((name) => (
-              <li key={name}>
-                <a href="#" className={labelLink}>
-                  {name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <nav
-          id="mobile-sections"
-          aria-label="Sections"
-          hidden={!open}
-          className="border-b py-2 md:hidden"
-        >
-          <ul>
-            {sections.map((name) => (
-              <li key={name}>
-                <a href="#" className={cn(labelLink, "block py-2")}>
-                  {name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </header>
-  )
-}
-
-function LeadRow() {
-  return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
-      <article className="flex flex-col gap-4 lg:col-span-8 lg:pr-6">
-        <div className="flex items-center gap-2">
-          <p className={`${label} text-foreground`}>Transport</p>
-          <Badge className="h-auto rounded-none border-transparent bg-tertiary px-2 py-1 font-mono text-label uppercase text-tertiary-foreground">
-            Exclusive
-          </Badge>
-        </div>
-        <h1 className="text-h1 uppercase md:text-display">
-          <a href="#" className={headlineLink}>
-            Bridge shut for six months
-          </a>
-        </h1>
-        <p className="max-w-3xl font-sans text-h2 font-normal">
-          Inspectors found cracked bearings under the Kessel Street Bridge, and the
-          council votes tonight on a £48m repair to reopen the city's main river crossing.
-        </p>
-        <p className={`${label} text-muted-foreground`}>
-          By Hana Lindqvist ·{" "}
-          <time dateTime="2026-11-11T06:15" className={num}>
-            06:15
-          </time>
-        </p>
-        <Figure
-          picture={{
-            scene:
-              "The Kessel Street Bridge closed behind metal barriers, with an empty roadway and the river below",
-            caption: "THE KESSEL STREET BRIDGE ON TUESDAY · PHOTOGRAPH: ODILE MARSH",
-          }}
-        />
-      </article>
-      <section
-        aria-labelledby="more-top-stories"
-        className="border-t pt-4 lg:col-span-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6"
-      >
-        <h2 id="more-top-stories" className="sr-only">
-          More top stories
-        </h2>
-        <ul className="flex flex-col gap-4">
-          {sideStories.map((story, index) => (
-            <li key={story.headline} className={index > 0 ? "border-t pt-4" : undefined}>
-              <StoryUnit
-                story={story}
-                headlineClass="font-heading text-body font-bold uppercase"
-                pictureAspect="aspect-video"
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
-  )
-}
-
-function LiveStrip() {
-  return (
-    <section
-      aria-labelledby="live-heading"
-      className="flex flex-col gap-2 border bg-card p-4 md:flex-row md:flex-wrap md:items-baseline md:gap-x-6 md:gap-y-2 md:p-6"
-    >
-      <h2
-        id="live-heading"
-        className="inline-flex items-center gap-2 font-mono text-label uppercase text-primary"
-      >
-        <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-primary" />
-        Live
-      </h2>
-      <h3 className="font-heading text-body font-bold uppercase">
-        <a href="#" className={headlineLink}>
-          Bridge vote: council meets at 18:00
-        </a>
-      </h3>
-      <p className="flex items-baseline gap-2 md:flex-1">
-        <time
-          dateTime="2026-11-11T17:30"
-          className={`${label} ${num} text-muted-foreground`}
-        >
-          17:30
-        </time>
-        <span className="text-body">
-          Councillors are arriving at the Guildhall, where about 200 people have
-          gathered outside.
-        </span>
-      </p>
-    </section>
-  )
-}
-
-function FrontSection({ section }: { section: (typeof frontSections)[number] }) {
-  const id = `section-${section.name.toLowerCase()}`
-  return (
-    <section aria-labelledby={id} className="flex flex-col gap-4">
-      <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
-        <h2 id={id} className="font-mono text-label uppercase text-foreground">
-          {section.name}
-        </h2>
-        <a href="#" className={labelLink}>
-          {section.all}
-        </a>
-      </div>
-      <ul className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-0">
-        {section.stories.map((story, index) => (
-          <li
-            key={story.headline}
-            className={cn(
-              index > 0 && "border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6",
-              index < section.stories.length - 1 && "md:pr-6"
-            )}
-          >
-            <StoryUnit story={story} headlineClass="text-h2 uppercase" />
-          </li>
-        ))}
-      </ul>
-    </section>
-  )
-}
-
-function Footer() {
-  return (
-    <footer>
-      <div className="mx-auto flex max-w-[1280px] flex-col gap-4 border-t-2 px-4 py-6 md:px-6">
-        <Masthead className="self-start text-h2" />
-        <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {sections.map((name) => (
-              <li key={name}>
-                <a href="#" className={labelLink}>
-                  {name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <p className={`${label} text-muted-foreground`}>
-          © <span className={num}>2026</span> The Port Avery Ledger · Port Avery
-        </p>
-      </div>
-    </footer>
+        </li>
+      ))}
+    </>
   )
 }
 
 export function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false)
+        menuButton.current?.focus()
+      }
+    }
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [menuOpen])
+
   return (
-    <div className="bg-background text-body text-foreground">
-      <Header />
+    <div className="text-body">
+      <header>
+        <div className={CONTAINER}>
+          <div className="flex items-center justify-between gap-4 py-2">
+            <time
+              dateTime="2026-11-11"
+              className={cn(LABEL, "text-muted-foreground tabular-nums")}
+            >
+              Wednesday 11 November 2026
+            </time>
+            <a
+              href="#"
+              className={cn(buttonVariants({ variant: "default" }), BUTTON)}
+            >
+              Subscribe
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 border-t-2 py-4 md:justify-center">
+            <a href="/" className={cn(MASTHEAD, "text-h2 md:text-h1")}>
+              The Port Avery Ledger
+            </a>
+            <Button
+              ref={menuButton}
+              variant="outline"
+              className={cn(BUTTON, "md:hidden")}
+              aria-expanded={menuOpen}
+              aria-controls="section-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              Menu
+            </Button>
+          </div>
+
+          <nav aria-label="Sections" className="hidden border-y py-2 md:block">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <SectionLinks className="" />
+            </ul>
+          </nav>
+
+          <nav
+            id="section-menu"
+            aria-label="Sections"
+            hidden={!menuOpen}
+            className="border-b py-2 md:hidden"
+          >
+            <ul>
+              <SectionLinks className="block py-2" />
+            </ul>
+          </nav>
+        </div>
+      </header>
+
       <main>
-        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 pt-6 pb-12 md:px-6">
-          <LeadRow />
-          <LiveStrip />
-          {frontSections.map((section) => (
-            <FrontSection key={section.name} section={section} />
-          ))}
+        <div className={cn(CONTAINER, "flex flex-col gap-12 pt-6 pb-12")}>
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
+            <article className="flex flex-col gap-4 lg:col-span-8 lg:pr-6">
+              <div className="flex items-center gap-2">
+                <p className={cn(LABEL, "text-foreground")}>Transport</p>
+                <Badge className="h-auto rounded-none border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase">
+                  Exclusive
+                </Badge>
+              </div>
+              <h1 className="text-h1 uppercase md:text-display">
+                <a href="#" className={HEADLINE_LINK}>
+                  Bridge shut for six months
+                </a>
+              </h1>
+              <p className="max-w-3xl font-sans text-h2 font-normal">
+                Inspectors found cracked bearings under the Kessel Street
+                Bridge, and the council votes tonight on a £48m repair.
+              </p>
+              <p className={cn(LABEL, "text-muted-foreground")}>
+                By Hana Lindqvist ·{" "}
+                <time
+                  dateTime="2026-11-11T06:15"
+                  className="font-mono tabular-nums"
+                >
+                  06:15
+                </time>
+              </p>
+              <Figure
+                ratio="aspect-3/2"
+                picture={{
+                  alt: "Steel barriers and a road closed sign across the empty roadway of the Kessel Street Bridge",
+                  caption: "The Kessel Street Bridge on Tuesday",
+                  credit: "Odile Marsh",
+                }}
+              />
+            </article>
+
+            <section
+              aria-labelledby="top-stories"
+              className="border-t pt-4 lg:col-span-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6"
+            >
+              <h2 id="top-stories" className="sr-only">
+                More top stories
+              </h2>
+              <ul className="flex flex-col gap-4">
+                {TOP_STORIES.map((story, index) => (
+                  <li
+                    key={story.headline}
+                    className={index > 0 ? "border-t pt-4" : undefined}
+                  >
+                    <StoryUnit
+                      story={story}
+                      size="small"
+                      ratio="aspect-video"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
+
+          <section
+            aria-labelledby="live"
+            className="flex flex-col gap-2 border bg-card p-4 md:flex-row md:flex-wrap md:items-baseline md:gap-x-6 md:gap-y-2 md:p-6"
+          >
+            <h2
+              id="live"
+              className="inline-flex items-center gap-2 font-mono text-label text-primary uppercase"
+            >
+              <span
+                aria-hidden="true"
+                className="size-2 shrink-0 rounded-full bg-primary"
+              />
+              Live
+            </h2>
+            <h3 className="font-heading text-body font-bold uppercase">
+              <a href="#" className={HEADLINE_LINK}>
+                Bridge vote: council meets at 18:00
+              </a>
+            </h3>
+            <p className="flex items-baseline gap-2 md:flex-1">
+              <time
+                dateTime="2026-11-11T17:30"
+                className={cn(LABEL, "text-muted-foreground tabular-nums")}
+              >
+                17:30
+              </time>
+              <span className="max-w-xl text-body">
+                Councillors are arriving at the Guildhall, where about 200
+                people are waiting for a seat in the public gallery.
+              </span>
+            </p>
+          </section>
+
+          {PAGE_SECTIONS.map((section) => {
+            const id = `section-${section.name.toLowerCase()}`
+            return (
+              <section
+                key={section.name}
+                aria-labelledby={id}
+                className="flex flex-col gap-4"
+              >
+                <div className="flex items-baseline justify-between gap-4 border-t-2 pt-2">
+                  <h2 id={id} className={cn(LABEL, "text-foreground")}>
+                    {section.name}
+                  </h2>
+                  <a href="#" className={cn(LABEL, LABEL_LINK)}>
+                    {section.all}
+                  </a>
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-0">
+                  {section.stories.map((story, index) => (
+                    <StoryUnit
+                      key={story.headline}
+                      story={story}
+                      size="h2"
+                      ratio="aspect-3/2"
+                      className={cn(
+                        index > 0 &&
+                          "border-t pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-6",
+                        index < section.stories.length - 1 && "md:pr-6"
+                      )}
+                    />
+                  ))}
+                </div>
+              </section>
+            )
+          })}
         </div>
       </main>
-      <Footer />
+
+      <footer>
+        <div className={cn(CONTAINER, "flex flex-col gap-4 border-t-2 py-6")}>
+          <a href="/" className={cn(MASTHEAD, "self-start text-h2")}>
+            The Port Avery Ledger
+          </a>
+          <nav aria-label="Footer">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <SectionLinks className="" />
+            </ul>
+          </nav>
+          <p className={cn(LABEL, "text-muted-foreground")}>
+            ©{" "}
+            <time dateTime="2026" className="font-mono tabular-nums">
+              2026
+            </time>{" "}
+            The Port Avery Ledger · Port Avery
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

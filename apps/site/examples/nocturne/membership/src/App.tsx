@@ -1,34 +1,38 @@
-import { useEffect, useRef, useState } from "react"
-import type { FormEvent, KeyboardEvent } from "react"
+import * as React from "react"
 import { CircleAlert } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
-type Period = "monthly" | "yearly"
 type PlanId = "friend" | "regular" | "patron"
+type Period = "monthly" | "yearly"
 
 type Plan = {
   id: PlanId
   name: string
   monthly: number
   yearly: number
-  perMonthYearly: string
-  forWhom: string
+  audience: string
   includes: string[]
 }
 
-const PLANS: Plan[] = [
+const plans: Plan[] = [
   {
     id: "friend",
     name: "Friend",
     monthly: 6,
     yearly: 60,
-    perMonthYearly: "£5",
-    forWhom:
-      "For anyone who comes a few times a season and wants the programme at home.",
+    audience:
+      "For people who come a few times a year and want the Vesper to stay open.",
     includes: [
       "10% off every ticket",
       "Members' screenings once a month",
@@ -40,9 +44,7 @@ const PLANS: Plan[] = [
     name: "Regular",
     monthly: 12,
     yearly: 120,
-    perMonthYearly: "£10",
-    forWhom:
-      "For people who see a film most weeks and like to book before the rush.",
+    audience: "For people who are here most weeks and like to book early.",
     includes: [
       "Two free tickets a month",
       "20% off every other ticket",
@@ -55,9 +57,7 @@ const PLANS: Plan[] = [
     name: "Patron",
     monthly: 25,
     yearly: 250,
-    perMonthYearly: "£20.83",
-    forWhom:
-      "For those who want to keep the Vesper running and have a seat to show for it.",
+    audience: "For people who treat Screen 2 as their second front room.",
     includes: [
       "Everything in Regular",
       "Four free tickets a month",
@@ -67,225 +67,226 @@ const PLANS: Plan[] = [
   },
 ]
 
-const START_DATE = "Wednesday 11 November 2026"
+const planItems = plans.map((plan) => ({ value: plan.id, label: plan.name }))
 
-const NAV_LINKS = [
-  { label: "Programme", href: "/" },
-  { label: "Seasons", href: "/season" },
-  { label: "Membership", href: "/membership" },
-  { label: "Visit", href: "/visit" },
+const periods: { id: Period; name: string }[] = [
+  { id: "monthly", name: "Monthly" },
+  { id: "yearly", name: "Yearly" },
 ]
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const CODE_FOCUS =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const BUTTON = "h-auto px-6 py-2 font-mono text-label uppercase"
-const LABEL = "font-mono text-label uppercase"
-const TEXT_LINK = cn(
-  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-primary",
-  FOCUS
-)
-const NAV_LINK = cn(
-  LABEL,
-  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
-)
-const FIELD_LABEL = "block font-mono text-label uppercase text-foreground"
-const INPUT = "mt-2 h-auto px-4 py-2 text-body md:text-body"
+const navLinks = [
+  { name: "Programme", href: "/" },
+  { name: "Seasons", href: "/season" },
+  { name: "Membership", href: "/membership" },
+  { name: "Visit", href: "/visit" },
+]
 
-function price(plan: Plan, period: Period) {
+const currentPath = "/membership"
+const startDate = "Wednesday 11 November 2026"
+
+const container = "mx-auto max-w-[1280px] px-4 md:px-6"
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-6"
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label uppercase"
+const navLink = cn(
+  label,
+  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+  focusOutline
+)
+const textLink = cn(
+  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-primary",
+  focusOutline
+)
+const buttonClasses = "h-auto px-6 py-2 font-mono text-label uppercase"
+const fieldLabel = "block font-mono text-label uppercase text-foreground"
+const fieldClasses = "mt-2 h-auto px-4 py-2 text-body md:text-body"
+const errorLine = "mt-2 flex items-start gap-2 text-body text-destructive"
+
+function pounds(amount: number) {
+  return Number.isInteger(amount) ? `£${amount}` : `£${amount.toFixed(2)}`
+}
+
+function priceOf(plan: Plan, period: Period) {
   return period === "monthly" ? plan.monthly : plan.yearly
 }
 
-function Header() {
-  const [open, setOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-
-  function onKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (open && event.key === "Escape") {
-      setOpen(false)
-      menuButton.current?.focus()
-    }
-  }
-
-  function linkClass(current: boolean) {
-    return cn(NAV_LINK, current && "underline")
-  }
-
-  return (
-    <header className="border-b border-border" onKeyDown={onKeyDown}>
-      <div className="mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 px-4 py-4 md:px-6">
-        <a
-          href="/"
-          className={cn(
-            "font-heading text-h2 text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-            FOCUS
-          )}
-        >
-          The Vesper
-        </a>
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex gap-6">
-            {NAV_LINKS.map((link) => {
-              const current = link.href === "/membership"
-              return (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={current ? "page" : undefined}
-                    className={linkClass(current)}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-        <Button
-          ref={menuButton}
-          variant="outline"
-          aria-expanded={open}
-          aria-controls="menu-small"
-          className={cn(BUTTON, "md:hidden")}
-          onClick={() => setOpen((value) => !value)}
-        >
-          Menu
-        </Button>
-      </div>
-      <nav
-        id="menu-small"
-        aria-label="Main"
-        hidden={!open}
-        className="border-t border-border md:hidden"
-      >
-        <div className="mx-auto max-w-[1280px] px-4 py-2 md:px-6">
-          <ul>
-            {NAV_LINKS.map((link) => {
-              const current = link.href === "/membership"
-              return (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={current ? "page" : undefined}
-                    className={cn(linkClass(current), "block py-2")}
-                    onClick={() => setOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      </nav>
-    </header>
-  )
+function priceWithUnit(plan: Plan, period: Period) {
+  return `${pounds(priceOf(plan, period))} ${
+    period === "monthly" ? "a month" : "a year"
+  }`
 }
 
-function Footer() {
-  return (
-    <footer className="mt-24 border-t border-border py-12">
-      <div className="mx-auto max-w-[1280px] px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-6">
-          <div className="md:col-span-6">
-            <p className="font-heading text-h2">The Vesper</p>
-            <p className="mt-2 text-body text-muted-foreground">
-              21 Tallow Row, Oldmere OM2 4LT
-            </p>
-          </div>
-          <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-body md:col-span-6 md:mt-0">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a href={link.href} className={TEXT_LINK}>
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p className={cn(LABEL, "mt-12 text-muted-foreground")}>
-          © 2026 The Vesper
-        </p>
-      </div>
-    </footer>
-  )
+function looksLikeEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
 }
 
 type Errors = { name?: string; email?: string }
-type Confirmation = { firstName: string; plan: Plan; period: Period }
+type Sent = { firstName: string; plan: Plan; period: Period }
 
 export function App() {
-  const [period, setPeriod] = useState<Period>("monthly")
-  const [planId, setPlanId] = useState<PlanId>("regular")
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [errors, setErrors] = useState<Errors>({})
-  const [confirmation, setConfirmation] = useState<Confirmation | null>(null)
+  const [menuOpen, setMenuOpen] = React.useState(false)
+  const [period, setPeriod] = React.useState<Period>("monthly")
+  const [planId, setPlanId] = React.useState<PlanId>("regular")
+  const [name, setName] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [errors, setErrors] = React.useState<Errors>({})
+  const [sent, setSent] = React.useState<Sent | null>(null)
 
-  const nameRef = useRef<HTMLInputElement>(null)
-  const emailRef = useRef<HTMLInputElement>(null)
-  const confirmRef = useRef<HTMLHeadingElement>(null)
+  const menuButtonRef = React.useRef<HTMLButtonElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const confirmationRef = React.useRef<HTMLHeadingElement>(null)
 
-  const plan = PLANS.find((p) => p.id === planId) ?? PLANS[1]
+  const chosenPlan = plans.find((plan) => plan.id === planId) ?? plans[1]
 
-  useEffect(() => {
-    if (confirmation) confirmRef.current?.focus()
-  }, [confirmation])
-
-  function choose(id: PlanId) {
-    if (confirmation) {
-      confirmRef.current?.focus()
-      return
+  React.useEffect(() => {
+    if (sent) {
+      confirmationRef.current?.focus()
     }
-    setPlanId(id)
-    nameRef.current?.focus()
+  }, [sent])
+
+  function handleHeaderKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape" && menuOpen) {
+      setMenuOpen(false)
+      menuButtonRef.current?.focus()
+    }
   }
 
-  function onSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const next: Errors = {}
-    if (name.trim() === "") next.name = "Enter your full name."
-    const value = email.trim()
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
-      next.email = "Enter an email address such as name@example.com."
+  function choosePlan(id: PlanId) {
+    setPlanId(id)
+    if (sent) {
+      confirmationRef.current?.focus()
+    } else {
+      nameRef.current?.focus()
     }
-    setErrors(next)
-    if (next.name) {
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
+    const nextErrors: Errors = {}
+
+    if (trimmedName === "") {
+      nextErrors.name = "Enter your full name."
+    }
+    if (!looksLikeEmail(trimmedEmail)) {
+      nextErrors.email = "Enter an email address such as name@example.com."
+    }
+
+    setErrors(nextErrors)
+
+    if (nextErrors.name) {
       nameRef.current?.focus()
       return
     }
-    if (next.email) {
+    if (nextErrors.email) {
       emailRef.current?.focus()
       return
     }
-    setConfirmation({
-      firstName: name.trim().split(/\s+/)[0],
-      plan,
+
+    setSent({
+      firstName: trimmedName.split(/\s+/)[0],
+      plan: chosenPlan,
       period,
     })
   }
 
-  const summaryPrice =
-    period === "monthly" ? `£${plan.monthly} a month` : `£${plan.yearly} a year`
-
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <Header />
-      <main className="mx-auto max-w-[1280px] px-4 pt-12 md:px-6">
+      <header className="border-b border-border" onKeyDown={handleHeaderKeyDown}>
+        <div
+          className={cn(
+            container,
+            "flex flex-wrap items-center justify-between gap-4 py-4"
+          )}
+        >
+          <a
+            href="/"
+            className={cn(
+              "font-heading text-h2 text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
+              focusOutline
+            )}
+          >
+            The Vesper
+          </a>
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex gap-6">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === currentPath ? "page" : undefined
+                    }
+                    className={cn(
+                      navLink,
+                      link.href === currentPath && "underline"
+                    )}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <Button
+            ref={menuButtonRef}
+            variant="outline"
+            aria-expanded={menuOpen}
+            aria-controls="main-menu"
+            onClick={() => setMenuOpen((open) => !open)}
+            className={cn(buttonClasses, "md:hidden")}
+          >
+            Menu
+          </Button>
+        </div>
+        <nav
+          id="main-menu"
+          aria-label="Main"
+          hidden={!menuOpen}
+          className="border-t border-border md:hidden"
+        >
+          <div className={cn(container, "py-2")}>
+            <ul>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === currentPath ? "page" : undefined
+                    }
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      navLink,
+                      "block py-2",
+                      link.href === currentPath && "underline"
+                    )}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </header>
+
+      <main className={cn(container, "pt-12")}>
         <section>
-          <p className={cn(LABEL, "text-muted-foreground")}>Membership</p>
+          <p className={cn(label, "text-muted-foreground")}>Membership</p>
           <div className="mt-2 max-w-4xl">
             <h1 className="text-h1 md:text-display">
               Become a member of the Vesper
             </h1>
           </div>
           <p className="mt-6 max-w-xl">
-            Members keep the Vesper open after dark. Your fee pays for the late
-            shows that start after the last bus, for the upkeep of the 35mm
-            projector in Screen 1, and for the seasons we build each autumn and
-            spring, with prints borrowed from archives across the country.
+            Membership pays for what ticket sales alone do not: the late shows
+            that start after the last bus, the 35mm projector in Screen 2 and
+            the person who keeps it running, and the seasons we programme
+            around one director, one country or one year.
           </p>
         </section>
 
@@ -297,74 +298,78 @@ export function App() {
               aria-label="Billing period"
               className="flex flex-wrap gap-2"
             >
-              {(["monthly", "yearly"] as const).map((value) => (
+              {periods.map((item) => (
                 <Button
-                  key={value}
-                  variant={period === value ? "secondary" : "outline"}
-                  aria-pressed={period === value}
-                  className={BUTTON}
-                  onClick={() => setPeriod(value)}
+                  key={item.id}
+                  variant={period === item.id ? "secondary" : "outline"}
+                  aria-pressed={period === item.id}
+                  onClick={() => setPeriod(item.id)}
+                  className={buttonClasses}
                 >
-                  {value === "monthly" ? "Monthly" : "Yearly"}
+                  {item.name}
                 </Button>
               ))}
             </div>
-            <p className={cn(LABEL, "text-muted-foreground")}>
+            <p className={cn(label, "text-muted-foreground")}>
               Yearly · two months free
             </p>
           </div>
 
           <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {PLANS.map((p) => (
+            {plans.map((plan) => (
               <article
-                key={p.id}
+                key={plan.id}
                 className="flex flex-col rounded-xl border border-border bg-card p-6"
               >
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-h2">{p.name}</h3>
-                  {p.id === "regular" && (
+                {plan.id === "regular" ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-h2">{plan.name}</h3>
                     <Badge
                       variant="secondary"
                       className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
                     >
                       Recommended
                     </Badge>
-                  )}
-                </div>
+                  </div>
+                ) : (
+                  <h3 className="text-h2">{plan.name}</h3>
+                )}
                 <p className="mt-4 font-heading text-h1 tabular-nums">
-                  £{price(p, period)}
-                  <span className={cn(LABEL, "ml-2 text-muted-foreground")}>
+                  {pounds(priceOf(plan, period))}
+                  <span className={cn(label, "ml-2 text-muted-foreground")}>
                     {period === "monthly" ? "/ month" : "/ year"}
                   </span>
                 </p>
                 <p
                   className={cn(
-                    LABEL,
+                    label,
                     "mt-2 text-muted-foreground tabular-nums"
                   )}
                 >
                   {period === "monthly"
                     ? "Billed monthly · cancel any time"
-                    : `Billed yearly · ${p.perMonthYearly} a month`}
+                    : `Billed yearly · ${pounds(
+                        Math.round((plan.yearly / 12) * 100) / 100
+                      )} a month`}
                 </p>
-                <p className="mt-4">{p.forWhom}</p>
+                <p className="mt-4">{plan.audience}</p>
                 <ul className="mt-6 list-disc pl-4">
-                  {p.includes.map((item, i) => (
-                    <li key={item} className={i > 0 ? "mt-2" : undefined}>
+                  {plan.includes.map((item, index) => (
+                    <li key={item} className={index > 0 ? "mt-2" : undefined}>
                       {item}
                     </li>
                   ))}
                 </ul>
                 <div className="mt-auto pt-6">
                   <Button
-                    variant={p.id === "regular" ? "secondary" : "outline"}
+                    variant={plan.id === "regular" ? "secondary" : "outline"}
+                    onClick={() => choosePlan(plan.id)}
                     className={cn(
-                      BUTTON,
+                      buttonClasses,
                       "w-full text-center whitespace-normal"
                     )}
-                    onClick={() => choose(p.id)}
                   >
-                    Choose {p.name}
+                    Choose {plan.name}
                   </Button>
                 </div>
               </article>
@@ -373,11 +378,11 @@ export function App() {
         </section>
 
         <section id="join" className="mt-24">
-          <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-6">
+          <div className={grid}>
             <div className="md:col-span-5">
               <h2 className="text-h2 md:text-h1">Join</h2>
               <p className="mt-4 max-w-xl">
-                Your membership starts today, {START_DATE}. You can cancel it at
+                Your membership starts today, {startDate}. You can cancel it at
                 any time from your account page.
               </p>
               <p className="mt-4 max-w-xl text-body text-muted-foreground">
@@ -387,32 +392,34 @@ export function App() {
             </div>
 
             <div className="mt-12 md:col-span-6 md:col-start-7 md:mt-0">
-              {!confirmation && (
-                <form noValidate onSubmit={onSubmit}>
+              {!sent && (
+                <form noValidate onSubmit={handleSubmit}>
                   <div>
-                    <label htmlFor="name" className={FIELD_LABEL}>
+                    <label htmlFor="full-name" className={fieldLabel}>
                       Full name
                     </label>
                     <Input
                       ref={nameRef}
-                      id="name"
+                      id="full-name"
                       name="name"
                       autoComplete="name"
+                      required
                       value={name}
-                      onChange={(e) => {
-                        setName(e.target.value)
-                        if (errors.name)
-                          setErrors((prev) => ({ ...prev, name: undefined }))
+                      onChange={(event) => {
+                        setName(event.target.value)
+                        setErrors((current) => ({
+                          ...current,
+                          name: undefined,
+                        }))
                       }}
                       aria-invalid={errors.name ? true : undefined}
-                      aria-describedby={errors.name ? "name-error" : undefined}
-                      className={INPUT}
+                      aria-describedby={
+                        errors.name ? "full-name-error" : undefined
+                      }
+                      className={fieldClasses}
                     />
                     {errors.name && (
-                      <p
-                        id="name-error"
-                        className="mt-2 flex items-start gap-2 text-body text-destructive"
-                      >
+                      <p id="full-name-error" className={errorLine}>
                         <CircleAlert
                           className="mt-1 size-4 shrink-0"
                           strokeWidth={1.5}
@@ -424,7 +431,7 @@ export function App() {
                   </div>
 
                   <div className="mt-6">
-                    <label htmlFor="email" className={FIELD_LABEL}>
+                    <label htmlFor="email" className={fieldLabel}>
                       Email address
                     </label>
                     <Input
@@ -433,29 +440,29 @@ export function App() {
                       name="email"
                       type="email"
                       autoComplete="email"
+                      required
                       value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value)
-                        if (errors.email)
-                          setErrors((prev) => ({ ...prev, email: undefined }))
+                      onChange={(event) => {
+                        setEmail(event.target.value)
+                        setErrors((current) => ({
+                          ...current,
+                          email: undefined,
+                        }))
                       }}
                       aria-invalid={errors.email ? true : undefined}
                       aria-describedby={
-                        errors.email ? "email-help email-error" : "email-help"
+                        errors.email ? "email-hint email-error" : "email-hint"
                       }
-                      className={INPUT}
+                      className={fieldClasses}
                     />
                     <p
-                      id="email-help"
+                      id="email-hint"
                       className="mt-2 text-body text-muted-foreground"
                     >
                       We send your membership card here.
                     </p>
                     {errors.email && (
-                      <p
-                        id="email-error"
-                        className="mt-2 flex items-start gap-2 text-body text-destructive"
-                      >
+                      <p id="email-error" className={errorLine}>
                         <CircleAlert
                           className="mt-1 size-4 shrink-0"
                           strokeWidth={1.5}
@@ -467,64 +474,67 @@ export function App() {
                   </div>
 
                   <div className="mt-6">
-                    <label htmlFor="plan" className={FIELD_LABEL}>
+                    <label htmlFor="plan" className={fieldLabel}>
                       Plan
                     </label>
-                    <select
-                      id="plan"
-                      name="plan"
+                    <Select
+                      items={planItems}
                       value={planId}
-                      onChange={(e) => setPlanId(e.target.value as PlanId)}
-                      className={cn(
-                        "mt-2 w-full rounded-lg border border-input bg-card px-4 py-2 text-body text-foreground",
-                        FOCUS
-                      )}
+                      onValueChange={(value) => {
+                        if (value !== null) {
+                          setPlanId(value)
+                        }
+                      }}
                     >
-                      {PLANS.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="plan" className="mt-2">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {planItems.map((item) => (
+                          <SelectItem key={item.value} value={item.value}>
+                            {item.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <p aria-live="polite" className="mt-6 text-body">
-                    {plan.name}, billed {period}: {summaryPrice}, starting{" "}
-                    {START_DATE}.
+                    {chosenPlan.name}, billed {period}:{" "}
+                    {priceWithUnit(chosenPlan, period)}, starting {startDate}.
                   </p>
 
-                  <Button type="submit" className={cn(BUTTON, "mt-6")}>
+                  <Button
+                    type="submit"
+                    className={cn(buttonClasses, "mt-6")}
+                  >
                     Join the Vesper
                   </Button>
                 </form>
               )}
 
               <div role="status">
-                {confirmation && (
+                {sent && (
                   <>
                     <h3
-                      ref={confirmRef}
+                      ref={confirmationRef}
                       tabIndex={-1}
-                      className={cn("text-h2", CODE_FOCUS)}
+                      className="text-h2 focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
                     >
-                      Welcome to the Vesper, {confirmation.firstName}
+                      Welcome to the Vesper, {sent.firstName}
                     </h3>
                     <p className="mt-4 max-w-xl">
-                      Your {confirmation.plan.name} membership, billed{" "}
-                      {confirmation.period} at{" "}
-                      {confirmation.period === "monthly"
-                        ? `£${confirmation.plan.monthly} a month`
-                        : `£${confirmation.plan.yearly}`}
-                      , starts on {START_DATE}. Your card will reach you by
-                      email. This was a demo: no payment was taken.
+                      Your {sent.plan.name} membership, billed {sent.period} at{" "}
+                      {priceWithUnit(sent.plan, sent.period)}, starts on{" "}
+                      {startDate}. Your card will reach you by email. This was
+                      a demo: no payment was taken.
                     </p>
                   </>
                 )}
               </div>
-
-              {confirmation && (
+              {sent && (
                 <p className="mt-6">
-                  <a href="/" className={TEXT_LINK}>
+                  <a href="/" className={textLink}>
                     See what's on
                   </a>
                 </p>
@@ -533,7 +543,31 @@ export function App() {
           </div>
         </section>
       </main>
-      <Footer />
+
+      <footer className="mt-24 border-t border-border py-12">
+        <div className={container}>
+          <div className={grid}>
+            <div className="md:col-span-6">
+              <p className="font-heading text-h2">The Vesper</p>
+              <p className="mt-2 text-body text-muted-foreground">
+                21 Tallow Row, Oldmere OM2 4LT
+              </p>
+            </div>
+            <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-body md:col-span-6 md:mt-0">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a href={link.href} className={textLink}>
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <p className={cn(label, "mt-12 text-muted-foreground")}>
+            © 2026 The Vesper
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

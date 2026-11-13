@@ -4,137 +4,142 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focus =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 // A link in the header or the footer, and a name or a title that is a link.
 const plainLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focus
+  focusOutline
 )
 
 // A link in running text.
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focus
+  focusOutline
 )
 
 const label = "font-mono text-label uppercase"
+const mutedLabel = "font-mono text-label text-muted-foreground uppercase"
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+const dividedSection =
+  "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
+const dlRow =
+  "grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
 
 const navLinks = [
-  { label: "Practice", href: "/practice/commercial-disputes", current: true },
-  { label: "People", href: "/people/ruth-calloway", current: false },
-  { label: "Insights", href: "/insights/notice-clauses", current: false },
-  { label: "Contact", href: "/contact", current: false },
+  { name: "Practice", href: "/practice/commercial-disputes", current: true },
+  { name: "People", href: "/people/ruth-calloway", current: false },
+  { name: "Insights", href: "/insights/notice-clauses", current: false },
+  { name: "Contact", href: "/contact", current: false },
 ]
 
 const typicalMatters = [
   {
-    title: "Contract and supply claims",
-    text: "Goods that arrived late, short or faulty, and supply agreements ended without the notice they required.",
+    kind: "Contract and supply claims",
+    text: "Claims over goods that arrived late, short or out of specification, and over contracts ended before their term.",
   },
   {
-    title: "Warranty claims after a sale",
-    text: "Claims by a buyer that the accounts, the stock or the order book were not as the seller warranted.",
+    kind: "Warranty claims after a sale",
+    text: "Claims by a buyer, or against a seller, when the company sold turns out not to be the one described in the agreement.",
   },
   {
-    title: "Shareholder disputes",
-    text: "Deadlock between founders, unfair prejudice petitions and the price of a departing shareholder's stake.",
+    kind: "Shareholder disputes",
+    text: "Deadlock between owners, unfair prejudice petitions and the valuation of a departing shareholder's stake.",
   },
   {
-    title: "Professional negligence",
-    text: "Claims against accountants, surveyors and other advisers whose advice cost a business money.",
+    kind: "Professional negligence",
+    text: "Claims against accountants, surveyors and other advisers whose advice cost a company money.",
   },
   {
-    title: "Arbitration",
-    text: "Contract disputes heard in private under the rules the parties chose, from the first notice to the award.",
+    kind: "Arbitration",
+    text: "Disputes under contracts that send them to a tribunal, from the first notice to the enforcement of the award.",
   },
   {
-    title: "Urgent court orders",
-    text: "Freezing orders and injunctions to stop assets or documents leaving, often obtained within a day or two.",
+    kind: "Urgent court orders",
+    text: "Freezing orders and injunctions, often within a day or two of the first call.",
   },
 ]
 
 const recentMatters = [
   {
-    name: "Estley Mills v Brandreth Engineering",
+    year: "2026",
     kind: "Trial",
+    name: "Estley Mills v Brandreth Engineering",
+    text: "Won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification.",
+    led: "Led by David Achterberg with Ruth Calloway",
     value: "£6.2m",
-    leads: "David Achterberg and Ruth Calloway",
-    text: "We won a claim for a textile mill, after a nine-day trial, over a production line that never ran to its specification.",
   },
   {
-    name: "The sellers of Halden Print",
+    year: "2026",
     kind: "Warranty claim",
-    value: "£3.4m",
-    leads: "Ruth Calloway",
+    name: "The sellers of Halden Print",
     text: "A buyer's warranty claim against our clients was struck out because its notice arrived one day after the contract's deadline.",
+    led: "Led by Ruth Calloway",
+    value: "£3.4m",
   },
   {
-    name: "Marram Logistics",
+    year: "2026",
     kind: "Urgent order",
+    name: "Marram Logistics",
+    text: "A freezing order against a former director, obtained within 36 hours of the first call.",
+    led: "Led by David Achterberg",
     value: "£2.1m",
-    leads: "David Achterberg",
-    text: "We obtained a freezing order against a former director within 36 hours of the client's first call.",
   },
 ]
 
 const partners = [
   {
     name: "David Achterberg",
-    initials: "DA",
     href: "#",
+    initials: "DA",
+    portrait:
+      "David Achterberg in a grey suit, standing beside the bookshelves of a meeting room.",
     role: "Head of commercial disputes",
-    text: "David runs the team's trials and its urgent court orders, and has led it since 2007.",
+    text: "David takes the team's trials and its urgent court orders, and has been a partner since 2007.",
     phone: "01632 960 231",
     email: "d.achterberg@harrowvane.example",
-    portrait:
-      "David Achterberg in a grey suit, standing beside the bookshelves of the firm's library.",
   },
   {
     name: "Ruth Calloway",
-    initials: "RC",
     href: "/people/ruth-calloway",
+    initials: "RC",
+    portrait:
+      "Ruth Calloway in a dark suit, at a window of the firm's library.",
     role: "Partner · Commercial disputes",
-    text: "Ruth handles the disputes that follow the sale of a company, for buyers and sellers alike.",
+    text: "Ruth handles the disputes that follow the sale of a company: warranty claims, earn-outs and completion accounts.",
     phone: "01632 960 237",
     email: "r.calloway@harrowvane.example",
-    portrait:
-      "Ruth Calloway in a dark suit, seated at a window of the firm's meeting room.",
   },
 ]
 
 const briefings = [
   {
+    date: "10 November 2026",
+    dateTime: "2026-11-10",
+    read: "8 min read",
     title:
       "Notice clauses after a sale: when a late letter ends a warranty claim",
-    date: "2026-11-10",
-    dateText: "10 November 2026",
-    read: "8 min read",
-    author: "Ruth Calloway",
     href: "/insights/notice-clauses",
-  },
-  {
-    title: "Freezing orders: the first forty-eight hours",
-    date: "2026-10-29",
-    dateText: "29 October 2026",
-    read: "6 min read",
-    author: "David Achterberg",
-    href: "#",
-  },
-  {
-    title: "Earn-outs that end in dispute",
-    date: "2026-09-17",
-    dateText: "17 September 2026",
-    read: "6 min read",
     author: "Ruth Calloway",
+  },
+  {
+    date: "29 October 2026",
+    dateTime: "2026-10-29",
+    read: "6 min read",
+    title: "Freezing orders: the first forty-eight hours",
     href: "#",
+    author: "David Achterberg",
+  },
+  {
+    date: "17 September 2026",
+    dateTime: "2026-09-17",
+    read: "6 min read",
+    title: "Earn-outs that end in dispute",
+    href: "#",
+    author: "Ruth Calloway",
   },
 ]
-
-const sectionDivided = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-const entryList = "list-none border-b border-border p-0"
 
 export function App() {
   return (
@@ -146,13 +151,13 @@ export function App() {
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-4 gap-y-2 md:gap-x-8">
             {navLinks.map((link) => (
-              <li key={link.label}>
+              <li key={link.name}>
                 <a
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
                   className={cn(label, plainLink, link.current && "underline")}
                 >
-                  {link.label}
+                  {link.name}
                 </a>
               </li>
             ))}
@@ -161,10 +166,9 @@ export function App() {
       </header>
 
       <main>
-        {/* Opening */}
-        <section className={cn("mt-14 md:mt-28", grid)}>
+        <section className={cn(grid, "mt-14 md:mt-28")}>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:col-span-12">
-            <p className={cn(label, "text-muted-foreground")}>
+            <p className={mutedLabel}>
               Practice area · 4 partners · 16 lawyers
             </p>
             <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground uppercase">
@@ -174,117 +178,107 @@ export function App() {
           <h1 className="mt-4 text-h1 md:col-span-9 md:text-display">
             Commercial disputes
           </h1>
-          <p className="mt-8 max-w-xl md:col-span-7 md:col-start-1">
+          <p className="mt-8 max-w-xl text-body md:col-span-7 md:col-start-1">
             When a contract, a sale or a partnership goes wrong, we work out
             what the claim is worth before anyone spends money on it, and then
             we pursue it or defend it to the end.
           </p>
         </section>
 
-        {/* What we do */}
-        <section className={cn(sectionDivided, grid)}>
+        <section className={cn(grid, dividedSection)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">What we do</h2>
-            <p className="mt-4 max-w-xl">
+            <p className="mt-4 max-w-xl text-body">
               We act for owner-managed companies, for the people who buy and
-              sell them, and for the banks and lenders who finance them. We take
-              their disputes to court, to arbitration and to mediation, and we
-              act for claimants and defendants in roughly equal numbers.
+              sell them, and for the banks and funds that lend to them. Most of
+              our clients come to us with one dispute that matters a great deal
+              to their business, and we treat it that way.
             </p>
-            <p className="mt-4 max-w-xl">
-              In the first two weeks of a new dispute, a partner reads the
-              papers in full. The client then gets a written view of the claim:
-              how strong it is, what it is likely to recover or cost, and what
-              each step to trial would cost in fees.
+            <p className="mt-4 max-w-xl text-body">
+              In the first two weeks of a new dispute a partner reads the
+              papers, not a summary of them. The client then gets a written
+              view of the claim: how strong it is, what it is likely to cost at
+              each stage, and what we would do next in their place.
             </p>
-            <p className="mt-4 max-w-xl">
-              Most of our claims settle before trial, nine in ten of them,
-              because both sides see the same numbers early. Many turn on a
-              single clause and a single date; for one example, read{" "}
+            <p className="mt-4 max-w-xl text-body">
+              About eight in ten of our claims settle before trial, most of
+              them at mediation. They settle because the other side can see
+              that the case has been prepared as if it will be tried. Many
+              claims are won or lost on a deadline long before that, as{" "}
               <a href="/insights/notice-clauses" className={textLink}>
                 our briefing on notice clauses
-              </a>
-              .
+              </a>{" "}
+              explains.
             </p>
           </div>
           <div className="mt-14 md:col-span-4 md:col-start-9 md:mt-0">
-            <h3 className={cn(label, "text-foreground")}>The team</h3>
+            <h3 className="font-mono text-label text-foreground uppercase">
+              The team
+            </h3>
             <dl className="mt-4 border-b border-border">
-              {[
-                {
-                  term: "Partners",
-                  value: <span className="font-mono tabular-nums">4</span>,
-                },
-                {
-                  term: "Lawyers",
-                  value: <span className="font-mono tabular-nums">16</span>,
-                },
-                { term: "Head of practice", value: "David Achterberg" },
-                {
-                  term: "Ranked",
-                  value: "Band 1, Northern Legal Review, 2026",
-                },
-              ].map((row) => (
-                <div
-                  key={row.term}
-                  className="grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
-                >
-                  <dt className={cn(label, "text-muted-foreground")}>
-                    {row.term}
-                  </dt>
-                  <dd className="col-span-2 text-body">{row.value}</dd>
-                </div>
-              ))}
+              <div className={dlRow}>
+                <dt className={mutedLabel}>Partners</dt>
+                <dd className="col-span-2 text-body">
+                  <span className="font-mono tabular-nums">4</span>
+                </dd>
+              </div>
+              <div className={dlRow}>
+                <dt className={mutedLabel}>Lawyers</dt>
+                <dd className="col-span-2 text-body">
+                  <span className="font-mono tabular-nums">16</span>
+                </dd>
+              </div>
+              <div className={dlRow}>
+                <dt className={mutedLabel}>Head of practice</dt>
+                <dd className="col-span-2 text-body">David Achterberg</dd>
+              </div>
+              <div className={dlRow}>
+                <dt className={mutedLabel}>Ranked</dt>
+                <dd className="col-span-2 text-body">
+                  Band 1, Northern Legal Review, 2026
+                </dd>
+              </div>
             </dl>
           </div>
         </section>
 
-        {/* Typical matters */}
-        <section className={cn(sectionDivided, grid)}>
+        <section className={cn(grid, dividedSection)}>
           <h2 className="text-h2 md:col-span-4">Typical matters</h2>
-          <ul
-            className={cn(
-              entryList,
-              "mt-8 md:col-span-8 md:col-start-5 md:mt-0"
-            )}
-          >
+          <ul className="mt-8 list-none border-b border-border md:col-span-8 md:col-start-5 md:mt-0">
             {typicalMatters.map((matter) => (
               <li
-                key={matter.title}
+                key={matter.kind}
                 className="border-t border-border py-4 md:grid md:grid-cols-8 md:items-baseline md:gap-x-8"
               >
-                <h3 className="text-h2 md:col-span-3">{matter.title}</h3>
-                <p className="mt-2 md:col-span-5 md:mt-0">{matter.text}</p>
+                <h3 className="text-h2 md:col-span-3">{matter.kind}</h3>
+                <p className="mt-2 text-body md:col-span-5 md:mt-0">
+                  {matter.text}
+                </p>
               </li>
             ))}
           </ul>
         </section>
 
-        {/* Recent matters */}
-        <section className={sectionDivided}>
+        <section className={dividedSection}>
           <h2 className="text-h2">Recent matters</h2>
-          <ul className={cn(entryList, "mt-8")}>
+          <ul className="mt-8 list-none border-b border-border">
             {recentMatters.map((matter) => (
               <li
                 key={matter.name}
                 className="border-t border-border py-8 md:grid md:grid-cols-12 md:items-baseline md:gap-x-8"
               >
-                <p className={cn(label, "text-muted-foreground md:col-span-3")}>
-                  <time dateTime="2026">2026</time> · {matter.kind}
+                <p className={cn(mutedLabel, "md:col-span-3")}>
+                  <time dateTime={matter.year} className="tabular-nums">
+                    {matter.year}
+                  </time>{" "}
+                  · {matter.kind}
                 </p>
                 <div className="mt-2 md:col-span-7 md:mt-0">
                   <h3 className="text-h2">{matter.name}</h3>
-                  <p className="mt-2 max-w-xl">{matter.text}</p>
-                  <p className={cn(label, "mt-2 text-muted-foreground")}>
-                    Led by {matter.leads}
-                  </p>
+                  <p className="mt-2 max-w-xl text-body">{matter.text}</p>
+                  <p className={cn(mutedLabel, "mt-2")}>{matter.led}</p>
                 </div>
-                <p
-                  className={cn(
-                    label,
-                    "mt-2 text-foreground tabular-nums md:col-span-2 md:mt-0 md:text-right"
-                  )}
-                >
+                <p className="mt-2 font-mono text-label text-foreground uppercase tabular-nums md:col-span-2 md:mt-0 md:text-right">
                   {matter.value}
                 </p>
               </li>
@@ -292,56 +286,51 @@ export function App() {
           </ul>
         </section>
 
-        {/* Who leads it */}
-        <section className={sectionDivided}>
+        <section className={dividedSection}>
           <h2 className="text-h2">Who leads it</h2>
-          <ul className={cn("mt-8 list-none p-0", grid)}>
-            {partners.map((person, index) => (
+          <ul className={cn(grid, "mt-8 list-none")}>
+            {partners.map((partner, index) => (
               <li
-                key={person.name}
+                key={partner.name}
                 className={cn(
-                  "md:grid md:grid-cols-6 md:gap-x-8",
-                  index === 0
-                    ? "md:col-span-6"
-                    : "mt-14 md:col-span-6 md:col-start-7 md:mt-0"
+                  "md:col-span-6 md:grid md:grid-cols-6 md:gap-x-8",
+                  index > 0 && "mt-14 md:col-start-7 md:mt-0"
                 )}
               >
                 <div
                   role="img"
-                  aria-label={person.portrait}
+                  aria-label={partner.portrait}
                   className="flex aspect-3/4 w-1/2 items-end rounded-xl border border-border bg-card p-4 md:col-span-2 md:w-full"
                 >
                   <span
                     aria-hidden="true"
                     className="font-heading text-h1 text-muted-foreground"
                   >
-                    {person.initials}
+                    {partner.initials}
                   </span>
                 </div>
                 <div className="mt-4 md:col-span-4 md:mt-0">
                   <h3 className="text-h2">
-                    <a href={person.href} className={plainLink}>
-                      {person.name}
+                    <a href={partner.href} className={plainLink}>
+                      {partner.name}
                     </a>
                   </h3>
-                  <p className={cn(label, "mt-2 text-muted-foreground")}>
-                    {person.role}
-                  </p>
-                  <p className="mt-4">{person.text}</p>
+                  <p className={cn(mutedLabel, "mt-2")}>{partner.role}</p>
+                  <p className="mt-4 text-body">{partner.text}</p>
                   <p className={cn(label, "mt-4")}>
                     <a
-                      href={`tel:${person.phone.replace(/\s/g, "")}`}
+                      href={`tel:${partner.phone.replaceAll(" ", "")}`}
                       className={textLink}
                     >
-                      {person.phone}
+                      {partner.phone}
                     </a>
                   </p>
                   <p className={cn(label, "mt-2")}>
                     <a
-                      href={`mailto:${person.email}`}
+                      href={`mailto:${partner.email}`}
                       className={cn(textLink, "normal-case")}
                     >
-                      {person.email}
+                      {partner.email}
                     </a>
                   </p>
                 </div>
@@ -350,17 +339,16 @@ export function App() {
           </ul>
         </section>
 
-        {/* Related briefings */}
-        <section className={sectionDivided}>
+        <section className={dividedSection}>
           <h2 className="text-h2">Related briefings</h2>
-          <ul className={cn(entryList, "mt-8")}>
+          <ul className="mt-8 list-none border-b border-border">
             {briefings.map((briefing) => (
               <li
                 key={briefing.title}
                 className="border-t border-border py-8 md:grid md:grid-cols-12 md:items-baseline md:gap-x-8"
               >
-                <p className={cn(label, "text-muted-foreground md:col-span-3")}>
-                  <time dateTime={briefing.date}>{briefing.dateText}</time> ·{" "}
+                <p className={cn(mutedLabel, "md:col-span-3")}>
+                  <time dateTime={briefing.dateTime}>{briefing.date}</time> ·{" "}
                   {briefing.read}
                 </p>
                 <div className="mt-2 md:col-span-9 md:mt-0">
@@ -369,9 +357,7 @@ export function App() {
                       {briefing.title}
                     </a>
                   </h3>
-                  <p className={cn(label, "mt-2 text-muted-foreground")}>
-                    {briefing.author}
-                  </p>
+                  <p className={cn(mutedLabel, "mt-2")}>{briefing.author}</p>
                 </div>
               </li>
             ))}
@@ -391,13 +377,12 @@ export function App() {
           </p>
         </section>
 
-        {/* Speak to the team */}
-        <section className={cn(sectionDivided, grid)}>
+        <section className={cn(grid, dividedSection)}>
           <div className="md:col-span-7">
             <h2 className="text-h2">Speak to the team</h2>
-            <p className="mt-4 max-w-xl">
-              Send us an outline of the dispute and any deadline you know of,
-              and a partner will reply within one working day.
+            <p className="mt-4 max-w-xl text-body">
+              Send us the outline of the dispute and any deadline you know of.
+              A partner replies within one working day.
             </p>
             <div className="mt-8">
               <a
@@ -419,7 +404,7 @@ export function App() {
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Harrow &amp; Vane LLP</p>
             <address
-              className={cn(label, "mt-2 text-muted-foreground not-italic")}
+              className={cn(mutedLabel, "mt-2 not-italic")}
             >
               <p>4 Chancery Row</p>
               <p>Wexcombe WX1 2LN</p>
@@ -446,7 +431,7 @@ export function App() {
           >
             <ul>
               {navLinks.map((link, index) => (
-                <li key={link.label} className={index > 0 ? "mt-2" : undefined}>
+                <li key={link.name} className={cn(index > 0 && "mt-2")}>
                   <a
                     href={link.href}
                     aria-current={link.current ? "page" : undefined}
@@ -456,14 +441,14 @@ export function App() {
                       link.current && "underline"
                     )}
                   >
-                    {link.label}
+                    {link.name}
                   </a>
                 </li>
               ))}
             </ul>
           </nav>
         </div>
-        <p className={cn(label, "mt-8 text-muted-foreground")}>
+        <p className={cn(mutedLabel, "mt-8")}>
           © 2026 Harrow &amp; Vane LLP · Registered in England and Wales
         </p>
       </footer>

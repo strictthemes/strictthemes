@@ -4,38 +4,91 @@ import { Badge } from "@/components/ui/badge"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-// A link in running text.
+// A link in running text, and an onward link.
 const textLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focusRing
+  focusOutline
 )
 
-// A link in the header or footer, or a name or title that is a link.
-const plainLink = cn(
+// A link in the header or the footer, and a name or a title that is a link.
+const titleLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
+  focusOutline
 )
 
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
+const sectionRule = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
 const label = "font-mono text-label uppercase"
-const labelHeading = "font-mono text-label uppercase text-foreground"
-const laterSection = "mt-8 border-t border-border pt-8 md:mt-14 md:pt-14"
+const labelHeading = "font-mono text-label text-foreground uppercase"
+const paragraph = "max-w-xl text-body"
 
 const navLinks = [
-  { label: "Practice", href: "/practice/commercial-disputes" },
-  { label: "People", href: "/people/ruth-calloway" },
-  { label: "Insights", href: "/insights/notice-clauses", current: true },
-  { label: "Contact", href: "/contact" },
+  { name: "Practice", href: "/practice/commercial-disputes", current: false },
+  { name: "People", href: "/people/ruth-calloway", current: false },
+  { name: "Insights", href: "/insights/notice-clauses", current: true },
+  { name: "Contact", href: "/contact", current: false },
 ]
 
-const contents = [
+const headings = [
   { id: "asks", title: "What a notice clause asks for" },
   { id: "fails", title: "Three ways a notice fails" },
   { id: "a-day", title: "A claim lost by a day" },
   { id: "before", title: "What to do before you send" },
 ]
+
+const inBrief = [
+  "A notice clause sets the form of a warranty claim, the person who must receive it and the last day on which it may arrive.",
+  "A court reads these clauses strictly, and a notice that arrives one day late can be too late.",
+  "Check the clause as soon as you suspect a problem, and serve early with the facts you have.",
+]
+
+const opening = [
+  "When a company is sold, the sellers promise the buyer certain things about it: that the accounts are fair, that the tax is paid, that no dispute is waiting in a drawer. These promises are the warranties. If one of them proves untrue after completion, the buyer usually has a claim against the sellers for the difference between the company it paid for and the company it received.",
+  "The same contract almost always says how that claim must be started. It names the form of the notice, the person who must receive it and the last day on which it may arrive. We see buyers treat these terms as paperwork, and we see sellers rely on them to end a claim outright. Most warranty claims are argued over the accounts. Some are lost in the post room first. This briefing explains what a notice clause asks for, how a notice fails and what we advise a buyer to do before sending one.",
+]
+
+const asks = [
+  "A notice clause is a short term, often set among the limits on the sellers' liability, and it is easy to read past. It usually asks for four things. The notice must be in writing. It must go to the address the contract gives, by a method the contract allows. It must set out the claim in reasonable detail. And it must be given before a last day, which is commonly between eighteen months and two years after completion for most warranties, and longer for tax. Each of the four is a condition. The contract will normally say that the sellers are not liable for a claim unless notice has been given in this way, so the clause does more than ask for courtesy. A buyer who misses one condition has no claim to bring, whatever the accounts show.",
+  "Reasonable detail is the condition that buyers most often underestimate. Contracts differ, but most ask the buyer to name the warranty relied on, to describe the facts that make it untrue and to give an estimate of the sum claimed. Where the contract lists what the notice must contain, each item on the list has to be there.",
+  "Many contracts add a second deadline. Once notice is given, the buyer must issue and serve court proceedings within a further period, often six or nine months, or the claim is treated as withdrawn. We advise putting both dates in the diary on the day of completion.",
+]
+
+const failsIntro =
+  "In our experience a notice goes wrong in one of three ways. None of them has anything to do with whether the warranty was broken."
+
+const failures = [
+  "It is sent too late. The clause may count a notice as given only when it is received, and a delivery after working hours can count as made on the next working day.",
+  "It goes to the wrong person or address. A letter to the sellers' solicitors, or an email to the director the buyer knows best, is not notice if the contract names a registered office and delivery by hand or by post.",
+  "It is too thin to say what the claim is. A letter that reserves the buyer's rights in general terms, without the warranty, the facts and an estimate of the sum, may not be a notice at all.",
+]
+
+const pullQuote =
+  "Most warranty claims are argued over the accounts. Some are lost in the post room first."
+
+const failsClose =
+  "A court reads these clauses strictly, and for a reason. The sellers agreed to stay liable for a limited time and on stated terms, and they are entitled to know on the last day whether they still face a claim. The court will not rewrite that bargain because the buyer's case looks strong or because the miss was small. Nor does it usually help that the sellers knew of the problem already: knowing of a problem is different from being given notice of a claim."
+
+const aDay = [
+  "This year we acted for the sellers of Halden Print, a printing company sold on 11 March 2024. The contract gave the buyer eighteen months to give notice of a warranty claim, so the last day was 11 September 2025. It also said that a notice sent by courier was given when it was signed for at the sellers' address.",
+  "The buyer believed that the stock in the completion accounts had been overstated, and put its loss at £3.4m. Its advisers finished the notice on the afternoon of 11 September 2025 and handed it to a courier at 16:50. The sellers' office had closed by the time the courier arrived, and the letter was signed for at 09:40 on 12 September 2025. A copy sent by email that evening did not count, because the contract did not allow notice by email.",
+  "We applied to have the claim struck out. The buyer answered that the sellers had lost nothing by the delay: they had known of the stock count for months, and they had read the email that evening. The court accepted both points and held that neither mattered. The contract set a time and a method, both sides had been advised when they signed it, and there was no reason to give its words a looser meaning than they had. It held that the clause meant what it said: notice was given on 12 September 2025, one day after the deadline, and the sellers' liability had ended the evening before. The question of the stock was never heard. A claim for £3.4m ended on the timing of one delivery, and the buyer was ordered to pay the sellers' costs of the application.",
+]
+
+const beforeIntro =
+  "None of this is hard to avoid, but it has to be done early. When a buyer first suspects a problem, and before the detail is known, we suggest four steps. The clause was written for exactly this moment, and it is too often the last thing anyone reads."
+
+const steps = [
+  "Read the notice clause itself, and the definitions it relies on, before you draft a word of the letter.",
+  "Work out the last day on the contract's own terms, including when a delivery counts as made, and plan to serve at least two weeks before it.",
+  "Send the notice to every address and by every method the contract names, and keep proof of each delivery.",
+  "Name the warranty, set out the facts you have and give your best estimate of the sum, and say that you will add to it as you learn more.",
+]
+
+const beforeClose =
+  "A notice served early with the facts then known is far safer than a complete one served on the last afternoon. If the sellers accept that the notice was good, nothing is lost by the care taken. If they do not, the buyer still has time to serve again. We are glad to read a notice clause with a client before a claim is sent, and for sellers we check every notice received against the contract on the day it arrives."
 
 const related = [
   {
@@ -44,7 +97,7 @@ const related = [
     dateTime: "2026-10-29",
     read: "6 min read",
     author: "David Achterberg",
-    practice: "Commercial disputes",
+    area: "Commercial disputes",
   },
   {
     title: "Break clauses in a commercial lease: getting the notice right",
@@ -52,7 +105,7 @@ const related = [
     dateTime: "2026-10-01",
     read: "5 min read",
     author: "Thomas Kerridge",
-    practice: "Real estate",
+    area: "Real estate",
   },
   {
     title: "Earn-outs that end in dispute",
@@ -60,73 +113,37 @@ const related = [
     dateTime: "2026-09-17",
     read: "6 min read",
     author: "Ruth Calloway",
-    practice: "Commercial disputes",
+    area: "Commercial disputes",
   },
 ]
-
-const inBrief = [
-  "A notice clause sets the form of a claim, the person it must go to and the last day for sending it.",
-  "A court reads these clauses strictly, and a notice that arrives one day late can end the claim.",
-  "Check the clause as soon as a problem appears, and serve notice early with the facts you have.",
-]
-
-const failures = [
-  "It is sent too late. A notice that arrives a day after the deadline is treated in the same way as one that never arrives at all.",
-  "It goes to the wrong person or the wrong address. A letter to the sellers’ old office, or to a director who has since left, may not count as served, even if it reaches the right people in the end.",
-  "It is too thin to say what the claim is. A notice that lists every warranty in the contract, or says only that the buyer has concerns about the accounts, may not give the detail the clause asks for.",
-]
-
-const steps = [
-  "Read the notice clause and every clause it refers to, and write down the deadline, the method and the address it requires.",
-  "Send the notice well before the last day, with the facts and figures you have, and say plainly that the figures will be updated.",
-  "Send it to every address the contract names, by every method it allows, and keep proof of when each copy arrived.",
-  "Name each warranty you rely on and explain, in a sentence or two, what you say went wrong under it.",
-]
-
-function SiteNav({
-  ariaLabel,
-  footer,
-}: {
-  ariaLabel: string
-  footer?: boolean
-}) {
-  return (
-    <nav aria-label={ariaLabel}>
-      <ul
-        className={
-          footer ? "list-none p-0" : "flex flex-wrap gap-x-4 gap-y-2 md:gap-x-8"
-        }
-      >
-        {navLinks.map((link, i) => (
-          <li key={link.href} className={footer && i > 0 ? "mt-2" : undefined}>
-            <a
-              href={link.href}
-              aria-current={link.current ? "page" : undefined}
-              className={cn(label, plainLink, link.current && "underline")}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  )
-}
 
 export function App() {
   return (
     <div className="mx-auto max-w-[1200px] px-4 text-body md:px-8">
       <header className="flex flex-col items-start gap-4 border-b border-border py-8 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", plainLink)}>
+        <a href="/" className={cn("font-heading text-h2", titleLink)}>
           Harrow &amp; Vane
         </a>
-        <SiteNav ariaLabel="Main" />
+        <nav aria-label="Main">
+          <ul className="flex flex-wrap gap-x-4 gap-y-2 md:gap-x-8">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <a
+                  href={link.href}
+                  aria-current={link.current ? "page" : undefined}
+                  className={cn(label, titleLink, link.current && "underline")}
+                >
+                  {link.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </header>
 
       <main>
         <article>
-          {/* Opening */}
-          <section className="mt-14 grid grid-cols-1 md:mt-28 md:grid-cols-12 md:gap-x-8">
+          <section className={cn(grid, "mt-14 md:mt-28")}>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:col-span-12">
               <p className={cn(label, "text-muted-foreground")}>
                 Briefing · Commercial disputes
@@ -158,13 +175,7 @@ export function App() {
             </p>
           </section>
 
-          {/* The briefing */}
-          <section
-            className={cn(
-              laterSection,
-              "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-            )}
-          >
+          <section className={cn(grid, sectionRule)}>
             <nav
               aria-labelledby="on-this-page"
               className="md:col-span-4 md:col-start-9 md:row-start-1"
@@ -172,14 +183,14 @@ export function App() {
               <h2 id="on-this-page" className={labelHeading}>
                 On this page
               </h2>
-              <ol className="mt-4 list-none p-0">
-                {contents.map((item, i) => (
-                  <li key={item.id} className={i > 0 ? "mt-2" : undefined}>
+              <ol className="mt-4 list-none">
+                {headings.map((heading, index) => (
+                  <li key={heading.id} className={cn(index > 0 && "mt-2")}>
                     <a
-                      href={`#${item.id}`}
-                      className={cn("text-body", plainLink)}
+                      href={`#${heading.id}`}
+                      className={cn("text-body", titleLink)}
                     >
-                      {item.title}
+                      {heading.title}
                     </a>
                   </li>
                 ))}
@@ -189,149 +200,70 @@ export function App() {
             <div className="mt-14 md:col-span-7 md:row-start-1 md:mt-0">
               <div className="rounded-xl bg-card p-8">
                 <h2 className={labelHeading}>In brief</h2>
-                <ul className="mt-4 list-disc pl-4">
-                  {inBrief.map((item, i) => (
-                    <li
-                      key={item}
-                      className={cn("max-w-xl text-body", i > 0 && "mt-2")}
-                    >
-                      {item}
+                <ul className="mt-4 max-w-xl list-disc pl-4 text-body">
+                  {inBrief.map((point, index) => (
+                    <li key={point} className={cn(index > 0 && "mt-2")}>
+                      {point}
                     </li>
                   ))}
                 </ul>
               </div>
 
-              <p className="mt-8 max-w-xl">
-                When a company changes hands, the buyer rarely learns everything
-                on the day of completion. A customer contract turns out to have
-                been lost months before, a tax bill arrives that nobody
-                disclosed, or the stock is worth less than the accounts said.
-                The sale contract usually answers this with warranties: promises
-                by the sellers about the state of the business, and a right for
-                the buyer to claim if one of them proves untrue.
-              </p>
-              <p className="mt-4 max-w-xl">
-                The same contract also says how that right must be used.
-                Somewhere after the warranties, often in a schedule that few
-                people read twice, sits a notice clause. It sets out how a claim
-                must be made, to whom and by when. In our experience it decides
-                more warranty disputes than the accounts do, and it decides them
-                early, before anyone has looked at whether the claim is any
-                good.
-              </p>
+              {opening.map((text, index) => (
+                <p
+                  key={text}
+                  className={cn(paragraph, index === 0 ? "mt-8" : "mt-4")}
+                >
+                  {text}
+                </p>
+              ))}
 
               <h2 id="asks" className="mt-14 scroll-mt-8 text-h2">
-                What a notice clause asks for
+                {headings[0].title}
               </h2>
-              <p className="mt-4 max-w-xl">
-                Most notice clauses ask for four things. The notice must be in
-                writing, and many clauses go further and exclude email, or allow
-                it only when a copy follows by post or courier. It must be sent
-                to a named person at a named address, usually the sellers
-                themselves or their solicitors, and the contract will often say
-                that a notice is served only when it arrives there, not when it
-                leaves the buyer’s office.
-              </p>
-              <p className="mt-4 max-w-xl">
-                It must also give reasonable detail of the claim. The wording
-                varies, but the idea is the same: the sellers should be able to
-                read the notice and know which warranty is said to be broken,
-                what the buyer says happened, and roughly how much is at stake.
-                A notice does not need to prove the claim, and it can say that
-                its figures are an estimate. It cannot simply reserve the
-                buyer’s position in general terms.
-              </p>
-              <p className="mt-4 max-w-xl">
-                Finally, the clause sets a last day. For general warranties this
-                is often eighteen months or two years after completion; for tax
-                it is usually longer. The deadline is the part buyers notice,
-                and it is the part sellers test first, because a court treats it
-                as a fixed line rather than a target.
-              </p>
+              {asks.map((text) => (
+                <p key={text} className={cn(paragraph, "mt-4")}>
+                  {text}
+                </p>
+              ))}
 
               <h2 id="fails" className="mt-14 scroll-mt-8 text-h2">
-                Three ways a notice fails
+                {headings[1].title}
               </h2>
-              <p className="mt-4 max-w-xl">
-                A court reads a notice clause as the parties wrote it. The
-                sellers agreed to stay exposed to claims for a set time and on
-                set terms, and a court will not usually extend that time or
-                soften those terms because the buyer meant well. When a notice
-                fails, it tends to fail in one of three ways.
-              </p>
-              <ol className="mt-8 max-w-xl list-decimal pl-8">
-                {failures.map((item, i) => (
-                  <li key={item} className={i > 0 ? "mt-2" : undefined}>
-                    {item}
+              <p className={cn(paragraph, "mt-4")}>{failsIntro}</p>
+              <ol className="mt-8 max-w-xl list-decimal pl-8 text-body">
+                {failures.map((text, index) => (
+                  <li key={text} className={cn(index > 0 && "mt-2")}>
+                    {text}
                   </li>
                 ))}
               </ol>
-              <blockquote className="mt-8 max-w-xl border-l border-border pl-8">
-                <p className="font-heading text-h2">
-                  Most warranty claims are argued over the accounts. Some are
-                  lost in the post room first.
-                </p>
+              <blockquote className="mt-8 border-l border-border pl-8">
+                <p className="max-w-xl font-heading text-h2">{pullQuote}</p>
               </blockquote>
-              <p className="mt-8 max-w-xl">
-                Each of these can be avoided, and none of them depends on the
-                merits. That is what makes them so costly: a claim the buyer
-                might well have won is never heard, and the costs of arguing
-                about the notice usually fall on the side that sent it.
-              </p>
+              <p className={cn(paragraph, "mt-8")}>{failsClose}</p>
 
               <h2 id="a-day" className="mt-14 scroll-mt-8 text-h2">
-                A claim lost by a day
+                {headings[2].title}
               </h2>
-              <p className="mt-4 max-w-xl">
-                This year we acted for the three sellers of Halden Print, a
-                family printing company sold in the spring of 2024. The sale
-                contract gave the buyer until 17:00 on 14 March 2026 to notify
-                any claim under the general warranties, and said that a notice
-                sent by courier was served when it was signed for at the
-                sellers’ solicitors’ office.
-              </p>
-              <p className="mt-4 max-w-xl">
-                The buyer believed that the company’s order book had been
-                overstated before the sale, and it prepared a claim for £3.4m.
-                Its letter was finished on the afternoon of the last day and
-                handed to a courier at 16:10. The courier reached the sellers’
-                solicitors after their office had closed, and the letter was
-                signed for at 09:05 on 15 March 2026, the next morning.
-              </p>
-              <p className="mt-4 max-w-xl">
-                We applied to strike the claim out before any evidence about the
-                order book was heard. The buyer argued that the letter had left
-                in time and that one morning’s delay had harmed nobody. The
-                court disagreed. The contract said when a notice was served, the
-                notice had been served a day late, and the sellers’ liability
-                for the claim had already ended. The claim was struck out, and
-                the buyer was ordered to pay our clients’ costs.
-              </p>
+              {aDay.map((text) => (
+                <p key={text} className={cn(paragraph, "mt-4")}>
+                  {text}
+                </p>
+              ))}
 
               <h2 id="before" className="mt-14 scroll-mt-8 text-h2">
-                What to do before you send
+                {headings[3].title}
               </h2>
-              <p className="mt-4 max-w-xl">
-                None of this is hard to get right, but it has to be done early,
-                by someone who has read the clause rather than remembered it.
-                Before a notice goes out, we would take four steps.
-              </p>
-              <ol className="mt-8 max-w-xl list-decimal pl-8">
-                {steps.map((item, i) => (
-                  <li key={item} className={i > 0 ? "mt-2" : undefined}>
-                    {item}
+              <p className={cn(paragraph, "mt-4")}>{beforeIntro}</p>
+              <ol className="mt-8 max-w-xl list-decimal pl-8 text-body">
+                {steps.map((text, index) => (
+                  <li key={text} className={cn(index > 0 && "mt-2")}>
+                    {text}
                   </li>
                 ))}
               </ol>
-              <p className="mt-8 max-w-xl">
-                A notice sent early with an estimate can be followed by a fuller
-                letter later; a notice sent late cannot be mended. If you are a
-                buyer with a possible claim, the time to look at the clause is
-                the week you find the problem, not the week the deadline falls.
-                If you are a seller, the same clause is often your first and
-                cheapest defence, and it is worth reading before you reply to
-                any letter of claim.
-              </p>
+              <p className={cn(paragraph, "mt-8")}>{beforeClose}</p>
 
               <p className="mt-8 max-w-xl font-mono text-label text-muted-foreground">
                 This briefing is general information and is not advice on any
@@ -341,13 +273,7 @@ export function App() {
           </section>
         </article>
 
-        {/* About the author */}
-        <section
-          className={cn(
-            laterSection,
-            "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
-          )}
-        >
+        <section className={cn(grid, sectionRule)}>
           <div className="md:col-span-2">
             <div
               role="img"
@@ -365,19 +291,19 @@ export function App() {
           <div className="mt-8 md:col-span-7 md:col-start-4 md:mt-0">
             <h2 className={labelHeading}>About the author</h2>
             <h3 className="mt-4 text-h2">
-              <a href="/people/ruth-calloway" className={plainLink}>
+              <a href="/people/ruth-calloway" className={titleLink}>
                 Ruth Calloway
               </a>
             </h3>
             <p className={cn(label, "mt-2 text-muted-foreground")}>
               Partner · Commercial disputes
             </p>
-            <p className="mt-4 max-w-xl">
-              Ruth acts for buyers and sellers of private companies in the
-              disputes that follow a sale, from warranty and indemnity claims to
-              earn-outs and completion accounts. She became a partner in 2026
-              and leads the team’s work on claims that turn on the wording of
-              the sale contract.
+            <p className={cn(paragraph, "mt-4")}>
+              Ruth acts for buyers and sellers in the disputes that follow the
+              sale of a company: warranty claims, earn-outs and arguments over
+              completion accounts. She also advises boards on claims between
+              shareholders, and on how to end a commercial contract without
+              starting a dispute.
             </p>
             <div className="mt-8">
               <a
@@ -393,10 +319,9 @@ export function App() {
           </div>
         </section>
 
-        {/* Related briefings */}
-        <section className={laterSection}>
+        <section className={sectionRule}>
           <h2 className="text-h2">Related briefings</h2>
-          <ul className="mt-8 list-none border-b border-border p-0">
+          <ul className="mt-8 list-none border-b border-border">
             {related.map((item) => (
               <li
                 key={item.title}
@@ -408,21 +333,21 @@ export function App() {
                 </p>
                 <div className="mt-2 md:col-span-9 md:mt-0">
                   <h3 className="text-h2">
-                    <a href="#" className={plainLink}>
+                    <a href="#" className={titleLink}>
                       {item.title}
                     </a>
                   </h3>
                   <p className={cn(label, "mt-2 text-muted-foreground")}>
-                    {item.author} · {item.practice}
+                    {item.author} · {item.area}
                   </p>
                 </div>
               </li>
             ))}
           </ul>
-          <p className={cn(label, "mt-8")}>
+          <p className="mt-8">
             <a
               href="#"
-              className={cn("inline-flex items-center gap-2", textLink)}
+              className={cn(label, "inline-flex items-center gap-2", textLink)}
             >
               All briefings
               <ArrowRight
@@ -436,32 +361,53 @@ export function App() {
       </main>
 
       <footer className="mt-14 border-t border-border py-8 md:mt-28">
-        <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-8">
+        <div className={grid}>
           <div className="md:col-span-4">
             <p className="font-heading text-h2">Harrow &amp; Vane LLP</p>
-            <address className="mt-2 font-mono text-label text-muted-foreground uppercase not-italic">
+            <address
+              className={cn(label, "mt-2 text-muted-foreground not-italic")}
+            >
               <p>4 Chancery Row</p>
               <p>Wexcombe WX1 2LN</p>
             </address>
           </div>
           <div className="mt-8 md:col-span-4 md:col-start-5 md:mt-0">
             <p className={label}>
-              <a href="tel:01632960214" className={plainLink}>
+              <a href="tel:01632960214" className={titleLink}>
                 01632 960 214
               </a>
             </p>
             <p className={cn(label, "mt-2")}>
               <a
                 href="mailto:enquiries@harrowvane.example"
-                className={cn("normal-case", plainLink)}
+                className={cn("normal-case", titleLink)}
               >
                 enquiries@harrowvane.example
               </a>
             </p>
           </div>
-          <div className="mt-8 md:col-span-4 md:col-start-9 md:mt-0">
-            <SiteNav ariaLabel="Footer" footer />
-          </div>
+          <nav
+            aria-label="Footer"
+            className="mt-8 md:col-span-4 md:col-start-9 md:mt-0"
+          >
+            <ul>
+              {navLinks.map((link, index) => (
+                <li key={link.name} className={cn(index > 0 && "mt-2")}>
+                  <a
+                    href={link.href}
+                    aria-current={link.current ? "page" : undefined}
+                    className={cn(
+                      label,
+                      titleLink,
+                      link.current && "underline"
+                    )}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
         <p className={cn(label, "mt-8 text-muted-foreground")}>
           © 2026 Harrow &amp; Vane LLP · Registered in England and Wales

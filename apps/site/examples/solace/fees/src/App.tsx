@@ -4,20 +4,18 @@ import { Minus, Plus } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
-const focusOutline =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
 const navLinkClass = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 hover:underline transition-colors duration-150",
-  focusOutline
+  focusRing
 )
 
 const textLinkClass = cn(
   "text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground transition-colors duration-150",
-  focusOutline
+  focusRing
 )
-
-const card = "rounded-xl border border-border bg-card p-7"
 
 const navLinks = [
   { label: "Approach", href: "/approach" },
@@ -26,7 +24,7 @@ const navLinks = [
   { label: "First session", href: "/first-session" },
 ]
 
-const currentHref = "/fees"
+const CURRENT = "/fees"
 
 const sessions = [
   {
@@ -96,11 +94,15 @@ const questions = [
   },
 ]
 
-function NavList({ className }: { className: string }) {
+function NavList({ vertical = false }: { vertical?: boolean }) {
   return (
-    <ul className={className}>
+    <ul
+      className={
+        vertical ? "list-none p-0" : "flex flex-wrap gap-x-4 md:gap-x-7"
+      }
+    >
       {navLinks.map((link) => {
-        const current = link.href === currentHref
+        const current = link.href === CURRENT
         return (
           <li key={link.href}>
             <a
@@ -136,13 +138,13 @@ export function App() {
           href="/"
           className={cn(
             "inline-flex h-11 items-center font-heading text-h2 text-foreground transition-colors duration-150",
-            focusOutline
+            focusRing
           )}
         >
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <NavList className="flex flex-wrap gap-x-4 md:gap-x-7" />
+          <NavList />
         </nav>
       </header>
 
@@ -228,12 +230,7 @@ export function App() {
             </p>
           </div>
 
-          <div
-            className={cn(
-              card,
-              "mt-12 md:col-span-4 md:col-start-9 md:mt-0 md:self-start"
-            )}
-          >
+          <div className="mt-12 rounded-xl border border-border bg-card p-7 md:col-span-4 md:col-start-9 md:mt-0 md:self-start">
             <h3 className="text-h2">If the fee is a worry</h3>
             <p className="mt-4">
               Say so when you write. I keep some sessions at £42 for people on a
@@ -245,7 +242,7 @@ export function App() {
         <div className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
           <section
             aria-labelledby="cancel-heading"
-            className={cn(card, "md:col-span-6")}
+            className="rounded-xl border border-border bg-card p-7 md:col-span-6"
           >
             <p className="font-mono text-label text-muted-foreground">
               48 hours' notice
@@ -268,7 +265,7 @@ export function App() {
           </section>
           <section
             aria-labelledby="pay-heading"
-            className={cn(card, "mt-4 md:col-span-6 md:col-start-7 md:mt-0")}
+            className="mt-4 rounded-xl border border-border bg-card p-7 md:col-span-6 md:mt-0"
           >
             <p className="font-mono text-label text-muted-foreground">
               One invoice a month
@@ -318,7 +315,7 @@ export function App() {
                         onClick={() => toggle(n)}
                         className={cn(
                           "flex w-full cursor-pointer items-center justify-between gap-4 py-4 text-left font-heading text-h2 text-foreground transition-colors duration-150 hover:text-muted-foreground",
-                          focusOutline
+                          focusRing
                         )}
                       >
                         <span>{item.q}</span>
@@ -329,11 +326,7 @@ export function App() {
                         />
                       </button>
                     </h3>
-                    <div
-                      id={`answer-${n}`}
-                      hidden={!isOpen}
-                      className="pb-4"
-                    >
+                    <div id={`answer-${n}`} hidden={!isOpen} className="pb-4">
                       <p className="max-w-xl">{item.a}</p>
                     </div>
                   </li>
@@ -347,7 +340,7 @@ export function App() {
           aria-labelledby="start-heading"
           className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
         >
-          <div className={cn(card, "md:col-span-7")}>
+          <div className="rounded-xl border border-border bg-card p-7 md:col-span-7">
             <h2 id="start-heading" className="text-h2">
               If you would like to start
             </h2>
@@ -390,7 +383,7 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <NavList className="list-none p-0" />
+            <NavList vertical />
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

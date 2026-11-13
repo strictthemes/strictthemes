@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import { cn } from "@/lib/utils"
 
@@ -14,7 +12,7 @@ function Table({
       tabIndex={0}
       role="region"
       aria-label={label}
-      className="relative w-full overflow-x-auto focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+      className="relative w-full overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring focus-visible:outline-solid"
     >
       <table
         data-slot="table"

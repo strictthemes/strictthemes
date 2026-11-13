@@ -1,6 +1,6 @@
 import { createCn } from "cn/config"
 
-// The theme's type classes are font sizes, not colors.
+// The theme type classes are font sizes, not colors.
 export const cn = createCn({
   extend: {
     classGroups: {

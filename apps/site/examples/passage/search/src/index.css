@@ -73,15 +73,6 @@
     --font-mono: 'Overpass Mono Variable', monospace;
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-  .dark {
-    color-scheme: dark;
-  }
-}
-
 :root {
     --background: #CAF0F8;
     --foreground: #03045E;

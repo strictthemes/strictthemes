@@ -9,6 +9,7 @@ checks:
   - Adding a habit with an empty name shows an error in words with an icon, tied to the field; a good name adds a card to the list and empties the field.
   - The "Add habit" button is the only raspberry button on the screen; the "Done" buttons are outline or secondary.
   - Every button and field on the page is at least 44px tall.
+  - 'The "How often" field is the theme''s `Select`, with no native `<select>` on the page: its trigger is a pill as tall as the input, its list opens under it as a sheet in the card''s color with a 1px border, the chosen row has a raspberry check, and the arrow keys, Enter and Escape work in it.'
 ---
 
 Sample content, if the user gave none: "Mossy", a habit tracker for small, daily steps. The person is Ines Okafor. Today she has five habits, two of them already done: Drink 8 glasses of water (every day, done at 08:12), Read 10 pages (every day), Walk after lunch (every day, done at 13:05), Stretch for 5 minutes (every day), No phone after 22:00 (every day). Her streak is 12 days. Use these as the starting state.
@@ -44,7 +45,7 @@ On a phone the name wraps beside the button; the button keeps its width. No othe
 **The form.** A card that is a section and the wrapper for the form and its status element. It opens with an `<h2>` "Add a habit" and, in the card's `gap-4`, one sentence in `text-body`: "Keep it small. Something you can do in two minutes is a good start." The form has `noValidate` and `flex flex-col gap-6`:
 
 - "What will you do?": an `Input` (add it with `npx shadcn@latest add input`) with `maxLength={40}` and helper text `Up to 40 characters, like "Drink a glass of water"`.
-- "How often": a `<select>` with Every day, Weekdays, Weekends and Three times a week, full width.
+- "How often": a `Select` from the layout notes with Every day, Weekdays, Weekends and Three times a week, full width. Every day is chosen at the start.
 - The page's one default `Button`, `type="submit"`, with the `Plus` icon: "Add habit", full width below `md` (`w-full md:w-auto md:self-start`).
 
 The form and the `role="status"` element for its confirmation share one `<div>` with no gap, which is the card's item after the sentence; the status element comes after the form, empty at first. When a habit is added it holds the confirmation line from the layout notes, with `mt-4` on the line, and the words `Added "Drink tea, not coffee"` (the name typed). The form stays; the message does not replace it.

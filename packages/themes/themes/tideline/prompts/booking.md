@@ -4,7 +4,7 @@ title: Book a lesson
 description: the booking form of a surf school, with a lesson, a date, the number of people, their ability, a name, an email, a phone number and a note, checked in code, a summary beside it whose total follows the choices, and a confirmation that replaces the form.
 order: 4
 checks:
-  - "The lesson and the ability are native selects whose first option is an empty choice in words, and the date is a date field whose earliest day is today on the visitor's clock."
+  - "The lesson and the ability are the theme's `Select` and the date is picked from the theme's calendar in a popover, with no native `<select>` and no `<input type=date>` on the page: each select shows an empty choice in words until one is chosen, its list opens under its trigger in the theme's colors with a check on the chosen row, and in the calendar no day before today on the visitor's clock can be chosen, today is outlined, and the arrow keys, Enter and Escape work."
   - "The number of people is set with minus and plus buttons from 1 to 4, each with an aria-label, and the value is announced with its noun, 1 person or 2 people."
   - "The summary's total is the lesson's price times the number of people and follows both: First Waves for 2 people reads £84, and with no lesson chosen it reads £0."
   - "Sending the empty form gives the lesson, the date, the ability, the name, the email and the phone each their own error line with an icon, tied to its field, and focus moves to the lesson select."
@@ -28,12 +28,12 @@ A full-width section that is a color block in lagoon, as the layout notes descri
 
 A section of parts side by side, from the layout notes, with its `aria-labelledby` pointing at the `<h2>` "Your lesson".
 
-**First part,** `md:col-span-7`: a `flex flex-col gap-6` with the `<h2>` "Your lesson" and the form card, as the Forms note describes it. Add the fields with `npx shadcn@latest add input textarea` if the project has none, and give the new files the edits the Added components note lists. This page uses the `outline` variant and `focusableWhenDisabled`, so it makes both of those edits in `button.tsx`, as well as the `secondary` one. The `<form>` has the `aria-label` "Book a lesson". Its fields, in this order, each in its own `flex flex-col gap-2`:
+**First part,** `md:col-span-7`: a `flex flex-col gap-6` with the `<h2>` "Your lesson" and the form card, as the Forms note describes it. Add the fields with `npx shadcn@latest add input textarea select popover calendar` if the project has none, and give the new files the edits the Added components note, the Selects note and the Date fields note list. This page uses the `outline` variant, `focusableWhenDisabled` and a date field, so it makes those three edits in `button.tsx` (the `outline` one, the `data-disabled:` one and the `ghost` one), as well as the `secondary` one. The `<form>` has the `aria-label` "Book a lesson". Its fields, in this order, each in its own `flex flex-col gap-2`:
 
-1. **Lesson**: the label "Lesson", then a native `<select>` styled as the layout notes describe, with the empty choice "Choose a lesson" and three options, each its plain text: `First Waves · Beginners · £42 a person`, `Green Waves · Improvers · £55 a person`, `Private Coaching · Any level · £85 a person`.
-2. **Date**: the label "Date", an `Input` of type `date` with `min` set to today on the visitor's clock, and the helper text `We set the start time by the tide and email it to you the day before.` `min` only limits the picker: a date typed before it still reaches the check.
+1. **Lesson**: the label "Lesson", then a `Select` from the layout notes, with the placeholder "Choose a lesson" and three choices, each its plain text: `First Waves · Beginners · £42 a person`, `Green Waves · Improvers · £55 a person`, `Private Coaching · Any level · £85 a person`.
+2. **Date**: the label "Date", a date field from the layout notes with `min` set to today on the visitor's clock (the start of the day, local time), and the helper text `We set the start time by the tide and email it to you the day before.`
 3. **People**: a label as a `<p>` with an `id`, "People", in `font-mono text-label uppercase text-foreground` (a `<label>` needs a field to point at; this one names the group), then a stepper from the layout notes, from 1 to 4, starting at 1. The value reads `1 person`, `2 people` and so on. The buttons' `aria-label`s are "Fewer people" and "More people". Under it the helper text `Up to 4 people online. For a bigger group, call 01632 960 418.`, named in the group's `aria-describedby`.
-4. **Ability**: the label "Surfing so far", then a native `<select>` with the empty choice "Choose the closest" and four options: `Never surfed`, `One or two lessons`, `Catching white water waves alone`, `Riding unbroken waves`. Under it the helper text `For a group, choose for the least experienced person.`
+4. **Ability**: the label "Surfing so far", then a `Select` with the placeholder "Choose the closest" and four choices: `Never surfed`, `One or two lessons`, `Catching white water waves alone`, `Riding unbroken waves`. Under it the helper text `For a group, choose for the least experienced person.`
 5. **Name**: the label "Your name", an `Input` with `autoComplete="name"`.
 6. **Email and phone**, side by side from `md` up: a `grid grid-cols-1 gap-6 md:grid-cols-2 md:items-start` whose two items are the fields' own stacks. The label "Email address", an `Input` of type `email` with `autoComplete="email"`, and the helper text `We send your start time here.` The label "Mobile phone", an `Input` of type `tel` with `autoComplete="tel"`, and the helper text `We text you if the sea changes our plans.`
 7. **Note**: the label "A note for your coach (optional)", a `Textarea` with `maxLength={300}`, and the helper text `An old injury, nerves, a birthday: anything that helps us plan.`
@@ -45,7 +45,7 @@ The last item of the form is the page's one main action: the default `Button`, `
 - The `<h2>` "Your booking".
 - Rows from the layout notes, a `<dl>` with four rows that read from the form:
   - `Lesson`: the lesson's name alone, `First Waves`; before one is chosen, `Not chosen yet`.
-  - `Date`: the date written out, `Saturday 19 June 2027`, in a `<time>` with the field's value as its `dateTime`; while the field is empty, `Not chosen yet`.
+  - `Date`: the date written out, `Saturday 19 June 2027`, in a `<time>` with the chosen day as its `dateTime` (`2027-06-19`); while the field is empty, `Not chosen yet`.
   - `People`: as the stepper writes it, `2 people`.
   - `Price`: `£42 a person`, with `tabular-nums`; before a lesson is chosen, `Not chosen yet`.
 - The total line: a `<div>` with `flex items-baseline justify-between gap-6 border-t border-border pt-4`, holding a label in `text-foreground`, `Total`, and the total as a `<p>` in `font-heading text-h2 text-foreground tabular-nums`: the lesson's price times the number of people, `£84`. Before a lesson is chosen it reads `£0`.
@@ -71,13 +71,13 @@ The footer from the layout notes.
 
 ### Behavior
 
-- Keep every value in component state: the lesson, the date, the number of people, the ability, the name, the email, the phone and the note. The summary reads from the same state, so its rows and its total follow each change as it is made.
-- The date in the summary is written from the field's `YYYY-MM-DD` value as the layout notes write a date, weekday first and with no comma. Read the value as a local date from its three numbers, not with `new Date(value)`, which reads it as UTC and can give the day before.
+- Keep every value in component state: the lesson and the ability (each `null` until one is chosen), the date (a `Date`, `undefined` until one is chosen), the number of people, the name, the email, the phone and the note. The summary reads from the same state, so its rows and its total follow each change as it is made.
+- The date in the summary is written from the chosen `Date` as the layout notes write a date, weekday first and with no comma. Its `dateTime` is built from the date's local year, month and day, not with `toISOString()`, which gives the day in UTC and can give the day before.
 - When the form is sent, check it in code, in this order:
-  - Lesson: the empty choice gives "Choose a lesson."
-  - Date: empty gives "Choose a date."; a date before today gives "Choose today or a later date." Compare dates as the `YYYY-MM-DD` strings a date field gives, with today taken from the visitor's clock in their own time zone.
+  - Lesson: no choice gives "Choose a lesson."
+  - Date: no date gives "Choose a date."; a date before today gives "Choose today or a later date.", with today taken from the visitor's clock in their own time zone. The calendar offers no such day, so this only guards a page left open past midnight.
   - The number of people is always valid, since the stepper cannot leave 1 to 4.
-  - Ability: the empty choice gives "Choose the closest match, so we can plan the lesson."
+  - Ability: no choice gives "Choose the closest match, so we can plan the lesson."
   - Name: empty, or only spaces, gives "Write your name."
   - Email: empty gives "Write your email address, so we can send your start time."; a malformed one gives "Check the email address: it needs an @ and a domain."
   - Phone: empty gives "Write a mobile number we can text on the day."; fewer than 10 digits, counting digits only and allowing spaces, `+` and `-`, gives "Check the mobile number: it needs at least 10 digits."

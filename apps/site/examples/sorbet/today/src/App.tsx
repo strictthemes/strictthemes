@@ -10,31 +10,55 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+type Frequency = "every-day" | "weekdays" | "weekends" | "three-a-week"
 
 type Habit = {
   id: number
   name: string
-  frequency: string
+  frequency: Frequency
   doneAt: string | null
 }
 
-const FREQUENCIES = ["Every day", "Weekdays", "Weekends", "Three times a week"]
-
-const STARTING_HABITS: Habit[] = [
-  { id: 1, name: "Drink 8 glasses of water", frequency: "Every day", doneAt: "08:12" },
-  { id: 2, name: "Read 10 pages", frequency: "Every day", doneAt: null },
-  { id: 3, name: "Walk after lunch", frequency: "Every day", doneAt: "13:05" },
-  { id: 4, name: "Stretch for 5 minutes", frequency: "Every day", doneAt: null },
-  { id: 5, name: "No phone after 22:00", frequency: "Every day", doneAt: null },
+const frequencies: { value: Frequency; label: string }[] = [
+  { value: "every-day", label: "Every day" },
+  { value: "weekdays", label: "Weekdays" },
+  { value: "weekends", label: "Weekends" },
+  { value: "three-a-week", label: "Three times a week" },
 ]
 
-const CONTAINER = "mx-auto w-full max-w-[1168px] px-4 md:px-6"
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const LABEL = "block font-mono text-label text-muted-foreground"
+const frequencyLabel = (value: Frequency) =>
+  frequencies.find((f) => f.value === value)?.label ?? ""
 
-const NAV_LINKS = [
+const startingHabits: Habit[] = [
+  {
+    id: 1,
+    name: "Drink 8 glasses of water",
+    frequency: "every-day",
+    doneAt: "08:12",
+  },
+  { id: 2, name: "Read 10 pages", frequency: "every-day", doneAt: null },
+  { id: 3, name: "Walk after lunch", frequency: "every-day", doneAt: "13:05" },
+  {
+    id: 4,
+    name: "Stretch for 5 minutes",
+    frequency: "every-day",
+    doneAt: null,
+  },
+  { id: 5, name: "No phone after 22:00", frequency: "every-day", doneAt: null },
+]
+
+const focusOutline =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const navLinks = [
   { label: "Today", href: "/today" },
   { label: "Progress", href: "/progress" },
   { label: "Plans", href: "/plans" },
@@ -54,272 +78,117 @@ function clockTime(date: Date) {
   return `${hh}:${mm}`
 }
 
-function Header() {
-  return (
-    <header className="border-b border-border">
-      <div
-        className={`${CONTAINER} flex flex-wrap items-center gap-x-6 gap-y-2 py-3`}
-      >
-        <a
-          href="/today"
-          className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${FOCUS}`}
-        >
-          Mossy
-        </a>
-        <nav aria-label="Main" className="w-full md:w-auto">
-          <ul className="flex gap-1">
-            {NAV_LINKS.map((link) => {
-              const current = link.label === "Today"
-              return (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    aria-current={current ? "page" : undefined}
-                    className={`inline-flex h-11 items-center rounded-lg px-3 font-mono text-label ${FOCUS} ${
-                      current
-                        ? "bg-secondary text-secondary-foreground"
-                        : "text-foreground underline-offset-4 hover:underline"
-                    }`}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-      </div>
-    </header>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-border">
-      <div
-        className={`${CONTAINER} flex flex-wrap items-center justify-between gap-3 py-10`}
-      >
-        <p className="font-heading text-h2">Mossy</p>
-        <p className="font-mono text-label text-muted-foreground">
-          Mossy · Made for small, daily steps · 2026
-        </p>
-      </div>
-    </footer>
-  )
-}
-
-function HabitCard({
-  habit,
-  onToggle,
-}: {
-  habit: Habit
-  onToggle: (id: number) => void
-}) {
-  const done = habit.doneAt !== null
-  return (
-    <li className="flex flex-row items-center gap-4 rounded-xl border border-border bg-card p-6">
-      <div className="flex min-w-0 flex-1 flex-col gap-2">
-        <h3 className="text-h2">{habit.name}</h3>
-        <p className={SMALL_FIGURE}>
-          {habit.frequency} ·{" "}
-          {done ? (
-            <>
-              Done at <time dateTime={habit.doneAt!}>{habit.doneAt}</time>
-            </>
-          ) : (
-            "Not yet"
-          )}
-        </p>
-      </div>
-      <Button
-        variant={done ? "secondary" : "outline"}
-        aria-pressed={done}
-        aria-label={`Done: ${habit.name}`}
-        onClick={() => onToggle(habit.id)}
-        className="h-11 shrink-0 px-6 font-mono text-label"
-      >
-        {done ? (
-          <CircleCheck className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        ) : (
-          <Circle className="size-4" strokeWidth={1.5} aria-hidden="true" />
-        )}
-        Done
-      </Button>
-    </li>
-  )
-}
-
-function AddHabitCard({
-  habits,
-  onAdd,
-}: {
-  habits: Habit[]
-  onAdd: (name: string, frequency: string) => void
-}) {
-  const [name, setName] = useState("")
-  const [frequency, setFrequency] = useState(FREQUENCIES[0])
-  const [error, setError] = useState<string | null>(null)
-  const [confirmation, setConfirmation] = useState<string | null>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const timerRef = useRef<number | undefined>(undefined)
-
-  useEffect(() => () => window.clearTimeout(timerRef.current), [])
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const trimmed = name.trim()
-    let problem: string | null = null
-    if (trimmed === "") {
-      problem = 'Give your habit a name, like "Stretch for 5 minutes".'
-    } else if (
-      habits.some((h) => h.name.trim().toLowerCase() === trimmed.toLowerCase())
-    ) {
-      problem = "You already have this habit."
-    }
-
-    if (problem) {
-      setError(problem)
-      inputRef.current?.focus()
-      return
-    }
-
-    setError(null)
-    onAdd(trimmed, frequency)
-    setName("")
-    inputRef.current?.focus()
-    setConfirmation(`Added "${trimmed}"`)
-    window.clearTimeout(timerRef.current)
-    timerRef.current = window.setTimeout(() => setConfirmation(null), 4000)
-  }
-
-  const describedBy = error
-    ? "habit-name-helper habit-name-error"
-    : "habit-name-helper"
-
-  return (
-    <section
-      aria-labelledby="add-habit-heading"
-      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:sticky md:top-6 md:col-span-5 md:self-start"
-    >
-      <h2 id="add-habit-heading" className="text-h2">
-        Add a habit
-      </h2>
-      <p className="max-w-lg">
-        Keep it small. Something you can do in two minutes is a good start.
-      </p>
-      <div>
-        <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="habit-name" className={LABEL}>
-              What will you do?
-            </label>
-            <Input
-              ref={inputRef}
-              id="habit-name"
-              name="name"
-              maxLength={40}
-              value={name}
-              onChange={(event) => {
-                setName(event.target.value)
-                setError(null)
-              }}
-              aria-invalid={error ? true : undefined}
-              aria-describedby={describedBy}
-              className="h-11 px-4 text-body md:text-body"
-            />
-            <p id="habit-name-helper" className={SMALL_FIGURE}>
-              Up to 40 characters, like "Drink a glass of water"
-            </p>
-            {error && (
-              <p
-                id="habit-name-error"
-                className="flex items-start gap-2 font-mono text-label text-destructive"
-              >
-                <CircleAlert
-                  className="size-4 shrink-0"
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                {error}
-              </p>
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="habit-frequency" className={LABEL}>
-              How often
-            </label>
-            <select
-              id="habit-frequency"
-              name="frequency"
-              value={frequency}
-              onChange={(event) => setFrequency(event.target.value)}
-              className={`h-11 w-full rounded-lg border border-input bg-card px-4 text-body text-foreground ${FOCUS}`}
-            >
-              {FREQUENCIES.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          </div>
-          <Button
-            type="submit"
-            className="h-11 w-full px-6 font-mono text-label md:w-auto md:self-start"
-          >
-            <Plus className="size-4" strokeWidth={1.5} aria-hidden="true" />
-            Add habit
-          </Button>
-        </form>
-        <div role="status">
-          {confirmation && (
-            <p className="mt-4 flex w-fit items-center gap-2 font-mono text-label text-success">
-              <CircleCheck
-                className="size-4"
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-              {confirmation}
-            </p>
-          )}
-        </div>
-      </div>
-    </section>
-  )
-}
+const container = "mx-auto max-w-[1168px] px-4 md:px-6"
 
 export function App() {
   const [greeting] = useState(() => greetingFor(new Date()))
-  const [habits, setHabits] = useState<Habit[]>(STARTING_HABITS)
-  const nextId = useRef(STARTING_HABITS.length + 1)
+  const [habits, setHabits] = useState<Habit[]>(startingHabits)
+  const [name, setName] = useState("")
+  const [frequency, setFrequency] = useState<Frequency>("every-day")
+  const [nameError, setNameError] = useState<string | null>(null)
+  const [added, setAdded] = useState<string | null>(null)
 
-  const doneCount = habits.filter((h) => h.doneAt !== null).length
+  const nameRef = useRef<HTMLInputElement>(null)
+  const nextId = useRef(startingHabits.length + 1)
+  const addedTimer = useRef<number | undefined>(undefined)
+
+  useEffect(() => () => window.clearTimeout(addedTimer.current), [])
+
+  const doneCount = habits.filter((h) => h.doneAt).length
   const allDone = habits.length > 0 && doneCount === habits.length
 
-  function toggleHabit(id: number) {
-    const now = clockTime(new Date())
-    setHabits((current) =>
-      current.map((h) =>
-        h.id === id ? { ...h, doneAt: h.doneAt === null ? now : null } : h
+  function toggle(id: number) {
+    setHabits((list) =>
+      list.map((h) =>
+        h.id === id
+          ? { ...h, doneAt: h.doneAt ? null : clockTime(new Date()) }
+          : h
       )
     )
   }
 
-  function addHabit(name: string, frequency: string) {
-    const id = nextId.current++
-    setHabits((current) => [...current, { id, name, frequency, doneAt: null }])
+  function addHabit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const trimmed = name.trim()
+
+    if (!trimmed) {
+      setNameError('Give your habit a name, like "Stretch for 5 minutes".')
+      nameRef.current?.focus()
+      return
+    }
+    if (
+      habits.some((h) => h.name.trim().toLowerCase() === trimmed.toLowerCase())
+    ) {
+      setNameError("You already have this habit.")
+      nameRef.current?.focus()
+      return
+    }
+
+    setHabits((list) => [
+      ...list,
+      { id: nextId.current++, name: trimmed, frequency, doneAt: null },
+    ])
+    setNameError(null)
+    setName("")
+    nameRef.current?.focus()
+
+    setAdded(trimmed)
+    window.clearTimeout(addedTimer.current)
+    addedTimer.current = window.setTimeout(() => setAdded(null), 4000)
   }
+
+  const nameDescribedBy = nameError
+    ? "habit-name-help habit-name-error"
+    : "habit-name-help"
 
   return (
     <div className="min-h-screen bg-background text-body text-foreground">
-      <Header />
-      <main className={`${CONTAINER} flex flex-col gap-10 pt-10 pb-16`}>
+      <header className="border-b border-border">
+        <div
+          className={`${container} flex flex-wrap items-center gap-x-6 gap-y-2 py-3`}
+        >
+          <a
+            href="/today"
+            className={`inline-flex h-11 items-center font-heading text-h2 text-foreground ${focusOutline}`}
+          >
+            Mossy
+          </a>
+          <nav aria-label="Main" className="w-full md:w-auto">
+            <ul className="flex gap-1">
+              {navLinks.map((link) => {
+                const current = link.href === "/today"
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      aria-current={current ? "page" : undefined}
+                      className={`inline-flex h-11 items-center rounded-lg px-3 font-mono text-label ${focusOutline} ${
+                        current
+                          ? "bg-secondary text-secondary-foreground"
+                          : "text-foreground underline-offset-4 hover:underline"
+                      }`}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        </div>
+      </header>
+
+      <main className={`${container} flex flex-col gap-10 pt-10 pb-16`}>
         <div className="flex flex-col gap-2">
-          <time dateTime="2026-11-11" className={SMALL_FIGURE}>
+          <time
+            dateTime="2026-11-11"
+            className="font-mono text-label text-muted-foreground tabular-nums"
+          >
             Wednesday, 11 November
           </time>
-          <h1 className="text-h1">{greeting}, Ines</h1>
+          <h1 className="text-h1 text-foreground">{greeting}, Ines</h1>
           <div className="flex items-center">
-            <p className="font-heading text-h2 tabular-nums">
+            <p className="font-heading text-h2 text-foreground tabular-nums">
               {doneCount} of {habits.length} done
             </p>
             <div role="status">
@@ -338,16 +207,176 @@ export function App() {
             aria-labelledby="habits-heading"
             className="flex flex-col gap-6 md:col-span-7"
           >
-            <h2 id="habits-heading" className="text-h2">
+            <h2 id="habits-heading" className="text-h2 text-foreground">
               Your habits
             </h2>
             <ul className="flex flex-col gap-3">
-              {habits.map((habit) => (
-                <HabitCard key={habit.id} habit={habit} onToggle={toggleHabit} />
-              ))}
+              {habits.map((habit) => {
+                const done = habit.doneAt !== null
+                return (
+                  <li
+                    key={habit.id}
+                    className="flex flex-row items-center gap-4 rounded-xl border border-border bg-card p-6"
+                  >
+                    <div className="flex min-w-0 flex-1 flex-col gap-2">
+                      <h3 className="text-h2 wrap-break-word text-foreground">
+                        {habit.name}
+                      </h3>
+                      <p className="font-mono text-label text-muted-foreground tabular-nums">
+                        {frequencyLabel(habit.frequency)} ·{" "}
+                        {done ? (
+                          <>
+                            Done at{" "}
+                            <time dateTime={habit.doneAt ?? undefined}>
+                              {habit.doneAt}
+                            </time>
+                          </>
+                        ) : (
+                          "Not yet"
+                        )}
+                      </p>
+                    </div>
+                    <Button
+                      variant={done ? "secondary" : "outline"}
+                      aria-pressed={done}
+                      aria-label={`Done: ${habit.name}`}
+                      onClick={() => toggle(habit.id)}
+                      className="h-11 shrink-0 px-6 font-mono text-label"
+                    >
+                      {done ? (
+                        <CircleCheck
+                          className="size-4"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Circle
+                          className="size-4"
+                          strokeWidth={1.5}
+                          aria-hidden="true"
+                        />
+                      )}
+                      Done
+                    </Button>
+                  </li>
+                )
+              })}
             </ul>
           </section>
-          <AddHabitCard habits={habits} onAdd={addHabit} />
+
+          <section
+            aria-labelledby="add-heading"
+            className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:sticky md:top-6 md:col-span-5 md:self-start"
+          >
+            <h2 id="add-heading" className="text-h2 text-foreground">
+              Add a habit
+            </h2>
+            <p className="max-w-lg text-body text-foreground">
+              Keep it small. Something you can do in two minutes is a good
+              start.
+            </p>
+            <div>
+              <form
+                noValidate
+                onSubmit={addHabit}
+                className="flex flex-col gap-6"
+              >
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="habit-name"
+                    className="block font-mono text-label text-muted-foreground"
+                  >
+                    What will you do?
+                  </label>
+                  <Input
+                    ref={nameRef}
+                    id="habit-name"
+                    name="habit-name"
+                    autoComplete="off"
+                    maxLength={40}
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value)
+                      if (nameError) setNameError(null)
+                    }}
+                    aria-invalid={nameError ? true : undefined}
+                    aria-describedby={nameDescribedBy}
+                    className="h-11 px-4 text-body md:text-body"
+                  />
+                  <p
+                    id="habit-name-help"
+                    className="font-mono text-label text-muted-foreground tabular-nums"
+                  >
+                    Up to 40 characters, like "Drink a glass of water"
+                  </p>
+                  {nameError && (
+                    <p
+                      id="habit-name-error"
+                      className="flex items-start gap-2 font-mono text-label text-destructive"
+                    >
+                      <CircleAlert
+                        className="size-4 shrink-0"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
+                      {nameError}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="habit-frequency"
+                    className="block font-mono text-label text-muted-foreground"
+                  >
+                    How often
+                  </label>
+                  <Select
+                    items={frequencies}
+                    value={frequency}
+                    onValueChange={(value) => {
+                      if (value !== null) setFrequency(value as Frequency)
+                    }}
+                  >
+                    <SelectTrigger id="habit-frequency">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {frequencies.map((f) => (
+                        <SelectItem key={f.value} value={f.value}>
+                          {f.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="h-11 w-full px-6 font-mono text-label md:w-auto md:self-start"
+                >
+                  <Plus
+                    className="size-4"
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                  />
+                  Add habit
+                </Button>
+              </form>
+              <div role="status">
+                {added && (
+                  <p className="mt-4 flex w-fit items-center gap-2 font-mono text-label text-success">
+                    <CircleCheck
+                      className="size-4"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                    />
+                    Added "{added}"
+                  </p>
+                )}
+              </div>
+            </div>
+          </section>
         </div>
 
         <section
@@ -357,13 +386,23 @@ export function App() {
           <p className="font-mono text-label text-muted-foreground">
             Tip for today
           </p>
-          <p>
+          <p className="text-body text-foreground">
             Put your book where your phone usually goes. Reading the first page
             is the hard part.
           </p>
         </section>
       </main>
-      <Footer />
+
+      <footer className="border-t border-border">
+        <div
+          className={`${container} flex flex-wrap items-center justify-between gap-3 py-10`}
+        >
+          <p className="font-heading text-h2 text-foreground">Mossy</p>
+          <p className="font-mono text-label text-muted-foreground">
+            Mossy · Made for small, daily steps · 2026
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,90 +13,71 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-const focusRing =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+// The sample's today: Friday 27 November 2026. Never the device clock.
+const TODAY = { iso: "2026-11-27", text: "27 Nov 2026" }
 
-const navLinks = [
+const INVOICE = {
+  number: "INV-0142",
+  issued: { iso: "2026-11-13", text: "13 Nov 2026" },
+  due: TODAY,
+  reference: "LC-PO-2211",
+  vatRate: 0.2,
+}
+
+const LINES = [
+  { description: "Menu cards", quantity: 400, unitPrice: 1.1 },
+  { description: "Table tents", quantity: 120, unitPrice: 2.5 },
+  { description: "Window posters", quantity: 6, unitPrice: 45 },
+  { description: "Design and proofing", quantity: 1, unitPrice: 230 },
+]
+
+const NAV_LINKS = [
   { label: "Overview", href: "/" },
   { label: "Transactions", href: "/transactions" },
   { label: "Invoices", href: "/invoice" },
   { label: "Payments", href: "/payment" },
   { label: "Reports", href: "/report" },
 ]
-const currentHref = "/invoice"
 
-const lineItems = [
-  { description: "Menu cards", quantity: "400", unit: "£1.10", amount: "£440.00" },
-  { description: "Table tents", quantity: "120", unit: "£2.50", amount: "£300.00" },
-  { description: "Window posters", quantity: "6", unit: "£45.00", amount: "£270.00" },
-  {
-    description: "Design and proofing",
-    quantity: "1",
-    unit: "£230.00",
-    amount: "£230.00",
-  },
-]
+const CURRENT_PATH = "/invoice"
 
-type ActivityItem = {
-  id: string
-  text: ReactNode
-  date: string
-  dateTime: string
-}
+const money = new Intl.NumberFormat("en-GB", {
+  style: "currency",
+  currency: "GBP",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})
 
-const initialActivity: ActivityItem[] = [
-  {
-    id: "viewed",
-    text: "Viewed by Larkspur Café",
-    date: "24 Nov 2026",
-    dateTime: "2026-11-24",
-  },
-  {
-    id: "sent",
-    text: (
-      <>
-        Sent to <span className="font-mono">accounts@larkspur.example</span>
-      </>
-    ),
-    date: "13 Nov 2026",
-    dateTime: "2026-11-13",
-  },
-  {
-    id: "created",
-    text: "Created by Ada Hollis",
-    date: "13 Nov 2026",
-    dateTime: "2026-11-13",
-  },
-]
+const count = new Intl.NumberFormat("en-GB")
 
-const labelClass = "font-mono text-label uppercase text-muted-foreground"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const subtotal = LINES.reduce(
+  (sum, line) => sum + line.quantity * line.unitPrice,
+  0
+)
+const vat = subtotal * INVOICE.vatRate
+const total = subtotal + vat
 
-function NavLink({
-  label,
-  href,
-  className,
-}: {
-  label: string
-  href: string
-  className?: string
-}) {
-  const current = href === currentHref
-  return (
-    <a
-      href={href}
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        "font-mono text-label uppercase transition-colors duration-150",
-        focusRing,
-        current
-          ? "text-foreground underline underline-offset-4"
-          : "text-muted-foreground hover:text-foreground",
-        className
-      )}
-    >
-      {label}
-    </a>
+const FOCUS =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const CONTAINER = "mx-auto w-full max-w-[1200px] px-4 md:px-6"
+const LABEL = "font-mono text-label uppercase text-muted-foreground"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const BUTTON = "px-4 font-mono text-label uppercase"
+const DL_ROW =
+  "flex items-baseline justify-between gap-3 border-border py-2 not-first:border-t"
+const DL_VALUE = "text-right font-mono tabular-nums"
+const HEAD_CELL =
+  "px-4 font-mono text-label text-muted-foreground uppercase first:pl-0 last:pr-0"
+const CELL = "px-4 py-2 first:pl-0 last:pr-0"
+const NUMBER_CELL = cn(CELL, "text-right font-mono tabular-nums")
+
+function navLinkClass(current: boolean) {
+  return cn(
+    "font-mono text-label uppercase transition-colors duration-150",
+    FOCUS,
+    current
+      ? "text-foreground underline underline-offset-4"
+      : "text-muted-foreground hover:text-foreground"
   )
 }
 
@@ -110,99 +91,109 @@ function State({ paid }: { paid: boolean }) {
           paid ? "bg-primary" : "bg-muted-foreground"
         )}
       />
-      <span className="text-body text-foreground">{paid ? "Paid" : "Sent"}</span>
+      <span className="text-body text-foreground">
+        {paid ? "Paid" : "Sent"}
+      </span>
     </span>
   )
 }
 
-function DetailRow({
-  term,
-  children,
-  mono = true,
-}: {
-  term: string
-  children: ReactNode
-  mono?: boolean
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-3 border-t border-border py-2 first:border-t-0">
-      <dt className={labelClass}>{term}</dt>
-      <dd
-        className={cn(
-          "text-right",
-          mono ? "font-mono tabular-nums" : "text-body"
-        )}
-      >
-        {children}
-      </dd>
-    </div>
-  )
-}
-
-const cellEdge = "px-4 py-2 first:pl-0 last:pr-0"
-
 export function App() {
-  const [menuOpen, setMenuOpen] = useState(false)
   const [paid, setPaid] = useState(false)
-  const [activity, setActivity] = useState(initialActivity)
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  const activity = [
+    ...(paid
+      ? [{ id: "paid", text: <>Marked as paid by Ada Hollis</>, date: TODAY }]
+      : []),
+    {
+      id: "viewed",
+      text: <>Viewed by Larkspur Café</>,
+      date: { iso: "2026-11-24", text: "24 Nov 2026" },
+    },
+    {
+      id: "sent",
+      text: (
+        <>
+          Sent to <span className="font-mono">accounts@larkspur.example</span>
+        </>
+      ),
+      date: INVOICE.issued,
+    },
+    {
+      id: "created",
+      text: <>Created by Ada Hollis</>,
+      date: INVOICE.issued,
+    },
+  ]
 
   function markAsPaid() {
     if (paid) return
     setPaid(true)
-    setActivity((rows) => [
-      {
-        id: "paid",
-        text: "Marked as paid by Ada Hollis",
-        date: "27 Nov 2026",
-        dateTime: "2026-11-27",
-      },
-      ...rows,
-    ])
   }
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <header className="border-b border-border">
-        <div className="mx-auto flex w-full max-w-[1200px] items-center gap-6 px-4 py-4 md:px-6">
+        <div className={cn(CONTAINER, "flex items-center gap-6 py-4")}>
           <a
             href="/"
-            className={cn("font-heading text-h2 text-foreground", focusRing)}
+            className={cn("font-heading text-h2 text-foreground", FOCUS)}
           >
             Fairhold
           </a>
           <nav aria-label="Main" className="hidden md:block">
             <ul className="flex gap-6">
-              {navLinks.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <NavLink {...link} />
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_PATH ? "page" : undefined
+                    }
+                    className={navLinkClass(link.href === CURRENT_PATH)}
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
           </nav>
-          <p className={cn(smallFigure, "ml-auto hidden md:block")}>
+          <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
             Hollis &amp; Vane
           </p>
           <Button
             variant="outline"
-            className="ml-auto px-4 font-mono text-label uppercase md:hidden"
+            className={cn(BUTTON, "ml-auto md:hidden")}
             aria-expanded={menuOpen}
-            aria-controls="mobile-nav"
+            aria-controls="main-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-nav"
+          id="main-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
-          <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
+          <div className={CONTAINER}>
             <ul className="py-2">
-              {navLinks.map((link) => (
+              {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <NavLink {...link} className="block py-2" />
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_PATH ? "page" : undefined
+                    }
+                    className={cn(
+                      navLinkClass(link.href === CURRENT_PATH),
+                      "block py-2"
+                    )}
+                  >
+                    {link.label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -211,21 +202,18 @@ export function App() {
       </header>
 
       <main className="flex-1 py-6 md:py-12">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 md:px-6">
+        <div className={cn(CONTAINER, "flex flex-col gap-6")}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className={labelClass}>Invoice</p>
-              <h1 className="text-h1">INV-0142</h1>
+              <p className={LABEL}>Invoice</p>
+              <h1 className="text-h1">{INVOICE.number}</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button
-                variant="outline"
-                className="px-4 font-mono text-label uppercase"
-              >
+              <Button variant="outline" className={BUTTON}>
                 Download PDF
               </Button>
               <Button
-                className="px-4 font-mono text-label uppercase"
+                className={BUTTON}
                 disabled={paid}
                 focusableWhenDisabled
                 onClick={markAsPaid}
@@ -237,7 +225,7 @@ export function App() {
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
             <article
-              aria-labelledby="invoice-title"
+              aria-labelledby="document-title"
               className="flex min-w-0 flex-col gap-12 rounded-xl border border-border bg-card p-6 md:p-12 lg:col-span-8"
             >
               <div className="flex flex-wrap items-start justify-between gap-6">
@@ -246,26 +234,28 @@ export function App() {
                   <address className="text-body not-italic">
                     Hollis &amp; Vane Ltd
                     <br />
-                    Unit 4, Tanner&apos;s Yard
+                    Unit 4, Tanner&rsquo;s Yard
                     <br />
                     Kestle KS3 9QT
                   </address>
-                  <p className={smallFigure}>VAT GB 318 4402 17</p>
+                  <p className={SMALL_FIGURE}>VAT GB 318 4402 17</p>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <h2 id="invoice-title" className="text-h2">
+                  <h2 id="document-title" className="text-h2">
                     Invoice
                   </h2>
-                  <p className={cn(smallFigure, "text-foreground")}>INV-0142</p>
-                  <State paid={paid} />
+                  <p className={cn(SMALL_FIGURE, "text-foreground")}>
+                    {INVOICE.number}
+                  </p>
+                  <p>
+                    <State paid={paid} />
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="flex flex-col gap-2">
-                  <h3 className={cn("font-mono text-label", labelClass)}>
-                    Bill to
-                  </h3>
+                  <h3 className={LABEL}>Bill to</h3>
                   <address className="text-body not-italic">
                     Larkspur Café
                     <br />
@@ -277,78 +267,94 @@ export function App() {
                   </address>
                 </div>
                 <dl>
-                  <DetailRow term="Invoice number">INV-0142</DetailRow>
-                  <DetailRow term="Issued">
-                    <time dateTime="2026-11-13">13 Nov 2026</time>
-                  </DetailRow>
-                  <DetailRow term="Due">
-                    <time dateTime="2026-11-27">27 Nov 2026</time>
-                  </DetailRow>
-                  <DetailRow term="Your reference">LC-PO-2211</DetailRow>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Invoice number</dt>
+                    <dd className={DL_VALUE}>{INVOICE.number}</dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Issued</dt>
+                    <dd className={DL_VALUE}>
+                      <time dateTime={INVOICE.issued.iso}>
+                        {INVOICE.issued.text}
+                      </time>
+                    </dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Due</dt>
+                    <dd className={DL_VALUE}>
+                      <time dateTime={INVOICE.due.iso}>{INVOICE.due.text}</time>
+                    </dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Your reference</dt>
+                    <dd className={DL_VALUE}>{INVOICE.reference}</dd>
+                  </div>
                 </dl>
               </div>
 
               <Table label="Line items" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={cn(labelClass, "min-w-48 px-4 first:pl-0 last:pr-0")}>
+                    <TableHead className={cn(HEAD_CELL, "min-w-48")}>
                       Description
                     </TableHead>
-                    <TableHead className={cn(labelClass, "px-4 text-right first:pl-0 last:pr-0")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Quantity
                     </TableHead>
-                    <TableHead className={cn(labelClass, "px-4 text-right first:pl-0 last:pr-0")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Unit price
                     </TableHead>
-                    <TableHead className={cn(labelClass, "px-4 text-right first:pl-0 last:pr-0")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Amount
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {lineItems.map((item) => (
-                    <TableRow key={item.description}>
-                      <TableCell className={cn(cellEdge, "whitespace-normal")}>
-                        {item.description}
+                  {LINES.map((line) => (
+                    <TableRow key={line.description}>
+                      <TableCell className={cn(CELL, "whitespace-normal")}>
+                        {line.description}
                       </TableCell>
-                      <TableCell className={cn(cellEdge, "text-right font-mono tabular-nums")}>
-                        {item.quantity}
+                      <TableCell className={NUMBER_CELL}>
+                        {count.format(line.quantity)}
                       </TableCell>
-                      <TableCell className={cn(cellEdge, "text-right font-mono tabular-nums")}>
-                        {item.unit}
+                      <TableCell className={NUMBER_CELL}>
+                        {money.format(line.unitPrice)}
                       </TableCell>
-                      <TableCell className={cn(cellEdge, "text-right font-mono tabular-nums")}>
-                        {item.amount}
+                      <TableCell className={NUMBER_CELL}>
+                        {money.format(line.quantity * line.unitPrice)}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
                 <TableFooter className="bg-transparent font-normal">
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={3} className={cn(cellEdge, "text-right")}>
-                      <span className={labelClass}>Subtotal</span>
-                    </TableCell>
                     <TableCell
-                      className={cn(cellEdge, "text-right font-mono tabular-nums text-foreground")}
+                      colSpan={3}
+                      className={cn(CELL, LABEL, "text-right")}
                     >
-                      £1,240.00
+                      Subtotal
+                    </TableCell>
+                    <TableCell className={cn(NUMBER_CELL, "text-foreground")}>
+                      {money.format(subtotal)}
                     </TableCell>
                   </TableRow>
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={3} className={cn(cellEdge, "text-right")}>
-                      <span className={labelClass}>VAT 20%</span>
-                    </TableCell>
                     <TableCell
-                      className={cn(cellEdge, "text-right font-mono tabular-nums text-foreground")}
+                      colSpan={3}
+                      className={cn(CELL, LABEL, "text-right")}
                     >
-                      £248.00
+                      VAT 20%
+                    </TableCell>
+                    <TableCell className={cn(NUMBER_CELL, "text-foreground")}>
+                      {money.format(vat)}
                     </TableCell>
                   </TableRow>
                   <TableRow className="hover:bg-transparent">
                     <TableCell
                       colSpan={3}
                       className={cn(
-                        cellEdge,
+                        CELL,
                         "border-t-4 border-double border-foreground text-right font-heading text-h2 tabular-nums"
                       )}
                     >
@@ -356,48 +362,58 @@ export function App() {
                     </TableCell>
                     <TableCell
                       className={cn(
-                        cellEdge,
+                        CELL,
                         "border-t-4 border-double border-foreground text-right font-heading text-h2 tabular-nums"
                       )}
                     >
-                      £1,488.00
+                      {money.format(total)}
                     </TableCell>
                   </TableRow>
                 </TableFooter>
               </Table>
 
               <div className="flex flex-col gap-3 border-t border-border pt-6">
-                <h3 className={cn("font-mono text-label", labelClass)}>
-                  Payment details
-                </h3>
+                <h3 className={LABEL}>Payment details</h3>
                 <p className="max-w-lg text-body text-foreground">
                   Pay by bank transfer within 14 days, quoting the invoice
                   number.
                 </p>
                 <dl className="w-full max-w-md">
-                  <DetailRow term="Account name" mono={false}>
-                    Hollis &amp; Vane Ltd
-                  </DetailRow>
-                  <DetailRow term="Sort code">60-14-22</DetailRow>
-                  <DetailRow term="Account number">31884417</DetailRow>
-                  <DetailRow term="Reference">INV-0142</DetailRow>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Account name</dt>
+                    <dd className="text-right text-body">
+                      Hollis &amp; Vane Ltd
+                    </dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Sort code</dt>
+                    <dd className={DL_VALUE}>60-14-22</dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Account number</dt>
+                    <dd className={DL_VALUE}>31884417</dd>
+                  </div>
+                  <div className={DL_ROW}>
+                    <dt className={LABEL}>Reference</dt>
+                    <dd className={DL_VALUE}>{INVOICE.number}</dd>
+                  </div>
                 </dl>
               </div>
             </article>
 
-            <div className="flex flex-col gap-6 lg:col-span-4">
+            <div className="flex min-w-0 flex-col gap-6 lg:col-span-4">
               <section
-                aria-labelledby="status-heading"
+                aria-labelledby="status-title"
                 className="flex flex-col gap-3 rounded-xl border border-border bg-card p-6"
               >
                 <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
-                  <h2 id="status-heading" className={cn("font-mono text-label", labelClass)}>
+                  <h2 id="status-title" className={LABEL}>
                     Status
                   </h2>
                   {!paid && (
                     <Badge
                       variant="outline"
-                      className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label uppercase text-tertiary-foreground"
+                      className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
                     >
                       Due
                     </Badge>
@@ -406,22 +422,22 @@ export function App() {
                 <div className="flex flex-col gap-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <State paid={paid} />
-                    <p className={smallFigure}>
+                    <p className={SMALL_FIGURE}>
                       {paid ? "Paid" : "Due"}{" "}
-                      <time dateTime="2026-11-27">27 Nov 2026</time>
+                      <time dateTime={TODAY.iso}>{TODAY.text}</time>
                     </p>
                   </div>
                   <div>
                     <div className="flex flex-col gap-1">
-                      <p className={labelClass}>Amount due</p>
-                      <p className="font-heading text-h1 tabular-nums text-foreground">
-                        {paid ? "£0.00" : "£1,488.00"}
+                      <p className={LABEL}>Amount due</p>
+                      <p className="font-heading text-h1 text-foreground tabular-nums">
+                        {money.format(paid ? 0 : total)}
                       </p>
                     </div>
                     <div role="status">
                       {paid && (
-                        <p className="mt-3 max-w-lg text-body text-foreground">
-                          Invoice INV-0142 marked as paid.
+                        <p className="mt-3 text-body text-foreground">
+                          Invoice {INVOICE.number} marked as paid.
                         </p>
                       )}
                     </div>
@@ -430,23 +446,23 @@ export function App() {
               </section>
 
               <section
-                aria-labelledby="activity-heading"
+                aria-labelledby="activity-title"
                 className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card"
               >
                 <div className="flex min-h-8 flex-wrap items-center justify-between gap-3 border-b border-border px-6 pt-6 pb-3">
-                  <h2 id="activity-heading" className={cn("font-mono text-label", labelClass)}>
+                  <h2 id="activity-title" className={LABEL}>
                     Activity
                   </h2>
                 </div>
                 <ul>
-                  {activity.map((row) => (
+                  {activity.map((entry) => (
                     <li
-                      key={row.id}
-                      className="flex flex-col gap-1 border-t border-border px-6 py-3 first:border-t-0"
+                      key={entry.id}
+                      className="flex flex-col gap-1 border-border px-6 py-3 not-first:border-t"
                     >
-                      <p className="max-w-lg text-body text-foreground">{row.text}</p>
-                      <time dateTime={row.dateTime} className={smallFigure}>
-                        {row.date}
+                      <p className="text-body text-foreground">{entry.text}</p>
+                      <time dateTime={entry.date.iso} className={SMALL_FIGURE}>
+                        {entry.date.text}
                       </time>
                     </li>
                   ))}
@@ -458,8 +474,8 @@ export function App() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-6">
-          <p className={smallFigure}>
+        <div className={cn(CONTAINER, "py-6")}>
+          <p className={SMALL_FIGURE}>
             Fairhold · A demo. No money moves. · 2026
           </p>
         </div>

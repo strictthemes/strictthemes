@@ -8,13 +8,14 @@ checks:
   - "The `<h1>` has exactly one phrase in italics, set with the `italic` class; the guest's words are the only other italic, and no heading or text in the heading font is bold."
   - "Each field of the date check has a visible label; a missing date, or a day of leaving that is not after the day of arriving, gets a message in words with an icon, and good dates lead to `/reserve` with the two dates and the guests in the address."
   - "Every picture is a plate drawn from plain elements, with the img role and an `aria-label`, 12px corners and a hairline border, and none sits inside a card."
+  - "The two dates and the guests are the theme's date field and `Select`, with no `<input type=\"date\">` and no native `<select>` on the page: the calendar and the list open under their fields in the theme's colors, the chosen day is filled and the chosen row has a check, and the arrow keys, Enter and Escape work in both."
   - "Check dates is the page's one default (slate) button, Breakfast included is its one badge, and nothing on the page is a pill or a circle."
   - "The hours and the ways to get here are rows with a name on the left, a 1px hairline and a figure in the mono font at the right end."
 ---
 
 Sample content, if the user gave none: the home page of **Kittiwake House**, the invented guesthouse of six rooms described in the layout notes: 9 Harbour Terrace, Port Lowan, above the harbour of an invented town, with a glazed veranda where breakfast is served. Rooms from £78 a night, breakfast included. Every name is invented. Where this brief gives a sentence only in outline, write it yourself, plain and unhurried, the way the samples read.
 
-Build these parts in order. This page needs `npx shadcn@latest add input badge`.
+Build these parts in order. This page needs `npx shadcn@latest add select popover calendar badge`.
 
 ### 1. Header
 
@@ -40,9 +41,9 @@ Still in the opening section, after the grid, with `mt-6`: a `<form>` that is a 
 
 - A label heading, an `<h2>` with an `id`: "Check your dates".
 - With `mt-4`, a row: `grid gap-6 md:grid-cols-12 md:items-end`, with four items, each a `<div>` of three columns (`md:col-span-3`):
-  1. The label "Arrive", then with `mt-2` an `Input` of type `date` with `name="arrive"` and `min` set to today.
-  2. The label "Leave", then with `mt-2` an `Input` of type `date` with `name="leave"` and `min` set to the day after the day of arriving, or to tomorrow while no day of arriving is set.
-  3. The label "Guests", then with `mt-2` a native `<select>` with `name="guests"` and four options, `1 guest`, `2 guests`, `3 guests` and `4 guests`, with the values `1` to `4`. It starts on `2 guests` and has no empty choice.
+  1. The label "Arrive", then with `mt-2` a date field from the layout notes with `name="arrive"` and `min` set to today.
+  2. The label "Leave", then with `mt-2` a date field with `name="leave"` and `min` set to the day after the day of arriving, or to tomorrow while no day of arriving is set.
+  3. The label "Guests", then with `mt-2` a `Select` with `name="guests"` and four choices, `1 guest`, `2 guests`, `3 guests` and `4 guests`, with the values `1` to `4`. It starts on `2 guests` and has no placeholder.
   4. The page's one default button, `type="submit"`: "Check dates", with `h-11 w-full` in place of the Buttons note's `h-auto`, so it is as tall as the fields beside it. This item has no label.
 - Under the row, the error lines, one for each date field that has an error, in the order of the fields, each with `mt-2` as the Errors note says for a row.
 - With `mt-4`, a `<p>` with `role="status"`, a label in `text-foreground`. While a date is missing, or the day of leaving is not after the day of arriving, it reads `Choose the days you arrive and leave`. With two good dates it says the nights in words: `3 nights · Friday 14 May 2027 to Monday 17 May 2027`, each date a `<time>`. Unlike the confirmations in the layout notes, this element holds its first text from the start: it is a line that changes, not a message that replaces a form.
@@ -135,6 +136,6 @@ The footer from the layout notes.
   - Leave: empty gives "Choose the day you leave."; a day that is not after the day of arriving gives "Choose a day after the day you arrive."
   - The guests are always valid.
 - With an error, stop the form from being sent, show the lines under the row and move focus to the first field with an error, as the Errors note says.
-- With two good dates, let the form go: do not stop it. The browser then opens `/reserve?arrive=2027-05-14&leave=2027-05-17&guests=2`, with the values of the three fields. Nothing is checked against real bookings: the reservation page takes it from there.
+- With two good dates, let the form go: do not stop it. The browser then opens `/reserve?arrive=2027-05-14&leave=2027-05-17&guests=2`, with the values of the three fields, which their hidden inputs carry. Nothing is checked against real bookings: the reservation page takes it from there.
 - "Find us" in the header jumps to the Find us section; `scroll-mt-6` keeps its hairline clear of the top edge.
 - The other links need no behavior.

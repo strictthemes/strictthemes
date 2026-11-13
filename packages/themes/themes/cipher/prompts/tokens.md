@@ -9,6 +9,7 @@ checks:
   - A revoke with a name that does not match shows an error and revokes nothing; with the exact name, the row is gone and a message is announced and focused.
   - The warning before revoking is said in words, not by the red color alone.
   - The new token wraps inside its box at 375px, and its expiry date shows in the table.
+  - 'Scope and Expires are the theme''s `Select` in the mono font, with no native `<select>` on the page: each list opens under its trigger in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
 ---
 
 Sample content, if the user gave none: the console of **Plinth**, a deploy tool by Plinth Labs; team Orrin, project `orrin-web`, signed in as `mara.lind@orrin.example`. Today is the fixed sample date, 11 November 2026, not the clock. Four tokens to start: `ci-deploy` (scope `deploy:write`, created 14 Aug 2026, last used 11 Nov 2026, 09:12, expires never), `staging-bot` (`deploy:write`, created 2 Sep 2026, last used 10 Nov 2026, 17:40, expires 1 Dec 2026), `metrics-reader` (`read`, created 19 Sep 2026, last used 11 Nov 2026, 08:03, expires 19 Sep 2027) and `mara-laptop` (`admin`, created 30 Oct 2026, never used, expires 28 Jan 2027). A token is `plt_` followed by 32 letters and digits; invent one for each sample token.
@@ -38,7 +39,7 @@ Ten columns from `lg` up, the full width below, with `min-w-0`. In this order:
 
 ### 5. Tokens panel
 
-A panel with rows. Its heading row holds the label heading, here an `<h3>` "Tokens" (under the `<h2>` "API tokens"), in the label-heading classes, not the `<h3>` style, and at the right end the count as a small figure (`4 tokens`). Add the components with `npx shadcn@latest add table badge input`. The table's `label` is "API tokens"; give the `<table>` `min-w-2xl`. Columns:
+A panel with rows. Its heading row holds the label heading, here an `<h3>` "Tokens" (under the `<h2>` "API tokens"), in the label-heading classes, not the `<h3>` style, and at the right end the count as a small figure (`4 tokens`). Add the components with `npx shadcn@latest add table badge input select`. The table's `label` is "API tokens"; give the `<table>` `min-w-2xl`. Columns:
 
 - **Name:** `font-mono`. On the token created last in this visit, the signal badge "new" follows the name with `gap-2`: the page's one lime mark.
 - **Token:** the first eight characters, `plt_` and four more, and an ellipsis (`plt_7Kq2…`), `font-mono text-muted-foreground`, never the whole token.
@@ -55,8 +56,8 @@ A padded panel. Its heading row holds the label heading, an `<h3>` "Create a tok
 The form has `noValidate` and three fields, each at most `max-w-md` wide:
 
 - "Name": an `Input` with helper text: lowercase letters, numbers and hyphens, up to 32 characters.
-- "Scope": a `<select>` with `font-mono` and `read`, `deploy:write` and `admin`, starting on `deploy:write`, with helper text that says what the chosen scope can do and changes with it.
-- "Expires": a `<select>` with `font-mono`, since its options are durations: 30 days, 90 days, 1 year and Never, starting on 90 days.
+- "Scope": a `Select` with `font-mono` and `read`, `deploy:write` and `admin`, starting on `deploy:write`, with helper text that says what the chosen scope can do and changes with it.
+- "Expires": a `Select` with `font-mono`, since its options are durations: 30 days, 90 days, 1 year and Never, starting on 90 days.
 
 With `mt-6`, the default button "Create token", `type="submit"`.
 

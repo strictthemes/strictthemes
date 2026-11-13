@@ -1,25 +1,45 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
-import { Check, CircleAlert } from "lucide-react"
+import * as React from "react"
+import { Calendar as CalendarIcon, Check, CircleAlert } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { cn } from "@/lib/utils"
 
 // The sample's "now": Tuesday 8 June 2027, 20:05. Never the device clock.
-const TODAY = "2027-06-08"
-const EARLIEST_BIRTH = "1927-01-01"
-// Born on or before this date means 18 or over today.
-const ADULT_BORN_BY = "2009-06-08"
+const TODAY = new Date(2027, 5, 8)
+const EARLIEST_BIRTH = new Date(1927, 0, 1)
+// A person born on or before this day is 18 or over on TODAY.
+const ADULT_CUTOFF = new Date(2009, 5, 8)
+const START_MONTH = new Date(1927, 0)
+const END_MONTH = new Date(2027, 5)
+
 const MEMBER_NUMBER = "WFC-27-0141"
 
-const focusRing =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const bandFocusRing =
+const FOCUS_BAND =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-foreground"
-const codeFocusRing =
+const FOCUS_CODE =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const buttonClasses = "h-auto px-5 py-2 font-mono text-label uppercase"
-const label = "font-mono text-label uppercase"
+const BUTTON = "h-auto px-5 py-2 font-mono text-label uppercase"
+const LABEL = "font-mono text-label uppercase"
+const TEXT_LINK =
+  "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2"
+
+const NAV = [
+  { label: "Fixtures", href: "/fixtures" },
+  { label: "Table", href: "/standings" },
+  { label: "Report", href: "/report" },
+  { label: "Membership", href: "/membership" },
+]
 
 type MembershipId = "playing" | "junior" | "social"
 
@@ -28,8 +48,9 @@ type Membership = {
   name: string
   price: string
   forWhom: string
-  includes: [string, string, string]
-  lastRow: [string, string]
+  includes: string[]
+  nextLabel: string
+  nextValue: string
 }
 
 const MEMBERSHIPS: Membership[] = [
@@ -43,7 +64,8 @@ const MEMBERSHIPS: Membership[] = [
       "A place in the first team or reserves squad",
       "Match kit and insurance for the season",
     ],
-    lastRow: ["First session", "Thursday 10 June, 19:00"],
+    nextLabel: "First session",
+    nextValue: "Thursday 10 June, 19:00",
   },
   {
     id: "junior",
@@ -55,7 +77,8 @@ const MEMBERSHIPS: Membership[] = [
       "Matches with the under 18s on Sundays",
       "Match kit and insurance for the season",
     ],
-    lastRow: ["First session", "Thursday 10 June, 17:30"],
+    nextLabel: "First session",
+    nextValue: "Thursday 10 June, 17:30",
   },
   {
     id: "social",
@@ -67,18 +90,13 @@ const MEMBERSHIPS: Membership[] = [
       "A vote at the annual meeting",
       "The club newsletter each month",
     ],
-    lastRow: ["Next home match", "Saturday 19 June, 15:00"],
+    nextLabel: "Next home match",
+    nextValue: "Saturday 19 June, 15:00",
   },
 ]
 
-const NAV = [
-  { label: "Fixtures", href: "/fixtures" },
-  { label: "Table", href: "/standings" },
-  { label: "Report", href: "/report" },
-  { label: "Membership", href: "/membership" },
-]
-
 type FieldId = "name" | "email" | "dob" | "contact" | "phone" | "consent"
+
 const FIELD_ORDER: FieldId[] = [
   "name",
   "email",
@@ -87,91 +105,55 @@ const FIELD_ORDER: FieldId[] = [
   "phone",
   "consent",
 ]
-type TextFieldId = Exclude<FieldId, "consent">
+
 type Errors = Partial<Record<FieldId, string>>
 
-type TextField = {
-  id: TextFieldId
-  label: string
-  type?: string
-  autoComplete: string
-  helper?: string
-  both?: boolean
+type Confirmed = {
+  firstName: string
+  email: string
+  membership: Membership
 }
 
-const FIELDS: TextField[] = [
-  { id: "name", label: "Full name", autoComplete: "name", both: true },
-  { id: "email", label: "Email", type: "email", autoComplete: "email" },
-  {
-    id: "dob",
-    label: "Date of birth",
-    type: "date",
-    autoComplete: "bday",
-    helper: "Playing members are 18 or over. Juniors are under 18.",
-  },
-  {
-    id: "contact",
-    label: "Emergency contact",
-    autoComplete: "off",
-    helper:
-      "Someone we can call on a match day. For a junior, a parent or guardian.",
-  },
-  {
-    id: "phone",
-    label: "Emergency contact's phone",
-    type: "tel",
-    autoComplete: "off",
-  },
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ]
 
-type Values = Record<TextFieldId, string>
-const EMPTY: Values = { name: "", email: "", dob: "", contact: "", phone: "" }
-
-function validate(
-  values: Values,
-  consent: boolean,
-  membership: MembershipId
-): Errors {
-  const v = {
-    name: values.name.trim(),
-    email: values.email.trim(),
-    dob: values.dob.trim(),
-    contact: values.contact.trim(),
-    phone: values.phone.trim(),
-  }
-  const errors: Errors = {}
-
-  if (!v.name) errors.name = "Enter your full name."
-
-  if (!v.email) errors.email = "Enter your email address."
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email))
-    errors.email = "Enter an email address such as name@example.com."
-
-  if (!v.dob) errors.dob = "Enter your date of birth."
-  else if (
-    !/^\d{4}-\d{2}-\d{2}$/.test(v.dob) ||
-    v.dob > TODAY ||
-    v.dob < EARLIEST_BIRTH
-  )
-    errors.dob = "Enter a date of birth from 1927 to today."
-  else if (membership === "playing" && v.dob > ADULT_BORN_BY)
-    errors.dob =
-      "Playing membership is for adults. Choose Junior membership, or check the date."
-  else if (membership === "junior" && v.dob <= ADULT_BORN_BY)
-    errors.dob =
-      "Junior membership is for under 18s. Choose Playing or Social membership, or check the date."
-
-  if (!v.contact) errors.contact = "Enter the name of someone we can call."
-
-  if (!/^\+?\d{10,15}$/.test(v.phone.replace(/\s/g, "")))
-    errors.phone = "Enter a phone number of 10 to 15 digits."
-
-  if (!consent) errors.consent = "Tick the box to agree to the code of conduct."
-
-  return errors
+function formatDate(date: Date) {
+  return `${date.getDate()} ${MONTHS[date.getMonth()]} ${date.getFullYear()}`
 }
 
-function ErrorLine({ id, children }: { id: string; children: string }) {
+function isoDate(date: Date) {
+  const m = String(date.getMonth() + 1).padStart(2, "0")
+  const d = String(date.getDate()).padStart(2, "0")
+  return `${date.getFullYear()}-${m}-${d}`
+}
+
+function Crest({ letters, className }: { letters: string; className: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={cn(
+        "flex shrink-0 items-center justify-center rounded-full bg-ice text-ice-foreground",
+        className
+      )}
+    >
+      {letters}
+    </span>
+  )
+}
+
+function ErrorLine({ id, message }: { id: string; message: string }) {
   return (
     <p id={id} className="flex items-start gap-2 text-label text-destructive">
       <CircleAlert
@@ -180,9 +162,14 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
         strokeLinecap="square"
         aria-hidden="true"
       />
-      <span>{children}</span>
+      <span>{message}</span>
     </p>
   )
+}
+
+function describedBy(...ids: (string | false | undefined)[]) {
+  const list = ids.filter(Boolean)
+  return list.length ? list.join(" ") : undefined
 }
 
 function Header() {
@@ -192,16 +179,14 @@ function Header() {
         <a
           href="/"
           className={cn(
-            "inline-flex items-center gap-3 transition-colors duration-150",
-            bandFocusRing
+            "inline-flex items-center gap-3 underline-offset-4 transition-colors duration-150 hover:underline",
+            FOCUS_BAND
           )}
         >
-          <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-full bg-ice font-heading text-body font-extrabold text-ice-foreground"
-            aria-hidden="true"
-          >
-            W
-          </span>
+          <Crest
+            letters="W"
+            className="size-10 font-heading text-body font-extrabold"
+          />
           <span className="font-heading text-h2 uppercase">Wendmoor FC</span>
         </a>
         <nav aria-label="Main">
@@ -216,7 +201,7 @@ function Header() {
                     className={cn(
                       "inline-flex h-10 items-center font-mono text-label uppercase underline-offset-4 transition-colors duration-150 hover:underline",
                       current && "underline decoration-2",
-                      bandFocusRing
+                      FOCUS_BAND
                     )}
                   >
                     {item.label}
@@ -242,11 +227,7 @@ function Footer() {
               <li key={item.href}>
                 <a
                   href={item.href}
-                  className={cn(
-                    label,
-                    "text-foreground underline underline-offset-4 transition-colors duration-150 hover:decoration-2",
-                    focusRing
-                  )}
+                  className={cn(LABEL, TEXT_LINK, FOCUS)}
                 >
                   {item.label}
                 </a>
@@ -254,7 +235,7 @@ function Footer() {
             ))}
           </ul>
         </nav>
-        <p className={cn(label, "text-muted-foreground")}>
+        <p className={cn(LABEL, "text-muted-foreground")}>
           © 2027 Wendmoor Football Club · Millrace Park, Wendmoor · A demo:
           nothing is sent or stored
         </p>
@@ -263,73 +244,274 @@ function Footer() {
   )
 }
 
-type Confirmed = {
-  firstName: string
-  email: string
-  membership: Membership
+function RadioCard({ membership }: { membership: Membership }) {
+  const nameId = `membership-${membership.id}-name`
+  const detailsId = `membership-${membership.id}-details`
+  return (
+    <label className="flex min-w-0 cursor-pointer flex-col gap-3 rounded-xl border border-border bg-card p-5 has-data-checked:border-foreground lg:col-span-4">
+      <span className="flex items-center gap-3">
+        <RadioGroupItem
+          value={membership.id}
+          aria-labelledby={nameId}
+          aria-describedby={detailsId}
+        />
+        <span id={nameId} className="font-heading text-h2 uppercase">
+          {membership.name}
+        </span>
+      </span>
+      <span id={detailsId} className="flex flex-col gap-3">
+        <span className="flex flex-col gap-1">
+          <span className="font-heading text-h1 tabular-nums">
+            {membership.price}
+          </span>
+          <span className={cn(LABEL, "text-muted-foreground")}>A season</span>
+        </span>
+        <span className="block text-body">{membership.forWhom}</span>
+        <span className="flex flex-col gap-2">
+          {membership.includes.map((line) => (
+            <span key={line} className="flex items-start gap-2 text-body">
+              <Check
+                className="mt-1 size-4 shrink-0"
+                strokeWidth={2}
+                strokeLinecap="square"
+                aria-hidden="true"
+              />
+              <span>{line}</span>
+            </span>
+          ))}
+        </span>
+      </span>
+    </label>
+  )
+}
+
+type TextFieldProps = {
+  id: Exclude<FieldId, "dob" | "consent">
+  label: string
+  value: string
+  onChange: (value: string) => void
+  error?: string
+  helper?: string
+  inputRef: React.Ref<HTMLInputElement>
+  className?: string
+} & Pick<React.ComponentProps<"input">, "type" | "autoComplete">
+
+function TextField({
+  id,
+  label,
+  value,
+  onChange,
+  error,
+  helper,
+  inputRef,
+  className,
+  type = "text",
+  autoComplete,
+}: TextFieldProps) {
+  const helperId = `${id}-helper`
+  const errorId = `${id}-error`
+  return (
+    <div className={cn("flex min-w-0 flex-col gap-2", className)}>
+      <label htmlFor={id} className={cn("block", LABEL, "text-foreground")}>
+        {label}
+      </label>
+      <Input
+        ref={inputRef}
+        id={id}
+        name={id}
+        type={type}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy(helper && helperId, error && errorId)}
+        className="h-10 px-3 text-body md:text-body"
+      />
+      {helper && (
+        <p id={helperId} className="text-label text-muted-foreground">
+          {helper}
+        </p>
+      )}
+      {error && <ErrorLine id={errorId} message={error} />}
+    </div>
+  )
+}
+
+function Confirmation({
+  confirmed,
+  headingRef,
+}: {
+  confirmed: Confirmed
+  headingRef: React.Ref<HTMLHeadingElement>
+}) {
+  const { membership } = confirmed
+  const rows = [
+    { term: "Membership number", value: MEMBER_NUMBER },
+    { term: "Membership", value: membership.name },
+    { term: "Fee for the season", value: membership.price },
+    { term: membership.nextLabel, value: membership.nextValue },
+  ]
+  return (
+    <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className={cn("text-h2 uppercase", FOCUS_CODE)}
+      >
+        Welcome to Wendmoor FC
+      </h2>
+      <p className="max-w-2xl text-body">
+        Thank you, {confirmed.firstName}. Your {membership.name} membership for
+        the 2027 season is ready.
+      </p>
+      <dl className="w-full max-w-md">
+        {rows.map((row, index) => (
+          <div
+            key={row.term}
+            className={cn(
+              "flex items-baseline justify-between gap-3 py-2",
+              index > 0 && "border-t border-border"
+            )}
+          >
+            <dt className={cn(LABEL, "text-muted-foreground")}>{row.term}</dt>
+            <dd className="text-right text-body">{row.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="max-w-2xl text-body">
+        We have sent the details to {confirmed.email}. This is a demo: nothing
+        was sent or stored.
+      </p>
+      <a
+        href="/fixtures"
+        className={cn(buttonVariants({ variant: "secondary" }), BUTTON, "self-start")}
+      >
+        See the fixtures
+      </a>
+    </div>
+  )
 }
 
 export function App() {
-  const [membership, setMembership] = useState<MembershipId>("playing")
-  const [values, setValues] = useState<Values>(EMPTY)
-  const [consent, setConsent] = useState(false)
-  const [errors, setErrors] = useState<Errors>({})
-  const [confirmed, setConfirmed] = useState<Confirmed | null>(null)
+  const [membership, setMembership] = React.useState<MembershipId>("playing")
+  const [name, setName] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [dob, setDob] = React.useState<Date | undefined>(undefined)
+  const [dobOpen, setDobOpen] = React.useState(false)
+  const [contact, setContact] = React.useState("")
+  const [phone, setPhone] = React.useState("")
+  const [consent, setConsent] = React.useState(false)
+  const [errors, setErrors] = React.useState<Errors>({})
+  const [confirmed, setConfirmed] = React.useState<Confirmed | null>(null)
 
-  const fieldRefs = useRef<Partial<Record<FieldId, HTMLInputElement | null>>>(
-    {}
-  )
-  const focusFirstError = useRef(false)
-  const confirmHeading = useRef<HTMLHeadingElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const dobRef = React.useRef<HTMLButtonElement>(null)
+  const contactRef = React.useRef<HTMLInputElement>(null)
+  const phoneRef = React.useRef<HTMLInputElement>(null)
+  const consentRef = React.useRef<HTMLElement>(null)
+  const headingRef = React.useRef<HTMLHeadingElement>(null)
+  const calendarRef = React.useRef<HTMLDivElement>(null)
 
-  // Focus moves only after the error lines exist in the DOM.
-  useEffect(() => {
-    if (!focusFirstError.current) return
-    focusFirstError.current = false
-    const first = FIELD_ORDER.find((id) => errors[id])
-    if (first) fieldRefs.current[first]?.focus()
+  // Set on submit; the effect below moves focus once the error lines exist.
+  const focusPending = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!focusPending.current) return
+    focusPending.current = false
+    const first = FIELD_ORDER.find((field) => errors[field])
+    if (!first) return
+    const refs: Record<FieldId, React.RefObject<HTMLElement | null>> = {
+      name: nameRef,
+      email: emailRef,
+      dob: dobRef,
+      contact: contactRef,
+      phone: phoneRef,
+      consent: consentRef,
+    }
+    refs[first].current?.focus()
   }, [errors])
 
-  useEffect(() => {
-    if (confirmed) confirmHeading.current?.focus()
+  React.useEffect(() => {
+    if (confirmed) headingRef.current?.focus()
   }, [confirmed])
 
-  function clearError(id: FieldId) {
-    setErrors((prev) => {
-      if (!prev[id]) return prev
-      const next = { ...prev }
-      delete next[id]
+  function clearError(field: FieldId) {
+    setErrors((current) => {
+      if (!current[field]) return current
+      const next = { ...current }
+      delete next[field]
       return next
     })
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function validate(): Errors {
+    const next: Errors = {}
+    const trimmedName = name.trim()
+    const trimmedEmail = email.trim()
+    const trimmedContact = contact.trim()
+    const trimmedPhone = phone.trim().replace(/\s/g, "")
+
+    if (!trimmedName) next.name = "Enter your full name."
+
+    if (!trimmedEmail) next.email = "Enter your email address."
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail))
+      next.email = "Enter an email address such as name@example.com."
+
+    if (!dob) next.dob = "Enter your date of birth."
+    else if (dob > TODAY || dob < EARLIEST_BIRTH)
+      next.dob = "Enter a date of birth from 1927 to today."
+    else if (membership === "playing" && dob > ADULT_CUTOFF)
+      next.dob =
+        "Playing membership is for adults. Choose Junior membership, or check the date."
+    else if (membership === "junior" && dob <= ADULT_CUTOFF)
+      next.dob =
+        "Junior membership is for under 18s. Choose Playing or Social membership, or check the date."
+
+    if (!trimmedContact)
+      next.contact = "Enter the name of someone we can call."
+
+    if (!/^\+?\d{10,15}$/.test(trimmedPhone))
+      next.phone = "Enter a phone number of 10 to 15 digits."
+
+    if (!consent) next.consent = "Tick the box to agree to the code of conduct."
+
+    return next
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const found = validate(values, consent, membership)
-    if (Object.keys(found).length > 0) {
-      focusFirstError.current = true
-      setErrors(found)
+    const next = validate()
+    if (Object.keys(next).length > 0) {
+      focusPending.current = true
+      setErrors(next)
       return
     }
+    const chosen = MEMBERSHIPS.find((item) => item.id === membership)!
     setErrors({})
     setConfirmed({
-      firstName: values.name.trim().split(/\s+/)[0],
-      email: values.email.trim(),
-      membership: MEMBERSHIPS.find((m) => m.id === membership)!,
+      firstName: name.trim().split(/\s+/)[0],
+      email: email.trim(),
+      membership: chosen,
     })
   }
+
+  const dobLabelId = "dob-label"
+  const dobValueId = "dob-value"
+  const dobHelperId = "dob-helper"
+  const dobErrorId = "dob-error"
+  const consentErrorId = "consent-error"
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <Header />
-
       <main className="flex-1">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-18 px-5 pt-8 pb-18">
           <div className="flex flex-col gap-8">
             <div className="flex flex-wrap items-end justify-between gap-5">
               <div className="flex flex-col gap-3">
-                <p className={cn(label, "text-muted-foreground")}>
-                  2027 Season · 140 Members
+                <p className={cn(LABEL, "text-muted-foreground")}>
+                  2027 season · 140 members
                 </p>
                 <h1 className="text-h1 uppercase">Join the club</h1>
                 <p className="max-w-2xl text-body">
@@ -347,8 +529,13 @@ export function App() {
                   className="flex flex-col gap-8"
                   onSubmit={handleSubmit}
                 >
-                  <div
-                    role="radiogroup"
+                  <RadioGroup
+                    name="membership"
+                    value={membership}
+                    onValueChange={(value) => {
+                      setMembership(value as MembershipId)
+                      clearError("dob")
+                    }}
                     aria-labelledby="membership-heading"
                     className="flex flex-col gap-5"
                   >
@@ -356,159 +543,173 @@ export function App() {
                       Choose a membership
                     </h2>
                     <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-                      {MEMBERSHIPS.map((m) => (
-                        <label
-                          key={m.id}
-                          className="flex min-w-0 cursor-pointer flex-col gap-3 rounded-xl border border-border bg-card p-5 has-checked:border-foreground lg:col-span-4"
-                        >
-                          <span className="flex items-center gap-3">
-                            <input
-                              type="radio"
-                              name="membership"
-                              value={m.id}
-                              checked={membership === m.id}
-                              onChange={() => {
-                                setMembership(m.id)
-                                clearError("dob")
-                              }}
-                              aria-labelledby={`membership-${m.id}-name`}
-                              aria-describedby={`membership-${m.id}-details`}
-                              className={cn(
-                                "size-5 shrink-0 accent-secondary",
-                                focusRing
-                              )}
-                            />
-                            <span
-                              id={`membership-${m.id}-name`}
-                              className="font-heading text-h2 uppercase"
-                            >
-                              {m.name}
-                            </span>
-                          </span>
-                          <span
-                            id={`membership-${m.id}-details`}
-                            className="flex flex-col gap-3"
-                          >
-                            <span className="flex flex-col gap-1">
-                              <span className="font-heading text-h1 tabular-nums">
-                                {m.price}
-                              </span>
-                              <span
-                                className={cn(label, "text-muted-foreground")}
-                              >
-                                A season
-                              </span>
-                            </span>
-                            <span className="block text-body">{m.forWhom}</span>
-                            <span className="flex flex-col gap-2">
-                              {m.includes.map((item) => (
-                                <span
-                                  key={item}
-                                  className="flex items-start gap-2 text-body"
-                                >
-                                  <Check
-                                    className="mt-1 size-4 shrink-0"
-                                    strokeWidth={2}
-                                    strokeLinecap="square"
-                                    aria-hidden="true"
-                                  />
-                                  <span>{item}</span>
-                                </span>
-                              ))}
-                            </span>
-                          </span>
-                        </label>
+                      {MEMBERSHIPS.map((item) => (
+                        <RadioCard key={item.id} membership={item} />
                       ))}
                     </div>
-                  </div>
+                  </RadioGroup>
 
                   <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-                    <div className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5 lg:col-span-8">
-                      <h2 className="text-h2 uppercase">Your details</h2>
+                    <section
+                      aria-labelledby="details-heading"
+                      className="flex min-w-0 flex-col gap-5 rounded-xl border border-border bg-card p-5 lg:col-span-8"
+                    >
+                      <h2 id="details-heading" className="text-h2 uppercase">
+                        Your details
+                      </h2>
 
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                        {FIELDS.map((field) => {
-                          const inputId = `field-${field.id}`
-                          const helperId = field.helper
-                            ? `${inputId}-helper`
-                            : undefined
-                          const error = errors[field.id]
-                          const errorId = error ? `${inputId}-error` : undefined
-                          const describedBy =
-                            [helperId, errorId].filter(Boolean).join(" ") ||
-                            undefined
-                          return (
-                            <div
-                              key={field.id}
+                        <TextField
+                          id="name"
+                          label="Full name"
+                          autoComplete="name"
+                          value={name}
+                          onChange={(value) => {
+                            setName(value)
+                            clearError("name")
+                          }}
+                          error={errors.name}
+                          inputRef={nameRef}
+                          className="md:col-span-2"
+                        />
+                        <TextField
+                          id="email"
+                          label="Email"
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(value) => {
+                            setEmail(value)
+                            clearError("email")
+                          }}
+                          error={errors.email}
+                          inputRef={emailRef}
+                        />
+
+                        <div className="flex min-w-0 flex-col gap-2">
+                          <label
+                            id={dobLabelId}
+                            htmlFor="dob"
+                            className={cn("block", LABEL, "text-foreground")}
+                          >
+                            Date of birth
+                          </label>
+                          <Popover open={dobOpen} onOpenChange={setDobOpen}>
+                            <PopoverTrigger
+                              id="dob"
+                              ref={dobRef}
+                              aria-labelledby={`${dobLabelId} ${dobValueId}`}
+                              aria-invalid={errors.dob ? true : undefined}
+                              aria-describedby={describedBy(
+                                dobHelperId,
+                                errors.dob && dobErrorId
+                              )}
                               className={cn(
-                                "flex min-w-0 flex-col gap-2",
-                                field.both && "md:col-span-2"
+                                "flex h-10 w-full items-center justify-between gap-2 rounded-lg border border-muted-foreground bg-card px-3 text-left text-body text-foreground transition-colors outline-none focus-visible:border-ring aria-invalid:border-destructive",
+                                FOCUS
                               )}
                             >
-                              <label
-                                htmlFor={inputId}
-                                className={cn(label, "block text-foreground")}
-                              >
-                                {field.label}
-                              </label>
-                              <Input
-                                ref={(el) => {
-                                  fieldRefs.current[field.id] = el
-                                }}
-                                id={inputId}
-                                name={field.id}
-                                type={field.type ?? "text"}
-                                autoComplete={field.autoComplete}
-                                value={values[field.id]}
-                                onChange={(e) => {
-                                  const value = e.target.value
-                                  setValues((prev) => ({
-                                    ...prev,
-                                    [field.id]: value,
-                                  }))
-                                  clearError(field.id)
-                                }}
-                                aria-invalid={error ? true : undefined}
-                                aria-describedby={describedBy}
-                                className="h-10 px-3 text-body md:text-body"
+                              <span id={dobValueId}>
+                                {dob ? (
+                                  <time dateTime={isoDate(dob)}>
+                                    {formatDate(dob)}
+                                  </time>
+                                ) : (
+                                  <span className="text-muted-foreground">
+                                    Choose a date
+                                  </span>
+                                )}
+                              </span>
+                              <CalendarIcon
+                                className="size-4 shrink-0 text-muted-foreground"
+                                strokeWidth={2}
+                                strokeLinecap="square"
+                                aria-hidden="true"
                               />
-                              {field.helper && (
-                                <p
-                                  id={helperId}
-                                  className="text-label text-muted-foreground"
-                                >
-                                  {field.helper}
-                                </p>
-                              )}
-                              {error && errorId && (
-                                <ErrorLine id={errorId}>{error}</ErrorLine>
-                              )}
-                            </div>
-                          )
-                        })}
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align="start"
+                              className="w-auto"
+                              initialFocus={() =>
+                                calendarRef.current?.querySelector<HTMLElement>(
+                                  'button[tabindex="0"]'
+                                ) ?? true
+                              }
+                            >
+                              <div ref={calendarRef}>
+                                <Calendar
+                                  mode="single"
+                                  required
+                                  captionLayout="dropdown"
+                                  weekStartsOn={1}
+                                  today={TODAY}
+                                  startMonth={START_MONTH}
+                                  endMonth={END_MONTH}
+                                  selected={dob}
+                                  defaultMonth={dob ?? TODAY}
+                                  onSelect={(date) => {
+                                    setDob(date)
+                                    clearError("dob")
+                                    setDobOpen(false)
+                                  }}
+                                />
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                          <p
+                            id={dobHelperId}
+                            className="text-label text-muted-foreground"
+                          >
+                            Playing members are 18 or over. Juniors are under
+                            18.
+                          </p>
+                          {errors.dob && (
+                            <ErrorLine id={dobErrorId} message={errors.dob} />
+                          )}
+                        </div>
+
+                        <TextField
+                          id="contact"
+                          label="Emergency contact"
+                          autoComplete="off"
+                          helper="Someone we can call on a match day. For a junior, a parent or guardian."
+                          value={contact}
+                          onChange={(value) => {
+                            setContact(value)
+                            clearError("contact")
+                          }}
+                          error={errors.contact}
+                          inputRef={contactRef}
+                        />
+                        <TextField
+                          id="phone"
+                          label="Emergency contact's phone"
+                          type="tel"
+                          autoComplete="off"
+                          value={phone}
+                          onChange={(value) => {
+                            setPhone(value)
+                            clearError("phone")
+                          }}
+                          error={errors.phone}
+                          inputRef={phoneRef}
+                        />
                       </div>
 
                       <div className="flex flex-col gap-2">
                         <label className="flex items-start gap-3 text-body text-foreground">
-                          <input
-                            ref={(el) => {
-                              fieldRefs.current.consent = el
-                            }}
-                            type="checkbox"
-                            name="consent"
+                          <Checkbox
+                            ref={consentRef}
+                            className="mt-0.5"
                             checked={consent}
-                            onChange={(e) => {
-                              setConsent(e.target.checked)
+                            onCheckedChange={(checked) => {
+                              setConsent(checked)
                               clearError("consent")
                             }}
                             aria-invalid={errors.consent ? true : undefined}
                             aria-describedby={
-                              errors.consent ? "field-consent-error" : undefined
+                              errors.consent ? consentErrorId : undefined
                             }
-                            className={cn(
-                              "mt-0.5 size-5 shrink-0 accent-secondary",
-                              focusRing
-                            )}
                           />
                           <span>
                             I agree to the club's code of conduct, and to the
@@ -516,14 +717,15 @@ export function App() {
                           </span>
                         </label>
                         {errors.consent && (
-                          <ErrorLine id="field-consent-error">
-                            {errors.consent}
-                          </ErrorLine>
+                          <ErrorLine
+                            id={consentErrorId}
+                            message={errors.consent}
+                          />
                         )}
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 border-t border-border pt-5">
-                        <Button type="submit" className={buttonClasses}>
+                        <Button type="submit" className={BUTTON}>
                           Join the club
                         </Button>
                         <p className="text-label text-muted-foreground">
@@ -531,11 +733,11 @@ export function App() {
                           here.
                         </p>
                       </div>
-                    </div>
+                    </section>
 
                     <aside
                       aria-labelledby="next-heading"
-                      className="flex min-w-0 flex-col gap-5 self-start rounded-xl bg-ice p-5 text-ice-foreground lg:col-span-4"
+                      className="flex min-w-0 flex-col gap-5 rounded-xl bg-ice p-5 text-ice-foreground lg:col-span-4 lg:self-start"
                     >
                       <h2 id="next-heading" className="text-h2 uppercase">
                         What happens next
@@ -545,10 +747,10 @@ export function App() {
                           "We email your membership number and a welcome from the club.",
                           "You come to your first session at Millrace Park and pay the season's fee there.",
                           "Players are registered with the league within a week, and can then be picked.",
-                        ].map((step, i) => (
+                        ].map((step, index) => (
                           <li key={step} className="flex items-baseline gap-3">
                             <span className="w-5 shrink-0 font-heading text-h2 tabular-nums">
-                              {i + 1}
+                              {index + 1}
                             </span>
                             <span className="text-body">{step}</span>
                           </li>
@@ -562,66 +764,15 @@ export function App() {
                   </div>
                 </form>
               )}
-
               <div role="status">
                 {confirmed && (
-                  <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
-                    <h2
-                      ref={confirmHeading}
-                      tabIndex={-1}
-                      className={cn("text-h2 uppercase", codeFocusRing)}
-                    >
-                      Welcome to Wendmoor FC
-                    </h2>
-                    <p className="max-w-2xl text-body">
-                      Thank you, {confirmed.firstName}. Your{" "}
-                      {confirmed.membership.name} membership for the 2027
-                      season is ready.
-                    </p>
-                    <dl className="w-full max-w-md">
-                      {[
-                        ["Membership number", MEMBER_NUMBER],
-                        ["Membership", confirmed.membership.name],
-                        ["Fee for the season", confirmed.membership.price],
-                        confirmed.membership.lastRow,
-                      ].map(([term, detail], i) => (
-                        <div
-                          key={term}
-                          className={cn(
-                            "flex items-baseline justify-between gap-3 py-2",
-                            i > 0 && "border-t border-border"
-                          )}
-                        >
-                          <dt className={cn(label, "text-muted-foreground")}>
-                            {term}
-                          </dt>
-                          <dd className="text-right text-body">{detail}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                    <p className="max-w-2xl text-body">
-                      We have sent the details to{" "}
-                      <span className="wrap-anywhere">{confirmed.email}</span>.
-                      This is a demo: nothing was sent or stored.
-                    </p>
-                    <a
-                      href="/fixtures"
-                      className={cn(
-                        buttonVariants({ variant: "secondary" }),
-                        buttonClasses,
-                        "self-start"
-                      )}
-                    >
-                      See the fixtures
-                    </a>
-                  </div>
+                  <Confirmation confirmed={confirmed} headingRef={headingRef} />
                 )}
               </div>
             </div>
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   )

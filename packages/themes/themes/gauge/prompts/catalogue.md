@@ -8,6 +8,7 @@ checks:
   - "Every dimension, load and price in the table is a right-aligned mono figure with `tabular-nums`, and its unit is in the column header, not in the cells."
   - "Every stock state is a status dot and a word, and the green and the red appear nowhere else on the page."
   - "The count in the table's heading row follows the filters, and an empty result shows a sentence and a Clear filters button that moves focus to the first checkbox."
+  - "Sort by is the theme's `Select`, with no native `<select>` on the page: its list opens under its trigger, as wide as it, the chosen row is bold with a check, and the arrow keys, Enter and Escape work in it."
   - "At 375px the table scrolls sideways inside its own box, which can be reached with the keyboard, and the page itself does not scroll sideways."
 ---
 
@@ -26,7 +27,7 @@ Sample content, if the user gave none: "Torvale Bearings Ltd" and its category "
 11. `TVL-4080-RS`, 40, 80, 18, 32.20, Made to order, 8.15
 12. `TVL-4585-RS`, 45, 85, 19, 34.90, Discontinued, 9.40
 
-This page uses the stock `button`, `badge`, `checkbox` and `table`; add any the project lacks with `npx shadcn@latest add button badge checkbox table`.
+This page uses the stock `button`, `badge`, `checkbox`, `select` and `table`; add any the project lacks with `npx shadcn@latest add button badge checkbox select table`.
 
 Build these parts in order; the footer is as the layout notes describe it.
 
@@ -47,9 +48,7 @@ A grid row. The filters are a panel spanning three columns from `lg` up, full wi
 - **Bore:** a group labelled "Bore (mm)" with three checkboxes, "10 to 17", "20 to 30" and "35 to 45", all clear.
 - **Seals:** a group labelled "Seals" with two checkboxes, "Rubber seals, RS" and "Metal shields, ZZ", all clear.
 - **Stock:** a group labelled "Stock" with one checkbox, "In stock only", clear.
-- **Sort:** a field with the label "Sort by" and a native `<select>` with four options: "Bore, smallest first" (chosen), "Part number, A to Z", "Load rating, highest first" and "Unit price, lowest first". It is not a filter: it does not enable "Clear filters".
-
-The page has a native `<select>`, so set `color-scheme` as the rules say.
+- **Sort:** a field with the label "Sort by" and a `Select`, as the Selects note sets it, with four choices: "Bore, smallest first" (chosen), "Part number, A to Z", "Load rating, highest first" and "Unit price, lowest first". It is not a filter: it does not enable "Clear filters".
 
 ### 4. Parts table
 

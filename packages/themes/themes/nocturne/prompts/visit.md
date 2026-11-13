@@ -8,6 +8,7 @@ checks:
   - Each screen states its seat count and its access notes in words; no access feature is shown by an icon alone.
   - The address is an `<address>` element, and the still of the bar has `role="img"`, an `aria-label` and a caption.
   - Sending the contact form with an empty name, a malformed email or an empty message shows a sentence with an icon under each such field, and a good form is replaced by a confirmation in a `role="status"` element.
+  - 'The topic field is the theme''s `Select`, with no native `<select>` on the page: its trigger looks like the text fields above it, its list opens under it in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
   - The "Send message" button is the page's only default (gold) button.
 ---
 
@@ -71,7 +72,7 @@ The form, with `noValidate`:
 
 1. "Your name", an `Input` with `autoComplete="name"` (add `input` and `textarea` with `npx shadcn@latest add` if the project lacks them).
 2. With `mt-6`, "Email address", an `Input` with `type="email"` and `autoComplete="email"`.
-3. With `mt-6`, "Topic", a native `<select>`: General question, Access, Private hire, Lost property. General question is chosen at first.
+3. With `mt-6`, "Topic", a `Select` from the layout notes (add it with `npx shadcn@latest add select`): General question, Access, Private hire, Lost property. General question is chosen at first.
 4. With `mt-6`, "Message", a `Textarea` with `rows={5}`; in `components/ui/textarea.tsx`, replace `field-sizing-content` with `field-sizing-fixed` (the stock one sizes to its content and ignores `rows`). Helper text: "If you lost something, say which screening you were at."
 5. With `mt-6`, the default `Button` "Send message", with `type="submit"`. It is the page's one gold action.
 

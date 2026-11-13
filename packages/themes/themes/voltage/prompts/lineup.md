@@ -5,13 +5,14 @@ description: the festival's programme, with a day switch, a stage filter, every 
 order: 2
 checks:
   - The day switch and the stage filter change the rows shown, and the chosen day's button has `aria-pressed="true"` and a check icon.
+  - 'The stage filter is the theme''s `Select`, with no native `<select>` on the page: its list opens under its trigger with a black outline, the row under the pointer is filled with ink, and the chosen row has a check.'
   - Every set has a time in the mono font as `<time>` elements with a `dateTime`, the act's name and its stage.
   - Each set has a Save button with `aria-pressed`; saving changes the saved count, and "Only my list" shows only saved sets.
   - Exactly one set carries the pink "New" badge, and no other element on the page is pink.
   - When no set matches, the list shows a sentence and a button that shows all sets again.
 ---
 
-Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, on Friday 4 and Saturday 5 December 2026, with three stages: Crane Stage, Pump House and the Drawing Office (talks and workshops). In a label and in the stage `<select>` that stage is "Drawing Office", with no "the"; in a sentence it is "the Drawing Office". All acts are invented. Use these twenty sets, all times UTC+1:
+Sample content, if the user gave none: **Tremor Days**, a two-day music and design festival at Varsby Docks, on Friday 4 and Saturday 5 December 2026, with three stages: Crane Stage, Pump House and the Drawing Office (talks and workshops). In a label and in the stage `Select` that stage is "Drawing Office", with no "the"; in a sentence it is "the Drawing Office". All acts are invented. Use these twenty sets, all times UTC+1:
 
 - **Friday:** Crane Stage: Juno Halde 17:30–18:15, Gravel & Gold 19:00–19:50, The Night Ferries 20:40–21:40, Ossa Bloom 22:40–23:50. Pump House: Neon Allotment 18:00–18:45, Pia Strand 19:30–20:20, Sister Antenna 21:00–22:00, Basement Choir 23:00–00:30. Drawing Office: Teo Marsh, "Posters that shout", 17:00–17:45; Fold Press, "Print your own poster", a workshop, 18:30–19:30.
 - **Saturday:** Crane Stage: Odd Weather 14:00–14:45, Lumen Varga 16:00–17:00, Halvard Ek 19:00–20:00, Kettle Drum Union 21:30–23:00. Pump House: Mira Sallis 13:30–14:15, Low Tide Radio 17:30–18:30, Cassette Saints 20:00–21:00, Rook & Ivy 23:30–01:00. Drawing Office: Studio Kantor, "Type for loud places", 13:00–13:45; Ossa Bloom, "Light shows from scrap", 15:00–15:45.
@@ -32,7 +33,7 @@ A section with no heading row. Its stack has `gap-3`:
 A section with a visually hidden `<h2>` "Filter the programme". It holds one panel across the full width, with `gap-5`, whose controls stack below `md` and stand in one row from `md` up that wraps: `md:flex-row md:flex-wrap md:items-end`.
 
 - **Day:** a stack with `gap-2`: a visible label "Day" (a `<p>` with an `id`, since a `<label>` cannot name a group), and under it a button group named by that label with `aria-labelledby`, holding "Fri 4 Dec" and "Sat 5 Dec". The chosen one follows the Button groups note, check icon included.
-- **Stage:** a stack with `gap-2`: the `<label>` "Stage" and a native `<select>` with All stages, Crane Stage, Pump House and Drawing Office, in a wrapper with `w-full md:w-56`.
+- **Stage:** a stack with `gap-2`: the `<label>` "Stage" and a `Select` from the Selects note with All stages, Crane Stage, Pump House and Drawing Office, in a wrapper with `w-full md:w-56`.
 - **Only my list:** a row with `flex items-center gap-2`: the shadcn `Checkbox` with `className="rounded-sm"` (add it with `npx shadcn@latest add checkbox`) and, right after it, its `<label>` "Only my list", styled as a label. Give the `Checkbox` `id="only-my-list"` and the `<label>` `htmlFor="only-my-list"`: Base UI puts that `id` on its hidden `<input>` and names the checkbox from the label, so add no `aria-label` or `aria-labelledby` yourself. In `components/ui/checkbox.tsx`, replace `dark:bg-input/30` with `bg-card`, the fill the Inputs note gives a field.
 - **Saved count:** at the right end from `md` up (`md:ml-auto`), a `<p>` styled as a label with `tabular-nums`, so it is uppercased on screen, here instead of the Small print note's look for a count; write it as below, always with the prefix: `My list · 3 sets`, `My list · 1 set`, and `My list · no sets yet` when nothing is saved. It counts saved sets on both days, whatever the filters show. It is not a live region: the Save button's `aria-pressed` already tells a screen reader that a set was saved.
 
@@ -63,5 +64,5 @@ The footer from the layout notes.
 - Keep the sets as data in the component, and the chosen day, the chosen stage, "Only my list" and the saved sets in state. The rows shown are the chosen day's sets, narrowed by the stage and, when it is ticked, by the saved list. The page starts on Friday, all stages, with "Only my list" off.
 - Save and unsave by each set's own id, so a set saved on Friday stays saved when you switch to Saturday and back. Unsaving a set while "Only my list" is on removes its row; move focus to the next row's Save button, or to the previous one when it was the last, or to the "Show all sets" button when none is left.
 - Keep the saved ids in `localStorage` under one key, read once when the page loads and written on every change. Wrap both in `try`/`catch`: where storage is not available, the list still works for the visit.
-- "Show all sets" sets the stage back to All stages and turns "Only my list" off; it keeps the day, and moves focus to the stage `<select>`.
+- "Show all sets" sets the stage back to All stages and turns "Only my list" off; it keeps the day, and moves focus to the stage select's trigger.
 - Changing a filter does not move focus. The shown count changes in its `aria-live` element, which is how a screen reader learns the result.

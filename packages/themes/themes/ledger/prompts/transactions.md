@@ -9,11 +9,12 @@ checks:
   - The total rows sum every transaction that matches the filters, on all pages, and change when a filter changes; the net row sits under a double rule in the heading font at its one weight.
   - Previous and Next are disabled at their end of the list and keep keyboard focus when they disable themselves.
   - An empty result shows a sentence and a "Clear filters" button, and after clearing, focus moves to the search field.
+  - 'The account filter is the theme''s `Select`, with no native `<select>` on the page: its list opens under its trigger, as wide as it, with a 1px rule between rows and a check on the chosen row, and the arrow keys, Enter and Escape work in it.'
 ---
 
 Sample content, if the user gave none: "Fairhold", a banking and invoicing service for small businesses, and its customer "Hollis & Vane", a two-person print studio. The statement covers 30 October to 27 November 2026 on two accounts: the current account (ending 4417) and the tax reserve (ending 8830). Invent 28 transactions, newest first: client payments in (Larkspur Café, Brennan Wholesale, Odell & Pryce Architects), payments out for rent, paper stock (Copperleaf Paper Mill), ink, software, card fees and a van lease, and two transfers to the tax reserve, each shown as two rows with the same date and amount: "To tax reserve" out of the current account and "From current account" into the tax reserve, so four of the 28 rows are transfers. Each has a reference such as `INV-0139` or `RENT NOV`.
 
-This page uses the stock `button`, `input` and `table`; add any the project lacks with `npx shadcn@latest add button input table`.
+This page uses the stock `button`, `input`, `select` and `table`; add any the project lacks with `npx shadcn@latest add button input select table`.
 
 Build these parts in order; the footer is as the layout notes describe it.
 
@@ -29,8 +30,8 @@ Above the heading, the period as a small figure, not uppercased: "30 Oct – 27 
 
 A sheet with no heading row, directly in the container and full width, not in a grid. It holds one row of controls, `flex flex-wrap items-end gap-4`, so that the bottoms of the fields line up when a label wraps.
 
-- **Search:** a field with the visible label "Search" and the placeholder "Payee or reference", no icon, in a wrapper with `w-full md:w-64`.
-- **Account:** a labelled `<select>` "Account" with the options All accounts, Current account and Tax reserve, in a wrapper with `w-full md:w-48`.
+- **Search:** a field with the visible label "Search" and the placeholder "Payee or reference", no icon, in a wrapper with `w-full md:w-64`. It is a plain text `Input`, not `type="search"`: the browser draws a clear button of its own in a search field.
+- **Account:** a labelled `Select` "Account" with the choices All accounts, Current account and Tax reserve, in a wrapper with `w-full md:w-48`.
 - **Direction:** a visible label "In or out" (a `<p>` with an `id`, since a `<label>` cannot name a group) over a button group, tied to it with `aria-labelledby`, with the choices All, In and Out; All is chosen. The label and the group are a stack with `gap-3`, like a field.
 - **Clear filters:** an `outline` button "Clear filters" at its own width, in a wrapper `<div>` with `w-full md:ml-auto md:w-auto`: the full-width wrapper gives it its own line under the group on a phone, and `md:ml-auto` puts it at the right end from `md` up. It is disabled with the plain `disabled` prop, not `focusableWhenDisabled`, while no filter is set: its click moves focus to the search field.
 

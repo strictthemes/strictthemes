@@ -1,7 +1,14 @@
-import { useMemo, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -13,61 +20,55 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-type Account = "current" | "reserve"
-
-type Transaction = {
-  id: string
-  date: string // ISO, YYYY-MM-DD
-  description: string
-  reference: string
-  account: Account
-  amount: number // pence; positive is money in, negative is money out
-}
-
-const TRANSACTIONS: Transaction[] = [
-  { id: "t28", date: "2026-11-27", description: "Larkspur Café", reference: "INV-0146", account: "current", amount: 124050 },
-  { id: "t27", date: "2026-11-26", description: "Copperleaf Paper Mill", reference: "CPM-88213", account: "current", amount: -61240 },
-  { id: "t26", date: "2026-11-25", description: "Card processing fees", reference: "FEES W48", account: "current", amount: -1875 },
-  { id: "t25", date: "2026-11-24", description: "Brennan Wholesale", reference: "INV-0145", account: "current", amount: 286000 },
-  { id: "t24", date: "2026-11-23", description: "To tax reserve", reference: "TAX NOV", account: "current", amount: -150000 },
-  { id: "t23", date: "2026-11-23", description: "From current account", reference: "TAX NOV", account: "reserve", amount: 150000 },
-  { id: "t22", date: "2026-11-20", description: "Inkwell Supply Co.", reference: "ISC-4471", account: "current", amount: -21430 },
-  { id: "t21", date: "2026-11-19", description: "Odell & Pryce Architects", reference: "INV-0144", account: "current", amount: 345000 },
-  { id: "t20", date: "2026-11-18", description: "Northgate Van Leasing", reference: "VAN NOV", account: "current", amount: -38900 },
-  { id: "t19", date: "2026-11-17", description: "Layerform design software", reference: "LF-2611", account: "current", amount: -4900 },
-  { id: "t18", date: "2026-11-16", description: "Card processing fees", reference: "FEES W47", account: "current", amount: -1240 },
-  { id: "t17", date: "2026-11-13", description: "Larkspur Café", reference: "INV-0143", account: "current", amount: 86520 },
-  { id: "t16", date: "2026-11-12", description: "Copperleaf Paper Mill", reference: "CPM-88107", account: "current", amount: -108465 },
-  { id: "t15", date: "2026-11-11", description: "Proofbox file storage", reference: "PBX-2611", account: "current", amount: -2400 },
-  { id: "t14", date: "2026-11-10", description: "Brennan Wholesale", reference: "INV-0142", account: "current", amount: 197500 },
-  { id: "t13", date: "2026-11-09", description: "Inkwell Supply Co.", reference: "ISC-4402", account: "current", amount: -15680 },
-  { id: "t12", date: "2026-11-09", description: "Card processing fees", reference: "FEES W46", account: "current", amount: -960 },
-  { id: "t11", date: "2026-11-06", description: "Odell & Pryce Architects", reference: "INV-0141", account: "current", amount: 212000 },
-  { id: "t10", date: "2026-11-04", description: "Larkspur Café", reference: "INV-0140", account: "current", amount: 54000 },
-  { id: "t09", date: "2026-11-03", description: "Ashby Row Properties", reference: "RENT NOV", account: "current", amount: -185000 },
-  { id: "t08", date: "2026-11-02", description: "To tax reserve", reference: "TAX OCT", account: "current", amount: -120000 },
-  { id: "t07", date: "2026-11-02", description: "From current account", reference: "TAX OCT", account: "reserve", amount: 120000 },
-  { id: "t06", date: "2026-11-02", description: "Card processing fees", reference: "FEES W45", account: "current", amount: -1530 },
-  { id: "t05", date: "2026-11-02", description: "Copperleaf Paper Mill", reference: "CPM-87994", account: "current", amount: -73820 },
-  { id: "t04", date: "2026-10-31", description: "Brennan Wholesale", reference: "INV-0139", account: "current", amount: 142800 },
-  { id: "t03", date: "2026-10-31", description: "Layerform design software", reference: "LF-2610", account: "current", amount: -4900 },
-  { id: "t02", date: "2026-10-30", description: "Inkwell Supply Co.", reference: "ISC-4359", account: "current", amount: -9875 },
-  { id: "t01", date: "2026-10-30", description: "Odell & Pryce Architects", reference: "INV-0138", account: "current", amount: 168000 },
-]
-
-const ACCOUNT_NAMES: Record<Account, string> = {
-  current: "Current",
-  reserve: "Tax reserve",
-}
-
-const PAGE_SIZE = 10
-const MINUS = "−"
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-
+type Account = "current" | "tax"
 type AccountFilter = "all" | Account
 type Direction = "all" | "in" | "out"
 
-const NAV_LINKS = [
+type Transaction = {
+  id: number
+  date: string
+  description: string
+  reference: string
+  account: Account
+  // In pence: positive is money in, negative is money out.
+  amount: number
+}
+
+// Newest first. The statement runs from 30 October to 27 November 2026.
+const transactions: Transaction[] = [
+  { id: 28, date: "2026-11-27", description: "Larkspur Café", reference: "INV-0139", account: "current", amount: 124050 },
+  { id: 27, date: "2026-11-26", description: "Copperleaf Paper Mill", reference: "CPM-20871", account: "current", amount: -68420 },
+  { id: 26, date: "2026-11-25", description: "Tillbrook Card Services", reference: "FEES NOV", account: "current", amount: -3860 },
+  { id: 25, date: "2026-11-24", description: "To tax reserve", reference: "TAX NOV", account: "current", amount: -90000 },
+  { id: 24, date: "2026-11-24", description: "From current account", reference: "TAX NOV", account: "tax", amount: 90000 },
+  { id: 23, date: "2026-11-23", description: "Brennan Wholesale", reference: "INV-0138", account: "current", amount: 286000 },
+  { id: 22, date: "2026-11-20", description: "Marlowe Inks", reference: "MI-4402", account: "current", amount: -31275 },
+  { id: 21, date: "2026-11-19", description: "Odell & Pryce Architects", reference: "INV-0136", account: "current", amount: 197500 },
+  { id: 20, date: "2026-11-18", description: "Pressroom Cloud", reference: "SUB-118820", account: "current", amount: -4900 },
+  { id: 19, date: "2026-11-17", description: "Harrow Van Leasing", reference: "LEASE NOV", account: "current", amount: -28640 },
+  { id: 18, date: "2026-11-16", description: "Larkspur Café", reference: "INV-0135", account: "current", amount: 42000 },
+  { id: 17, date: "2026-11-13", description: "Copperleaf Paper Mill", reference: "CPM-20744", account: "current", amount: -52990 },
+  { id: 16, date: "2026-11-12", description: "Brennan Wholesale", reference: "INV-0134", account: "current", amount: 148025 },
+  { id: 15, date: "2026-11-11", description: "Foldline Type Library", reference: "LIC-2291", account: "current", amount: -12000 },
+  { id: 14, date: "2026-11-10", description: "Fairhold interest", reference: "INT OCT", account: "tax", amount: 684 },
+  { id: 13, date: "2026-11-09", description: "Odell & Pryce Architects", reference: "INV-0132", account: "current", amount: 320000 },
+  { id: 12, date: "2026-11-06", description: "Marlowe Inks", reference: "MI-4317", account: "current", amount: -19830 },
+  { id: 11, date: "2026-11-05", description: "Wexcombe Estates", reference: "RENT NOV", account: "current", amount: -115000 },
+  { id: 10, date: "2026-11-04", description: "Larkspur Café", reference: "INV-0131", account: "current", amount: 61500 },
+  { id: 9, date: "2026-11-03", description: "To tax reserve", reference: "TAX OCT", account: "current", amount: -75000 },
+  { id: 8, date: "2026-11-03", description: "From current account", reference: "TAX OCT", account: "tax", amount: 75000 },
+  { id: 7, date: "2026-11-03", description: "Brennan Wholesale", reference: "INV-0130", account: "current", amount: 98000 },
+  { id: 6, date: "2026-11-02", description: "Tillbrook Card Services", reference: "FEES OCT", account: "current", amount: -4115 },
+  { id: 5, date: "2026-11-02", description: "Copperleaf Paper Mill", reference: "CPM-20610", account: "current", amount: -74200 },
+  { id: 4, date: "2026-10-30", description: "Odell & Pryce Architects", reference: "INV-0129", account: "current", amount: 134000 },
+  { id: 3, date: "2026-10-30", description: "Harrow Van Leasing", reference: "LEASE OCT", account: "current", amount: -28640 },
+  { id: 2, date: "2026-10-30", description: "Pressroom Cloud", reference: "SUB-117302", account: "current", amount: -4900 },
+  { id: 1, date: "2026-10-30", description: "Dunmore Couriers", reference: "DC-55120", account: "current", amount: -6480 },
+]
+
+const PAGE_SIZE = 10
+
+const navLinks = [
   { label: "Overview", href: "/" },
   { label: "Transactions", href: "/transactions" },
   { label: "Invoices", href: "/invoice" },
@@ -76,108 +77,88 @@ const NAV_LINKS = [
 ]
 const CURRENT_PATH = "/transactions"
 
-const FOCUS =
+const accountChoices: { value: AccountFilter; label: string }[] = [
+  { value: "all", label: "All accounts" },
+  { value: "current", label: "Current account" },
+  { value: "tax", label: "Tax reserve" },
+]
+
+const directionChoices: { value: Direction; label: string }[] = [
+  { value: "all", label: "All" },
+  { value: "in", label: "In" },
+  { value: "out", label: "Out" },
+]
+
+const accountNames: Record<Account, string> = {
+  current: "Current",
+  tax: "Tax reserve",
+}
+
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const LABEL = "font-mono text-label uppercase text-muted-foreground"
-const SMALL = "font-mono text-label tabular-nums text-muted-foreground"
-const BUTTON = "px-4 font-mono text-label uppercase"
+const container = "mx-auto w-full max-w-[1200px] px-4 md:px-6"
+const label = "font-mono text-label uppercase text-muted-foreground"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const buttonText = "px-4 font-mono text-label uppercase"
+const bodyCell = "px-4 py-2 first:pl-6 last:pr-6"
+const totalCell = "border-t-4 border-double border-foreground"
 
-function formatPounds(pence: number) {
-  const abs = Math.abs(pence)
-  const pounds = Math.floor(abs / 100).toLocaleString("en-GB")
-  const rest = String(abs % 100).padStart(2, "0")
-  return `£${pounds}.${rest}`
-}
-
+// "2026-11-27" to "27 Nov".
 function shortDate(iso: string) {
-  const [, m, d] = iso.split("-")
-  return `${Number(d)} ${MONTHS[Number(m) - 1]}`
+  const [, month, day] = iso.split("-")
+  return `${Number(day)} ${months[Number(month) - 1]}`
 }
 
-function plural(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
+// Pence to "£1,240.50", without a sign.
+function pounds(pence: number) {
+  const whole = Math.floor(Math.abs(pence) / 100).toLocaleString("en-GB")
+  const rest = String(Math.abs(pence) % 100).padStart(2, "0")
+  return `£${whole}.${rest}`
 }
 
-function SignedAmount({ pence, direction }: { pence: number; direction: "in" | "out" }) {
-  const zero = pence === 0
-  const sign = zero ? "" : direction === "in" ? "+" : MINUS
+function navLinkClass(href: string) {
+  return cn(
+    "font-mono text-label uppercase transition-colors duration-150",
+    focusOutline,
+    href === CURRENT_PATH
+      ? "text-foreground underline underline-offset-4"
+      : "text-muted-foreground hover:text-foreground"
+  )
+}
+
+// The word first, then the figure, so the digits keep the column's right edge.
+function SignedAmount({
+  direction,
+  pence,
+}: {
+  direction: "in" | "out"
+  pence: number
+}) {
+  const sum = Math.abs(pence)
   return (
     <span className="inline-flex items-baseline justify-end gap-2 whitespace-nowrap">
-      <span className={LABEL}>{direction === "in" ? "In" : "Out"}</span>
+      <span className={label}>{direction === "in" ? "In" : "Out"}</span>
       <span
         className={cn(
           "font-mono tabular-nums",
-          zero ? "text-foreground" : direction === "in" ? "text-primary" : "text-destructive"
+          sum === 0
+            ? "text-foreground"
+            : direction === "in"
+              ? "text-primary"
+              : "text-destructive"
         )}
       >
-        {sign}
-        {formatPounds(pence)}
+        {sum === 0 ? "" : direction === "in" ? "+" : "−"}
+        {pounds(sum)}
       </span>
     </span>
   )
 }
 
-function Header() {
-  const [open, setOpen] = useState(false)
-  const linkClass = (current: boolean) =>
-    cn(
-      "font-mono text-label uppercase transition-colors duration-150",
-      FOCUS,
-      current
-        ? "text-foreground underline underline-offset-4"
-        : "text-muted-foreground hover:text-foreground"
-    )
-  const links = (block: boolean) =>
-    NAV_LINKS.map((link) => {
-      const current = link.href === CURRENT_PATH
-      return (
-        <li key={link.href}>
-          <a
-            href={link.href}
-            aria-current={current ? "page" : undefined}
-            className={cn(linkClass(current), block && "block py-2")}
-          >
-            {link.label}
-          </a>
-        </li>
-      )
-    })
-
-  return (
-    <header className="border-b border-border">
-      <div className="mx-auto flex w-full max-w-[1200px] items-center gap-6 px-4 py-4 md:px-6">
-        <a href="/" className={cn("font-heading text-h2 text-foreground", FOCUS)}>
-          Fairhold
-        </a>
-        <nav aria-label="Main" className="hidden md:block">
-          <ul className="flex gap-6">{links(false)}</ul>
-        </nav>
-        <p className={cn(SMALL, "ml-auto hidden md:block")}>Hollis &amp; Vane</p>
-        <Button
-          variant="outline"
-          className={cn(BUTTON, "ml-auto md:hidden")}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
-        >
-          Menu
-        </Button>
-      </div>
-      <nav
-        id="mobile-nav"
-        aria-label="Main"
-        hidden={!open}
-        className="border-t border-border md:hidden"
-      >
-        <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
-          <ul className="py-2">{links(true)}</ul>
-        </div>
-      </nav>
-    </header>
-  )
-}
-
 export function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
   const [search, setSearch] = useState("")
   const [account, setAccount] = useState<AccountFilter>("all")
   const [direction, setDirection] = useState<Direction>("all")
@@ -187,33 +168,34 @@ export function App() {
   const query = search.trim().toLowerCase()
   const filterSet = query !== "" || account !== "all" || direction !== "all"
 
-  const matches = useMemo(
-    () =>
-      TRANSACTIONS.filter((t) => {
-        if (
-          query &&
-          !t.description.toLowerCase().includes(query) &&
-          !t.reference.toLowerCase().includes(query)
-        )
-          return false
-        if (account !== "all" && t.account !== account) return false
-        if (direction === "in" && t.amount <= 0) return false
-        if (direction === "out" && t.amount >= 0) return false
-        return true
-      }),
-    [query, account, direction]
-  )
+  const matching = transactions.filter((row) => {
+    if (account !== "all" && row.account !== account) return false
+    if (direction === "in" && row.amount < 0) return false
+    if (direction === "out" && row.amount > 0) return false
+    if (query === "") return true
+    return (
+      row.description.toLowerCase().includes(query) ||
+      row.reference.toLowerCase().includes(query)
+    )
+  })
 
-  const total = matches.length
-  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE))
-  const currentPage = Math.min(page, pageCount)
-  const start = (currentPage - 1) * PAGE_SIZE
-  const rows = matches.slice(start, start + PAGE_SIZE)
-  const rangeLabel =
-    total === 0 ? "0 of 0" : `${start + 1}–${start + rows.length} of ${total}`
+  const count = matching.length
+  const pageCount = Math.max(1, Math.ceil(count / PAGE_SIZE))
+  const first = (page - 1) * PAGE_SIZE
+  const shown = matching.slice(first, first + PAGE_SIZE)
+  const range =
+    count === 0
+      ? "0 of 0"
+      : shown.length === 1
+        ? `${first + 1} of ${count}`
+        : `${first + 1}–${first + shown.length} of ${count}`
 
-  const moneyIn = matches.reduce((sum, t) => (t.amount > 0 ? sum + t.amount : sum), 0)
-  const moneyOut = matches.reduce((sum, t) => (t.amount < 0 ? sum - t.amount : sum), 0)
+  let moneyIn = 0
+  let moneyOut = 0
+  for (const row of matching) {
+    if (row.amount > 0) moneyIn += row.amount
+    else moneyOut -= row.amount
+  }
   const net = moneyIn - moneyOut
 
   function clearFilters() {
@@ -224,84 +206,145 @@ export function App() {
     searchRef.current?.focus()
   }
 
-  const directions: { value: Direction; label: string }[] = [
-    { value: "all", label: "All" },
-    { value: "in", label: "In" },
-    { value: "out", label: "Out" },
-  ]
-
-  const footCell = "px-4 py-2 first:pl-6 last:pr-6"
-  const totalCell = cn(footCell, "border-t-4 border-double border-foreground")
-
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
-      <Header />
+      <header className="border-b border-border">
+        <div className={cn(container, "flex items-center gap-6 py-4")}>
+          <a
+            href="/"
+            className={cn("font-heading text-h2 text-foreground", focusOutline)}
+          >
+            Fairhold
+          </a>
+          <nav aria-label="Main" className="hidden md:block">
+            <ul className="flex gap-6">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_PATH ? "page" : undefined
+                    }
+                    className={navLinkClass(link.href)}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <p className={cn(smallFigure, "ml-auto hidden md:block")}>
+            Hollis &amp; Vane
+          </p>
+          <Button
+            variant="outline"
+            className={cn(buttonText, "ml-auto md:hidden")}
+            aria-expanded={menuOpen}
+            aria-controls="menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            Menu
+          </Button>
+        </div>
+        <nav
+          id="menu"
+          aria-label="Main"
+          hidden={!menuOpen}
+          className="border-t border-border md:hidden"
+        >
+          <div className={container}>
+            <ul className="py-2">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={
+                      link.href === CURRENT_PATH ? "page" : undefined
+                    }
+                    className={cn("block py-2", navLinkClass(link.href))}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+      </header>
 
       <main className="flex-1 py-6 md:py-12">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 md:px-6">
+        <div className={cn(container, "flex flex-col gap-6")}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className={SMALL}>
+              <p className={smallFigure}>
                 <time dateTime="2026-10-30">30 Oct</time> –{" "}
                 <time dateTime="2026-11-27">27 Nov 2026</time>
               </p>
               <h1 className="text-h1">Transactions</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className={BUTTON}>
+              <Button variant="outline" className={buttonText}>
                 Export CSV
               </Button>
             </div>
           </div>
 
-          <section aria-label="Filters" className="rounded-xl border border-border bg-card p-6">
+          <section
+            aria-label="Filters"
+            className="rounded-xl border border-border bg-card p-6"
+          >
             <div className="flex flex-wrap items-end gap-4">
               <div className="flex w-full flex-col gap-3 md:w-64">
-                <label htmlFor="search" className={cn("block", LABEL)}>
+                <label htmlFor="search" className={cn("block", label)}>
                   Search
                 </label>
                 <div className="flex flex-col gap-2">
                   <Input
-                    id="search"
                     ref={searchRef}
-                    type="search"
+                    id="search"
+                    type="text"
+                    autoComplete="off"
                     placeholder="Payee or reference"
+                    className="px-2 text-body md:text-body"
                     value={search}
-                    onChange={(e) => {
-                      setSearch(e.target.value)
+                    onChange={(event) => {
+                      setSearch(event.target.value)
                       setPage(1)
                     }}
-                    className="text-body md:text-body"
                   />
                 </div>
               </div>
 
               <div className="flex w-full flex-col gap-3 md:w-48">
-                <label htmlFor="account" className={cn("block", LABEL)}>
+                <label htmlFor="account" className={cn("block", label)}>
                   Account
                 </label>
                 <div className="flex flex-col gap-2">
-                  <select
-                    id="account"
+                  <Select
+                    items={accountChoices}
                     value={account}
-                    onChange={(e) => {
-                      setAccount(e.target.value as AccountFilter)
+                    onValueChange={(value) => {
+                      if (value === null) return
+                      setAccount(value)
                       setPage(1)
                     }}
-                    className={cn(
-                      "h-8 w-full rounded-lg border border-input bg-card px-2 text-body text-foreground aria-invalid:border-destructive",
-                      FOCUS
-                    )}
                   >
-                    <option value="all">All accounts</option>
-                    <option value="current">Current account</option>
-                    <option value="reserve">Tax reserve</option>
-                  </select>
+                    <SelectTrigger id="account">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {accountChoices.map((choice) => (
+                        <SelectItem key={choice.value} value={choice.value}>
+                          {choice.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               <div className="flex flex-col gap-3">
-                <p id="direction-label" className={LABEL}>
+                <p id="direction-label" className={label}>
                   In or out
                 </p>
                 <div
@@ -309,30 +352,29 @@ export function App() {
                   aria-labelledby="direction-label"
                   className="flex flex-wrap gap-1"
                 >
-                  {directions.map((d) => {
-                    const chosen = direction === d.value
-                    return (
-                      <Button
-                        key={d.value}
-                        variant={chosen ? "secondary" : "outline"}
-                        aria-pressed={chosen}
-                        className={BUTTON}
-                        onClick={() => {
-                          setDirection(d.value)
-                          setPage(1)
-                        }}
-                      >
-                        {d.label}
-                      </Button>
-                    )
-                  })}
+                  {directionChoices.map((choice) => (
+                    <Button
+                      key={choice.value}
+                      variant={
+                        direction === choice.value ? "secondary" : "outline"
+                      }
+                      aria-pressed={direction === choice.value}
+                      className={buttonText}
+                      onClick={() => {
+                        setDirection(choice.value)
+                        setPage(1)
+                      }}
+                    >
+                      {choice.label}
+                    </Button>
+                  ))}
                 </div>
               </div>
 
               <div className="w-full md:ml-auto md:w-auto">
                 <Button
                   variant="outline"
-                  className={BUTTON}
+                  className={buttonText}
                   disabled={!filterSet}
                   onClick={clearFilters}
                 >
@@ -347,97 +389,124 @@ export function App() {
             className="flex flex-col overflow-hidden rounded-xl border border-border bg-card"
           >
             <div className="flex min-h-8 flex-wrap items-center justify-between gap-3 border-b border-border px-6 pt-6 pb-3">
-              <h2 id="statement-heading" className={LABEL}>
+              <h2 id="statement-heading" className={label}>
                 Statement
               </h2>
-              <p aria-live="polite" className={SMALL}>
-                {rangeLabel}
+              <p aria-live="polite" className={smallFigure}>
+                {range}
               </p>
             </div>
 
             <Table label="Statement" className="text-body">
               <TableHeader>
                 <TableRow>
-                  {["Date", "Description", "Reference", "Account"].map((h) => (
-                    <TableHead key={h} className={cn("px-4 first:pl-6 last:pr-6", LABEL)}>
-                      {h}
-                    </TableHead>
-                  ))}
-                  <TableHead className={cn("px-4 text-right first:pl-6 last:pr-6", LABEL)}>
+                  <TableHead className={cn("px-4 first:pl-6 last:pr-6", label)}>
+                    Date
+                  </TableHead>
+                  <TableHead className={cn("px-4 first:pl-6 last:pr-6", label)}>
+                    Description
+                  </TableHead>
+                  <TableHead className={cn("px-4 first:pl-6 last:pr-6", label)}>
+                    Reference
+                  </TableHead>
+                  <TableHead className={cn("px-4 first:pl-6 last:pr-6", label)}>
+                    Account
+                  </TableHead>
+                  <TableHead
+                    className={cn(
+                      "px-4 text-right first:pl-6 last:pr-6",
+                      label
+                    )}
+                  >
                     Amount
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.length === 0 ? (
+                {count === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="px-6 py-12 whitespace-normal">
+                    <TableCell
+                      colSpan={5}
+                      className="px-6 py-12 whitespace-normal"
+                    >
                       <div className="flex flex-col items-start gap-3">
-                        <p className="text-body text-foreground">
+                        <p className="text-body">
                           No transactions match these filters.
                         </p>
-                        <Button variant="outline" className={BUTTON} onClick={clearFilters}>
+                        <Button
+                          variant="outline"
+                          className={buttonText}
+                          onClick={clearFilters}
+                        >
                           Clear filters
                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
                 ) : (
-                  rows.map((t) => (
-                    <TableRow key={t.id}>
-                      <TableCell className="px-4 py-2 font-mono tabular-nums first:pl-6 last:pr-6">
-                        <time dateTime={t.date}>{shortDate(t.date)}</time>
+                  shown.map((row) => (
+                    <TableRow key={row.id}>
+                      <TableCell className={bodyCell}>
+                        <time
+                          dateTime={row.date}
+                          className="font-mono tabular-nums"
+                        >
+                          {shortDate(row.date)}
+                        </time>
                       </TableCell>
-                      <TableCell className="px-4 py-2 text-body first:pl-6 last:pr-6">
-                        {t.description}
+                      <TableCell className={bodyCell}>
+                        {row.description}
                       </TableCell>
-                      <TableCell className={cn("px-4 py-2 first:pl-6 last:pr-6", SMALL)}>
-                        {t.reference}
+                      <TableCell className={cn(bodyCell, smallFigure)}>
+                        {row.reference}
                       </TableCell>
-                      <TableCell className="px-4 py-2 first:pl-6 last:pr-6">
-                        {ACCOUNT_NAMES[t.account]}
+                      <TableCell className={bodyCell}>
+                        {accountNames[row.account]}
                       </TableCell>
-                      <TableCell className="px-4 py-2 text-right first:pl-6 last:pr-6">
+                      <TableCell className={cn(bodyCell, "text-right")}>
                         <SignedAmount
-                          pence={Math.abs(t.amount)}
-                          direction={t.amount > 0 ? "in" : "out"}
+                          direction={row.amount > 0 ? "in" : "out"}
+                          pence={row.amount}
                         />
                       </TableCell>
                     </TableRow>
                   ))
                 )}
               </TableBody>
-              {total > 0 && (
+              {count > 0 && (
                 <TableFooter className="bg-transparent font-normal">
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={4} className={footCell}>
-                      <span className={LABEL}>Money in</span>
+                    <TableCell colSpan={4} className={cn(bodyCell, label)}>
+                      Money in
                     </TableCell>
-                    <TableCell className={cn(footCell, "text-right")}>
-                      <SignedAmount pence={moneyIn} direction="in" />
-                    </TableCell>
-                  </TableRow>
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={4} className={footCell}>
-                      <span className={LABEL}>Money out</span>
-                    </TableCell>
-                    <TableCell className={cn(footCell, "text-right")}>
-                      <SignedAmount pence={moneyOut} direction="out" />
+                    <TableCell className={cn(bodyCell, "text-right")}>
+                      <SignedAmount direction="in" pence={moneyIn} />
                     </TableCell>
                   </TableRow>
                   <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={4} className={totalCell}>
+                    <TableCell colSpan={4} className={cn(bodyCell, label)}>
+                      Money out
+                    </TableCell>
+                    <TableCell className={cn(bodyCell, "text-right")}>
+                      <SignedAmount direction="out" pence={moneyOut} />
+                    </TableCell>
+                  </TableRow>
+                  <TableRow className="hover:bg-transparent">
+                    <TableCell colSpan={4} className={cn(bodyCell, totalCell)}>
                       <div className="flex flex-wrap items-baseline gap-2">
                         <span className="font-heading text-h2 tabular-nums">
                           {net > 0 ? "Net in" : net < 0 ? "Net out" : "Net"}
                         </span>
-                        <span className={SMALL}>
-                          {plural(total, "transaction", "transactions")}
+                        <span className={smallFigure}>
+                          {count === 1
+                            ? "1 transaction"
+                            : `${count} transactions`}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell
                       className={cn(
+                        bodyCell,
                         totalCell,
                         "text-right font-heading text-h2 tabular-nums",
                         net > 0
@@ -447,8 +516,8 @@ export function App() {
                             : "text-foreground"
                       )}
                     >
-                      {net > 0 ? "+" : net < 0 ? MINUS : ""}
-                      {formatPounds(net)}
+                      {net > 0 ? "+" : net < 0 ? "−" : ""}
+                      {pounds(net)}
                     </TableCell>
                   </TableRow>
                 </TableFooter>
@@ -456,25 +525,25 @@ export function App() {
             </Table>
 
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-6 py-3">
-              <p className={SMALL}>
-                Page {currentPage} of {pageCount}
+              <p className={smallFigure}>
+                Page {page} of {pageCount}
               </p>
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  className={BUTTON}
-                  disabled={currentPage <= 1}
+                  className={buttonText}
                   focusableWhenDisabled
-                  onClick={() => setPage(currentPage - 1)}
+                  disabled={page <= 1}
+                  onClick={() => setPage(page - 1)}
                 >
                   Previous
                 </Button>
                 <Button
                   variant="outline"
-                  className={BUTTON}
-                  disabled={currentPage >= pageCount}
+                  className={buttonText}
                   focusableWhenDisabled
-                  onClick={() => setPage(currentPage + 1)}
+                  disabled={page >= pageCount}
+                  onClick={() => setPage(page + 1)}
                 >
                   Next
                 </Button>
@@ -485,8 +554,10 @@ export function App() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-6">
-          <p className={SMALL}>Fairhold · A demo. No money moves. · 2026</p>
+        <div className={cn(container, "py-6")}>
+          <p className={smallFigure}>
+            Fairhold · A demo. No money moves. · 2026
+          </p>
         </div>
       </footer>
     </div>

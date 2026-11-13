@@ -5,6 +5,7 @@ description: the course catalogue of an online school, with a search field and a
 order: 1
 checks:
   - "The search field and the level filter work together on the nine cards, and the level filter is a button group with `aria-pressed`, not tabs."
+  - "The search field looks like any field of the theme, with text in it too: the browser's own clear button does not show."
   - "The count of results is a sentence in words in a `role=status` element that is on the page from the start, and it follows every keystroke and every press."
   - "Every card gives its topic in words beside the dot, its level in a green badge, its number of lessons and its length, and no text is set on azure, sun or berry."
   - "A search with no result shows a sentence and a Clear search and level button, and pressing it brings back all nine cards and moves focus to the search field."
@@ -52,7 +53,7 @@ A section with the `<h2>` "All courses". Its content, in the section's `gap-5`, 
 
 **The controls.** A `<div>` with `flex flex-col gap-5 md:flex-row md:items-end md:justify-between`:
 
-- The search field, in a wrapper with `w-full md:max-w-sm`: a field from the layout notes with the label "Search courses", an `Input` with `type="search"` and `autoComplete="off"`, and the helper text `By title, topic or teacher`. No placeholder and no search button: the grid follows as you type.
+- The search field, in a wrapper with `w-full md:max-w-sm`: a field from the layout notes with the label "Search courses", an `Input` with `type="search"` and `autoComplete="off"`, and the helper text `By title, topic or teacher`. No placeholder and no search button: the grid follows as you type. A browser draws a clear button of its own inside a search field that holds text: add `[&::-webkit-search-cancel-button]:appearance-none` to the `Input`'s `className`, beside the classes of the Inputs note, so the field keeps the theme's look. Escape still empties the field where the browser does that.
 - The level filter, a `flex flex-col gap-2`: a `<p>` with an `id`, styled as a field's label, "Level"; then a button group from the layout notes, named by that `<p>` with `aria-labelledby` (in place of the `aria-label`), with four buttons: "All levels", chosen at the start, "Beginner", "Intermediate" and "Advanced".
 
 **The count.** A `<p>` with `role="status"`, a small figure in `text-foreground`. It always holds a sentence, so it is an item of the section's stack:

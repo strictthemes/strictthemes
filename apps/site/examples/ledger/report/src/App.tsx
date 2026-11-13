@@ -12,83 +12,95 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-const focusRing =
+const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
+const container = "mx-auto w-full max-w-[1200px] px-4 md:px-6"
+
+const label = "font-mono text-label uppercase text-muted-foreground"
+
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+
 const textLink = cn(
   "text-primary underline underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  focusRing
+  focusOutline
 )
-const label = "font-mono text-label uppercase"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-const buttonText = "px-4 font-mono text-label uppercase"
+
+const buttonLabel = "px-4 font-mono text-label uppercase"
 
 const navLinks = [
-  { label: "Overview", href: "/" },
-  { label: "Transactions", href: "/transactions" },
-  { label: "Invoices", href: "/invoice" },
-  { label: "Payments", href: "/payment" },
-  { label: "Reports", href: "/report" },
-]
-const currentHref = "/report"
-
-const figures = [
-  { term: "Income", value: "£412,860", change: "Up 14% on last year." },
-  { term: "Costs", value: "£356,240", change: "Up 11% on last year." },
-  {
-    term: "Profit before tax",
-    value: "£56,620",
-    change: "Up 37% on last year.",
-  },
+  { name: "Overview", href: "/" },
+  { name: "Transactions", href: "/transactions" },
+  { name: "Invoices", href: "/invoice" },
+  { name: "Payments", href: "/payment" },
+  { name: "Reports", href: "/report" },
 ]
 
-type Quarter = {
-  quarter: string
-  months: string
-  income: string
-  costs: string
-  net: { kind: "profit" | "loss"; amount: string }
-  margin: string
-  cash: string
+const currentPath = "/report"
+
+const keyFigures = [
+  { name: "Income", amount: 412860, change: "Up 14% on last year." },
+  { name: "Costs", amount: 356240, change: "Up 11% on last year." },
+  { name: "Profit before tax", amount: 56620, change: "Up 37% on last year." },
+]
+
+type Period = {
+  name: string
+  months?: string
+  income: number
+  costs: number
+  net: number
+  margin: number
+  cash: number
 }
 
-const quarters: Quarter[] = [
+const quarters: Period[] = [
   {
-    quarter: "Q1",
+    name: "Q1",
     months: "Oct–Dec 2025",
-    income: "£98,420",
-    costs: "£79,310",
-    net: { kind: "profit", amount: "+£19,110" },
-    margin: "19.4%",
-    cash: "£38,250",
+    income: 98420,
+    costs: 79310,
+    net: 19110,
+    margin: 19.4,
+    cash: 38250,
   },
   {
-    quarter: "Q2",
+    name: "Q2",
     months: "Jan–Mar 2026",
-    income: "£84,950",
-    costs: "£89,130",
-    net: { kind: "loss", amount: "−£4,180" },
-    margin: "−4.9%",
-    cash: "£29,870",
+    income: 84950,
+    costs: 89130,
+    net: -4180,
+    margin: -4.9,
+    cash: 29870,
   },
   {
-    quarter: "Q3",
+    name: "Q3",
     months: "Apr–Jun 2026",
-    income: "£109,760",
-    costs: "£90,420",
-    net: { kind: "profit", amount: "+£19,340" },
-    margin: "17.6%",
-    cash: "£44,120",
+    income: 109760,
+    costs: 90420,
+    net: 19340,
+    margin: 17.6,
+    cash: 44120,
   },
   {
-    quarter: "Q4",
+    name: "Q4",
     months: "Jul–Sep 2026",
-    income: "£119,730",
-    costs: "£97,380",
-    net: { kind: "profit", amount: "+£22,350" },
-    margin: "18.7%",
-    cash: "£54,310",
+    income: 119730,
+    costs: 97380,
+    net: 22350,
+    margin: 18.7,
+    cash: 54310,
   },
 ]
+
+const year: Period = {
+  name: "Year",
+  income: 412860,
+  costs: 356240,
+  net: 56620,
+  margin: 13.7,
+  cash: 54310,
+}
 
 const notes = [
   "Figures are rounded to the nearest pound and are before corporation tax.",
@@ -97,62 +109,98 @@ const notes = [
   "Transfers between the current account and the tax reserve are left out of income and costs.",
 ]
 
-function NoteMarker({ n }: { n: number }) {
+const MINUS = "−"
+
+// Whole pounds, with a thousands comma and no sign.
+function pounds(amount: number) {
+  return `£${Math.abs(amount).toLocaleString("en-GB")}`
+}
+
+function signedPounds(amount: number) {
+  return `${amount < 0 ? MINUS : "+"}${pounds(amount)}`
+}
+
+function percent(value: number) {
+  return `${value < 0 ? MINUS : ""}${Math.abs(value).toFixed(1)}%`
+}
+
+function NavLink({
+  link,
+  className,
+}: {
+  link: (typeof navLinks)[number]
+  className?: string
+}) {
+  const current = link.href === currentPath
+  return (
+    <a
+      href={link.href}
+      aria-current={current ? "page" : undefined}
+      className={cn(
+        "font-mono text-label uppercase transition-colors duration-150",
+        current
+          ? "text-foreground underline underline-offset-4"
+          : "text-muted-foreground hover:text-foreground",
+        focusOutline,
+        className
+      )}
+    >
+      {link.name}
+    </a>
+  )
+}
+
+function NoteMarker({ note }: { note: number }) {
   return (
     <sup className="relative -top-1 align-baseline text-label">
-      <a href={`#note-${n}`} aria-label={`Note ${n}`} className={textLink}>
-        {n}
+      <a
+        href={`#note-${note}`}
+        aria-label={`Note ${note}`}
+        className={textLink}
+      >
+        {note}
       </a>
     </sup>
   )
 }
 
-function NavLink({
-  href,
-  children,
-  className,
-}: {
-  href: string
-  children: React.ReactNode
-  className?: string
-}) {
-  const current = href === currentHref
+function Net({ amount, total = false }: { amount: number; total?: boolean }) {
+  const loss = amount < 0
   return (
-    <a
-      href={href}
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        label,
-        "transition-colors duration-150",
-        current
-          ? "text-foreground underline underline-offset-4"
-          : "text-muted-foreground hover:text-foreground",
-        focusRing,
-        className
-      )}
-    >
-      {children}
-    </a>
+    <span className="inline-flex items-baseline justify-end gap-2 whitespace-nowrap">
+      <span className={label}>{loss ? "Loss" : "Profit"}</span>
+      <span
+        className={cn(
+          "tabular-nums",
+          total ? "font-heading text-h2" : "font-mono",
+          loss ? "text-destructive" : "text-primary"
+        )}
+      >
+        {signedPounds(amount)}
+      </span>
+    </span>
   )
 }
-
-const headCell = cn(label, "px-4 text-muted-foreground first:pl-6 last:pr-6")
-const bodyCell = "px-4 py-2 first:pl-6 last:pr-6"
-const totalCell = cn(
-  bodyCell,
-  "border-t-4 border-double border-foreground font-heading text-h2 tabular-nums"
-)
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const headCell = cn(label, "px-4 first:pl-6 last:pr-6")
+  const amountHead = cn(headCell, "text-right")
+  const cell = "px-4 py-2 first:pl-6 last:pr-6"
+  const amountCell = cn(cell, "text-right font-mono tabular-nums")
+  const totalCell = cn(
+    cell,
+    "border-t-4 border-double border-foreground font-heading text-h2 tabular-nums"
+  )
+
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <header className="border-b border-border">
-        <div className="mx-auto flex w-full max-w-[1200px] items-center gap-6 px-4 py-4 md:px-6">
+        <div className={cn(container, "flex items-center gap-6 py-4")}>
           <a
             href="/"
-            className={cn("font-heading text-h2 text-foreground", focusRing)}
+            className={cn("font-heading text-h2 text-foreground", focusOutline)}
           >
             Fairhold
           </a>
@@ -160,7 +208,7 @@ export function App() {
             <ul className="flex gap-6">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <NavLink href={link.href}>{link.label}</NavLink>
+                  <NavLink link={link} />
                 </li>
               ))}
             </ul>
@@ -170,27 +218,25 @@ export function App() {
           </p>
           <Button
             variant="outline"
-            className={cn(buttonText, "ml-auto md:hidden")}
+            className={cn(buttonLabel, "ml-auto md:hidden")}
             aria-expanded={menuOpen}
-            aria-controls="mobile-nav"
+            aria-controls="small-screen-menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
             Menu
           </Button>
         </div>
         <nav
-          id="mobile-nav"
+          id="small-screen-menu"
           aria-label="Main"
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
-          <div className="mx-auto w-full max-w-[1200px] px-4 md:px-6">
+          <div className={container}>
             <ul className="py-2">
               {navLinks.map((link) => (
                 <li key={link.href}>
-                  <NavLink href={link.href} className="block py-2">
-                    {link.label}
-                  </NavLink>
+                  <NavLink link={link} className="block py-2" />
                 </li>
               ))}
             </ul>
@@ -199,16 +245,14 @@ export function App() {
       </header>
 
       <main className="flex-1 py-6 md:py-12">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-12 px-4 md:px-6">
+        <div className={cn(container, "flex flex-col gap-12")}>
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <p className={cn(label, "text-muted-foreground")}>
-                Yearly report
-              </p>
+              <p className={label}>Yearly report</p>
               <h1 className="text-h1">The year to 30 September 2026</h1>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="outline" className={buttonText}>
+              <Button variant="outline" className={buttonLabel}>
                 Download PDF
               </Button>
             </div>
@@ -222,16 +266,14 @@ export function App() {
               The year in figures
             </h2>
             <dl className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-              {figures.map((figure) => (
+              {keyFigures.map((figure) => (
                 <div
-                  key={figure.term}
+                  key={figure.name}
                   className="flex flex-col gap-2 border-t border-border pt-3"
                 >
-                  <dt className={cn(label, "text-muted-foreground")}>
-                    {figure.term}
-                  </dt>
+                  <dt className={label}>{figure.name}</dt>
                   <dd className="font-heading text-display text-foreground tabular-nums">
-                    {figure.value}
+                    {pounds(figure.amount)}
                   </dd>
                   <dd className="text-body">{figure.change}</dd>
                 </div>
@@ -248,28 +290,28 @@ export function App() {
             </h2>
             <div className="flex flex-col gap-4">
               <p className="max-w-lg text-body text-foreground">
-                It was our busiest year since we opened the studio. Our income
-                came to £412,860, 14% more than the year before.
-                <NoteMarker n={1} /> Two new café clients now order menus,
-                loyalty cards and window posters every month, and a busy summer
-                of weddings and festivals filled the press with event print from
-                June to September.
+                Income for the year was £412,860, up 14% on the year before.
+                <NoteMarker note={1} /> Most of the growth came from two new
+                café clients, who now order menus, loyalty cards and window
+                posters from us every month. The summer was the busiest we have
+                had for event print, with programmes and signs for four
+                festivals between June and September.
               </p>
               <p className="max-w-lg text-body text-foreground">
-                Our costs rose by 11% to £356,240. Most of the rise was paper:
-                the stock we buy most went up by about 9% over the year, a
-                little in every quarter.
-                <NoteMarker n={2} /> We passed some of that on in our autumn
-                prices, but kept the café work at last year’s rates to win the
-                two new accounts.
+                Costs came to £356,240, up 11%. The largest part of the rise was
+                paper. The price we pay for paper went up by about 9% over the
+                year, with the steepest step in the spring.
+                <NoteMarker note={2} /> We printed more as well, so we bought
+                more ink and plates and paid more for delivery. Rent and our own
+                pay did not change.
               </p>
               <p className="max-w-lg text-body text-foreground">
-                The second quarter was a loss of £4,180. In February we paid
-                £18,400 for a new folding machine, and we count it in full in
-                that month.
-                <NoteMarker n={3} /> January and February are always quiet, so
-                cash was at its lowest at the end of March, £29,870. It
-                recovered by June and ended the year at £54,310.
+                The second quarter was a loss of £4,180. We bought a new folding
+                machine for £18,400 and paid for it in full in February.
+                <NoteMarker note={3} /> Without it the quarter would have made a
+                profit. Cash was lowest at the end of March, at £29,870, and
+                recovered through the summer. We ended the year with £54,310
+                across both accounts.
               </p>
             </div>
           </section>
@@ -289,81 +331,49 @@ export function App() {
               <Table label="The year by quarter" className="text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={headCell}>Quarter</TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead scope="col" className={headCell}>
+                      Quarter
+                    </TableHead>
+                    <TableHead scope="col" className={amountHead}>
                       Income
                     </TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead scope="col" className={amountHead}>
                       Costs
                     </TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead scope="col" className={amountHead}>
                       Net
                     </TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead scope="col" className={amountHead}>
                       Margin
                     </TableHead>
-                    <TableHead className={cn(headCell, "text-right")}>
+                    <TableHead scope="col" className={amountHead}>
                       Cash at end
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {quarters.map((q) => (
-                    <TableRow key={q.quarter}>
-                      <TableCell className={bodyCell}>
+                  {quarters.map((quarter) => (
+                    <TableRow key={quarter.name}>
+                      <TableCell className={cell}>
                         <div className="flex flex-col gap-1">
-                          <span className="text-body">{q.quarter}</span>
-                          <span className={smallFigure}>{q.months}</span>
+                          <span className="text-body">{quarter.name}</span>
+                          <span className={smallFigure}>{quarter.months}</span>
                         </div>
                       </TableCell>
-                      <TableCell
-                        className={cn(
-                          bodyCell,
-                          "text-right font-mono tabular-nums"
-                        )}
-                      >
-                        {q.income}
+                      <TableCell className={amountCell}>
+                        {pounds(quarter.income)}
                       </TableCell>
-                      <TableCell
-                        className={cn(
-                          bodyCell,
-                          "text-right font-mono tabular-nums"
-                        )}
-                      >
-                        {q.costs}
+                      <TableCell className={amountCell}>
+                        {pounds(quarter.costs)}
                       </TableCell>
-                      <TableCell className={cn(bodyCell, "text-right")}>
-                        <span className="inline-flex items-baseline justify-end gap-2 whitespace-nowrap">
-                          <span className={cn(label, "text-muted-foreground")}>
-                            {q.net.kind === "profit" ? "Profit" : "Loss"}
-                          </span>
-                          <span
-                            className={cn(
-                              "font-mono tabular-nums",
-                              q.net.kind === "profit"
-                                ? "text-primary"
-                                : "text-destructive"
-                            )}
-                          >
-                            {q.net.amount}
-                          </span>
-                        </span>
+                      <TableCell className={cn(cell, "text-right")}>
+                        <Net amount={quarter.net} />
                       </TableCell>
-                      <TableCell
-                        className={cn(
-                          bodyCell,
-                          "text-right font-mono tabular-nums"
-                        )}
-                      >
-                        {q.margin}
+                      <TableCell className={amountCell}>
+                        {percent(quarter.margin)}
                       </TableCell>
-                      <TableCell
-                        className={cn(
-                          bodyCell,
-                          "text-right font-mono tabular-nums"
-                        )}
-                      >
-                        {q.cash}
+                      <TableCell className={amountCell}>
+                        {pounds(quarter.cash)}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -371,29 +381,22 @@ export function App() {
                 <TableFooter className="bg-transparent font-normal">
                   <TableRow className="hover:bg-transparent">
                     <TableCell className={cn(totalCell, "text-foreground")}>
-                      Year
+                      {year.name}
                     </TableCell>
                     <TableCell className={cn(totalCell, "text-right")}>
-                      £412,860
+                      {pounds(year.income)}
                     </TableCell>
                     <TableCell className={cn(totalCell, "text-right")}>
-                      £356,240
+                      {pounds(year.costs)}
                     </TableCell>
                     <TableCell className={cn(totalCell, "text-right")}>
-                      <span className="inline-flex items-baseline justify-end gap-2 whitespace-nowrap">
-                        <span className={cn(label, "text-muted-foreground")}>
-                          Profit
-                        </span>
-                        <span className="font-heading text-h2 text-primary tabular-nums">
-                          +£56,620
-                        </span>
-                      </span>
+                      <Net amount={year.net} total />
                     </TableCell>
                     <TableCell className={cn(totalCell, "text-right")}>
-                      13.7%
+                      {percent(year.margin)}
                     </TableCell>
                     <TableCell className={cn(totalCell, "text-right")}>
-                      £54,310
+                      {pounds(year.cash)}
                     </TableCell>
                   </TableRow>
                 </TableFooter>
@@ -409,8 +412,12 @@ export function App() {
               Notes
             </h2>
             <ol className="flex list-decimal flex-col gap-2 pl-6">
-              {notes.map((note, i) => (
-                <li key={i} id={`note-${i + 1}`} className="max-w-lg text-body">
+              {notes.map((note, index) => (
+                <li
+                  key={index}
+                  id={`note-${index + 1}`}
+                  className="max-w-lg text-body"
+                >
                   {note}
                 </li>
               ))}
@@ -425,7 +432,7 @@ export function App() {
       </main>
 
       <footer className="border-t border-border">
-        <div className="mx-auto w-full max-w-[1200px] px-4 py-6 md:px-6">
+        <div className={cn(container, "py-6")}>
           <p className={smallFigure}>
             Fairhold · A demo. No money moves. · 2026
           </p>

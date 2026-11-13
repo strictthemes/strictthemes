@@ -1,68 +1,95 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react"
-import { Bike, CalendarClock, CircleAlert, Dog, Minus, Plus } from "lucide-react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
+import {
+  Bike,
+  Calendar as CalendarIcon,
+  CalendarClock,
+  CircleAlert,
+  Dog,
+  Minus,
+  Plus,
+} from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 
-const FOCUS =
+const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const CODE_FOCUS =
+const codeFocusRing =
   "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const RUNNING_LINK = cn(
+const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
-  FOCUS
+  focusRing
 )
-const HEADER_LINK = cn(
+const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
-  FOCUS
+  focusRing
 )
-const BUTTON = "h-auto rounded-md px-5 py-2 font-mono text-label"
-const LABEL = "font-mono text-label"
-const FIELD_LABEL = "block font-mono text-label text-foreground"
-const SELECT = cn(
-  "mt-2 h-auto w-full rounded-md border border-muted-foreground bg-card px-3 py-2 text-body text-foreground aria-invalid:border-destructive",
-  FOCUS
-)
-const INPUT = "mt-2 h-auto rounded-md border-muted-foreground px-3 py-2 text-body md:text-body"
+const buttonText = "h-auto rounded-md px-5 py-2 font-mono text-label"
 
-const PORTS = [
-  { code: "HRW", name: "Harrowmouth" },
-  { code: "PEL", name: "Port Ellery" },
-  { code: "BRN", name: "Brindle Ness" },
-  { code: "WRH", name: "Wrenholm" },
-  { code: "TLQ", name: "Tollan Quay" },
+const ports = [
+  { value: "HRW", label: "Harrowmouth (HRW)", name: "Harrowmouth" },
+  { value: "PEL", label: "Port Ellery (PEL)", name: "Port Ellery" },
+  { value: "BRN", label: "Brindle Ness (BRN)", name: "Brindle Ness" },
+  { value: "WRH", label: "Wrenholm (WRH)", name: "Wrenholm" },
+  { value: "TLQ", label: "Tollan Quay (TLQ)", name: "Tollan Quay" },
 ]
+const portItems = ports.map(({ value, label }) => ({ value, label }))
+const portName = (code: string) =>
+  ports.find((port) => port.value === code)?.name ?? code
 
-const ROUTES = [
+const routes = [
   {
-    frequency: "5 sailings a day",
-    name: "Harrowmouth to Port Ellery",
-    text: "Our busiest crossing, with sailings from early morning to late evening, so a day trip leaves you most of the day ashore.",
-    duration: "1 h 45 min · Direct",
-    price: "£29.00",
+    to: "Port Ellery",
+    sailings: "5 sailings a day",
+    about:
+      "The island's main harbour, with buses to every village waiting on the quay when the ship comes in.",
+    trip: "1 h 45 min · Direct",
+    fare: "£29.00",
     href: "/results",
   },
   {
-    frequency: "3 sailings a day",
-    name: "Harrowmouth to Brindle Ness",
-    text: "The short hop across the sound, past the lighthouse on Gull Point, and the easiest way to the walking paths on the headland.",
-    duration: "55 min · Direct",
-    price: "£18.00",
+    to: "Brindle Ness",
+    sailings: "3 sailings a day",
+    about:
+      "Our shortest crossing, past the lighthouse and into the sheltered bay below the cliff walk.",
+    trip: "55 min · Direct",
+    fare: "£18.00",
     href: "#",
   },
   {
-    frequency: "2 sailings a day",
-    name: "Harrowmouth to Wrenholm",
-    text: "The long run out to the furthest island, with a café on the upper deck and room on the car deck for camper vans.",
-    duration: "2 h 30 min · Direct",
-    price: "£36.00",
+    to: "Wrenholm",
+    sailings: "2 sailings a day",
+    about:
+      "The longest run, out past the seal rocks to the farthest island and its white sand beaches.",
+    trip: "2 h 30 min · Direct",
+    fare: "£36.00",
     href: "#",
   },
 ]
 
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-const MONTHS = [
+const weekdaysLong = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+]
+const monthsLong = [
   "January",
   "February",
   "March",
@@ -77,108 +104,182 @@ const MONTHS = [
   "December",
 ]
 
-function isoDate(date: Date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, "0")
-  const d = String(date.getDate()).padStart(2, "0")
-  return `${y}-${m}-${d}`
+const pad = (n: number) => String(n).padStart(2, "0")
+const toKey = (date: Date) =>
+  `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+const fromKey = (key: string) => {
+  const [year, month, day] = key.split("-").map(Number)
+  return new Date(year, month - 1, day)
+}
+const addDays = (date: Date, days: number) =>
+  new Date(date.getFullYear(), date.getMonth(), date.getDate() + days)
+const shortDate = (key: string) => {
+  const date = fromKey(key)
+  return `${weekdaysLong[date.getDay()].slice(0, 3)} ${date.getDate()} ${monthsLong[date.getMonth()].slice(0, 3)} ${date.getFullYear()}`
+}
+const longDate = (key: string) => {
+  const date = fromKey(key)
+  return `${weekdaysLong[date.getDay()]} ${date.getDate()} ${monthsLong[date.getMonth()]} ${date.getFullYear()}`
 }
 
-function dateLimits() {
-  const now = new Date()
-  const later = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 180)
-  return { today: isoDate(now), max: isoDate(later) }
-}
+const adultsText = (n: number) => `${n} ${n === 1 ? "adult" : "adults"}`
+const childrenText = (n: number) => `${n} ${n === 1 ? "child" : "children"}`
 
-function longDate(iso: string) {
-  const [y, m, d] = iso.split("-").map(Number)
-  const date = new Date(y, m - 1, d)
-  return `${WEEKDAYS[date.getDay()]} ${d} ${MONTHS[m - 1]} ${y}`
-}
-
-function portName(code: string) {
-  return PORTS.find((port) => port.code === code)?.name ?? code
-}
-
-function count(n: number, one: string, many: string) {
-  return `${n} ${n === 1 ? one : many}`
-}
-
+type Field = "from" | "to" | "outward" | "return"
+type Errors = Partial<Record<Field, string>>
 type Trip = "one-way" | "return"
-type FieldName = "from" | "to" | "outward" | "return"
-type Errors = Partial<Record<FieldName, string>>
-
-const FIELD_IDS: Record<FieldName, string> = {
-  from: "from",
-  to: "to",
-  outward: "outward-date",
-  return: "return-date",
-}
-
 type Search = {
+  trip: Trip
   from: string
   to: string
   outward: string
-  returnDate: string | null
+  back: string
   adults: number
   children: number
 }
 
-function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
+function ErrorLine({ id, message }: { id: string; message: string }) {
   return (
-    <p id={id} className="mt-2 flex items-start gap-2 font-mono text-label text-destructive">
+    <p
+      id={id}
+      className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
+    >
       <CircleAlert className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
-      <span>{children}</span>
+      {message}
     </p>
   )
 }
 
-function Stepper({
-  labelId,
+function DateField({
+  id,
   label,
   value,
-  min,
-  max,
-  atTotal,
-  one,
-  many,
-  fewerLabel,
-  moreLabel,
+  first,
+  last,
+  error,
   onChange,
-  describedBy,
 }: {
-  labelId: string
+  id: string
+  label: string
+  value: string
+  first: string
+  last: string
+  error?: string
+  onChange: (value: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const calendarRef = useRef<HTMLDivElement>(null)
+  const firstDay = fromKey(first)
+  const lastDay = fromKey(last)
+  const selected = value ? fromKey(value) : undefined
+
+  return (
+    <div>
+      <label
+        id={`${id}-label`}
+        htmlFor={id}
+        className="block font-mono text-label text-foreground"
+      >
+        {label}
+      </label>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger
+          id={id}
+          aria-labelledby={`${id}-label ${id}-value`}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? `${id}-error` : undefined}
+          className={cn(
+            "mt-2 flex w-full items-center justify-between gap-2 rounded-md border border-muted-foreground bg-card px-3 py-2 text-body text-foreground transition-colors focus-visible:border-ring aria-invalid:border-destructive",
+            focusRing
+          )}
+        >
+          <span id={`${id}-value`} className="min-w-0 truncate">
+            {value ? (
+              <time dateTime={value} className="tabular-nums">
+                {shortDate(value)}
+              </time>
+            ) : (
+              <span className="text-muted-foreground">Choose a date</span>
+            )}
+          </span>
+          <CalendarIcon
+            className="size-4 shrink-0 text-muted-foreground"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        </PopoverTrigger>
+        <PopoverContent
+          align="start"
+          className="w-auto"
+          initialFocus={() =>
+            calendarRef.current?.querySelector<HTMLElement>(
+              'td button[tabindex="0"]'
+            ) ?? true
+          }
+        >
+          <div ref={calendarRef}>
+            <Calendar
+              mode="single"
+              required
+              weekStartsOn={1}
+              showOutsideDays={false}
+              selected={selected}
+              defaultMonth={selected ?? firstDay}
+              startMonth={firstDay}
+              endMonth={lastDay}
+              disabled={{ before: firstDay, after: lastDay }}
+              onSelect={(day) => {
+                onChange(toKey(day))
+                setOpen(false)
+              }}
+            />
+          </div>
+        </PopoverContent>
+      </Popover>
+      {error && <ErrorLine id={`${id}-error`} message={error} />}
+    </div>
+  )
+}
+
+function Stepper({
+  id,
+  label,
+  value,
+  text,
+  canLower,
+  canRaise,
+  lowerLabel,
+  raiseLabel,
+  onChange,
+}: {
+  id: string
   label: string
   value: number
-  min: number
-  max: number
-  atTotal: boolean
-  one: string
-  many: string
-  fewerLabel: string
-  moreLabel: string
+  text: string
+  canLower: boolean
+  canRaise: boolean
+  lowerLabel: string
+  raiseLabel: string
   onChange: (value: number) => void
-  describedBy?: string
 }) {
   return (
     <>
-      <p id={labelId} className="font-mono text-label text-foreground">
+      <p id={`${id}-label`} className="font-mono text-label text-foreground">
         {label}
       </p>
       <div
         role="group"
-        aria-labelledby={labelId}
-        aria-describedby={describedBy}
+        aria-labelledby={`${id}-label`}
         className="mt-2 flex items-center gap-2"
       >
         <Button
           variant="outline"
           size="icon"
           className="rounded-md"
-          aria-label={fewerLabel}
-          disabled={value <= min}
+          aria-label={lowerLabel}
+          disabled={!canLower}
           focusableWhenDisabled
-          onClick={() => onChange(Math.max(min, value - 1))}
+          onClick={() => onChange(value - 1)}
         >
           <Minus className="size-4" strokeWidth={1.5} aria-hidden="true" />
         </Button>
@@ -186,16 +287,16 @@ function Stepper({
           aria-live="polite"
           className="inline-flex min-w-24 justify-center font-mono text-label text-foreground tabular-nums"
         >
-          {count(value, one, many)}
+          {text}
         </span>
         <Button
           variant="outline"
           size="icon"
           className="rounded-md"
-          aria-label={moreLabel}
-          disabled={value >= max || atTotal}
+          aria-label={raiseLabel}
+          disabled={!canRaise}
           focusableWhenDisabled
-          onClick={() => onChange(Math.min(max, value + 1))}
+          onClick={() => onChange(value + 1)}
         >
           <Plus className="size-4" strokeWidth={1.5} aria-hidden="true" />
         </Button>
@@ -205,256 +306,237 @@ function Stepper({
 }
 
 function SearchCard() {
-  const [limits] = useState(dateLimits)
   const [trip, setTrip] = useState<Trip>("one-way")
-  const [from, setFrom] = useState("")
-  const [to, setTo] = useState("")
+  const [from, setFrom] = useState<string | null>(null)
+  const [to, setTo] = useState<string | null>(null)
   const [outward, setOutward] = useState("")
-  const [returnDate, setReturnDate] = useState("")
+  const [back, setBack] = useState("")
   const [adults, setAdults] = useState(2)
   const [children, setChildren] = useState(0)
   const [errors, setErrors] = useState<Errors>({})
-  const [focusTarget, setFocusTarget] = useState<{ field: FieldName; attempt: number } | null>(
-    null
-  )
-  const [result, setResult] = useState<Search | null>(null)
+  const [focusRequest, setFocusRequest] = useState<{ id: string } | null>(null)
+  const [search, setSearch] = useState<Search | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
 
-  const atTotal = adults + children >= 9
+  const today = toKey(new Date())
+  const lastDay = toKey(addDays(new Date(), 180))
+  const passengers = adults + children
 
   useEffect(() => {
-    if (focusTarget) document.getElementById(FIELD_IDS[focusTarget.field])?.focus()
-  }, [focusTarget])
+    if (focusRequest) document.getElementById(focusRequest.id)?.focus()
+  }, [focusRequest])
 
   useEffect(() => {
-    if (result) headingRef.current?.focus()
-  }, [result])
+    if (search) headingRef.current?.focus()
+  }, [search])
 
-  function clearError(field: FieldName) {
+  const clearError = (field: Field) =>
     setErrors((current) => {
       if (!current[field]) return current
       const next = { ...current }
       delete next[field]
       return next
     })
-  }
 
-  function chooseTrip(next: Trip) {
-    setTrip(next)
-    if (next === "one-way") {
-      setReturnDate("")
+  const chooseTrip = (value: Trip) => {
+    setTrip(value)
+    if (value === "one-way") {
+      setBack("")
       clearError("return")
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const { today, max } = dateLimits()
     const found: Errors = {}
 
     if (!from) found.from = "Choose the port you sail from."
 
     if (!to) found.to = "Choose the port you sail to."
-    else if (from && to === from) found.to = "Choose a different port from the one you sail from."
+    else if (to === from)
+      found.to = "Choose a different port from the one you sail from."
 
     if (!outward) found.outward = "Choose the date you sail."
     else if (outward < today) found.outward = "Choose today or a later date."
-    else if (outward > max) found.outward = "We sell tickets up to 180 days ahead."
+    else if (outward > lastDay)
+      found.outward = "We sell tickets up to 180 days ahead."
 
     if (trip === "return") {
-      if (!returnDate) found.return = "Choose the date you sail back."
-      else if (outward && returnDate < outward)
+      if (!back) found.return = "Choose the date you sail back."
+      else if (outward && back < outward)
         found.return = "Choose a return date on or after the outward date."
-      else if (returnDate > max) found.return = "We sell tickets up to 180 days ahead."
+      else if (back > lastDay)
+        found.return = "We sell tickets up to 180 days ahead."
     }
 
     setErrors(found)
-    const first = (["from", "to", "outward", "return"] as FieldName[]).find((f) => found[f])
-    if (first) {
-      setFocusTarget((current) => ({ field: first, attempt: (current?.attempt ?? 0) + 1 }))
+    const order: Field[] = ["from", "to", "outward", "return"]
+    const firstError = order.find((field) => found[field])
+    if (firstError) {
+      setFocusRequest({ id: firstError })
       return
     }
 
-    setResult({
-      from,
-      to,
+    setSearch({
+      trip,
+      from: from!,
+      to: to!,
       outward,
-      returnDate: trip === "return" ? returnDate : null,
+      back,
       adults,
       children,
     })
   }
 
-  function errorProps(field: FieldName) {
-    return errors[field]
-      ? { "aria-invalid": true as const, "aria-describedby": `${FIELD_IDS[field]}-error` }
-      : {}
-  }
-
-  function passengers(search: Search) {
-    const parts = [count(search.adults, "adult", "adults")]
-    if (search.children > 0) parts.push(count(search.children, "child", "children"))
-    return parts.join(" and ")
-  }
+  const who = search
+    ? search.children > 0
+      ? `${adultsText(search.adults)} and ${childrenText(search.children)}`
+      : adultsText(search.adults)
+    : ""
 
   return (
     <div className="rounded-xl border bg-card p-5 md:col-span-6 md:col-start-7">
-      {!result && (
-        <form noValidate aria-label="Search sailings" onSubmit={handleSubmit}>
+      {!search && (
+        <form noValidate aria-label="Search sailings" onSubmit={onSubmit}>
           <div>
             <p id="trip-label" className="font-mono text-label text-foreground">
               Trip
             </p>
-            <div role="group" aria-labelledby="trip-label" className="mt-2 flex flex-wrap gap-2">
-              <Button
-                className={BUTTON}
-                variant={trip === "one-way" ? "secondary" : "outline"}
-                aria-pressed={trip === "one-way"}
-                onClick={() => chooseTrip("one-way")}
-              >
-                One way
-              </Button>
-              <Button
-                className={BUTTON}
-                variant={trip === "return" ? "secondary" : "outline"}
-                aria-pressed={trip === "return"}
-                onClick={() => chooseTrip("return")}
-              >
-                Return
-              </Button>
+            <div
+              role="group"
+              aria-labelledby="trip-label"
+              className="mt-2 flex flex-wrap gap-2"
+            >
+              {(
+                [
+                  ["one-way", "One way"],
+                  ["return", "Return"],
+                ] as const
+              ).map(([value, text]) => (
+                <Button
+                  key={value}
+                  variant={trip === value ? "secondary" : "outline"}
+                  aria-pressed={trip === value}
+                  className={buttonText}
+                  onClick={() => chooseTrip(value)}
+                >
+                  {text}
+                </Button>
+              ))}
             </div>
           </div>
 
           <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div>
-              <label htmlFor="from" className={FIELD_LABEL}>
-                From
-              </label>
-              <select
-                id="from"
-                className={SELECT}
-                value={from}
-                onChange={(e) => {
-                  setFrom(e.target.value)
-                  clearError("from")
-                }}
-                {...errorProps("from")}
-              >
-                <option value="">Choose a port</option>
-                {PORTS.map((port) => (
-                  <option key={port.code} value={port.code}>
-                    {port.name} ({port.code})
-                  </option>
-                ))}
-              </select>
-              {errors.from && <ErrorLine id="from-error">{errors.from}</ErrorLine>}
-            </div>
-            <div>
-              <label htmlFor="to" className={FIELD_LABEL}>
-                To
-              </label>
-              <select
-                id="to"
-                className={SELECT}
-                value={to}
-                onChange={(e) => {
-                  setTo(e.target.value)
-                  clearError("to")
-                }}
-                {...errorProps("to")}
-              >
-                <option value="">Choose a port</option>
-                {PORTS.map((port) => (
-                  <option key={port.code} value={port.code}>
-                    {port.name} ({port.code})
-                  </option>
-                ))}
-              </select>
-              {errors.to && <ErrorLine id="to-error">{errors.to}</ErrorLine>}
-            </div>
-          </div>
-
-          <div className="mt-5 grid gap-5 lg:grid-cols-2">
-            <div>
-              <label htmlFor="outward-date" className={FIELD_LABEL}>
-                Outward date
-              </label>
-              <Input
-                id="outward-date"
-                type="date"
-                className={INPUT}
-                min={limits.today}
-                max={limits.max}
-                value={outward}
-                onChange={(e) => {
-                  setOutward(e.target.value)
-                  clearError("outward")
-                }}
-                {...errorProps("outward")}
-              />
-              {errors.outward && <ErrorLine id="outward-date-error">{errors.outward}</ErrorLine>}
-            </div>
-            {trip === "return" && (
-              <div>
-                <label htmlFor="return-date" className={FIELD_LABEL}>
-                  Return date
+            {(
+              [
+                ["from", "From", from, setFrom],
+                ["to", "To", to, setTo],
+              ] as const
+            ).map(([field, text, value, setValue]) => (
+              <div key={field}>
+                <label
+                  htmlFor={field}
+                  className="block font-mono text-label text-foreground"
+                >
+                  {text}
                 </label>
-                <Input
-                  id="return-date"
-                  type="date"
-                  className={INPUT}
-                  min={outward || limits.today}
-                  max={limits.max}
-                  value={returnDate}
-                  onChange={(e) => {
-                    setReturnDate(e.target.value)
-                    clearError("return")
-                  }}
-                  {...errorProps("return")}
-                />
-                {errors.return && <ErrorLine id="return-date-error">{errors.return}</ErrorLine>}
+                <div className="mt-2">
+                  <Select
+                    items={portItems}
+                    value={value}
+                    onValueChange={(next) => {
+                      if (next === null) return
+                      setValue(next)
+                      clearError(field)
+                    }}
+                  >
+                    <SelectTrigger
+                      id={field}
+                      aria-invalid={errors[field] ? true : undefined}
+                      aria-describedby={
+                        errors[field] ? `${field}-error` : undefined
+                      }
+                    >
+                      <SelectValue placeholder="Choose a port" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {portItems.map((port) => (
+                        <SelectItem key={port.value} value={port.value}>
+                          {port.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {errors[field] && (
+                  <ErrorLine id={`${field}-error`} message={errors[field]} />
+                )}
               </div>
+            ))}
+          </div>
+
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            <DateField
+              id="outward"
+              label="Outward date"
+              value={outward}
+              first={today}
+              last={lastDay}
+              error={errors.outward}
+              onChange={(value) => {
+                setOutward(value)
+                clearError("outward")
+              }}
+            />
+            {trip === "return" && (
+              <DateField
+                id="return"
+                label="Return date"
+                value={back}
+                first={outward && outward > today ? outward : today}
+                last={lastDay}
+                error={errors.return}
+                onChange={(value) => {
+                  setBack(value)
+                  clearError("return")
+                }}
+              />
             )}
           </div>
 
           <div className="mt-5">
             <Stepper
-              labelId="adults-label"
+              id="adults"
               label="Adults"
               value={adults}
-              min={1}
-              max={9}
-              atTotal={atTotal}
-              one="adult"
-              many="adults"
-              fewerLabel="Fewer adults"
-              moreLabel="More adults"
+              text={adultsText(adults)}
+              canLower={adults > 1}
+              canRaise={adults < 9 && passengers < 9}
+              lowerLabel="Fewer adults"
+              raiseLabel="More adults"
               onChange={setAdults}
             />
           </div>
 
           <div className="mt-5">
             <Stepper
-              labelId="children-label"
+              id="children"
               label="Children"
               value={children}
-              min={0}
-              max={8}
-              atTotal={atTotal}
-              one="child"
-              many="children"
-              fewerLabel="Fewer children"
-              moreLabel="More children"
+              text={childrenText(children)}
+              canLower={children > 0}
+              canRaise={children < 8 && passengers < 9}
+              lowerLabel="Fewer children"
+              raiseLabel="More children"
               onChange={setChildren}
-              describedBy="children-help"
             />
-            <p id="children-help" className="mt-2 font-mono text-label text-muted-foreground">
+            <p className="mt-2 font-mono text-label text-muted-foreground">
               Ages 4 to 15. Under 4s travel free and need no ticket.
             </p>
           </div>
 
           <div className="mt-5">
-            <Button type="submit" className={BUTTON}>
+            <Button type="submit" className={buttonText}>
               Search sailings
             </Button>
           </div>
@@ -462,32 +544,36 @@ function SearchCard() {
       )}
 
       <div role="status">
-        {result && (
+        {search && (
           <div>
             <h2
               ref={headingRef}
               tabIndex={-1}
-              className={cn("text-h2 text-foreground", CODE_FOCUS)}
+              className={cn("text-h2", codeFocusRing)}
             >
               Your search is ready
             </h2>
-            <p className="mt-3 max-w-xl text-foreground">
-              Sailings from {portName(result.from)} to {portName(result.to)} on{" "}
-              <time dateTime={result.outward}>{longDate(result.outward)}</time>
-              {result.returnDate && (
+            <p className="mt-3 max-w-xl">
+              Sailings from {portName(search.from)} to {portName(search.to)} on{" "}
+              <time dateTime={search.outward}>{longDate(search.outward)}</time>
+              {search.trip === "return" && (
                 <>
-                  , back on <time dateTime={result.returnDate}>{longDate(result.returnDate)}</time>
+                  , back on{" "}
+                  <time dateTime={search.back}>{longDate(search.back)}</time>
                 </>
               )}
-              , for {passengers(result)}.
+              , for {who}.
             </p>
           </div>
         )}
       </div>
 
-      {result && (
+      {search && (
         <div className="mt-5">
-          <a href="/results" className={cn(buttonVariants({ variant: "default" }), BUTTON)}>
+          <a
+            href="/results"
+            className={cn(buttonVariants({ variant: "default" }), buttonText)}
+          >
             See the sailings
           </a>
         </div>
@@ -501,28 +587,38 @@ export function App() {
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b bg-card">
         <div className="mx-auto flex max-w-[1120px] flex-col items-start gap-2 px-5 py-5 md:flex-row md:items-center md:justify-between">
-          <a href="/" className={cn(HEADER_LINK, "font-heading text-h2")}>
+          <a
+            href="/"
+            className={cn(
+              "font-heading text-h2 text-foreground transition-colors duration-150",
+              focusRing
+            )}
+          >
             Kestrel Ferries
           </a>
           <nav aria-label="Main">
             <ul className="flex flex-wrap gap-x-5 gap-y-2">
               <li>
-                <a href="/" aria-current="page" className={cn(HEADER_LINK, "text-body underline")}>
+                <a
+                  href="/"
+                  aria-current="page"
+                  className={cn("text-body underline", headerLink)}
+                >
                   Book
                 </a>
               </li>
               <li>
-                <a href="/departures" className={cn(HEADER_LINK, "text-body")}>
+                <a href="/departures" className={cn("text-body", headerLink)}>
                   Departures
                 </a>
               </li>
               <li>
-                <a href="/ticket" className={cn(HEADER_LINK, "text-body")}>
+                <a href="/ticket" className={cn("text-body", headerLink)}>
                   My booking
                 </a>
               </li>
               <li>
-                <a href="#" className={cn(HEADER_LINK, "text-body")}>
+                <a href="#" className={cn("text-body", headerLink)}>
                   Help
                 </a>
               </li>
@@ -534,15 +630,18 @@ export function App() {
       <main className="mx-auto max-w-[1120px] px-5">
         <section className="grid gap-5 pt-8 md:grid-cols-12 md:items-start">
           <div className="md:col-span-5">
-            <p className={cn(LABEL, "text-muted-foreground")}>Ferries to the islands · Since 1987</p>
-            <h1 className="mt-2 text-h1 text-foreground lg:text-display">
+            <p className="font-mono text-label text-muted-foreground">
+              Ferries to the islands · Since 1987
+            </p>
+            <h1 className="mt-2 text-h1 lg:text-display">
               Over the water by lunchtime
             </h1>
             <p className="mt-3 max-w-xl text-body">
-              Crossings from Harrowmouth to the harbours, beaches and hill paths of four islands.
-              Bring the car, the bike or the dog: there is room on board for all three.
+              Every day of the year we sail from Harrowmouth to four island
+              harbours. Bring the car, the bike or the dog: there is room on
+              board for all three.
             </p>
-            <p className={cn(LABEL, "mt-5 text-muted-foreground")}>
+            <p className="mt-5 font-mono text-label text-muted-foreground">
               Harrowmouth · Port Ellery · Brindle Ness · Wrenholm · Tollan Quay
             </p>
           </div>
@@ -550,28 +649,39 @@ export function App() {
         </section>
 
         <section className="mt-16">
-          <h2 className="text-h2 text-foreground">Popular routes</h2>
+          <h2 className="text-h2">Popular routes</h2>
           <p className="mt-3 max-w-xl">
-            Every crossing leaves from Harrowmouth harbour, a five-minute walk from the station.
+            Every crossing leaves from Harrowmouth harbour, a five-minute walk
+            from the railway station.
           </p>
           <div className="mt-5 grid gap-5 md:grid-cols-3">
-            {ROUTES.map((route) => (
-              <article key={route.name} className="rounded-xl border bg-card p-5">
-                <p className={cn(LABEL, "text-muted-foreground")}>{route.frequency}</p>
-                <h3 className="mt-2 text-h2 text-foreground">{route.name}</h3>
-                <p className="mt-3 max-w-xl text-body">{route.text}</p>
+            {routes.map((route) => (
+              <article
+                key={route.to}
+                className="rounded-xl border bg-card p-5"
+              >
+                <p className="font-mono text-label text-muted-foreground">
+                  {route.sailings}
+                </p>
+                <h3 className="mt-2 text-h2">Harrowmouth to {route.to}</h3>
+                <p className="mt-3 max-w-xl text-body">{route.about}</p>
                 <div className="mt-5 flex items-end justify-between gap-5">
-                  <p className={cn(LABEL, "text-muted-foreground")}>{route.duration}</p>
+                  <p className="font-mono text-label text-muted-foreground">
+                    {route.trip}
+                  </p>
                   <div className="shrink-0 text-right">
-                    <p className={cn(LABEL, "text-muted-foreground")}>From, one adult</p>
+                    <p className="font-mono text-label text-muted-foreground">
+                      From, one adult
+                    </p>
                     <p className="mt-1 font-mono text-h2 text-foreground tabular-nums">
-                      {route.price}
+                      {route.fare}
                     </p>
                   </div>
                 </div>
                 <p className="mt-5">
-                  <a href={route.href} className={RUNNING_LINK}>
+                  <a href={route.href} className={textLink}>
                     See sailings
+                    <span className="sr-only"> to {route.to}</span>
                   </a>
                 </p>
               </article>
@@ -580,36 +690,40 @@ export function App() {
         </section>
 
         <section className="mt-16">
-          <h2 className="text-h2 text-foreground">Why sail with Kestrel</h2>
+          <h2 className="text-h2">Why sail with Kestrel</h2>
           <div className="mt-5 grid gap-5 md:grid-cols-3 md:items-start">
             <div>
-              <h3 className="flex items-center gap-2 text-body font-bold text-foreground">
-                <CalendarClock className="size-4" strokeWidth={1.5} aria-hidden="true" />
+              <h3 className="flex items-center gap-2 text-body font-bold">
+                <CalendarClock
+                  className="size-4"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
                 Change for £10.00
               </h3>
               <p className="mt-3 max-w-xl">
-                Plans shift. Move your sailing up to 24 hours before it leaves for £10.00 a
-                booking, however many people are on it.
+                Plans shift. Move your booking to another sailing up to 24
+                hours before it leaves, for £10.00 a booking.
               </p>
             </div>
             <div>
-              <h3 className="flex items-center gap-2 text-body font-bold text-foreground">
+              <h3 className="flex items-center gap-2 text-body font-bold">
                 <Bike className="size-4" strokeWidth={1.5} aria-hidden="true" />
                 Bring the bike
               </h3>
               <p className="mt-3 max-w-xl">
-                Bicycles cost £6.00 each and travel on the car deck, with a rack by the stairs so
-                you can lock up and go straight to the lounge.
+                Bicycles cost £6.00 each and travel on the car deck, with a
+                rack by the stairs to lock them to.
               </p>
             </div>
             <div>
-              <h3 className="flex items-center gap-2 text-body font-bold text-foreground">
+              <h3 className="flex items-center gap-2 text-body font-bold">
                 <Dog className="size-4" strokeWidth={1.5} aria-hidden="true" />
                 Dogs on deck
               </h3>
               <p className="mt-3 max-w-xl">
-                Dogs travel free on the open deck and in the dog lounge on every ship, with water
-                bowls by the door.
+                Dogs travel free on the open deck and in the dog lounge on
+                every ship, with water bowls by the door.
               </p>
             </div>
           </div>
@@ -620,27 +734,30 @@ export function App() {
         <div className="mx-auto max-w-[1120px] px-5 py-8">
           <div className="grid gap-5 md:grid-cols-12 md:items-start">
             <div className="md:col-span-6">
-              <p className="font-heading text-h2 text-foreground">Kestrel Ferries</p>
+              <p className="font-heading text-h2">Kestrel Ferries</p>
               <p className="mt-2 max-w-xl">
-                Crossings from Harrowmouth to Port Ellery, Brindle Ness, Wrenholm and Tollan Quay
-                since 1987.
+                Crossings from Harrowmouth to Port Ellery, Brindle Ness,
+                Wrenholm and Tollan Quay since 1987.
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8">
-              <p className={cn(LABEL, "text-muted-foreground")}>Customer desk</p>
-              <p className="mt-2 text-body">
-                Call{" "}
-                <a href="tel:+441632960512" className={RUNNING_LINK}>
-                  01632 960 512
-                </a>{" "}
-                to change or ask about a booking.
+              <p className="font-mono text-label text-muted-foreground">
+                Customer desk
               </p>
-              <p className={cn(LABEL, "mt-2 text-muted-foreground tabular-nums")}>
-                Every day · <time dateTime="06:00">06:00</time>–<time dateTime="22:00">22:00</time>
+              <p className="mt-2 text-body">
+                <a href="tel:+441632960512" className={textLink}>
+                  01632 960 512
+                </a>
+              </p>
+              <p className="mt-2 font-mono text-label text-muted-foreground tabular-nums">
+                Every day · <time dateTime="06:00">06:00</time>–
+                <time dateTime="22:00">22:00</time>
               </p>
             </div>
           </div>
-          <p className={cn(LABEL, "mt-5 text-muted-foreground")}>© 2026 Kestrel Ferries</p>
+          <p className="mt-5 font-mono text-label text-muted-foreground">
+            © 2026 Kestrel Ferries
+          </p>
         </div>
       </footer>
     </div>

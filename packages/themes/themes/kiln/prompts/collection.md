@@ -6,6 +6,7 @@ order: 2
 checks:
   - Choosing a category shows only its pieces, the chosen button has `aria-pressed="true"`, and the count above the grid says how many pieces are shown.
   - Each sort order really reorders the tiles, prices as numbers, and keeps the chosen category.
+  - 'The sort order is the theme''s `Select`, with no native `<select>` on the page: its trigger is as tall as an input would be, its list opens under it as ruled rows in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
   - Choosing "Jugs" shows the empty state, and its button shows every piece again and moves focus to the "All" button.
   - The tiles are two to a row at 375px with no sideways scroll, and four to a row on a wide screen.
   - The page has no terracotta (default) button.
@@ -49,7 +50,7 @@ In the same section as the introduction, after its grid: first a visually hidden
 **Controls.** With `mt-10` under the introduction's grid, a row, `flex flex-col gap-6 md:flex-row md:items-end md:justify-between`:
 
 - At the left, the category filter: a visible label "Category" (a `<p>`, in `text-foreground`), then with `mt-2` a button group, as the notes say, named by that label, with All, Mugs and cups, Bowls, Plates and Jugs. "All" is chosen to start. On a phone the buttons wrap onto a second line.
-- At the right, the sort order: the label "Sort by" and with `mt-2` a native `<select>` as the Selects note says, with Featured, Price: low to high, Price: high to low and Name: A to Z. Its wrapper is `w-full md:w-56`.
+- At the right, the sort order: the label "Sort by" and with `mt-2` a `Select` as the Selects note says, with Featured, Price: low to high, Price: high to low and Name: A to Z; "Featured" is chosen to start. Its wrapper is `w-full md:w-56`.
 
 **Count.** With `mt-6` a label, a `<p>`, in `text-muted-foreground` with `aria-live="polite"`: "12 pieces", or "4 pieces", "1 piece", "No pieces". It counts what is shown.
 

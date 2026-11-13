@@ -9,6 +9,7 @@ checks:
   - Choosing a deployment's commit hash shows its log in the log panel, whose lines do not wrap, and the chosen row is marked by more than its background.
   - Commit hashes, branches, durations and times are in the mono font, and durations and times are right-aligned.
   - The one lime mark is the "live" badge on the deployment that serves production.
+  - 'The state filter is the theme''s `Select` in the mono font, with no native `<select>` on the page: its list opens under its trigger in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
 ---
 
 Sample content, if the user gave none: the console of **Plinth**, a deploy tool by Plinth Labs. The team is Orrin and the project `orrin-web`; the signed-in person is `mara.lind@orrin.example`. Invent 20 deployments over the last three days, the newest on 11 November 2026, the sample's fixed today (no clock): commits as seven-character hashes (`8f3c2a1`) with a one-line message, branches (`main`, `feat/search`, `fix/cart-total`, `chore/deps`), environments `production` (always from `main`) and `preview` (all other branches). States: one `queued` (the newest), one `building` (the one before it), two `failed`, one `canceled`, the rest `ready`. Durations from `38s` to `3m 12s`.
@@ -25,11 +26,11 @@ The `<h1>` "Deploys". The action is the default button "Deploy main".
 
 ### 3. Filters
 
-A panel spanning twelve columns, with no heading row; the panel element itself is the row, `flex flex-wrap items-end gap-6`. Add the components with `npx shadcn@latest add input table badge`.
+A panel spanning twelve columns, with no heading row; the panel element itself is the row, `flex flex-wrap items-end gap-6`. Add the components with `npx shadcn@latest add input select table badge`.
 
 - A search field with the visible label "Branch" and the placeholder "main, feat/…", in a wrapper with `w-64`, full width below `md`. It matches any part of the branch name, ignoring case.
 - The environment filter: a visible label "Environment" (a `<p>` styled as a field label, since a `<label>` cannot name a group), and with `mt-2` a button group with All, Production and Preview. Here the group's name comes from the `<p>` through `aria-labelledby`, in place of the notes' `aria-label`.
-- The state filter: a labelled `<select>` "State" in `font-mono`, with All states, `ready`, `building`, `queued`, `failed` and `canceled`, in a wrapper with `w-48`.
+- The state filter: a labelled `Select` "State" in `font-mono`, with All states, `ready`, `building`, `queued`, `failed` and `canceled`, in a wrapper with `w-48`.
 - At the right end (`ml-auto`), an `outline` button "Clear filters", disabled while no filter is set.
 
 ### 4. Deployments

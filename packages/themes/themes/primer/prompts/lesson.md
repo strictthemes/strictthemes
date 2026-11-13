@@ -5,8 +5,8 @@ description: one lesson of an online course, with where the learner is in the co
 order: 3
 checks:
   - "The opening says Lesson 4 of 12 in words, with a progress bar whose percentage and count of lessons done are written beside it."
-  - "The four answers are native radio buttons in one `<fieldset>` with the question as its `<legend>`, and Check my answer is the only default button on the page."
-  - "Check my answer with nothing chosen shows an error line with an icon, tied to the fieldset; with an answer chosen it says in words, in a `role=status` element that was on the page from the start, whether the answer is right, and explains the right one."
+  - "The four answers are the theme's `RadioGroup`, named by the question, with no native radio button on the page: each is a round button with a border that shows on the card when empty and a filled one with a dot when chosen, the arrow keys move the choice, and Check my answer is the only default button on the page."
+  - "Check my answer with nothing chosen shows an error line with an icon, tied to the group of answers; with an answer chosen it says in words, in a `role=status` element that was on the page from the start, whether the answer is right, and explains the right one."
   - "A right answer marks lesson 4 done: the bar goes to 33%, the count to 4 of 12 lessons done, and the lesson's row in the module list says Done."
   - "Every lesson in the module list has its state as an icon and a word (Done, This lesson, Next or Locked), and the locked lesson is not a link."
   - "The code sample is a `<pre>` in the label font that scrolls inside its own box and can be reached with the keyboard."
@@ -23,7 +23,7 @@ Sample content, if the user gave none: "Rowlark", an online school for practical
 
 The lesson's examples ask Rowlark's own table of courses, `courses`, which has four courses for beginners, three intermediate and two advanced.
 
-The container inside `<main>` uses `gap-8` between groups. This page uses the stock `button` only. It has no button group, so `components/ui/button.tsx` needs only the `secondary` change of the Buttons note. It has native radio buttons: set `color-scheme` in the global CSS as the Dark mode rule gives it for a native control, so that they follow the mode.
+The container inside `<main>` uses `gap-8` between groups. This page uses the stock `button` and `radio-group`; add any the project lacks with `npx shadcn@latest add button radio-group`. It has no button group, so `components/ui/button.tsx` needs only the `secondary` change of the Buttons note.
 
 Build these parts in order.
 
@@ -64,8 +64,10 @@ The `<pre>` scrolls sideways when it has to, so it gets `tabIndex={0}`, `role="r
 
 **The question.** A card that is a section, with the `<h2>` "Check what you learned". Under it, as the card's second item, one plain `<div>` holds the `<form>` and, after it, the `role="status"` element for the result, empty at the start. The `<form>` has `noValidate` and `flex flex-col gap-5`:
 
-- A `<fieldset>` with `m-0 min-w-0 border-0 p-0`. Its `<legend>` has `p-0 pb-3 font-sans text-body font-semibold` and is the question: "Which query returns the intermediate courses?" After the legend, a `flex flex-col gap-3`: the hint, a small figure with an `id`, `One answer is right.`; then the four answers in a `<div>` with `flex flex-col`; then the error line, while there is one. The fieldset names the hint, and the error line while there is one, in its `aria-describedby`.
-- Each answer is a `<label>` with `flex min-h-10 cursor-pointer items-start gap-3 border-t border-border py-3`, all four with the rule above them. It holds a native `<input type="radio">` with the `name` `answer` and `mt-0.5 size-5 shrink-0 accent-primary`, then the query as a `<code>` with `min-w-0 font-mono text-body break-words`. Not the shadcn `RadioGroup`. None is chosen at the start. The four, in this order:
+- A `flex flex-col gap-3`: the question, a `<p>` with an `id` in `font-sans text-body font-semibold`, "Which query returns the intermediate courses?"; the hint, a small figure with an `id`, `One answer is right.`; then the four answers in the shadcn `RadioGroup`; then the error line, while there is one. No `<fieldset>` and no `<legend>`: the `RadioGroup` is the group. It gets `name="answer"`, `value` (the chosen answer, `null` at the start) and `onValueChange`, which passes the new value, not an event; `aria-labelledby` naming the question; `aria-describedby` naming the hint, and the error line while there is one; and `className="flex flex-col gap-0"`, which replaces its stock grid and gap, so the rows are divided by their rules alone.
+- Each answer is a `<label>` with `flex min-h-10 cursor-pointer items-start gap-3 border-t border-border py-3`, all four with the rule above them. It holds a `<RadioGroupItem value="…" className="mt-0.5" />`, then the query as a `<code>` with `min-w-0 font-mono text-body break-words`. The `<label>` around the two names the radio button and makes the whole row a target; it needs no `htmlFor`. Never a native `<input type="radio">`: the browser draws that one. None is chosen at the start.
+- The radio button is round, as this theme's switches are, 20px across, with a border that shows on the white card. Edit `components/ui/radio-group.tsx`, once, changing the classes in the file. On `RadioGroupItem`: replace `size-4` with `size-5`; replace `border-input` with `border-muted-foreground`, both where it stands alone and at the end of the class that starts with `group-has-[:focus-visible]/field-label:not-data-checked:` (the stock border is the pale one of a card's edge, and an empty radio button would hardly show); replace `dark:bg-input/30` with `bg-card`, written without `dark:`; replace its `focus-visible:ring-*` classes with the outline classes of the Focus rule, whose list of stock components does not name this one; and replace its `aria-invalid:ring-*` classes with `aria-invalid:ring-0`, deleting the `dark:` one. On the indicator inside it, replace `size-4` with `size-5`. The rest stays: `rounded-full`, the fill of a chosen one (`data-checked:bg-primary`, deep blue, yellow in dark mode) and its 8px dot in `bg-primary-foreground`. A chosen answer is then told from the others by its dot, not by its color alone.
+- The four answers, in this order:
   1. `SELECT title FROM courses WHERE level = Intermediate;`
   2. `SELECT title FROM courses WHERE level = 'Intermediate';`
   3. `SELECT title WHERE level = 'Intermediate' FROM courses;`
@@ -97,7 +99,7 @@ The footer from the layout notes.
 ### Behavior
 
 - Keep the chosen answer, the checked result and whether lesson 4 is done in component state.
-- "Check my answer" with no answer chosen shows the error line "Choose one of the four answers first." under the answers, names it in the fieldset's `aria-describedby` and moves focus to the first radio button. Render the line first and move focus after, in an effect. Choosing an answer removes the line.
+- "Check my answer" with no answer chosen shows the error line "Choose one of the four answers first." under the answers, names it in the `RadioGroup`'s `aria-describedby` and moves focus to the first radio button: a `ref` on the first `RadioGroupItem` is the element to focus. Render the line first and move focus after, in an effect. Choosing an answer removes the line. In the group, Tab reaches one radio button and the arrow keys move the choice, as the `RadioGroup` ships.
 - With an answer chosen, "Check my answer" puts the result into the status element and keeps focus on the button. Choosing another answer afterwards empties the status element, so a result never stands beside an answer it does not belong to. The learner may check again as often as they like.
 - The first right answer marks lesson 4 done, and it stays done whatever is checked later. From then on the place in the course reads `4 of 12 lessons done` with the bar and its figure at 33%, the small figure beside "Lesson 4 of 12" reads `16 min · 2 h 15 min left in the course`, and the lesson's row in the module's list has the `CircleCheck` icon and `16 min · Done`. Its title stays as it is, with `aria-current="page"`. Lessons 5 and 6 do not change.
 - The percentage is the lessons done out of 12, rounded to a whole number, and sets the fill's width.

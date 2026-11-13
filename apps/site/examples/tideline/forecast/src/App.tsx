@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -24,21 +24,14 @@ type Day = {
   shortDate: string
   button: string
   rating: string
-  bestDay?: boolean
   heading: string
-  lowTime: string
-  lowHeight: string
-  highAt: string
-  swell: string
-  period: string
-  swellFrom: string
-  wind: string
-  windFrom: string
-  windKind: string
-  water: string
-  waterNote: string
+  swell: { height: number; period: number; from: string }
+  wind: { speed: number; direction: string; aspect: string }
+  water: { temp: number; note: string }
   sentence: string
-  tides: Tide[]
+  // In order through the day: low, high, low, high. The third is the
+  // daytime low shown on the conditions block, the fourth the high after it.
+  tides: [Tide, Tide, Tide, Tide]
 }
 
 const DAYS: Day[] = [
@@ -49,17 +42,9 @@ const DAYS: Day[] = [
     button: "Today",
     rating: "Good",
     heading: "Good: clean and waist high",
-    lowTime: "13:34",
-    lowHeight: "1.5 m",
-    highAt: "19:41",
-    swell: "3",
-    period: "9 s",
-    swellFrom: "the west",
-    wind: "8",
-    windFrom: "East",
-    windKind: "Offshore",
-    water: "15",
-    waterNote: "Summer wetsuit",
+    swell: { height: 3, period: 9, from: "the west" },
+    wind: { speed: 8, direction: "East", aspect: "Offshore" },
+    water: { temp: 15, note: "Summer wetsuit" },
     sentence:
       "A light offshore wind holds the waves up all morning. Best for beginners in the two hours either side of low water.",
     tides: [
@@ -75,19 +60,10 @@ const DAYS: Day[] = [
     shortDate: "Fri 18 Jun",
     button: "Fri 18 Jun",
     rating: "Very good",
-    bestDay: true,
     heading: "Very good: clean and chest high",
-    lowTime: "14:22",
-    lowHeight: "1.3 m",
-    highAt: "20:28",
-    swell: "4",
-    period: "11 s",
-    swellFrom: "the west",
-    wind: "6",
-    windFrom: "South-east",
-    windKind: "Offshore",
-    water: "15",
-    waterNote: "Summer wetsuit",
+    swell: { height: 4, period: 11, from: "the west" },
+    wind: { speed: 6, direction: "South-east", aspect: "Offshore" },
+    water: { temp: 15, note: "Summer wetsuit" },
     sentence:
       "The best day of the five. A longer swell arrives overnight, and the wind stays light and offshore until the middle of the afternoon.",
     tides: [
@@ -104,17 +80,9 @@ const DAYS: Day[] = [
     button: "Sat 19 Jun",
     rating: "Fair",
     heading: "Fair: bigger, and bumpy by noon",
-    lowTime: "15:09",
-    lowHeight: "1.1 m",
-    highAt: "21:14",
-    swell: "5",
-    period: "12 s",
-    swellFrom: "the west",
-    wind: "14",
-    windFrom: "West",
-    windKind: "Onshore",
-    water: "15",
-    waterNote: "Summer wetsuit",
+    swell: { height: 5, period: 12, from: "the west" },
+    wind: { speed: 14, direction: "West", aspect: "Onshore" },
+    water: { temp: 15, note: "Summer wetsuit" },
     sentence:
       "The biggest waves of the five days, but the wind turns onshore by noon. Improvers should go early; beginners stay in the white water.",
     tides: [
@@ -131,17 +99,9 @@ const DAYS: Day[] = [
     button: "Sun 20 Jun",
     rating: "Fair",
     heading: "Fair: small and tidy",
-    lowTime: "15:56",
-    lowHeight: "0.9 m",
-    highAt: "22:01",
-    swell: "2",
-    period: "8 s",
-    swellFrom: "the north-west",
-    wind: "10",
-    windFrom: "North",
-    windKind: "Cross-shore",
-    water: "16",
-    waterNote: "Summer wetsuit",
+    swell: { height: 2, period: 8, from: "the north-west" },
+    wind: { speed: 10, direction: "North", aspect: "Cross-shore" },
+    water: { temp: 16, note: "Summer wetsuit" },
     sentence:
       "The swell drops away and the wind swings to the north. Small, tidy waves that suit a first lesson.",
     tides: [
@@ -158,17 +118,9 @@ const DAYS: Day[] = [
     button: "Mon 21 Jun",
     rating: "Poor",
     heading: "Poor: nearly flat, and windy",
-    lowTime: "16:44",
-    lowHeight: "0.8 m",
-    highAt: "22:49",
-    swell: "1",
-    period: "7 s",
-    swellFrom: "the west",
-    wind: "18",
-    windFrom: "South-west",
-    windKind: "Onshore",
-    water: "16",
-    waterNote: "Summer wetsuit",
+    swell: { height: 1, period: 7, from: "the west" },
+    wind: { speed: 18, direction: "South-west", aspect: "Onshore" },
+    water: { temp: 16, note: "Summer wetsuit" },
     sentence:
       "Hardly a wave, and a stiff onshore wind. A day for a swim, a walk to the north rocks or the café.",
     tides: [
@@ -179,6 +131,9 @@ const DAYS: Day[] = [
     ],
   },
 ]
+
+// Friday has the best conditions of the five days.
+const BEST_DAY_INDEX = 1
 
 const READING_NOTES = [
   {
@@ -205,7 +160,7 @@ const READING_NOTES = [
 
 const NAV_LINKS = [
   { label: "Lessons", href: "/lessons" },
-  { label: "Forecast", href: "/forecast", current: true },
+  { label: "Forecast", href: "/forecast" },
   { label: "Guide", href: "/guide" },
   { label: "Book", href: "/booking" },
 ]
@@ -213,7 +168,7 @@ const NAV_LINKS = [
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const textLink = cn(
+const inlineLink = cn(
   "text-foreground underline decoration-1 underline-offset-4 hover:decoration-2",
   focusOutline
 )
@@ -221,111 +176,19 @@ const textLink = cn(
 const buttonClasses = "h-11 rounded-md px-6 font-mono text-label uppercase"
 
 const label = "font-mono text-label uppercase"
-
 const smallFigure =
   "font-mono text-label uppercase tabular-nums text-muted-foreground"
 
 const headCell =
   "h-auto px-6 py-4 font-mono text-label uppercase text-muted-foreground"
-
 const bodyCell = "px-6 py-4 text-foreground"
 
-function Header() {
-  return (
-    <header className="border-b border-border">
-      <div className="mx-auto flex max-w-[1248px] flex-wrap items-center gap-x-6 px-6 py-2">
-        <a
-          href="/"
-          className={cn(
-            "inline-flex h-11 items-center font-heading text-h2 text-foreground",
-            focusOutline
-          )}
-        >
-          Sandhopper
-        </a>
-        <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <ul className="flex flex-wrap gap-x-6">
-            {NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={cn(
-                    "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
-                    link.current && "underline",
-                    focusOutline
-                  )}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </header>
-  )
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-border">
-      <div className="mx-auto flex max-w-[1248px] flex-col gap-6 px-6 py-10 md:flex-row md:items-start md:justify-between">
-        <div className="flex flex-col gap-2">
-          <p className="font-heading text-h2">Sandhopper Surf School</p>
-          <p className="text-body">
-            Surf lessons and kit hire at Pentarrow Sands since 2009.
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 md:items-end">
-          <p className={cn(label, "text-muted-foreground")}>
-            The Boat Shed · Beach Road · Pentarrow Sands · ZP7 3SB
-          </p>
-          <p className="text-body">
-            <a href="tel:+441632960418" className={textLink}>
-              01632 960 418
-            </a>
-            {" · "}
-            <a href="mailto:hello@sandhopper.example" className={textLink}>
-              hello@sandhopper.example
-            </a>
-          </p>
-          <p className={cn(label, "text-muted-foreground")}>
-            Every day ·{" "}
-            <time dateTime="08:30" className="tabular-nums">
-              08:30
-            </time>
-            –
-            <time dateTime="18:00" className="tabular-nums">
-              18:00
-            </time>{" "}
-            · © 2027 Sandhopper Surf School
-          </p>
-        </div>
-      </div>
-    </footer>
-  )
-}
-
-function Figure({
-  value,
-  unit,
-  dateTime,
-}: {
-  value: string
-  unit: string
-  dateTime?: string
-}) {
-  const figureClass = "font-heading text-h1 tabular-nums lg:text-display"
+function Figure({ value, unit }: { value: ReactNode; unit: string }) {
   return (
     <dd className="flex flex-wrap items-baseline gap-x-2">
-      {dateTime ? (
-        <time dateTime={dateTime} className={figureClass}>
-          {value}
-        </time>
-      ) : (
-        <span className={figureClass}>{value}</span>
-      )}
+      <span className="font-heading text-h1 tabular-nums lg:text-display">
+        {value}
+      </span>
       <span className={label}>{unit}</span>
     </dd>
   )
@@ -334,26 +197,60 @@ function Figure({
 export function App() {
   const [chosen, setChosen] = useState(0)
   const day = DAYS[chosen]
+  const low = day.tides[2]
+  const highAfter = day.tides[3]
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <Header />
+      <header className="border-b border-border">
+        <div className="mx-auto flex max-w-[1248px] flex-wrap items-center gap-x-6 px-6 py-2">
+          <a
+            href="/"
+            className={cn(
+              "inline-flex h-11 items-center font-heading text-h2 text-foreground",
+              focusOutline
+            )}
+          >
+            Sandhopper
+          </a>
+          <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
+            <ul className="flex flex-wrap gap-x-6">
+              {NAV_LINKS.map((link) => {
+                const current = link.href === "/forecast"
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      aria-current={current ? "page" : undefined}
+                      className={cn(
+                        "inline-flex h-11 items-center font-mono text-label text-foreground uppercase underline-offset-4 hover:underline",
+                        current && "underline",
+                        focusOutline
+                      )}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        </div>
+      </header>
 
       <main className="mx-auto flex max-w-[1248px] flex-col gap-24 px-6 pt-10 pb-24">
         <section
-          aria-labelledby="opening-heading"
+          aria-labelledby="forecast-title"
           className="flex flex-col gap-6 rounded-xl bg-coral p-6 text-coral-foreground md:p-10"
         >
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <p className={label}>
+              <p className={cn(label, "tabular-nums")}>
                 Pentarrow Sands · Updated{" "}
                 <time dateTime="2027-06-17">Thursday 17 June 2027</time> at{" "}
-                <time dateTime="06:40" className="tabular-nums">
-                  06:40
-                </time>
+                <time dateTime="06:40">06:40</time>
               </p>
-              <h1 id="opening-heading" className="text-h1 md:text-display">
+              <h1 id="forecast-title" className="text-h1 md:text-display">
                 Surf forecast
               </h1>
             </div>
@@ -365,35 +262,41 @@ export function App() {
           </div>
         </section>
 
-        <section aria-labelledby="day-heading" className="flex flex-col gap-6">
-          <h2 id="day-heading" className="text-h2">
+        <section
+          aria-labelledby="day-by-day-title"
+          className="flex flex-col gap-6"
+        >
+          <h2 id="day-by-day-title" className="text-h2">
             Day by day
           </h2>
 
           <div className="flex flex-col gap-2">
             <p
-              id="day-control-label"
-              className={cn(label, "text-foreground")}
+              id="day-choice-label"
+              className="font-mono text-label text-foreground uppercase"
             >
               Choose a day
             </p>
             <div
               role="group"
-              aria-labelledby="day-control-label"
+              aria-labelledby="day-choice-label"
               className="flex flex-wrap gap-2"
             >
-              {DAYS.map((d, i) => (
-                <Button
-                  key={d.date}
-                  type="button"
-                  variant={i === chosen ? "secondary" : "outline"}
-                  aria-pressed={i === chosen}
-                  onClick={() => setChosen(i)}
-                  className={buttonClasses}
-                >
-                  {d.button}
-                </Button>
-              ))}
+              {DAYS.map((d, index) => {
+                const pressed = index === chosen
+                return (
+                  <Button
+                    key={d.date}
+                    type="button"
+                    variant={pressed ? "secondary" : "outline"}
+                    aria-pressed={pressed}
+                    onClick={() => setChosen(index)}
+                    className={buttonClasses}
+                  >
+                    {d.button}
+                  </Button>
+                )
+              })}
             </div>
             <p role="status" className={smallFigure}>
               Showing <time dateTime={day.date}>{day.longDate}</time>
@@ -411,34 +314,33 @@ export function App() {
             <dl className="grid grid-cols-2 gap-6 md:grid-cols-4">
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Tide</dt>
-                <Figure value={day.lowTime} unit="low" dateTime={day.lowTime} />
-                <dd className={label}>
-                  <span className="tabular-nums">{day.lowHeight}</span> · High
-                  at{" "}
-                  <time dateTime={day.highAt} className="tabular-nums">
-                    {day.highAt}
-                  </time>
+                <Figure
+                  value={<time dateTime={low.time}>{low.time}</time>}
+                  unit="low"
+                />
+                <dd className={cn(label, "tabular-nums")}>
+                  {low.height} · High at{" "}
+                  <time dateTime={highAfter.time}>{highAfter.time}</time>
                 </dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Swell</dt>
-                <Figure value={day.swell} unit="ft" />
-                <dd className={label}>
-                  <span className="tabular-nums">{day.period}</span> · From{" "}
-                  {day.swellFrom}
+                <Figure value={day.swell.height} unit="ft" />
+                <dd className={cn(label, "tabular-nums")}>
+                  {day.swell.period} s · From {day.swell.from}
                 </dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Wind</dt>
-                <Figure value={day.wind} unit="mph" />
+                <Figure value={day.wind.speed} unit="mph" />
                 <dd className={label}>
-                  {day.windFrom} · {day.windKind}
+                  {day.wind.direction} · {day.wind.aspect}
                 </dd>
               </div>
               <div className="flex flex-col gap-2 border-t border-lagoon-foreground pt-4">
                 <dt className={label}>Water</dt>
-                <Figure value={day.water} unit="°C" />
-                <dd className={label}>{day.waterNote}</dd>
+                <Figure value={day.water.temp} unit="°C" />
+                <dd className={label}>{day.water.note}</dd>
               </div>
             </dl>
 
@@ -448,11 +350,11 @@ export function App() {
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start lg:gap-x-6">
           <section
-            aria-labelledby="tides-heading"
+            aria-labelledby="tide-times-title"
             className="flex flex-col gap-6 lg:col-span-5"
           >
             <div className="flex flex-col gap-2">
-              <h2 id="tides-heading" className="text-h2">
+              <h2 id="tide-times-title" className="text-h2">
                 Tide times
               </h2>
               <p className={smallFigure}>
@@ -493,10 +395,10 @@ export function App() {
           </section>
 
           <section
-            aria-labelledby="reading-heading"
+            aria-labelledby="how-to-read-title"
             className="flex flex-col gap-6 lg:col-span-6 lg:col-start-7"
           >
-            <h2 id="reading-heading" className="text-h2">
+            <h2 id="how-to-read-title" className="text-h2">
               How to read it
             </h2>
             <dl className="flex flex-col gap-6">
@@ -512,9 +414,12 @@ export function App() {
           </section>
         </div>
 
-        <section aria-labelledby="five-heading" className="flex flex-col gap-6">
+        <section
+          aria-labelledby="five-days-title"
+          className="flex flex-col gap-6"
+        >
           <div className="flex flex-col gap-2">
-            <h2 id="five-heading" className="text-h2">
+            <h2 id="five-days-title" className="text-h2">
               Five days
             </h2>
             <p className={smallFigure}>
@@ -527,47 +432,52 @@ export function App() {
             <Table label="Five days" className="text-body">
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  {["Day", "Swell", "Period", "Wind", "Direction", "Rating"].map(
-                    (heading) => (
-                      <TableHead key={heading} scope="col" className={headCell}>
-                        {heading}
-                      </TableHead>
-                    )
-                  )}
+                  {[
+                    "Day",
+                    "Swell",
+                    "Period",
+                    "Wind",
+                    "Direction",
+                    "Rating",
+                  ].map((heading) => (
+                    <TableHead key={heading} scope="col" className={headCell}>
+                      {heading}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {DAYS.map((d, i) => {
-                  const isChosen = i === chosen
+                {DAYS.map((d, index) => {
+                  const current = index === chosen
                   return (
                     <TableRow
                       key={d.date}
-                      aria-current={isChosen ? "true" : undefined}
+                      aria-current={current ? "true" : undefined}
                       className={
-                        isChosen
+                        current
                           ? "bg-accent hover:bg-accent"
                           : "hover:bg-transparent"
                       }
                     >
                       <TableCell
-                        className={cn(bodyCell, isChosen && "font-bold")}
+                        className={cn(bodyCell, current && "font-bold")}
                       >
                         <time dateTime={d.date}>{d.shortDate}</time>
                       </TableCell>
                       <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.swell} ft
+                        {d.swell.height} ft
                       </TableCell>
                       <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.period}
+                        {d.swell.period} s
                       </TableCell>
                       <TableCell className={cn(bodyCell, "tabular-nums")}>
-                        {d.wind} mph
+                        {d.wind.speed} mph
                       </TableCell>
                       <TableCell className={bodyCell}>
-                        {d.windFrom}, {d.windKind.toLowerCase()}
+                        {d.wind.direction}, {d.wind.aspect.toLowerCase()}
                       </TableCell>
                       <TableCell className={bodyCell}>
-                        {d.bestDay ? (
+                        {index === BEST_DAY_INDEX ? (
                           <span className="inline-flex items-center gap-2">
                             {d.rating}
                             <Badge className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase">
@@ -596,14 +506,42 @@ export function App() {
             >
               Book a lesson
             </a>
-            <p className="text-body">
+            <p className="max-w-xl text-body">
               Lessons run every day. We set the start time by the tide.
             </p>
           </div>
         </section>
       </main>
 
-      <Footer />
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-[1248px] flex-col gap-6 px-6 py-10 md:flex-row md:items-start md:justify-between">
+          <div className="flex flex-col gap-2">
+            <p className="font-heading text-h2">Sandhopper Surf School</p>
+            <p className="text-body">
+              Surf lessons and kit hire at Pentarrow Sands since 2009.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 md:items-end">
+            <p className={cn(label, "text-muted-foreground")}>
+              The Boat Shed · Beach Road · Pentarrow Sands · ZP7 3SB
+            </p>
+            <p className="text-body">
+              <a href="tel:+441632960418" className={inlineLink}>
+                01632 960 418
+              </a>{" "}
+              ·{" "}
+              <a href="mailto:hello@sandhopper.example" className={inlineLink}>
+                hello@sandhopper.example
+              </a>
+            </p>
+            <p className={cn(label, "text-muted-foreground tabular-nums")}>
+              Every day · <time dateTime="08:30">08:30</time>–
+              <time dateTime="18:00">18:00</time> · © 2027 Sandhopper Surf
+              School
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }

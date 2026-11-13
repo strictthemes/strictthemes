@@ -74,15 +74,6 @@
     --font-mono: 'Kode Mono Variable', monospace;
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-  .dark {
-    color-scheme: dark;
-  }
-}
-
 :root {
     --background: #F5FAFC;
     --foreground: #023047;

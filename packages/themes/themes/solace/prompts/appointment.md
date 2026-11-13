@@ -4,11 +4,12 @@ title: Appointment
 description: a therapist's page for requesting a first session, with a note that the practice is not an emergency service, a form for a name, an email address, an optional phone number, how to be contacted, in person or online, the times that suit, an optional message and consent, checked in code and replaced by a confirmation, with what happens next and a few lines on confidentiality beside it.
 order: 5
 checks:
-  - "Every field has a visible label; how to reply and in person or online are fieldsets of native radio buttons drawn round, the times are a fieldset of three checkboxes, and the consent is a checkbox whose label is tied to it."
+  - "Every field has a visible label; how to reply and in person or online are fieldsets holding the theme's `RadioGroup`, with round radios, the times are a fieldset of three checkboxes, and the consent is a checkbox whose label is tied to it."
   - "Sending the form empty shows an error line with an icon under the name, the email address, both radio groups, the times and the consent, each saying how to put it right, and moves focus to the name field."
   - "Choosing By phone and leaving the phone number empty gives the phone field an error that says to write a number or to choose By email."
   - "A good request is replaced, inside the same card, by a confirmation in an element with the status role that was there from the start; its heading takes focus, and it says where the reply goes and that it comes within two working days."
   - "The note that this is not an emergency service stands above the form, says to call your local emergency number or go to the nearest emergency department, and holds no phone number and no organisation's name."
+  - "No control is drawn by the browser: the page has no native radio, checkbox or select, the arrow keys move the choice inside each radio group, a chosen radio is filled with a dot in its middle, and the message field has no resize grip."
   - "Send my request is the page's one default (indigo) button, the only round things are the radio buttons, and no text is italic or heavier than weight 500."
 ---
 
@@ -39,7 +40,7 @@ The note about emergencies comes first: a card from the layout notes, a `<div>` 
 - An `<h2>`: "This is not an emergency service".
 - With `mt-4`, a `<p>` in `text-body`, at most `max-w-xl`: "I read requests on working days, and it can take me two days to reply. If you are in immediate danger, or you think you might harm yourself or someone else, please do not wait for me. Call your local emergency number or go to the nearest emergency department."
 
-With `mt-7`, the form's card, as the Forms note describes it: a card holding the `<form>` and, after it, the empty `role="status"` element. Add the fields with `npx shadcn@latest add input textarea checkbox`. In the `<form>`, in this order:
+With `mt-7`, the form's card, as the Forms note describes it: a card holding the `<form>` and, after it, the empty `role="status"` element. Add the fields with `npx shadcn@latest add input textarea checkbox radio-group`. In the `<form>`, in this order:
 
 - An `<h2>` with an `id`: "Your request".
 - With `mt-4`, a `<p>` in `text-body`: "Your name, an email address and the choices below are needed. The rest is up to you."
@@ -47,8 +48,8 @@ With `mt-7`, the form's card, as the Forms note describes it: a card holding the
   1. **Name:** the label "Your name", the helper line "A first name is enough.", an `Input` with `autoComplete="name"`.
   2. **Email:** the label "Email address", an `Input` of type `email` with `autoComplete="email"`.
   3. **Phone:** the label "Phone number (optional)", the helper line "Only needed if you would like me to call.", an `Input` of type `tel` with `autoComplete="tel"`.
-  4. **How to reply:** a group of choices with the `<legend>` "How should I reply?" and the helper line "If I call and you cannot answer, I leave no message." Two radios with the `name` `reply`: "By email" and "By phone".
-  5. **Where:** a group of choices with the `<legend>` "In person or online?" Three radios with the `name` `place`: "In person, in Larkmere", "Online, by video" and "Either is fine".
+  4. **How to reply:** a group of choices with the `<legend>` "How should I reply?" and the helper line "If I call and you cannot answer, I leave no message." A `RadioGroup` with the `name` `reply` and two radios: "By email" and "By phone".
+  5. **Where:** a group of choices with the `<legend>` "In person or online?" A `RadioGroup` with the `name` `place` and three radios: "In person, in Larkmere", "Online, by video" and "Either is fine".
   6. **Times:** a group of choices with the `<legend>` "Which times could suit you?" and the helper line "Tick all that could work." Three checkboxes, each in a row of a group: "Mornings, 09:00 to 12:00", "Afternoons, 12:00 to 17:00" and "Wednesday evenings, 17:00 to 20:00".
   7. **Message:** the label "What brings you here? (optional)", the helper line "A sentence is enough. You can also leave this empty and tell me when we speak.", a `Textarea` with `maxLength={1000}`.
   8. **Consent:** a wrapper holding one checkbox row whose label is a sentence, as the Checkboxes note gives it, and under the row its error line while there is one. The `<label>`: "I agree that Nora Ellingham may keep these details to reply to my request."
@@ -85,7 +86,7 @@ Every part is one column, in this order: the opening, the note about emergencies
   - Times, none ticked: "Tick at least one time. You can tick them all."
   - Consent, not ticked: "Tick the box, so that I may keep your details and reply."
   - The message is never checked.
-- **Focus:** focus moves to the first field with an error. For a group of radios that is its first radio; for the times, the first checkbox; for the consent, its checkbox. To focus a `Checkbox`, hold a ref on it and call `focus()`. The consent's `Checkbox` gets `aria-invalid` and names its error line in `aria-describedby` while the error shows.
+- **Focus:** focus moves to the first field with an error. For a group of radios that is its first radio; for the times, the first checkbox; for the consent, its checkbox. To focus a `Checkbox` or a `RadioGroupItem`, hold a ref on it and call `focus()`. The consent's `Checkbox` gets `aria-invalid` and names its error line in `aria-describedby` while the error shows.
 - **Errors going away:** as the Errors note says, and one more: the phone number's error about a missing number also goes when By email is chosen.
 - **Confirmation:** when all is good, the form is replaced by the message in the status element, as the Confirmations note says. The `<h2>`, with `tabIndex={-1}` and focus moved to it: "Thank you, Sam. Your request is with me.", with the name as typed, trimmed. Then three paragraphs:
   - Where the reply goes. By email: "I will write to sam@example.com within two working days." By phone: "I will call 01632 960 417 within two working days. If I do not reach you, I will write to sam@example.com." The address and the number are the ones typed, trimmed; the two here are samples.

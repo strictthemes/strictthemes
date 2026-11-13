@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent } from "react"
 import { CircleAlert } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -7,54 +7,66 @@ import { cn } from "@/lib/utils"
 
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const codeFocusRing =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+
 const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusRing
 )
+
 const plainLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
+
 const buttonClasses = "h-auto rounded-md px-6 py-2 font-mono text-label"
+
+const label = "font-mono text-label text-muted-foreground"
 
 const recentLetters = [
   {
-    title: "Six years of oak and patience",
-    date: "2026-03-01",
-    label: "1 March 2026",
+    number: 112,
+    title: "Six years of planking",
+    date: "2026-11-08",
+    shown: "8 November 2026",
   },
   {
-    title: "The editor who read every slip",
-    date: "2026-02-15",
-    label: "15 February 2026",
+    number: 111,
+    title: "The word that took a decade to define",
+    date: "2026-10-25",
+    shown: "25 October 2026",
   },
   {
-    title: "A hedge planted for someone else",
-    date: "2026-02-01",
-    label: "1 February 2026",
+    number: 110,
+    title: "A pear tree planted for someone else",
+    date: "2026-10-11",
+    shown: "11 October 2026",
   },
   {
-    title: "Counting the stitches in a sail",
-    date: "2026-01-18",
-    label: "18 January 2026",
+    number: 109,
+    title: "On sharpening the same chisel every morning",
+    date: "2026-09-27",
+    shown: "27 September 2026",
   },
   {
-    title: "What the slow printer kept",
-    date: "2026-01-04",
-    label: "4 January 2026",
+    number: 108,
+    title: "The map that was finished after its maker died",
+    date: "2026-09-13",
+    shown: "13 September 2026",
   },
 ]
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export function App() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
   const emailRef = useRef<HTMLInputElement>(null)
-  const confirmRef = useRef<HTMLHeadingElement>(null)
+  const confirmationRef = useRef<HTMLHeadingElement>(null)
+
+  useEffect(() => {
+    if (subscribed) confirmationRef.current?.focus()
+  }, [subscribed])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -64,19 +76,20 @@ export function App() {
       emailRef.current?.focus()
       return
     }
-    if (!EMAIL_PATTERN.test(value)) {
-      setError("Enter an email address in the form name@example.com.")
+    if (!emailPattern.test(value)) {
+      setError(
+        "Check the address: it needs an @ and a domain, as in name@example.com."
+      )
       emailRef.current?.focus()
       return
     }
     setError(null)
     setSubscribed(true)
-    requestAnimationFrame(() => confirmRef.current?.focus())
   }
 
-  function handleSubscribeLink() {
+  function focusSignUp() {
     if (subscribed) {
-      confirmRef.current?.focus({ preventScroll: true })
+      confirmationRef.current?.focus({ preventScroll: true })
     } else {
       emailRef.current?.focus({ preventScroll: true })
     }
@@ -99,24 +112,19 @@ export function App() {
       </header>
 
       <main>
-        {/* 2. Opening */}
         <div className="mx-auto max-w-lg pt-24">
-          <p className="font-mono text-label text-muted-foreground">
-            A letter every other Sunday
-          </p>
+          <p className={label}>A letter every other Sunday</p>
           <h1 className="mt-4 text-h1 md:text-display">
             Notes on work that takes years
           </h1>
           <p className="mt-6">
-            Every other Sunday you get one long letter about something made
-            slowly: a boat built in a garage over six years, a dictionary
-            edited by hand, a garden planted for the next owner. It is written
-            by Maren Holt, who has been sending it since 2019 to about 4,000
-            readers. It is free.
+            Every other Sunday you get one long letter about something being
+            made slowly: a boat, a dictionary, a garden, a map. It is written by
+            Ida Marlow, who has spent the last nine years visiting the people
+            who make them and writing down what they say.
           </p>
         </div>
 
-        {/* 3. Sign-up form */}
         <div id="subscribe" className="mx-auto mt-12 max-w-lg scroll-mt-6">
           {!subscribed && (
             <form noValidate onSubmit={handleSubmit}>
@@ -157,7 +165,7 @@ export function App() {
                   Subscribe
                 </Button>
               </div>
-              <p className="mt-4 font-mono text-label text-muted-foreground">
+              <p className={cn(label, "mt-4")}>
                 Free · Every other Sunday · Leave with one click
               </p>
             </form>
@@ -166,67 +174,65 @@ export function App() {
             {subscribed && (
               <>
                 <h2
-                  ref={confirmRef}
+                  ref={confirmationRef}
                   tabIndex={-1}
-                  className={cn("text-h2", codeFocusRing)}
+                  className="text-h2 focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
                 >
                   You are on the list
                 </h2>
                 <p className="mt-4">
-                  The next letter arrives in your inbox within two weeks.
+                  The next letter arrives in your inbox within two weeks, on a
+                  Sunday morning.
                 </p>
               </>
             )}
           </div>
         </div>
 
-        {/* 4. From the last letter */}
         <div className="mx-auto mt-24 max-w-lg">
-          <p className="font-mono text-label text-muted-foreground">
-            Letter 112 · <time dateTime="2026-03-01">1 March 2026</time>
+          <p className={label}>
+            Letter 112 · <time dateTime="2026-11-08">8 November 2026</time>
           </p>
-          <h2 className="mt-2 text-h2">Six years of oak and patience</h2>
+          <h2 className="mt-2 text-h2">Six years of planking</h2>
           <p className="mt-4">
-            Tomas started the boat in the spring his daughter learned to walk.
-            She is in school now, and the hull is planked. He works on it two
-            evenings a week and most Saturday mornings, in a garage that is
-            forty centimetres too short, so the bow has always stuck out under
-            a tarpaulin.
+            Tomas Berg started the boat in his barn in the spring of 2020, with
+            a set of plans bought from a widow in Bergen and a stack of larch
+            he had been drying for four years before that. He works on it on
+            Saturdays and in the long evenings of June. In winter the glue will
+            not set, so he sharpens tools and reads.
           </p>
           <p className="mt-6">
-            He keeps a notebook for every plank: where the oak came from, how
-            long it steamed, which way it wanted to twist. Some pages have one
-            line. One page has three days of notes about a single plank that
-            split twice before it went on.
+            When I visited in October he had just fitted the last plank on the
+            port side. It had taken him three weekends. The first attempt split
+            along the grain, and the second came out a few millimetres short at
+            the stern, which nobody but him would ever see.
           </p>
           <p className="mt-6">
-            I asked him whether he ever wished it would go faster. He thought
-            about it for a while and said no, he only wished he had{" "}
-            <em>started</em> sooner. The slow part, he said, is the part he
-            would miss.
+            He made it a third time anyway. &ldquo;I will be looking at that
+            joint for thirty years,&rdquo; he said. Then, after a pause:{" "}
+            <em>&ldquo;If I am lucky.&rdquo;</em>
           </p>
           <blockquote className="my-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              The boat will float for one summer before someone notices a
-              mistake I made in the first month.
+              A boat that takes six years to build is not late; it is simply
+              the size of a boat that takes six years.
             </p>
           </blockquote>
           <p className="mt-6">
-            <a href="#" className={textLink}>
+            <a href="/archive/112" className={textLink}>
               Read the whole letter
             </a>
           </p>
         </div>
 
-        {/* 5. What you get */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">What you get</h2>
           <ul className="mt-6">
             <li className="border-t py-6">
               <h3 className="text-body font-semibold">One long letter</h3>
               <p className="mt-2">
-                About 2,000 words on one person and one piece of slow work,
-                written from a visit or a long conversation.
+                About 2,500 words on one piece of slow work, written from a
+                visit to the person doing it.
               </p>
             </li>
             <li className="border-t py-6">
@@ -234,73 +240,68 @@ export function App() {
                 One thing worth reading
               </h3>
               <p className="mt-2">
-                A link to an essay, a book or an old article by someone else,
-                with a few lines on why it is in the letter.
+                At the end of each letter, a link to something by someone else
+                that I read twice, with a line on why.
               </p>
             </li>
             <li className="border-t py-6">
               <h3 className="text-body font-semibold">No advertising</h3>
               <p className="mt-2">
-                No sponsors and no tracking links. Your address is used for the
-                letter and nothing else.
+                No sponsors and no tracking pixels. The letter is paid for by
+                the readers who choose to give, and sent to everyone.
               </p>
             </li>
           </ul>
         </div>
 
-        {/* 6. Readers */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">From readers</h2>
           <blockquote className="mt-6 mb-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              I read it on Sunday evenings with the radio off. It is the one
-              email I save.
+              I read it on Sunday with the second cup of coffee, and it is the
+              only email I have never once skimmed.
             </p>
-            <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Ilse, a hospital pharmacist
+            <footer className={cn(label, "mt-4 not-italic")}>
+              Hanne, a hospital pharmacist
             </footer>
           </blockquote>
           <blockquote className="my-12 border-l-2 border-primary pl-6">
             <p className="font-heading text-h2 font-normal italic">
-              The letter about the dictionary made me go back to a quilt I had
-              left in a cupboard for nine years.
+              The letter on the dictionary made me finish a quilt I had left in
+              a cupboard for eleven years.
             </p>
-            <footer className="mt-4 font-mono text-label text-muted-foreground not-italic">
-              Ruairi, a secondary school teacher
+            <footer className={cn(label, "mt-4 not-italic")}>
+              Rafael, a secondary school teacher
             </footer>
           </blockquote>
         </div>
 
-        {/* 7. The writer */}
         <div className="mx-auto mt-24 max-w-lg">
           <aside className="mb-12 rounded-xl border bg-card p-6">
-            <p className="font-mono text-label text-muted-foreground">
-              Who writes it
-            </p>
-            <h2 className="mt-2 text-h2">Maren Holt</h2>
+            <p className={label}>Who writes it</p>
+            <h2 className="mt-2 text-h2">Ida Marlow</h2>
             <p className="mt-4">
-              Maren worked as a copy editor at a regional paper for twelve
-              years. She started the letter after writing a piece about a
-              clockmaker that the paper had no room for. She lives on the
-              coast and is, slowly, restoring a rowing boat of her own.
+              Ida worked for twelve years as a copy editor at a regional
+              newspaper before she began writing these letters in 2017. She
+              lives near the coast with a slow dog and a vegetable garden that
+              is, by her own count, four years behind schedule.
             </p>
           </aside>
         </div>
 
-        {/* 8. Recent letters */}
         <div className="mx-auto mt-24 max-w-lg">
           <h2 className="text-h2">Recent letters</h2>
           <ul className="mt-6">
             {recentLetters.map((letter) => (
               <li
-                key={letter.date}
+                key={letter.number}
                 className="border-t py-4 md:flex md:items-baseline md:justify-between md:gap-6"
               >
-                <a href="#" className={plainLink}>
+                <a href={`/archive/${letter.number}`} className={plainLink}>
                   {letter.title}
                 </a>
-                <p className="mt-2 font-mono text-label text-muted-foreground md:mt-0 md:shrink-0">
-                  <time dateTime={letter.date}>{letter.label}</time>
+                <p className={cn(label, "mt-2 md:mt-0 md:shrink-0")}>
+                  <time dateTime={letter.date}>{letter.shown}</time>
                 </p>
               </li>
             ))}
@@ -310,14 +311,14 @@ export function App() {
               See the archive
             </a>
           </p>
+
           <p className="mt-12">
-            If you would like the next one, leave your address and it will
-            arrive on a Sunday.
+            If you would like the next one, it comes free every other Sunday.
           </p>
           <p className="mt-4">
             <a
               href="#subscribe"
-              onClick={handleSubscribeLink}
+              onClick={focusSignUp}
               className={cn(
                 buttonVariants({ variant: "secondary" }),
                 buttonClasses
@@ -333,11 +334,10 @@ export function App() {
         <div className="border-t py-12">
           <p className="font-heading text-h2">The Long Margin</p>
           <p className="mt-2">
-            A free letter every other Sunday about work that takes a long time.
+            A letter about slow work, sent every other Sunday to about 4,000
+            readers.
           </p>
-          <p className="mt-6 font-mono text-label text-muted-foreground">
-            © 2026 The Long Margin · Maren Holt
-          </p>
+          <p className={cn(label, "mt-6")}>© 2026 The Long Margin</p>
         </div>
       </footer>
     </div>

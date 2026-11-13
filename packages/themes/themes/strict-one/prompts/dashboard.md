@@ -8,6 +8,7 @@ checks:
   - Changes (up, down) are stated in words or with a labelled icon, never by color alone.
   - The chart has a text alternative, and its bars are `bg-foreground`, not the primary color.
   - The status filter and the name filter change which rows are shown, and an empty result shows a message.
+  - The name filter is the theme's `Input` with `type="search"`, and with text in it shows no clear button drawn by the browser.
   - The period switch and the status filter are button groups with `aria-pressed`, not tabs, and the period switch sits with the key numbers it changes.
   - Below `lg` the sidebar is reachable through a "Menu" button that works with the keyboard.
 ---
@@ -42,7 +43,7 @@ Build the chart from plain elements, with no chart library: seven columns in a `
 
 A panel with a 1px border.
 
-- Header row with `p-4` and a 1px bottom border: the label heading `RECENT SHEETS` on the left; on the right, in a `flex w-full flex-wrap items-center gap-4 sm:w-auto`, an `Input` with the placeholder "Filter by name", `w-full sm:w-64`, and a status filter, which is a button group (All, Shared, Private). The row is `flex flex-wrap items-center justify-between gap-4`; on small screens the controls wrap under the heading.
+- Header row with `p-4` and a 1px bottom border: the label heading `RECENT SHEETS` on the left; on the right, in a `flex w-full flex-wrap items-center gap-4 sm:w-auto`, an `Input` with `type="search"` and the placeholder "Filter by name", `w-full sm:w-64`, and a status filter, which is a button group (All, Shared, Private). The row is `flex flex-wrap items-center justify-between gap-4`; on small screens the controls wrap under the heading.
 - A `Table`: Name, Owner, Status, Edits, Last edited. Sheet names are plain text, not links. Label-style header cells. Edits and dates in `font-mono tabular-nums`, right-aligned. Status is a `Badge` styled as the notes say, outlined for Shared and Private alike: the word tells them apart. A status repeats on many rows, so it is never the signal badge: this page has no tertiary badge. The table's name is the panel's label heading, also passed as its `label`. Last edited is a date as the notes write it. 1px row borders, no zebra stripes. On small screens the table scrolls sideways inside the panel.
 - When the filters leave no rows, show one row reading "No sheets match this filter."
 

@@ -348,9 +348,12 @@ test('prompts: the rules answer what test builds kept asking', () => {
   for (const prompt of registry.prompts) {
     // An element that code focuses needs `focus:`, not `focus-visible:`.
     assert.ok(prompt.prompt.includes('focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring'), prompt.slug)
-    // The starter's own mode key stays, and native controls are told the mode.
+    // The starter's own mode key stays.
     assert.ok(prompt.prompt.includes('switches on the `d` key'), prompt.slug)
-    assert.ok(prompt.prompt.includes('color-scheme: dark'), prompt.slug)
+    // No control keeps the browser's own look.
+    assert.ok(prompt.prompt.includes('never a native `<select>`'), prompt.slug)
+    assert.ok(prompt.prompt.includes('never an `<input type="date">`'), prompt.slug)
+    assert.ok(!prompt.prompt.includes('color-scheme'), prompt.slug)
     // A font the theme's install added is not one to remove.
     assert.ok(prompt.prompt.includes("Keep every font import the theme's install added"), prompt.slug)
     // What happens to the Button's other rings is said in so many words.

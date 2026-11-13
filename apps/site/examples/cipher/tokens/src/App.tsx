@@ -1,9 +1,18 @@
-import { useEffect, useRef, useState, type FormEvent } from "react"
+import { useEffect, useRef, useState } from "react"
+import type { FormEvent, ReactNode } from "react"
+import { flushSync } from "react-dom"
 import { Check, CircleAlert, TriangleAlert } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import {
   Table,
   TableBody,
@@ -15,12 +24,11 @@ import {
 import { cn } from "@/lib/utils"
 
 type Scope = "read" | "deploy:write" | "admin"
-type Expiry = "30" | "90" | "365" | "never"
+type Expiry = "30d" | "90d" | "1y" | "never"
 
 type Token = {
-  id: string
   name: string
-  prefix: string
+  secret: string
   scope: Scope
   created: string
   lastUsed: string | null
@@ -33,7 +41,9 @@ type CreatedToken = {
   expires: string | null
 }
 
+// The fixed sample date: every new token is created on it.
 const TODAY = "2026-11-11"
+
 const MONTHS = [
   "Jan",
   "Feb",
@@ -48,47 +58,35 @@ const MONTHS = [
   "Nov",
   "Dec",
 ]
-const ALPHABET =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
-const SCOPE_HELP: Record<Scope, string> = {
-  read: "Can view deploys, logs and domains, and change nothing.",
-  "deploy:write": "Can start, cancel and roll back deploys, and read logs.",
-  admin: "Full access, including members, domains, billing and tokens.",
-}
-
-const SAMPLE_TOKENS: Token[] = [
+const INITIAL_TOKENS: Token[] = [
   {
-    id: "t1",
     name: "ci-deploy",
-    prefix: "plt_7Kq2vR9mXa4LpT8sW3nB6cJ1dF5hY0eZ".slice(0, 8),
+    secret: "plt_7Kq2mVx9RtB4nLp8ZcW3hYd6FsJ1aGuE",
     scope: "deploy:write",
     created: "2026-08-14",
     lastUsed: "2026-11-11T09:12",
     expires: null,
   },
   {
-    id: "t2",
     name: "staging-bot",
-    prefix: "plt_Nf3xQ8bH2kW6yR1tM9sL4vC7pD0gJ5aE".slice(0, 8),
+    secret: "plt_Xw5TnR8bQe2LkM7vHj4PzC9sYd3GfA6u",
     scope: "deploy:write",
     created: "2026-09-02",
     lastUsed: "2026-11-10T17:40",
     expires: "2026-12-01",
   },
   {
-    id: "t3",
     name: "metrics-reader",
-    prefix: "plt_c5Ds1Pz8jU4oG7rK2wA9eX3iV6nB0mHq".slice(0, 8),
+    secret: "plt_b9ZrE4tLq7NwK2xVm6JpH3sDc8FyG5aU",
     scope: "read",
     created: "2026-09-19",
     lastUsed: "2026-11-11T08:03",
     expires: "2027-09-19",
   },
   {
-    id: "t4",
     name: "mara-laptop",
-    prefix: "plt_Wb9Tg2Lx6Yq0Rn4Hs8Fd1Jk5Mc3Vp7Za".slice(0, 8),
+    secret: "plt_Jd3VuP6kXs9BnQ2wLt7RzM4cHf8GyE5a",
     scope: "admin",
     created: "2026-10-30",
     lastUsed: null,
@@ -96,82 +94,101 @@ const SAMPLE_TOKENS: Token[] = [
   },
 ]
 
-const FOCUS =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const FOCUS_CODE =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-const CONTAINER = "mx-auto max-w-[1200px] px-4 md:px-6"
-const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
-const BUTTON = "px-4 font-mono text-label"
-const LABEL_HEADING = "font-mono text-label text-muted-foreground"
-const FIELD_LABEL = "block font-mono text-label text-foreground"
-const SELECT = cn(
-  "mt-2 h-8 w-full rounded-lg border border-input bg-transparent px-2 font-mono text-body aria-invalid:border-destructive",
-  FOCUS
-)
-const HEADER_LINK = cn(
-  "text-muted-foreground transition-colors duration-150 hover:text-foreground aria-[current=page]:text-foreground aria-[current=page]:underline aria-[current=page]:underline-offset-4",
-  FOCUS
-)
-const TH =
-  "px-3 font-mono text-label text-muted-foreground first:pl-6 last:pr-6"
-const TD = "px-3 py-2 first:pl-6 last:pr-6"
+const SCOPE_ITEMS: { value: Scope; label: string }[] = [
+  { value: "read", label: "read" },
+  { value: "deploy:write", label: "deploy:write" },
+  { value: "admin", label: "admin" },
+]
+
+const SCOPE_HELP: Record<Scope, string> = {
+  read: "Can read deploys, logs and domains. Cannot change anything.",
+  "deploy:write": "Can start and roll back deploys, and read everything.",
+  admin: "Can do everything, including members, tokens and billing.",
+}
+
+const EXPIRY_ITEMS: { value: Expiry; label: string }[] = [
+  { value: "30d", label: "30 days" },
+  { value: "90d", label: "90 days" },
+  { value: "1y", label: "1 year" },
+  { value: "never", label: "Never" },
+]
 
 const MAIN_LINKS = [
-  { label: "Deploys", href: "/deploys" },
-  { label: "Domains", href: "#" },
-  { label: "Logs", href: "#" },
+  { label: "Deploys", href: "/deploys", current: false },
+  { label: "Domains", href: "#", current: false },
+  { label: "Logs", href: "#", current: false },
   { label: "Settings", href: "/settings/tokens", current: true },
 ]
 
 const SETTINGS_LINKS = [
-  { label: "General", href: "#" },
-  { label: "Members", href: "#" },
-  { label: "Domains", href: "#" },
+  { label: "General", href: "#", current: false },
+  { label: "Members", href: "#", current: false },
+  { label: "Domains", href: "#", current: false },
   { label: "API tokens", href: "/settings/tokens", current: true },
-  { label: "Billing", href: "#" },
+  { label: "Billing", href: "#", current: false },
 ]
 
+const FOCUS_VISIBLE =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const FOCUS_FROM_CODE =
+  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+const NAV_LINK =
+  "text-muted-foreground transition-colors duration-150 hover:text-foreground"
+const NAV_LINK_CURRENT = "text-foreground underline underline-offset-4"
+const SMALL_FIGURE = "font-mono text-label text-muted-foreground tabular-nums"
+const BUTTON = "px-4 font-mono text-label"
+const FIELD_LABEL = "block font-mono text-label text-foreground"
+const LABEL_HEADING = "font-mono text-label text-muted-foreground"
+const HEAD_CELL =
+  "px-3 font-mono text-label text-muted-foreground first:pl-6 last:pr-6"
+const BODY_CELL = "px-3 py-2 first:pl-6 last:pr-6"
+const INLINE_CODE = "rounded-sm bg-muted px-1 py-0.5 font-mono"
+
 function formatDate(iso: string) {
-  const [y, m, d] = iso.slice(0, 10).split("-").map(Number)
-  return `${d} ${MONTHS[m - 1]} ${y}`
+  const [year, month, day] = iso.slice(0, 10).split("-").map(Number)
+  return `${day} ${MONTHS[month - 1]} ${year}`
 }
 
-function addToToday(expiry: Expiry): string | null {
-  if (expiry === "never") return null
-  const [y, m, d] = TODAY.split("-").map(Number)
+function expiryDate(choice: Expiry): string | null {
+  if (choice === "never") return null
+  const [year, month, day] = TODAY.split("-").map(Number)
   const date =
-    expiry === "365"
-      ? new Date(Date.UTC(y + 1, m - 1, d))
-      : new Date(Date.UTC(y, m - 1, d + Number(expiry)))
+    choice === "1y"
+      ? new Date(Date.UTC(year + 1, month - 1, day))
+      : new Date(Date.UTC(year, month - 1, day + (choice === "30d" ? 30 : 90)))
   return date.toISOString().slice(0, 10)
 }
 
 function makeSecret() {
+  const alphabet =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+  // Bytes from 248 up are thrown away, so every character is as likely.
+  const limit = 256 - (256 % alphabet.length)
   let out = ""
-  const bytes = new Uint8Array(1)
   while (out.length < 32) {
-    crypto.getRandomValues(bytes)
-    // 248 is the largest multiple of 62 below 256: no bias.
-    if (bytes[0] < 248) out += ALPHABET[bytes[0] % 62]
+    const bytes = crypto.getRandomValues(new Uint8Array(32))
+    for (const byte of bytes) {
+      if (byte < limit && out.length < 32) {
+        out += alphabet[byte % alphabet.length]
+      }
+    }
   }
   return `plt_${out}`
 }
 
 function countTokens(n: number) {
-  return `${n} ${n === 1 ? "token" : "tokens"}`
+  return n === 1 ? "1 token" : `${n} tokens`
 }
 
 function DateCell({ value }: { value: string | null }) {
-  if (!value) return <span className="font-mono">never</span>
   return (
-    <time dateTime={value} className="font-mono tabular-nums">
-      {formatDate(value)}
-    </time>
+    <TableCell className={cn(BODY_CELL, "text-right font-mono tabular-nums")}>
+      {value ? <time dateTime={value}>{formatDate(value)}</time> : "never"}
+    </TableCell>
   )
 }
 
-function ErrorLine({ id, children }: { id: string; children: string }) {
+function ErrorLine({ id, children }: { id: string; children: ReactNode }) {
   return (
     <p
       id={id}
@@ -189,156 +206,158 @@ function ErrorLine({ id, children }: { id: string; children: string }) {
 
 export function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
+  const [tokens, setTokens] = useState<Token[]>(INITIAL_TOKENS)
+  const [newest, setNewest] = useState<string | null>(null)
 
-  const [tokens, setTokens] = useState<Token[]>(SAMPLE_TOKENS)
-  const [newestId, setNewestId] = useState<string | null>(null)
+  const [revokeTarget, setRevokeTarget] = useState<string | null>(null)
+  const [confirmText, setConfirmText] = useState("")
+  const [confirmError, setConfirmError] = useState(false)
+  const [revoked, setRevoked] = useState<string | null>(null)
 
-  // Revoking
-  const [revokeId, setRevokeId] = useState<string | null>(null)
-  const [revokeText, setRevokeText] = useState("")
-  const [revokeError, setRevokeError] = useState(false)
-  const [revokedName, setRevokedName] = useState<string | null>(null)
-  const revokeButtons = useRef(new Map<string, HTMLButtonElement>())
-  const revokeInput = useRef<HTMLInputElement>(null)
-  const revokedMessage = useRef<HTMLParagraphElement>(null)
-
-  // Creating
   const [name, setName] = useState("")
-  const [scope, setScope] = useState<Scope>("deploy:write")
-  const [expiry, setExpiry] = useState<Expiry>("90")
   const [nameError, setNameError] = useState<string | null>(null)
+  const [scope, setScope] = useState<Scope>("deploy:write")
+  const [expiry, setExpiry] = useState<Expiry>("90d")
   const [created, setCreated] = useState<CreatedToken | null>(null)
   const [copyState, setCopyState] = useState<"idle" | "copied" | "failed">(
     "idle"
   )
-  const copyTimer = useRef<number | undefined>(undefined)
-  const nameInput = useRef<HTMLInputElement>(null)
-  const createdMessage = useRef<HTMLParagraphElement>(null)
 
-  // Focus to move after the next render.
-  const focusNext = useRef<(() => HTMLElement | null | undefined) | null>(null)
-  useEffect(() => {
-    if (focusNext.current) {
-      focusNext.current()?.focus()
-      focusNext.current = null
-    }
-  })
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const revokeButtons = useRef(new Map<string, HTMLButtonElement>())
+  const confirmFieldRef = useRef<HTMLInputElement>(null)
+  const revokedRef = useRef<HTMLParagraphElement>(null)
+  const nameFieldRef = useRef<HTMLInputElement>(null)
+  const createdRef = useRef<HTMLParagraphElement>(null)
+  const copyTimer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     if (!menuOpen) return
-    function onKey(event: KeyboardEvent) {
+    function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setMenuOpen(false)
-        menuButton.current?.focus()
+        menuButtonRef.current?.focus()
       }
     }
-    document.addEventListener("keydown", onKey)
-    return () => document.removeEventListener("keydown", onKey)
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
   }, [menuOpen])
 
   useEffect(() => () => window.clearTimeout(copyTimer.current), [])
 
-  const revokeToken = tokens.find((t) => t.id === revokeId) ?? null
-
-  function openRevoke(id: string) {
-    setRevokeId(id)
-    setRevokeText("")
-    setRevokeError(false)
-    focusNext.current = () => revokeInput.current
+  function openRevoke(tokenName: string) {
+    flushSync(() => {
+      setRevokeTarget(tokenName)
+      setConfirmText("")
+      setConfirmError(false)
+    })
+    confirmFieldRef.current?.focus()
   }
 
   function cancelRevoke() {
-    const id = revokeId
-    setRevokeId(null)
-    setRevokeText("")
-    setRevokeError(false)
-    if (id) focusNext.current = () => revokeButtons.current.get(id)
+    const tokenName = revokeTarget
+    setRevokeTarget(null)
+    setConfirmText("")
+    setConfirmError(false)
+    if (tokenName) revokeButtons.current.get(tokenName)?.focus()
   }
 
   function submitRevoke(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!revokeToken) return
-    if (revokeText !== revokeToken.name) {
-      setRevokeError(true)
-      revokeInput.current?.focus()
+    const tokenName = revokeTarget
+    if (!tokenName) return
+    if (confirmText !== tokenName) {
+      setConfirmError(true)
+      confirmFieldRef.current?.focus()
       return
     }
-    setTokens((list) => list.filter((t) => t.id !== revokeToken.id))
-    if (newestId === revokeToken.id) setNewestId(null)
-    setRevokeId(null)
-    setRevokeText("")
-    setRevokeError(false)
-    setRevokedName(revokeToken.name)
-    focusNext.current = () => revokedMessage.current
+    flushSync(() => {
+      setTokens((list) => list.filter((token) => token.name !== tokenName))
+      setNewest((current) => (current === tokenName ? null : current))
+      setRevokeTarget(null)
+      setConfirmText("")
+      setConfirmError(false)
+      setRevoked(tokenName)
+    })
+    revokedRef.current?.focus()
   }
 
   function submitCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     let error: string | null = null
-    if (name.trim() === "") error = "Enter a name for the token."
-    else if (!/^[a-z0-9-]+$/.test(name))
+    if (name.trim() === "") {
+      error = "Enter a name for the token."
+    } else if (!/^[a-z0-9-]+$/.test(name)) {
       error = "Use only lowercase letters, numbers and hyphens."
-    else if (name.length > 32) error = "Use 32 characters or fewer."
-    else if (tokens.some((t) => t.name === name))
+    } else if (name.length > 32) {
+      error = "Use 32 characters or fewer."
+    } else if (tokens.some((token) => token.name === name)) {
       error = `A token named ${name} already exists. Choose another name.`
+    }
     if (error) {
       setNameError(error)
-      nameInput.current?.focus()
+      nameFieldRef.current?.focus()
       return
     }
-    const secret = makeSecret()
-    const expires = addToToday(expiry)
-    const id = `t${Date.now()}`
-    setTokens((list) => [
-      {
-        id,
-        name,
-        prefix: secret.slice(0, 8),
-        scope,
-        created: TODAY,
-        lastUsed: null,
-        expires,
-      },
-      ...list,
-    ])
-    setNewestId(id)
-    setCreated({ name, secret, expires })
-    setCopyState("idle")
-    focusNext.current = () => createdMessage.current
+    const token: Token = {
+      name,
+      secret: makeSecret(),
+      scope,
+      created: TODAY,
+      lastUsed: null,
+      expires: expiryDate(expiry),
+    }
+    flushSync(() => {
+      setTokens((list) => [token, ...list])
+      setNewest(token.name)
+      setNameError(null)
+      setCreated({
+        name: token.name,
+        secret: token.secret,
+        expires: token.expires,
+      })
+    })
+    createdRef.current?.focus()
   }
 
-  async function copySecret() {
+  function copyToken() {
     if (!created) return
     window.clearTimeout(copyTimer.current)
-    try {
-      await navigator.clipboard.writeText(created.secret)
-      setCopyState("copied")
-    } catch {
-      setCopyState("failed")
+    const done = (state: "copied" | "failed") => {
+      setCopyState(state)
+      copyTimer.current = window.setTimeout(() => setCopyState("idle"), 2000)
     }
-    copyTimer.current = window.setTimeout(() => setCopyState("idle"), 2000)
+    try {
+      navigator.clipboard.writeText(created.secret).then(
+        () => done("copied"),
+        () => done("failed")
+      )
+    } catch {
+      done("failed")
+    }
   }
 
-  function done() {
+  function finishCreate() {
     window.clearTimeout(copyTimer.current)
-    setCreated(null)
-    setCopyState("idle")
-    setName("")
-    setScope("deploy:write")
-    setExpiry("90")
-    setNameError(null)
-    focusNext.current = () => nameInput.current
+    flushSync(() => {
+      setCreated(null)
+      setCopyState("idle")
+      setName("")
+      setNameError(null)
+      setScope("deploy:write")
+      setExpiry("90d")
+    })
+    nameFieldRef.current?.focus()
   }
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b border-border bg-card">
-        <div className={CONTAINER}>
+        <div className="mx-auto max-w-[1200px] px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 py-3">
             <a
               href="/"
-              className={cn("font-heading text-h2 text-foreground", FOCUS)}
+              className={cn("font-heading text-h2 text-foreground", FOCUS_VISIBLE)}
             >
               plinth
             </a>
@@ -349,19 +368,23 @@ export function App() {
                   key={link.label}
                   href={link.href}
                   aria-current={link.current ? "page" : undefined}
-                  className={cn("font-mono text-label", HEADER_LINK)}
+                  className={cn(
+                    "font-mono text-label",
+                    link.current ? NAV_LINK_CURRENT : NAV_LINK,
+                    FOCUS_VISIBLE
+                  )}
                 >
                   {link.label}
                 </a>
               ))}
             </nav>
-            <p className={cn("ml-auto hidden md:block", SMALL_FIGURE)}>
+            <p className={cn(SMALL_FIGURE, "ml-auto hidden md:block")}>
               mara.lind@orrin.example
             </p>
             <Button
-              ref={menuButton}
+              ref={menuButtonRef}
               variant="outline"
-              className={cn("ml-auto md:hidden", BUTTON)}
+              className={cn(BUTTON, "ml-auto md:hidden")}
               aria-expanded={menuOpen}
               aria-controls="main-menu"
               onClick={() => setMenuOpen((open) => !open)}
@@ -376,13 +399,17 @@ export function App() {
           hidden={!menuOpen}
           className="border-t border-border md:hidden"
         >
-          <div className={cn(CONTAINER, "py-2")}>
+          <div className="mx-auto max-w-[1200px] px-4 py-2 md:px-6">
             {MAIN_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
                 aria-current={link.current ? "page" : undefined}
-                className={cn("block py-2 font-mono text-label", HEADER_LINK)}
+                className={cn(
+                  "block py-2 font-mono text-label",
+                  link.current ? NAV_LINK_CURRENT : NAV_LINK,
+                  FOCUS_VISIBLE
+                )}
               >
                 {link.label}
               </a>
@@ -392,9 +419,7 @@ export function App() {
       </header>
 
       <main className="py-6">
-        <div
-          className={cn(CONTAINER, "grid grid-cols-1 gap-6 lg:grid-cols-12")}
-        >
+        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-6 px-4 md:px-6 lg:grid-cols-12">
           <div className="flex flex-wrap items-center justify-between gap-3 lg:col-span-12">
             <h1 className="text-h1">Settings</h1>
           </div>
@@ -409,7 +434,11 @@ export function App() {
                   <a
                     href={link.href}
                     aria-current={link.current ? "page" : undefined}
-                    className={cn("block py-1 text-body", HEADER_LINK)}
+                    className={cn(
+                      "block py-1 text-body",
+                      link.current ? NAV_LINK_CURRENT : NAV_LINK,
+                      FOCUS_VISIBLE
+                    )}
                   >
                     {link.label}
                   </a>
@@ -418,31 +447,28 @@ export function App() {
             </ul>
           </nav>
 
-          <section className="min-w-0 lg:col-span-10">
-            <h2 id="tokens-heading" className="text-h2">
+          <section
+            aria-labelledby="api-tokens-heading"
+            className="min-w-0 lg:col-span-10"
+          >
+            <h2 id="api-tokens-heading" className="text-h2">
               API tokens
             </h2>
             <p className="mt-3 max-w-lg">
               Tokens let scripts and CI run{" "}
-              <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
-                plinth
-              </code>{" "}
-              as the team. The CLI reads one from{" "}
-              <code className="rounded-sm bg-muted px-1 py-0.5 font-mono">
-                PLINTH_TOKEN
-              </code>
-              .
+              <code className={INLINE_CODE}>plinth</code> as the team. The
+              command reads its token from{" "}
+              <code className={INLINE_CODE}>PLINTH_TOKEN</code>.
             </p>
 
             <div role="status">
-              {revokedName && (
+              {revoked && (
                 <p
-                  ref={revokedMessage}
+                  ref={revokedRef}
                   tabIndex={-1}
-                  className={cn("mt-3", FOCUS_CODE)}
+                  className={cn("mt-3", FOCUS_FROM_CODE)}
                 >
-                  Token <span className="font-mono">{revokedName}</span>{" "}
-                  revoked.
+                  Token <span className="font-mono">{revoked}</span> revoked.
                 </p>
               )}
             </div>
@@ -458,123 +484,128 @@ export function App() {
               <Table label="API tokens" className="min-w-2xl text-body">
                 <TableHeader>
                   <TableRow>
-                    <TableHead className={TH}>Name</TableHead>
-                    <TableHead className={TH}>Token</TableHead>
-                    <TableHead className={TH}>Scope</TableHead>
-                    <TableHead className={cn(TH, "text-right")}>
+                    <TableHead className={HEAD_CELL}>Name</TableHead>
+                    <TableHead className={HEAD_CELL}>Token</TableHead>
+                    <TableHead className={HEAD_CELL}>Scope</TableHead>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Created
                     </TableHead>
-                    <TableHead className={cn(TH, "text-right")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Last used
                     </TableHead>
-                    <TableHead className={cn(TH, "text-right")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       Expires
                     </TableHead>
-                    <TableHead className={cn(TH, "text-right")}>
+                    <TableHead className={cn(HEAD_CELL, "text-right")}>
                       <span className="sr-only">Actions</span>
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {tokens.length === 0 ? (
+                  {tokens.length === 0 && (
                     <TableRow>
                       <TableCell
                         colSpan={7}
-                        className={cn(TD, "whitespace-normal")}
+                        className={cn(BODY_CELL, "whitespace-normal")}
                       >
                         No tokens. Create one below.
                       </TableCell>
                     </TableRow>
-                  ) : (
-                    tokens.map((token) => (
-                      <TableRow key={token.id}>
-                        <TableCell className={cn(TD, "font-mono")}>
+                  )}
+                  {tokens.map((token) => (
+                    <TableRow key={token.name}>
+                      <TableCell className={cn(BODY_CELL, "font-mono")}>
+                        {token.name === newest ? (
                           <span className="inline-flex items-center gap-2">
                             {token.name}
-                            {token.id === newestId && (
-                              <Badge
-                                variant="outline"
-                                className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
-                              >
-                                new
-                              </Badge>
-                            )}
+                            <Badge
+                              variant="outline"
+                              className="h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
+                            >
+                              new
+                            </Badge>
                           </span>
-                        </TableCell>
-                        <TableCell
-                          className={cn(TD, "font-mono text-muted-foreground")}
+                        ) : (
+                          token.name
+                        )}
+                      </TableCell>
+                      <TableCell
+                        className={cn(
+                          BODY_CELL,
+                          "font-mono text-muted-foreground"
+                        )}
+                      >
+                        {token.secret.slice(0, 8)}…
+                      </TableCell>
+                      <TableCell className={cn(BODY_CELL, "font-mono")}>
+                        {token.scope}
+                      </TableCell>
+                      <DateCell value={token.created} />
+                      <DateCell value={token.lastUsed} />
+                      <DateCell value={token.expires} />
+                      <TableCell className={cn(BODY_CELL, "text-right")}>
+                        <Button
+                          ref={(node) => {
+                            if (node) {
+                              revokeButtons.current.set(token.name, node)
+                            } else {
+                              revokeButtons.current.delete(token.name)
+                            }
+                          }}
+                          variant="destructive"
+                          className={cn(BUTTON, "hover:text-foreground")}
+                          aria-label={`Revoke ${token.name}`}
+                          onClick={() => openRevoke(token.name)}
                         >
-                          {token.prefix}…
-                        </TableCell>
-                        <TableCell className={cn(TD, "font-mono")}>
-                          {token.scope}
-                        </TableCell>
-                        <TableCell className={cn(TD, "text-right")}>
-                          <DateCell value={token.created} />
-                        </TableCell>
-                        <TableCell className={cn(TD, "text-right")}>
-                          <DateCell value={token.lastUsed} />
-                        </TableCell>
-                        <TableCell className={cn(TD, "text-right")}>
-                          <DateCell value={token.expires} />
-                        </TableCell>
-                        <TableCell className={cn(TD, "text-right")}>
-                          <Button
-                            ref={(el: HTMLButtonElement | null) => {
-                              if (el) revokeButtons.current.set(token.id, el)
-                              else revokeButtons.current.delete(token.id)
-                            }}
-                            variant="destructive"
-                            className={cn(BUTTON, "hover:text-foreground")}
-                            aria-label={`Revoke ${token.name}`}
-                            onClick={() => openRevoke(token.id)}
-                          >
-                            Revoke
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                          Revoke
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
 
-              {revokeToken && (
+              {revokeTarget && (
                 <div className="border-t border-border px-6 py-4">
                   <form
+                    key={revokeTarget}
                     noValidate
                     aria-labelledby="revoke-title"
                     onSubmit={submitRevoke}
                   >
                     <p id="revoke-title" className="font-mono font-bold">
-                      Revoke {revokeToken.name}
+                      Revoke {revokeTarget}
                     </p>
                     <p className="mt-3 max-w-lg">
-                      Scripts that use this token stop working at once, and this
+                      Scripts using this token stop working at once, and this
                       cannot be undone.
                     </p>
                     <div className="mt-4 max-w-md">
                       <label htmlFor="revoke-confirm" className={FIELD_LABEL}>
-                        Type {revokeToken.name} to confirm
+                        Type {revokeTarget} to confirm
                       </label>
                       <Input
-                        ref={revokeInput}
+                        ref={confirmFieldRef}
                         id="revoke-confirm"
+                        name="confirm"
+                        type="text"
                         autoComplete="off"
+                        autoCapitalize="none"
                         spellCheck={false}
-                        value={revokeText}
-                        onChange={(e) => {
-                          setRevokeText(e.target.value)
-                          setRevokeError(false)
-                        }}
-                        aria-invalid={revokeError || undefined}
+                        className="mt-2 px-2 font-mono text-body md:text-body"
+                        value={confirmText}
+                        aria-invalid={confirmError ? true : undefined}
                         aria-describedby={
-                          revokeError ? "revoke-error" : undefined
+                          confirmError ? "revoke-confirm-error" : undefined
                         }
-                        className="mt-2 text-body md:text-body"
+                        onChange={(event) => {
+                          setConfirmText(event.target.value)
+                          setConfirmError(false)
+                        }}
                       />
-                      {revokeError && (
-                        <ErrorLine id="revoke-error">
-                          {`Type ${revokeToken.name} exactly to revoke this token.`}
+                      {confirmError && (
+                        <ErrorLine id="revoke-confirm-error">
+                          Type {revokeTarget} exactly to revoke this token.
                         </ErrorLine>
                       )}
                     </div>
@@ -608,6 +639,7 @@ export function App() {
               <div className="flex min-h-8 flex-wrap items-center justify-between gap-3">
                 <h3 className={LABEL_HEADING}>Create a token</h3>
               </div>
+
               <div className="mt-4">
                 {!created && (
                   <form noValidate onSubmit={submitCreate}>
@@ -616,26 +648,29 @@ export function App() {
                         Name
                       </label>
                       <Input
-                        ref={nameInput}
+                        ref={nameFieldRef}
                         id="token-name"
+                        name="name"
+                        type="text"
                         autoComplete="off"
+                        autoCapitalize="none"
                         spellCheck={false}
+                        className="mt-2 px-2 font-mono text-body md:text-body"
                         value={name}
-                        onChange={(e) => {
-                          setName(e.target.value)
-                          setNameError(null)
-                        }}
                         aria-invalid={nameError ? true : undefined}
                         aria-describedby={
                           nameError
                             ? "token-name-help token-name-error"
                             : "token-name-help"
                         }
-                        className="mt-2 text-body md:text-body"
+                        onChange={(event) => {
+                          setName(event.target.value)
+                          setNameError(null)
+                        }}
                       />
                       <p
                         id="token-name-help"
-                        className={cn("mt-2", SMALL_FIGURE)}
+                        className={cn(SMALL_FIGURE, "mt-2")}
                       >
                         Lowercase letters, numbers and hyphens, up to 32
                         characters.
@@ -644,49 +679,71 @@ export function App() {
                         <ErrorLine id="token-name-error">{nameError}</ErrorLine>
                       )}
                     </div>
+
                     <div className="mt-4 max-w-md">
                       <label htmlFor="token-scope" className={FIELD_LABEL}>
                         Scope
                       </label>
-                      <select
-                        id="token-scope"
+                      <Select
+                        items={SCOPE_ITEMS}
                         value={scope}
-                        onChange={(e) => setScope(e.target.value as Scope)}
-                        aria-describedby="token-scope-help"
-                        className={SELECT}
+                        onValueChange={(value) => {
+                          if (value !== null) setScope(value)
+                        }}
                       >
-                        <option value="read">read</option>
-                        <option value="deploy:write">deploy:write</option>
-                        <option value="admin">admin</option>
-                      </select>
+                        <SelectTrigger
+                          id="token-scope"
+                          className="mt-2 font-mono"
+                          aria-describedby="token-scope-help"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="font-mono">
+                          {SCOPE_ITEMS.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <p
                         id="token-scope-help"
-                        className={cn("mt-2", SMALL_FIGURE)}
+                        className={cn(SMALL_FIGURE, "mt-2")}
                       >
                         {SCOPE_HELP[scope]}
                       </p>
                     </div>
+
                     <div className="mt-4 max-w-md">
-                      <label htmlFor="token-expiry" className={FIELD_LABEL}>
+                      <label htmlFor="token-expires" className={FIELD_LABEL}>
                         Expires
                       </label>
-                      <select
-                        id="token-expiry"
+                      <Select
+                        items={EXPIRY_ITEMS}
                         value={expiry}
-                        onChange={(e) => setExpiry(e.target.value as Expiry)}
-                        className={SELECT}
+                        onValueChange={(value) => {
+                          if (value !== null) setExpiry(value)
+                        }}
                       >
-                        <option value="30">30 days</option>
-                        <option value="90">90 days</option>
-                        <option value="365">1 year</option>
-                        <option value="never">Never</option>
-                      </select>
+                        <SelectTrigger
+                          id="token-expires"
+                          className="mt-2 font-mono"
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="font-mono">
+                          {EXPIRY_ITEMS.map((item) => (
+                            <SelectItem key={item.value} value={item.value}>
+                              {item.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <div className="mt-6">
-                      <Button type="submit" className={BUTTON}>
-                        Create token
-                      </Button>
-                    </div>
+
+                    <Button type="submit" className={cn(BUTTON, "mt-6")}>
+                      Create token
+                    </Button>
                   </form>
                 )}
 
@@ -694,9 +751,9 @@ export function App() {
                   {created && (
                     <>
                       <p
-                        ref={createdMessage}
+                        ref={createdRef}
                         tabIndex={-1}
-                        className={FOCUS_CODE}
+                        className={FOCUS_FROM_CODE}
                       >
                         Token <span className="font-mono">{created.name}</span>{" "}
                         created.
@@ -731,7 +788,7 @@ export function App() {
                     <Button
                       variant="outline"
                       className={BUTTON}
-                      onClick={copySecret}
+                      onClick={copyToken}
                     >
                       {copyState === "copied" && (
                         <Check
@@ -749,20 +806,20 @@ export function App() {
                     <Button
                       variant="secondary"
                       className={BUTTON}
-                      onClick={done}
+                      onClick={finishCreate}
                     >
                       Done
                     </Button>
                   </div>
                 )}
 
-                <div role="status" className="sr-only">
+                <span role="status" className="sr-only">
                   {copyState === "copied"
                     ? "Copied"
                     : copyState === "failed"
                       ? "Copy failed"
                       : ""}
-                </div>
+                </span>
               </div>
             </div>
           </section>

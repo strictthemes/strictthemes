@@ -178,10 +178,3 @@
     @apply font-heading;
     }
 }
-:root {
-  color-scheme: light;
-}
-
-.dark {
-  color-scheme: dark;
-}

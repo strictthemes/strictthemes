@@ -6,6 +6,7 @@ order: 3
 checks:
   - Clicking a column header sorts by it and clicking again reverses the order; the sorted column's `<th>` carries `aria-sort` and shows an arrow.
   - Search, the status filter and the depot filter work together, and changing any of them goes back to page 1 and clears the selection.
+  - The depot filter is the theme's `Select`, with no native `<select>` on the page. Its list opens under its trigger in the theme's colors, and the chosen row has a check.
   - The checkbox in the header selects every row on the page, shows a dash when only some are selected, and every checkbox has a name a screen reader can read.
   - Numbers are right-aligned in mono figures with `tabular-nums`, and every state is a dot and a word.
   - An empty result shows a message and a way to clear the filters.
@@ -29,7 +30,7 @@ A panel, twelve columns, with no label heading: a row of controls with `gap-5` t
 
 - A search field with a visible label "Search" and the placeholder "ID, customer or destination", no icon, `w-64`, full width below `md`.
 - The status filter: a visible label "Status" (a `<p>`, since a `<label>` cannot name a group) above a button group with the choices All, In transit, Delivered, Late, Held.
-- The depot filter: a labelled `<select>` "Depot" with All depots and the four depots, in a wrapper with `w-48`.
+- The depot filter: a labelled `Select` "Depot" with All depots and the four depots, in a wrapper with `w-48`.
 - At the right end (`ml-auto`), a "Clear filters" button, `variant="outline"`, disabled while the search is empty and both filters are on All.
 
 ### 4. Table

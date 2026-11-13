@@ -11,24 +11,18 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 
-/* ---------- Shared classes ---------- */
-
-const focusRing =
+const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const labelLink = cn(
-  "text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-const mastheadLink = cn(
-  "font-heading text-h2 text-foreground uppercase decoration-2 underline-offset-4 transition-colors duration-150 hover:underline",
-  focusRing
-)
-const buttonClasses = "h-auto px-4 py-2 font-mono text-label uppercase"
-const label = "font-mono text-label uppercase"
-const sectionHead = "flex items-baseline justify-between gap-4 border-t-2 pt-2"
-const container = "mx-auto max-w-[1280px] px-4 md:px-6"
+const BUTTON = "h-auto px-4 py-2 font-mono text-label uppercase"
+const LABEL = "font-mono text-label uppercase"
+const LABEL_LINK = `${LABEL} text-foreground underline-offset-4 transition-colors duration-150 hover:underline ${FOCUS}`
+const MASTHEAD = `font-heading text-h2 uppercase text-foreground decoration-2 underline-offset-4 transition-colors duration-150 hover:underline ${FOCUS}`
+const SECTION_HEAD = "flex items-baseline justify-between gap-4 border-t-2 pt-2"
+const SECTION_NAME = `${LABEL} text-foreground`
 
-const sections = [
+const PAPER = "The Port Avery Ledger"
+const HOME_CLUB = "Port Avery Harriers"
+const SECTIONS = [
   "News",
   "Politics",
   "City",
@@ -38,32 +32,21 @@ const sections = [
   "Culture",
   "Opinion",
 ]
-const currentSection = "Results"
-
-/* ---------- Sample data ---------- */
+const CURRENT = "Results"
 
 type Competition = "coastal" | "cup" | "women"
+type Filter = "all" | Competition
 
-const competitions: { id: Competition; name: string; short: string }[] = [
+const COMPETITIONS: { id: Competition; name: string; short: string }[] = [
   { id: "coastal", name: "Coastal League", short: "Coastal League" },
   { id: "cup", name: "County Cup", short: "County Cup" },
   { id: "women", name: "Women's Coastal League", short: "Women's League" },
 ]
 
-type Filter = "all" | Competition
-
-const filters: { id: Filter; name: string }[] = [
+const FILTERS: { id: Filter; name: string }[] = [
   { id: "all", name: "All" },
-  { id: "coastal", name: "Coastal League" },
-  { id: "cup", name: "County Cup" },
-  { id: "women", name: "Women's League" },
+  ...COMPETITIONS.map(({ id, short }) => ({ id, name: short })),
 ]
-
-type MatchState =
-  | { kind: "ft" }
-  | { kind: "live"; minute: number }
-  | { kind: "aet" }
-  | { kind: "pens"; winner: "home" | "away"; home: number; away: number }
 
 type Result = {
   id: string
@@ -73,177 +56,199 @@ type Result = {
   away: string
   homeScore: number
   awayScore: number
-  state: MatchState
+  state: "ft" | "aet" | "pens" | "live"
+  minute?: number
+  winner?: "home" | "away"
+  penalties?: string
   scorers?: string
 }
 
-const results: Result[] = [
+const RESULTS: Result[] = [
   {
-    id: "pah-sal",
+    id: "harriers-saltgate",
     competition: "coastal",
     ground: "Harbour Road",
     home: "Port Avery Harriers",
     away: "Saltgate United",
     homeScore: 2,
     awayScore: 1,
-    state: { kind: "ft" },
+    state: "ft",
+    winner: "home",
     scorers: "Okonjo 12', 58' · Brandt 71'",
   },
   {
-    id: "hol-wes",
+    id: "westmere-dunmore",
     competition: "coastal",
-    ground: "The Shingle",
-    home: "Holm Bay",
-    away: "Westmere Athletic",
+    ground: "The Links",
+    home: "Westmere Athletic",
+    away: "Dunmore City",
+    homeScore: 0,
+    awayScore: 0,
+    state: "ft",
+  },
+  {
+    id: "fenwick-brackwater",
+    competition: "coastal",
+    ground: "Tannery Road",
+    home: "Fenwick Albion",
+    away: "Brackwater Town",
+    homeScore: 0,
+    awayScore: 3,
+    state: "ft",
+    winner: "away",
+    scorers: "Varga 9', 44' · Achterberg 80'",
+  },
+  {
+    id: "calloway-holm-bay",
+    competition: "coastal",
+    ground: "Calloway Park",
+    home: "Calloway Rovers",
+    away: "Holm Bay",
     homeScore: 1,
     awayScore: 1,
-    state: { kind: "ft" },
-    scorers: "Dacre 34' · Ferraz 80'",
+    state: "live",
+    minute: 67,
+    scorers: "Teale 23' · Ibsen 61'",
   },
   {
-    id: "cal-fen",
-    competition: "coastal",
-    ground: "Quarry Field",
-    home: "Calloway Rovers",
-    away: "Fenwick Albion",
-    homeScore: 3,
-    awayScore: 0,
-    state: { kind: "ft" },
-    scorers: "Mbeki 9', 77' · Lundqvist 44'",
-  },
-  {
-    id: "dun-bra",
-    competition: "coastal",
-    ground: "Mill Lane",
-    home: "Dunmore City",
-    away: "Brackwater Town",
-    homeScore: 1,
-    awayScore: 2,
-    state: { kind: "live", minute: 67 },
-    scorers: "Rossiter 23', 61' · Hale 40'",
-  },
-  {
-    id: "tar-kes",
+    id: "thornley-marsh-green",
     competition: "cup",
-    ground: "Station Road",
-    home: "Tarrow Vale",
-    away: "Kestle Wanderers",
+    ground: "Vale Road",
+    home: "Thornley Vale",
+    away: "Marsh Green",
     homeScore: 3,
     awayScore: 2,
-    state: { kind: "aet" },
-    scorers: "Quinlan 18', 112' · Arendt 50' · Moyo 55', 88'",
+    state: "aet",
+    winner: "home",
+    scorers: "Pryce 31', 104' · Sorley 77' · Dunne 18', 52'",
   },
   {
-    id: "roo-elm",
+    id: "rookhaven-elmsford",
     competition: "cup",
-    ground: "Abbey Field",
+    ground: "The Rookery",
     home: "Rookhaven",
     away: "Elmsford",
     homeScore: 1,
     awayScore: 1,
-    state: { kind: "pens", winner: "home", home: 4, away: 3 },
-    scorers: "Castell 27' · Ndiaye 63'",
+    state: "pens",
+    winner: "home",
+    penalties: "4–3",
+    scorers: "Maddox 40' · Lindqvist 88'",
   },
 ]
 
 type Standing = {
   club: string
-  w: number
-  d: number
-  l: number
-  gd: number
+  won: number
+  drawn: number
+  lost: number
+  goalDifference: number
 }
 
-// The Coastal League table as it stood before today's games.
-const table: Standing[] = [
-  { club: "Port Avery Harriers", w: 8, d: 2, l: 2, gd: 11 },
-  { club: "Westmere Athletic", w: 7, d: 3, l: 2, gd: 8 },
-  { club: "Saltgate United", w: 6, d: 3, l: 3, gd: 5 },
-  { club: "Dunmore City", w: 5, d: 3, l: 4, gd: 1 },
-  { club: "Calloway Rovers", w: 4, d: 3, l: 5, gd: 0 },
-  { club: "Brackwater Town", w: 4, d: 2, l: 6, gd: -4 },
-  { club: "Fenwick Albion", w: 2, d: 3, l: 7, gd: -9 },
-  { club: "Holm Bay", w: 1, d: 3, l: 8, gd: -12 },
+const STANDINGS: Standing[] = [
+  { club: "Westmere Athletic", won: 8, drawn: 2, lost: 2, goalDifference: 13 },
+  { club: "Port Avery Harriers", won: 7, drawn: 3, lost: 2, goalDifference: 9 },
+  { club: "Saltgate United", won: 6, drawn: 4, lost: 2, goalDifference: 6 },
+  { club: "Dunmore City", won: 5, drawn: 3, lost: 4, goalDifference: 2 },
+  { club: "Calloway Rovers", won: 4, drawn: 4, lost: 4, goalDifference: 0 },
+  { club: "Fenwick Albion", won: 3, drawn: 3, lost: 6, goalDifference: -6 },
+  { club: "Brackwater Town", won: 2, drawn: 3, lost: 7, goalDifference: -10 },
+  { club: "Holm Bay", won: 1, drawn: 2, lost: 9, goalDifference: -14 },
 ]
-const homeClub = "Port Avery Harriers"
+
+const COLUMNS = [
+  { short: "P", title: "Played" },
+  { short: "W", title: "Won" },
+  { short: "D", title: "Drawn" },
+  { short: "L", title: "Lost" },
+  { short: "GD", title: "Goal difference" },
+  { short: "Pts", title: "Points" },
+]
 
 type Fixture = {
   id: string
   competition: Competition
-  date: string
   time: string
   home: string
   away: string
   ground: string
 }
 
-const fixtureDays = [
-  { date: "2026-11-12", label: "Thu 12 Nov" },
-  { date: "2026-11-13", label: "Fri 13 Nov" },
-  { date: "2026-11-14", label: "Sat 14 Nov" },
-  { date: "2026-11-15", label: "Sun 15 Nov" },
+const FIXTURE_DAYS: { date: string; label: string; fixtures: Fixture[] }[] = [
+  {
+    date: "2026-11-12",
+    label: "Thu 12 Nov",
+    fixtures: [
+      {
+        id: "ashby-northmoor",
+        competition: "cup",
+        time: "19:30",
+        home: "Ashby Wharf",
+        away: "Northmoor",
+        ground: "Wharf Lane",
+      },
+      {
+        id: "lindale-castle-heath",
+        competition: "cup",
+        time: "19:45",
+        home: "Lindale Town",
+        away: "Castle Heath",
+        ground: "Lindale Green",
+      },
+    ],
+  },
+  { date: "2026-11-13", label: "Fri 13 Nov", fixtures: [] },
+  {
+    date: "2026-11-14",
+    label: "Sat 14 Nov",
+    fixtures: [
+      {
+        id: "dunmore-fenwick",
+        competition: "coastal",
+        time: "15:00",
+        home: "Dunmore City",
+        away: "Fenwick Albion",
+        ground: "Mill Lane",
+      },
+      {
+        id: "saltgate-westmere",
+        competition: "coastal",
+        time: "17:30",
+        home: "Saltgate United",
+        away: "Westmere Athletic",
+        ground: "Saltgate Lane",
+      },
+    ],
+  },
+  {
+    date: "2026-11-15",
+    label: "Sun 15 Nov",
+    fixtures: [
+      {
+        id: "holm-bay-harriers",
+        competition: "coastal",
+        time: "14:00",
+        home: "Holm Bay",
+        away: "Port Avery Harriers",
+        ground: "Bay View",
+      },
+      {
+        id: "brackwater-calloway",
+        competition: "coastal",
+        time: "16:00",
+        home: "Brackwater Town",
+        away: "Calloway Rovers",
+        ground: "Quay Field",
+      },
+    ],
+  },
 ]
 
-const fixtures: Fixture[] = [
-  {
-    id: "mar-pen",
-    competition: "cup",
-    date: "2026-11-12",
-    time: "19:45",
-    home: "Marlow Heath",
-    away: "Pennick Town",
-    ground: "Heath Lane",
-  },
-  {
-    id: "ash-gre",
-    competition: "cup",
-    date: "2026-11-12",
-    time: "19:45",
-    home: "Ashby Quay",
-    away: "Greystone",
-    ground: "The Quayside",
-  },
-  {
-    id: "dun-fen",
-    competition: "coastal",
-    date: "2026-11-14",
-    time: "15:00",
-    home: "Dunmore City",
-    away: "Fenwick Albion",
-    ground: "Mill Lane",
-  },
-  {
-    id: "sal-hol",
-    competition: "coastal",
-    date: "2026-11-14",
-    time: "15:00",
-    home: "Saltgate United",
-    away: "Holm Bay",
-    ground: "Salt Street",
-  },
-  {
-    id: "wes-pah",
-    competition: "coastal",
-    date: "2026-11-15",
-    time: "13:00",
-    home: "Westmere Athletic",
-    away: "Port Avery Harriers",
-    ground: "Westmere Park",
-  },
-  {
-    id: "bra-cal",
-    competition: "coastal",
-    date: "2026-11-15",
-    time: "15:00",
-    home: "Brackwater Town",
-    away: "Calloway Rovers",
-    ground: "The Marshes",
-  },
-]
+function competitionName(id: Competition) {
+  return COMPETITIONS.find((competition) => competition.id === id)!.name
+}
 
-/* ---------- Helpers ---------- */
-
-function plural(n: number, noun: string) {
+function count(n: number, noun: string) {
   return `${n} ${noun}${n === 1 ? "" : "s"}`
 }
 
@@ -253,472 +258,249 @@ function signed(n: number) {
   return "0"
 }
 
-function ordinal(n: number) {
-  const mod100 = n % 100
-  if (mod100 >= 11 && mod100 <= 13) return `${n}th`
-  return `${n}${["th", "st", "nd", "rd"][n % 10] ?? "th"}`
-}
-
-function pensWinnerLine(r: Result) {
-  if (r.state.kind !== "pens") return ""
-  const winner = r.state.winner === "home" ? r.home : r.away
-  const hi = Math.max(r.state.home, r.state.away)
-  const lo = Math.min(r.state.home, r.state.away)
-  return `${winner} win ${hi}–${lo} on penalties`
-}
-
-function matchLabel(r: Result) {
-  const score = `${r.home} ${r.homeScore}, ${r.away} ${r.awayScore}`
-  switch (r.state.kind) {
-    case "ft":
-      return `${score}, full time`
-    case "live":
-      return `${score}, live, ${ordinal(r.state.minute)} minute`
-    case "aet":
-      return `${score}, after extra time`
-    case "pens":
-      return `${score}, ${pensWinnerLine(r)}`
+function matchLabel(match: Result) {
+  const score = `${match.home} ${match.homeScore}, ${match.away} ${match.awayScore}`
+  if (match.state === "live") return `${score}, live, ${match.minute}th minute`
+  if (match.state === "aet") return `${score}, after extra time`
+  if (match.state === "pens") {
+    const winner = match.winner === "home" ? match.home : match.away
+    return `${score}, ${winner} win ${match.penalties} on penalties`
   }
+  return `${score}, full time`
 }
-
-function winnerOf(r: Result): "home" | "away" | null {
-  if (r.state.kind === "live") return null
-  if (r.state.kind === "pens") return r.state.winner
-  if (r.homeScore > r.awayScore) return "home"
-  if (r.awayScore > r.homeScore) return "away"
-  return null
-}
-
-/* ---------- Header ---------- */
-
-function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuButton = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    function onKeyDown(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setMenuOpen(false)
-        menuButton.current?.focus()
-      }
-    }
-    document.addEventListener("keydown", onKeyDown)
-    return () => document.removeEventListener("keydown", onKeyDown)
-  }, [menuOpen])
-
-  return (
-    <header>
-      <div className={container}>
-        <div className="flex items-center justify-between gap-4 py-2">
-          <p className={cn(label, "text-muted-foreground")}>
-            <time dateTime="2026-11-11" className="font-mono tabular-nums">
-              Wednesday 11 November 2026
-            </time>
-          </p>
-          <a href="#" className={cn(buttonVariants(), buttonClasses)}>
-            Subscribe
-          </a>
-        </div>
-
-        <div className="flex items-center justify-between gap-4 border-t-2 py-4">
-          <a href="/" className={mastheadLink}>
-            The Port Avery Ledger
-          </a>
-          <Button
-            ref={menuButton}
-            variant="outline"
-            className={cn(buttonClasses, "md:hidden")}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-sections"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            Menu
-          </Button>
-        </div>
-
-        <nav
-          id="mobile-sections"
-          aria-label="Sections"
-          hidden={!menuOpen}
-          className="border-b py-2 md:hidden"
-        >
-          <ul className={label}>
-            {sections.map((name) => (
-              <li key={name}>
-                <SectionLink name={name} className="block py-2" />
-              </li>
-            ))}
-          </ul>
-        </nav>
-
-        <nav aria-label="Sections" className="hidden border-y py-2 md:block">
-          <ul className={cn("flex flex-wrap gap-x-6 gap-y-2", label)}>
-            {sections.map((name) => (
-              <li key={name}>
-                <SectionLink name={name} />
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-    </header>
-  )
-}
-
-function SectionLink({
-  name,
-  className,
-}: {
-  name: string
-  className?: string
-}) {
-  const current = name === currentSection
-  return (
-    <a
-      href="#"
-      aria-current={current ? "page" : undefined}
-      className={cn(
-        labelLink,
-        current && "underline decoration-2 underline-offset-4",
-        className
-      )}
-    >
-      {name}
-    </a>
-  )
-}
-
-/* ---------- Page parts ---------- */
 
 function LiveMarker() {
   return (
     <span className="inline-flex items-center gap-2 font-mono text-label text-primary uppercase">
       <span
-        aria-hidden="true"
         className="size-2 shrink-0 rounded-full bg-primary"
+        aria-hidden="true"
       />
       Live
     </span>
   )
 }
 
-function MatchStateLabel({ state }: { state: MatchState }) {
-  if (state.kind === "live") {
-    return (
-      <span className="flex items-center gap-2">
-        <LiveMarker />
-        <span className={cn(label, "text-primary tabular-nums")}>
-          {state.minute}'
-        </span>
-      </span>
-    )
-  }
-  const text = state.kind === "ft" ? "FT" : state.kind === "aet" ? "AET" : "PENS"
-  return <span className="text-foreground">{text}</span>
-}
-
-function ScoreBox({ result }: { result: Result }) {
-  const winner = winnerOf(result)
-  const rows = [
-    { side: "home" as const, name: result.home, score: result.homeScore },
-    { side: "away" as const, name: result.away, score: result.awayScore },
+function ScoreBox({ match }: { match: Result }) {
+  const finished = match.state !== "live"
+  const sides = [
+    { side: "home", name: match.home, score: match.homeScore },
+    { side: "away", name: match.away, score: match.awayScore },
   ]
+
   return (
     <article
-      aria-label={matchLabel(result)}
+      aria-label={matchLabel(match)}
       className="flex flex-col gap-2 border bg-card p-4 md:p-6"
     >
-      <div
-        className={cn(label, "flex items-center justify-between gap-4")}
-      >
-        <span className="text-muted-foreground">{result.ground}</span>
-        <MatchStateLabel state={result.state} />
-      </div>
-      {rows.map((row) => (
-        <div
-          key={row.side}
-          className="flex items-baseline justify-between gap-4"
-        >
-          <span className={cn("text-body", winner === row.side && "font-bold")}>
-            {row.name}
+      <p className={`flex items-center justify-between gap-4 ${LABEL}`}>
+        <span className="text-muted-foreground">{match.ground}</span>
+        {match.state === "live" ? (
+          <span className="inline-flex items-center gap-2">
+            <LiveMarker />
+            <span className="text-primary tabular-nums">{match.minute}'</span>
           </span>
-          <span className="font-mono text-h2 tabular-nums">{row.score}</span>
-        </div>
+        ) : (
+          <span className="text-foreground">
+            {match.state === "ft"
+              ? "FT"
+              : match.state === "aet"
+                ? "AET"
+                : "PENS"}
+          </span>
+        )}
+      </p>
+      {sides.map(({ side, name, score }) => (
+        <p key={side} className="flex items-baseline justify-between gap-4">
+          <span
+            className={
+              finished && match.winner === side
+                ? "text-body font-bold"
+                : "text-body"
+            }
+          >
+            {name}
+          </span>
+          <span className="font-mono text-h2 tabular-nums">{score}</span>
+        </p>
       ))}
-      {result.state.kind === "pens" && (
-        <p className={cn(label, "text-muted-foreground tabular-nums")}>
-          {pensWinnerLine(result)}
+      {match.state === "pens" && (
+        <p className={`${LABEL} text-muted-foreground tabular-nums`}>
+          {match.winner === "home" ? match.home : match.away} win{" "}
+          {match.penalties} on penalties
         </p>
       )}
-      {result.scorers && (
-        <p className={cn(label, "text-muted-foreground tabular-nums")}>
-          {result.scorers}
+      {match.scorers && (
+        <p className={`${LABEL} text-muted-foreground tabular-nums`}>
+          {match.scorers}
         </p>
       )}
     </article>
   )
 }
 
-function TodaysResults({ filter }: { filter: Filter }) {
-  const groups = competitions
-    .filter((c) => filter === "all" || c.id === filter)
-    .map((c) => ({
-      competition: c,
-      results: results.filter((r) => r.competition === c.id),
-    }))
-    .filter((g) => g.results.length > 0)
-
-  const chosen = competitions.find((c) => c.id === filter)
-
-  return (
-    <section className="flex flex-col gap-4">
-      <div className={sectionHead}>
-        <h2 className="font-mono text-label text-foreground uppercase">
-          Today's results
-        </h2>
-      </div>
-      {groups.length === 0 && chosen ? (
-        <p className="max-w-xl text-body">
-          No {chosen.short} matches today.
-        </p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          {groups.map((g) => (
-            <div key={g.competition.id} className="flex flex-col gap-2">
-              <h3 className="font-mono text-label text-foreground uppercase">
-                {g.competition.name}
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {g.results.map((r) => (
-                  <ScoreBox key={r.id} result={r} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  )
+function SectionLinks({
+  current,
+  itemClassName,
+}: {
+  current?: string
+  itemClassName?: string
+}) {
+  return SECTIONS.map((section) => (
+    <li key={section}>
+      <a
+        href="#"
+        aria-current={section === current ? "page" : undefined}
+        className={cn(
+          LABEL_LINK,
+          section === current && "underline decoration-2",
+          itemClassName
+        )}
+      >
+        {section}
+      </a>
+    </li>
+  ))
 }
-
-const headCell = "font-mono text-label text-muted-foreground uppercase"
-const numberCell = "text-right font-mono tabular-nums"
-
-function LeagueTable({ filter }: { filter: Filter }) {
-  const notFiltered = filter !== "all" && filter !== "coastal"
-  return (
-    <section className="flex flex-col gap-4">
-      <div className={sectionHead}>
-        <h2 className="font-mono text-label text-foreground uppercase">
-          Coastal League table
-        </h2>
-      </div>
-      <Table label="Coastal League table" className="min-w-lg text-body">
-        <TableHeader>
-          <TableRow>
-            <TableHead className={headCell}>
-              <abbr title="Position">Pos</abbr>
-            </TableHead>
-            <TableHead className={headCell}>Club</TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Played">P</abbr>
-            </TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Won">W</abbr>
-            </TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Drawn">D</abbr>
-            </TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Lost">L</abbr>
-            </TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Goal difference">GD</abbr>
-            </TableHead>
-            <TableHead className={cn(headCell, "text-right")}>
-              <abbr title="Points">Pts</abbr>
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {table.map((row, index) => (
-            <TableRow key={row.club}>
-              <TableCell className="font-mono tabular-nums">
-                {index + 1}
-              </TableCell>
-              <TableCell className={cn(row.club === homeClub && "font-bold")}>
-                {row.club}
-              </TableCell>
-              <TableCell className={numberCell}>
-                {row.w + row.d + row.l}
-              </TableCell>
-              <TableCell className={numberCell}>{row.w}</TableCell>
-              <TableCell className={numberCell}>{row.d}</TableCell>
-              <TableCell className={numberCell}>{row.l}</TableCell>
-              <TableCell className={numberCell}>{signed(row.gd)}</TableCell>
-              <TableCell className={cn(numberCell, "font-bold")}>
-                {3 * row.w + row.d}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <p className={cn(label, "text-muted-foreground tabular-nums")}>
-        Top two go up · After 12 games{notFiltered && " · Not filtered"}
-      </p>
-    </section>
-  )
-}
-
-function Fixtures({ filter }: { filter: Filter }) {
-  const days = fixtureDays
-    .map((day) => ({
-      ...day,
-      fixtures: fixtures.filter(
-        (f) =>
-          f.date === day.date && (filter === "all" || f.competition === filter)
-      ),
-    }))
-    .filter((day) => day.fixtures.length > 0)
-
-  return (
-    <section className="flex flex-col gap-4">
-      <div className={sectionHead}>
-        <h2 className="font-mono text-label text-foreground uppercase">
-          Fixtures
-        </h2>
-      </div>
-      {days.length === 0 ? (
-        <p className="max-w-xl text-body">No fixtures in the next four days.</p>
-      ) : (
-        <div className="flex flex-col gap-6">
-          {days.map((day) => (
-            <div key={day.date} className="flex flex-col gap-2">
-              <h3 className="font-mono text-label text-foreground uppercase">
-                <time dateTime={day.date} className="font-mono tabular-nums">
-                  {day.label}
-                </time>
-              </h3>
-              <ul className="flex flex-col gap-4">
-                {day.fixtures.map((f, index) => (
-                  <li
-                    key={f.id}
-                    className={cn(
-                      "flex flex-col gap-1",
-                      index > 0 && "border-t pt-4"
-                    )}
-                  >
-                    <p className="text-body">
-                      {f.home} v {f.away}
-                    </p>
-                    <p className={cn(label, "text-muted-foreground")}>
-                      <time
-                        dateTime={`${f.date}T${f.time}`}
-                        className="font-mono tabular-nums"
-                      >
-                        {f.time}
-                      </time>
-                      {" · "}
-                      {competitions.find((c) => c.id === f.competition)?.name}
-                      {" · "}
-                      {f.ground}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  )
-}
-
-function SiteFooter() {
-  return (
-    <footer>
-      <div className={cn(container, "flex flex-col gap-4 border-t-2 py-6")}>
-        <a href="/" className={cn(mastheadLink, "self-start")}>
-          The Port Avery Ledger
-        </a>
-        <nav aria-label="Footer">
-          <ul className={cn("flex flex-wrap gap-x-6 gap-y-2", label)}>
-            {sections.map((name) => (
-              <li key={name}>
-                <a href="#" className={labelLink}>
-                  {name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <p className={cn(label, "text-muted-foreground tabular-nums")}>
-          © 2026 The Port Avery Ledger · Port Avery
-        </p>
-      </div>
-    </footer>
-  )
-}
-
-/* ---------- Page ---------- */
 
 export function App() {
   const [filter, setFilter] = useState<Filter>("all")
   const [status, setStatus] = useState("")
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
-  function choose(next: Filter) {
+  useEffect(() => {
+    if (!menuOpen) return undefined
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false)
+        menuButton.current?.focus()
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown)
+    return () => document.removeEventListener("keydown", onKeyDown)
+  }, [menuOpen])
+
+  const shows = (competition: Competition) =>
+    filter === "all" || filter === competition
+
+  const resultGroups = COMPETITIONS.map((competition) => ({
+    ...competition,
+    matches: RESULTS.filter(
+      (match) =>
+        match.competition === competition.id && shows(match.competition)
+    ),
+  })).filter((group) => group.matches.length > 0)
+
+  const fixtureDays = FIXTURE_DAYS.map((day) => ({
+    ...day,
+    fixtures: day.fixtures.filter((fixture) => shows(fixture.competition)),
+  })).filter((day) => day.fixtures.length > 0)
+
+  function choose(next: Filter, name: string) {
     if (next === filter) return
+
+    const results = RESULTS.filter(
+      (match) => next === "all" || match.competition === next
+    ).length
+    const fixtures = FIXTURE_DAYS.flatMap((day) => day.fixtures).filter(
+      (fixture) => next === "all" || fixture.competition === next
+    ).length
+
     setFilter(next)
-    const resultCount = results.filter(
-      (r) => next === "all" || r.competition === next
-    ).length
-    const fixtureCount = fixtures.filter(
-      (f) => next === "all" || f.competition === next
-    ).length
-    const name = filters.find((f) => f.id === next)?.name ?? ""
     setStatus(
-      `${name}: ${plural(resultCount, "result")}, ${plural(fixtureCount, "fixture")}.`
+      `${name}: ${count(results, "result")}, ${count(fixtures, "fixture")}.`
     )
   }
 
+  const chosenShort =
+    filter === "all"
+      ? ""
+      : COMPETITIONS.find((competition) => competition.id === filter)!.short
+
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <SiteHeader />
+      <header>
+        <div className="mx-auto max-w-[1280px] px-4 md:px-6">
+          <div className="flex items-center justify-between gap-4 py-2">
+            <time
+              dateTime="2026-11-11"
+              className={`${LABEL} text-muted-foreground tabular-nums`}
+            >
+              Wednesday 11 November 2026
+            </time>
+            <a
+              href="#"
+              className={cn(buttonVariants({ variant: "default" }), BUTTON)}
+            >
+              Subscribe
+            </a>
+          </div>
+          <div className="flex items-center justify-between gap-4 border-t-2 py-4">
+            <a href="/" className={MASTHEAD}>
+              {PAPER}
+            </a>
+            <Button
+              ref={menuButton}
+              variant="outline"
+              className={`${BUTTON} md:hidden`}
+              aria-expanded={menuOpen}
+              aria-controls="section-menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              Menu
+            </Button>
+          </div>
+          <nav
+            id="section-menu"
+            aria-label="Sections"
+            hidden={!menuOpen}
+            className="border-b py-2 md:hidden"
+          >
+            <ul>
+              <SectionLinks current={CURRENT} itemClassName="block py-2" />
+            </ul>
+          </nav>
+          <nav aria-label="Sections" className="hidden border-y py-2 md:block">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <SectionLinks current={CURRENT} />
+            </ul>
+          </nav>
+        </div>
+      </header>
+
       <main>
-        <div className={cn(container, "flex flex-col gap-12 pt-6 pb-12")}>
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-12 px-4 pt-6 pb-12 md:px-6">
           <div className="flex flex-col gap-4">
-            <div className={sectionHead}>
-              <p className="font-mono text-label text-foreground uppercase">
-                Sport
-              </p>
+            <div className={SECTION_HEAD}>
+              <p className={SECTION_NAME}>Sport</p>
             </div>
             <h1 className="text-h1 uppercase md:text-display">Results</h1>
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <p className={cn(label, "text-muted-foreground")}>
-                <time dateTime="2026-11-11" className="font-mono tabular-nums">
-                  Wednesday 11 November 2026
-                </time>
-              </p>
+              <time
+                dateTime="2026-11-11"
+                className={`${LABEL} text-muted-foreground tabular-nums`}
+              >
+                Wednesday 11 November 2026
+              </time>
               <div
                 role="group"
                 aria-label="Competition"
                 className="flex flex-wrap gap-1"
               >
-                {filters.map((f) => {
-                  const pressed = f.id === filter
-                  return (
-                    <Button
-                      key={f.id}
-                      variant={pressed ? "secondary" : "outline"}
-                      aria-pressed={pressed}
-                      className={buttonClasses}
-                      onClick={() => choose(f.id)}
-                    >
-                      {f.name}
-                    </Button>
-                  )
-                })}
+                {FILTERS.map(({ id, name }) => (
+                  <Button
+                    key={id}
+                    variant={filter === id ? "secondary" : "outline"}
+                    aria-pressed={filter === id}
+                    className={BUTTON}
+                    onClick={() => choose(id, name)}
+                  >
+                    {name}
+                  </Button>
+                ))}
               </div>
             </div>
             <p role="status" className="sr-only">
@@ -726,19 +508,188 @@ export function App() {
             </p>
           </div>
 
-          <TodaysResults filter={filter} />
+          <section
+            aria-labelledby="results-heading"
+            className="flex flex-col gap-4"
+          >
+            <div className={SECTION_HEAD}>
+              <h2 id="results-heading" className={SECTION_NAME}>
+                Today's results
+              </h2>
+            </div>
+            {resultGroups.length > 0 ? (
+              <div className="flex flex-col gap-6">
+                {resultGroups.map((group) => (
+                  <div key={group.id} className="flex flex-col gap-2">
+                    <h3 className={SECTION_NAME}>{group.name}</h3>
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {group.matches.map((match) => (
+                        <ScoreBox key={match.id} match={match} />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-body">
+                {chosenShort
+                  ? `No ${chosenShort} matches today.`
+                  : "No matches today."}
+              </p>
+            )}
+          </section>
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-0">
-            <div className="min-w-0 lg:col-span-8 lg:pr-6">
-              <LeagueTable filter={filter} />
-            </div>
-            <div className="lg:col-span-4 lg:border-l lg:pl-6">
-              <Fixtures filter={filter} />
-            </div>
+            <section
+              aria-labelledby="table-heading"
+              className="flex min-w-0 flex-col gap-4 lg:col-span-8 lg:pr-6"
+            >
+              <div className={SECTION_HEAD}>
+                <h2 id="table-heading" className={SECTION_NAME}>
+                  Coastal League table
+                </h2>
+              </div>
+              <Table
+                label="Coastal League table"
+                className="min-w-lg text-body"
+              >
+                <TableHeader>
+                  <TableRow>
+                    <TableHead
+                      className={`${LABEL} text-muted-foreground`}
+                      scope="col"
+                    >
+                      <abbr title="Position">Pos</abbr>
+                    </TableHead>
+                    <TableHead
+                      className={`${LABEL} text-muted-foreground`}
+                      scope="col"
+                    >
+                      Club
+                    </TableHead>
+                    {COLUMNS.map(({ short, title }) => (
+                      <TableHead
+                        key={short}
+                        className={`${LABEL} text-right text-muted-foreground`}
+                        scope="col"
+                      >
+                        <abbr title={title}>{short}</abbr>
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {STANDINGS.map((row, index) => (
+                    <TableRow key={row.club}>
+                      <TableCell className="font-mono tabular-nums">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell
+                        className={
+                          row.club === HOME_CLUB ? "font-bold" : undefined
+                        }
+                      >
+                        {row.club}
+                      </TableCell>
+                      {[
+                        row.won + row.drawn + row.lost,
+                        row.won,
+                        row.drawn,
+                        row.lost,
+                        signed(row.goalDifference),
+                      ].map((value, column) => (
+                        <TableCell
+                          key={COLUMNS[column].short}
+                          className="text-right font-mono tabular-nums"
+                        >
+                          {value}
+                        </TableCell>
+                      ))}
+                      <TableCell className="text-right font-mono font-bold tabular-nums">
+                        {row.won * 3 + row.drawn}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <p className={`${LABEL} text-muted-foreground tabular-nums`}>
+                Top two go up · After 12 games
+                {filter !== "all" && " · Not filtered"}
+              </p>
+            </section>
+
+            <section
+              aria-labelledby="fixtures-heading"
+              className="flex flex-col gap-4 lg:col-span-4 lg:border-l lg:pl-6"
+            >
+              <div className={SECTION_HEAD}>
+                <h2 id="fixtures-heading" className={SECTION_NAME}>
+                  Fixtures
+                </h2>
+              </div>
+              {fixtureDays.length > 0 ? (
+                <div className="flex flex-col gap-6">
+                  {fixtureDays.map((day) => (
+                    <div key={day.date} className="flex flex-col gap-2">
+                      <h3 className={SECTION_NAME}>
+                        <time dateTime={day.date} className="tabular-nums">
+                          {day.label}
+                        </time>
+                      </h3>
+                      <ul className="flex flex-col gap-4">
+                        {day.fixtures.map((fixture, index) => (
+                          <li
+                            key={fixture.id}
+                            className={
+                              index > 0
+                                ? "flex flex-col gap-1 border-t pt-4"
+                                : "flex flex-col gap-1"
+                            }
+                          >
+                            <p className="text-body">
+                              {fixture.home} v {fixture.away}
+                            </p>
+                            <p className={`${LABEL} text-muted-foreground`}>
+                              <time
+                                dateTime={`${day.date}T${fixture.time}`}
+                                className="tabular-nums"
+                              >
+                                {fixture.time}
+                              </time>
+                              {" · "}
+                              {competitionName(fixture.competition)}
+                              {" · "}
+                              {fixture.ground}
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-body">No fixtures in the next four days.</p>
+              )}
+            </section>
           </div>
         </div>
       </main>
-      <SiteFooter />
+
+      <footer>
+        <div className="mx-auto flex max-w-[1280px] flex-col gap-4 border-t-2 px-4 py-6 md:px-6">
+          <a href="/" className={`${MASTHEAD} self-start`}>
+            {PAPER}
+          </a>
+          <nav aria-label="Footer">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              <SectionLinks />
+            </ul>
+          </nav>
+          <p className={`${LABEL} text-muted-foreground tabular-nums`}>
+            © 2026 {PAPER} · Port Avery
+          </p>
+        </div>
+      </footer>
     </div>
   )
 }

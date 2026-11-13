@@ -7,6 +7,7 @@ checks:
   - The opening hours are a table with real `<th>` cells, and today's row says "Today" in words, not only with a color.
   - The map is drawn from plain elements with `role="img"` and an `aria-label`, and a paragraph next to it gives the same directions in words.
   - The address is an `<address>` element, set upright, with the phone number and email address as links.
+  - 'The subject of the message is the theme''s `Select`, with no native `<select>` on the page: its list opens under its trigger in the theme''s colors, the chosen row has a check, and the arrow keys, Enter and Escape work in it.'
   - Every field of the contact form has a visible label, each empty or wrong field gets its own message in words with an icon, and a good message replaces the form with a confirmation that a screen reader announces.
   - At 375px the hours table and the map fit the screen without the page scrolling sideways.
 ---
@@ -30,7 +31,7 @@ A section with `mt-18`, as a grid (`grid gap-6 md:grid-cols-12 md:items-start`):
 - In columns 1–4: an `<h2>` "Address", then with `mt-4` an `<address className="not-italic">` with three block lines in `text-body`: `14 Mill Lane`, `Ashby Wold`, `AW3 7LN`. With `mt-4` the phone number and with `mt-2` the email address, each a link in running text in its own `<p>` inside the `<address>`, the `<p>` carrying the margin: `tel:+441632960418` and `mailto:hello@lindenroom.example`.
 - In columns 6–12: an `<h2>` "Opening hours", then with `mt-6` the hours table.
 
-**Hours table.** The shadcn `Table` as the layout notes describe (add it, with the form's fields, by `npx shadcn@latest add table input textarea` if missing), with `label="Opening hours"`, seven rows from Monday to Sunday and three columns: Day, Room, Kitchen. Header cells have `scope="col"`; the day in each row is a `TableHead` with `scope="row"`, given `h-auto`, the body cells' classes and `font-sans text-body font-normal text-foreground text-left` in place of the header look. The Room and Kitchen cells are labels in `text-foreground` with `tabular-nums`, each time in a `<time>`: `9:00–17:00`, `11:30–14:30`. Monday reads `Closed` in both, as a word.
+**Hours table.** The shadcn `Table` as the layout notes describe (add it, with the form's fields, by `npx shadcn@latest add table input textarea select` if missing), with `label="Opening hours"`, seven rows from Monday to Sunday and three columns: Day, Room, Kitchen. Header cells have `scope="col"`; the day in each row is a `TableHead` with `scope="row"`, given `h-auto`, the body cells' classes and `font-sans text-body font-normal text-foreground text-left` in place of the header look. The Room and Kitchen cells are labels in `text-foreground` with `tabular-nums`, each time in a `<time>`: `9:00–17:00`, `11:30–14:30`. Monday reads `Closed` in both, as a word.
 
 Today's row gets `aria-current="date"`, and its day cell holds, under the day's name, the word `Today` as a `<span>` with `block font-mono text-label text-primary` and no margin. No fill, no bold. Take today from the visitor's clock.
 
@@ -65,7 +66,7 @@ A section with `mt-18` and the `id` `contact`, in columns 1–7 of a grid: an `<
 
 - "Your name": an `Input` with `autoComplete="name"`.
 - "Email address": an `Input` of type `email` with `autoComplete="email"`.
-- "About": a native `<select>` styled as the layout notes describe, with the empty choice "Choose a subject", then "A booking", "Buying tea", "Access", "Something else".
+- "About": a `Select` as the layout notes describe, with the placeholder "Choose a subject" and the items "A booking", "Buying tea", "Access", "Something else".
 - "Message": a `Textarea` with `min-h-48`.
 
 Then, in the notes' `<div>` with `mt-6`, the page's one default button, `type="submit"`: "Send message".

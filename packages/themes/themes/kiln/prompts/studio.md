@@ -9,6 +9,7 @@ checks:
   - The opening hours are a description list (`<dl>`) with a `<time>` for every time, and the address is an `<address>` that is not italic.
   - Each empty or wrong field of the contact form gets its own message in words with an icon, focus goes to the first of them, and a good message is replaced by a confirmation that takes focus.
   - The "Send message" button is the page's only terracotta button.
+  - '"What it is about" is the theme''s `Select`, with no native `<select>` on the page: its trigger is as tall as the inputs above it and its text starts on their line, its list opens under it as ruled rows in the theme''s colors, and the chosen row has a check.'
 ---
 
 Sample content, if the user gave none: "Whitlow Pottery", a stoneware studio at Unit 3, Coldharbour Yard, Bramwick BW4 2LT, in a dairy that closed in 1994. Nell Varga and Tomas Reid started it in 2019 with one wheel and a borrowed electric kiln; in 2021 they built a gas kiln in the yard. Ines Okafor joined in 2024 to pack orders and teach the Saturday class. The studio is open Thursday to Saturday, 10:00 to 16:00, and closed from 24 December to 2 January. Write the rest of the copy yourself, plain and specific.
@@ -55,7 +56,7 @@ A section with the `id` `contact`, a 12-column grid. Columns 1–7: the `<h2>` "
 
 - "Your name": an `Input` with `autoComplete="name"`.
 - "Email address": an `Input` of type `email` with `autoComplete="email"`.
-- "What it is about": a native `<select>` as the Selects note says, starting on an empty "Choose one" option, then A commission, An order, The Saturday class and Something else.
+- "What it is about": a `Select` as the Selects note says, with nothing chosen to start and the prompt "Choose one", and four choices: A commission, An order, The Saturday class and Something else.
 - "Message": a `Textarea` with `min-h-40`.
 - The default button "Send message", `type="submit"`. It is the page's one terracotta button.
 

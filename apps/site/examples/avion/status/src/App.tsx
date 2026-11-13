@@ -1,19 +1,26 @@
-import { useRef, useState, type FormEvent, type MouseEvent } from "react"
-import { Check, CircleAlert } from "lucide-react"
+import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from "react"
+import { CircleAlert, CircleCheck } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
-type Tone = "good" | "caution" | "neutral" | "bad"
 type Day = "up" | "slow" | "down"
+type Tone = "success" | "caution" | "failed" | "neutral"
+
+const focusRing =
+  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+const label = "font-mono text-label uppercase text-muted-foreground"
+const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const panel = "rounded-xl border bg-card"
+const headingRow = "flex min-h-7 flex-wrap items-center justify-between gap-3"
 
 const dotTone: Record<Tone, string> = {
-  good: "bg-success",
+  success: "bg-success",
   caution: "bg-tertiary",
+  failed: "bg-destructive",
   neutral: "bg-muted-foreground",
-  bad: "bg-destructive",
 }
 
 const dayTone: Record<Day, string> = {
@@ -21,14 +28,6 @@ const dayTone: Record<Day, string> = {
   slow: "bg-tertiary",
   down: "bg-destructive",
 }
-
-const label = "font-mono text-label uppercase"
-const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
-const focusRing =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const panel = "rounded-xl border bg-card p-5"
-const headingRow = "flex min-h-7 flex-wrap items-center justify-between gap-3"
-const panelHeading = "font-mono text-label uppercase text-muted-foreground"
 
 function State({ tone, children }: { tone: Tone; children: string }) {
   return (
@@ -42,106 +41,157 @@ function State({ tone, children }: { tone: Tone; children: string }) {
   )
 }
 
-function plural(count: number, noun: string) {
-  return `${count} ${noun}${count === 1 ? "" : "s"}`
+/** 30 days, oldest first; the last one is today. */
+function days(marks: Record<number, Day> = {}): Day[] {
+  return Array.from({ length: 30 }, (_, i) => marks[i] ?? "up")
 }
 
-// Day 1 is 13 Oct, day 30 is today, 11 Nov.
-function days(marks: Record<number, Day>): Day[] {
-  return Array.from({ length: 30 }, (_, i) => marks[i + 1] ?? "up")
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`
+
+type System = {
+  name: string
+  degraded: boolean
+  uptime: string
+  history: Day[]
 }
 
-const systems = [
-  { name: "Tracking site", uptime: "100%", days: days({}) },
-  { name: "Booking API", uptime: "99.91%", days: days({ 12: "down" }) },
+// Index 29 is 13 Nov (today), 22 is 6 Nov, 17 is 1 Nov, 10 is 25 Oct.
+const systems: System[] = [
+  {
+    name: "Tracking site",
+    degraded: false,
+    uptime: "99.91%",
+    history: days({ 17: "down" }),
+  },
+  {
+    name: "Booking API",
+    degraded: false,
+    uptime: "100.00%",
+    history: days({ 22: "slow" }),
+  },
   {
     name: "Label printing",
-    uptime: "99.80%",
-    days: days({ 29: "slow", 30: "slow" }),
+    degraded: true,
+    uptime: "100.00%",
+    history: days({ 29: "slow" }),
   },
-  { name: "Email notices", uptime: "99.95%", days: days({ 20: "slow" }) },
-  { name: "Customer dashboard", uptime: "100%", days: days({}) },
-  { name: "Webhooks", uptime: "100%", days: days({}) },
+  {
+    name: "Email notices",
+    degraded: false,
+    uptime: "100.00%",
+    history: days({ 10: "slow" }),
+  },
+  {
+    name: "Customer dashboard",
+    degraded: false,
+    uptime: "100.00%",
+    history: days(),
+  },
+  {
+    name: "Webhooks",
+    degraded: false,
+    uptime: "100.00%",
+    history: days(),
+  },
 ]
 
-function summary(list: Day[]) {
-  const slow = list.filter((d) => d === "slow").length
-  const down = list.filter((d) => d === "down").length
+function summary(history: Day[]) {
+  const slow = history.filter((d) => d === "slow").length
+  const down = history.filter((d) => d === "down").length
   return { slow, down }
 }
 
-const incidents = [
+type Update = { kind: string; time: string; dateTime: string; text: string }
+type Incident = {
+  title: string
+  date: string
+  dateTime: string
+  duration: string
+  updates: Update[]
+}
+
+const incidents: Incident[] = [
   {
-    title: "Email notices delayed",
-    date: "2026-11-01",
-    dateText: "1 Nov",
-    duration: "1 h 25 min",
+    title: "Booking API slow to confirm bookings",
+    date: "6 Nov",
+    dateTime: "2026-11-06",
+    duration: "1 h 12 min",
     updates: [
       {
         kind: "Resolved",
-        time: "09:45",
-        text: "The queue is empty and new notices go out within a minute. Every delayed notice has been sent.",
+        time: "10:54",
+        dateTime: "2026-11-06T10:54Z",
+        text: "Booking confirmations are back under one second. No bookings were lost.",
+      },
+      {
+        kind: "Monitoring",
+        time: "10:31",
+        dateTime: "2026-11-06T10:31Z",
+        text: "We added capacity to the booking queue. Response times are falling and we are watching them.",
       },
       {
         kind: "Identified",
-        time: "08:50",
-        text: "Our mail provider limited how fast we could send. We have raised the limit with them.",
+        time: "10:05",
+        dateTime: "2026-11-06T10:05Z",
+        text: "A surge of bulk bookings from one integration filled the queue. Single bookings were waiting behind it.",
       },
       {
         kind: "Investigating",
-        time: "08:20",
-        text: "Delivery and pickup notices are reaching customers up to 40 minutes late.",
+        time: "09:42",
+        dateTime: "2026-11-06T09:42Z",
+        text: "Some bookings take up to 20 seconds to confirm. We are looking into it.",
       },
     ],
   },
   {
-    title: "Booking API returned errors",
-    date: "2026-10-24",
-    dateText: "24 Oct",
+    title: "Tracking site unavailable",
+    date: "1 Nov",
+    dateTime: "2026-11-01",
     duration: "38 min",
     updates: [
       {
         kind: "Resolved",
-        time: "10:52",
-        text: "Bookings are going through again. Requests that failed during the outage can be sent again as they were.",
-      },
-      {
-        kind: "Monitoring",
-        time: "10:40",
-        text: "We moved traffic to the standby database. Error rates are back to normal and we are watching them.",
+        time: "07:26",
+        dateTime: "2026-11-01T07:26Z",
+        text: "The tracking site is working again for all parcels.",
       },
       {
         kind: "Identified",
-        time: "10:25",
-        text: "The main booking database stopped accepting new connections after a storage alert.",
+        time: "07:04",
+        dateTime: "2026-11-01T07:04Z",
+        text: "An expired certificate on the tracking site's load balancer blocked every request. We are replacing it.",
       },
       {
         kind: "Investigating",
-        time: "10:14",
-        text: "Some calls to the booking API return a 503 error. We are looking into it.",
+        time: "06:48",
+        dateTime: "2026-11-01T06:48Z",
+        text: "The tracking site shows an error page. Parcels are still moving and the booking API is not affected.",
       },
     ],
   },
   {
-    title: "Tracking pages slow to load",
-    date: "2026-10-08",
-    dateText: "8 Oct",
-    duration: "52 min",
+    title: "Delivery emails sent late",
+    date: "25 Oct",
+    dateTime: "2026-10-25",
+    duration: "2 h 5 min",
     updates: [
       {
         kind: "Resolved",
-        time: "16:32",
-        text: "Tracking pages load in under a second again.",
+        time: "16:20",
+        dateTime: "2026-10-25T16:20Z",
+        text: "All delayed emails have been sent and new ones go out within a minute.",
       },
       {
         kind: "Monitoring",
-        time: "16:05",
-        text: "We rolled back this afternoon's release of the tracking site. Load times are falling.",
+        time: "15:10",
+        dateTime: "2026-10-25T15:10Z",
+        text: "Our mail provider has lifted the limit. The backlog of about 40,000 emails is clearing.",
       },
       {
         kind: "Investigating",
-        time: "15:40",
-        text: "Tracking pages take up to 20 seconds to load. Parcel scans are still recorded as usual.",
+        time: "14:15",
+        dateTime: "2026-10-25T14:15Z",
+        text: "Out for delivery emails are arriving up to an hour late. Tracking pages show the right status.",
       },
     ],
   },
@@ -153,40 +203,50 @@ export function App() {
   const [email, setEmail] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [subscribed, setSubscribed] = useState(false)
-  const emailRef = useRef<HTMLInputElement>(null)
-  const statusRef = useRef<HTMLDivElement>(null)
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const panelRef = useRef<HTMLElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const statusRef = useRef<HTMLDivElement>(null)
+  const justSubscribed = useRef(false)
+
+  useEffect(() => {
+    if (subscribed && justSubscribed.current) {
+      justSubscribed.current = false
+      statusRef.current?.focus()
+    }
+  }, [subscribed])
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const value = email.trim()
-    if (value === "") {
-      setError("Enter your email address, such as name@example.com.")
-      emailRef.current?.focus()
+    if (!value) {
+      setError("Enter your email address.")
+      inputRef.current?.focus()
       return
     }
     if (!emailPattern.test(value)) {
-      setError(
-        "Check the email address: it needs an @ and a domain, such as name@example.com."
-      )
-      emailRef.current?.focus()
+      setError("Enter an email address such as name@example.com.")
+      inputRef.current?.focus()
       return
     }
     setError(null)
+    justSubscribed.current = true
     setSubscribed(true)
-    requestAnimationFrame(() => statusRef.current?.focus())
   }
 
-  function handleGetUpdates(event: MouseEvent<HTMLAnchorElement>) {
+  function onGetUpdates(event: MouseEvent<HTMLAnchorElement>) {
     event.preventDefault()
-    document.getElementById("updates")?.scrollIntoView()
-    const target = subscribed ? statusRef.current : emailRef.current
+    panelRef.current?.scrollIntoView()
+    const target = subscribed ? statusRef.current : inputRef.current
     target?.focus({ preventScroll: true })
   }
+
+  const container = "mx-auto max-w-3xl px-3 md:px-5"
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
       <header className="border-b bg-card">
-        <div className="mx-auto flex max-w-3xl items-center px-3 py-3 md:px-5">
+        <div className={cn(container, "flex items-center py-3")}>
           <div className="flex items-baseline gap-3">
             <a
               href="/"
@@ -197,11 +257,11 @@ export function App() {
             >
               Northgate
             </a>
-            <span className={cn(label, "text-muted-foreground")}>Status</span>
+            <span className={label}>Status</span>
           </div>
           <a
             href="#updates"
-            onClick={handleGetUpdates}
+            onClick={onGetUpdates}
             className={cn(
               buttonVariants({ variant: "secondary" }),
               "ml-auto px-5 font-mono text-label uppercase"
@@ -212,59 +272,56 @@ export function App() {
         </div>
       </header>
 
-      <main className="mx-auto flex max-w-3xl flex-col gap-5 px-3 py-5 md:px-5">
-        <section className={panel}>
+      <main className={cn(container, "flex flex-col gap-5 py-5")}>
+        {/* Current state */}
+        <section className={cn(panel, "p-5")}>
           <h1 className="text-h1">One system is running slowly</h1>
           <div className="mt-3">
             <State tone="caution">Degraded performance</State>
           </div>
           <p className="mt-3 max-w-md">
-            Label printing is slower than usual: a label can take up to two
-            minutes to appear. Our engineers are adding print servers and expect
-            normal speeds this afternoon. Tracking, bookings and notices work as
-            usual.
+            Labels take up to two minutes to print, in the dashboard and through
+            the API. Bookings, tracking and collections are not affected. We are
+            moving print jobs to a second print server while we find the cause.
           </p>
           <div className="mt-5 flex flex-wrap items-baseline gap-2">
-            <span className={cn(label, "text-muted-foreground")}>
-              Last checked
-            </span>
-            <time dateTime="2026-11-11T14:05Z" className={smallFigure}>
-              11 Nov, 14:05
+            <span className={label}>Last checked</span>
+            <time dateTime="2026-11-13T14:05Z" className={smallFigure}>
+              13 Nov, 14:05
             </time>
           </div>
         </section>
 
+        {/* Systems */}
         <section
           aria-labelledby="systems-heading"
-          className="overflow-hidden rounded-xl border bg-card"
+          className={cn(panel, "overflow-hidden")}
         >
           <div className="border-b px-5 pt-5 pb-3">
             <div className={headingRow}>
-              <h2 id="systems-heading" className={panelHeading}>
+              <h2 id="systems-heading" className={label}>
                 Systems
               </h2>
-              <span className={cn(label, "text-muted-foreground")}>
-                Last 30 days
-              </span>
+              <span className={label}>Last 30 days</span>
             </div>
           </div>
           <ul>
             {systems.map((system) => {
-              const { slow, down } = summary(system.days)
-              const parts = [
-                slow > 0 ? `${plural(slow, "day")} slow` : null,
-                down > 0 ? `${plural(down, "day")} down` : null,
+              const { slow, down } = summary(system.history)
+              const notes = [
+                slow ? `${plural(slow, "day")} slow` : null,
+                down ? `${plural(down, "day")} down` : null,
               ].filter(Boolean)
               const spoken = [
-                slow > 0 ? `slow on ${plural(slow, "day")}` : null,
-                down > 0 ? `down on ${plural(down, "day")}` : null,
-              ].filter(Boolean) as string[]
-              const sentence =
-                spoken.length > 0
+                slow ? `Slow on ${plural(slow, "day")}` : null,
+                down ? `down on ${plural(down, "day")}` : null,
+              ].filter(Boolean)
+              const alt = `${system.uptime} uptime over 30 days. ${
+                spoken.length
                   ? spoken.join(", ").replace(/^./, (c) => c.toUpperCase()) +
                     "."
                   : "No slow or down days."
-              const degraded = system.days[29] !== "up"
+              }`
               return (
                 <li
                   key={system.name}
@@ -274,41 +331,31 @@ export function App() {
                     <h3 className="font-sans text-body font-medium">
                       {system.name}
                     </h3>
-                    {degraded ? (
+                    {system.degraded ? (
                       <State tone="caution">Degraded</State>
                     ) : (
-                      <State tone="good">Operational</State>
+                      <State tone="success">Operational</State>
                     )}
                   </div>
-                  <div
-                    role="img"
-                    aria-label={`${system.uptime} uptime over 30 days. ${sentence}`}
-                    className="mt-3 flex gap-px"
-                  >
-                    {system.days.map((day, i) => (
-                      <div
+                  <div role="img" aria-label={alt} className="mt-3 flex gap-px">
+                    {system.history.map((day, i) => (
+                      <span
                         key={i}
                         className={cn("h-6 flex-1 rounded-sm", dayTone[day])}
                       />
                     ))}
                   </div>
                   <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 md:grid-cols-3">
-                    <span className={cn(label, "text-muted-foreground")}>
-                      30 days ago
-                    </span>
+                    <span className={label}>30 days ago</span>
                     <span
                       className={cn(
                         smallFigure,
                         "order-last col-span-2 md:order-none md:col-span-1 md:text-center"
                       )}
                     >
-                      {[system.uptime, ...parts].join(" · ")}
+                      {[system.uptime, ...notes].join(" · ")}
                     </span>
-                    <span
-                      className={cn(label, "text-right text-muted-foreground")}
-                    >
-                      Today
-                    </span>
+                    <span className={cn(label, "text-right")}>Today</span>
                   </div>
                 </li>
               )
@@ -327,17 +374,19 @@ export function App() {
                   aria-hidden="true"
                   className={cn("size-3 rounded-sm", dayTone[day])}
                 />
-                <span className={cn(label, "text-muted-foreground")}>
-                  {word}
-                </span>
+                <span className={label}>{word}</span>
               </span>
             ))}
           </div>
         </section>
 
-        <section aria-labelledby="maintenance-heading" className={panel}>
+        {/* Planned maintenance */}
+        <section
+          aria-labelledby="maintenance-heading"
+          className={cn(panel, "p-5")}
+        >
           <div className={headingRow}>
-            <h2 id="maintenance-heading" className={panelHeading}>
+            <h2 id="maintenance-heading" className={label}>
               Planned maintenance
             </h2>
             <Badge
@@ -352,32 +401,34 @@ export function App() {
           </h3>
           <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
             <div className="flex items-baseline gap-2">
-              <span className={cn(label, "text-muted-foreground")}>Starts</span>
-              <time dateTime="2026-11-18T01:00Z" className={smallFigure}>
-                18 Nov, 01:00
+              <span className={label}>Starts</span>
+              <time dateTime="2026-11-19T02:00Z" className={smallFigure}>
+                19 Nov, 02:00
               </time>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className={cn(label, "text-muted-foreground")}>Ends</span>
-              <time dateTime="2026-11-18T03:00Z" className={smallFigure}>
-                18 Nov, 03:00
+              <span className={label}>Ends</span>
+              <time dateTime="2026-11-19T03:30Z" className={smallFigure}>
+                19 Nov, 03:30
               </time>
             </div>
           </div>
           <p className="mt-3 max-w-md">
-            New bookings through the API may take up to 30 seconds to confirm,
-            and a few calls may need a second try. Tracking, labels and the
-            dashboard are not affected.
+            New bookings through the API may be refused for up to five minutes
+            during the window; retry and they will go through. Tracking, labels
+            and the dashboard keep working throughout.
           </p>
         </section>
 
+        {/* Get updates */}
         <section
           id="updates"
+          ref={panelRef}
           aria-labelledby="updates-heading"
-          className={cn(panel, "scroll-mt-5")}
+          className={cn(panel, "scroll-mt-5 p-5")}
         >
           <div className={headingRow}>
-            <h2 id="updates-heading" className={panelHeading}>
+            <h2 id="updates-heading" className={label}>
               Get updates
             </h2>
           </div>
@@ -387,33 +438,31 @@ export function App() {
           <div className="mt-5">
             {!subscribed && (
               <>
-                <form noValidate onSubmit={handleSubmit}>
-                  <label
-                    htmlFor="email"
-                    className={cn(label, "text-muted-foreground")}
-                  >
+                <form noValidate onSubmit={onSubmit}>
+                  <label htmlFor="email" className={cn(label, "block")}>
                     Email address
                   </label>
                   <div className="mt-2 flex flex-col gap-3 md:flex-row">
                     <Input
-                      ref={emailRef}
+                      ref={inputRef}
                       id="email"
+                      name="email"
                       type="email"
                       autoComplete="email"
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value)
-                        setError(null)
+                        if (error) setError(null)
                       }}
                       aria-invalid={error ? true : undefined}
                       aria-describedby={
                         error ? "email-error email-help" : "email-help"
                       }
-                      className="text-body md:flex-1 md:text-body"
+                      className="px-2 text-body md:flex-1 md:text-body"
                     />
                     <Button
                       type="submit"
-                      className="px-5 font-mono text-label uppercase"
+                      className="w-full px-5 font-mono text-label uppercase md:w-auto"
                     >
                       Subscribe
                     </Button>
@@ -448,22 +497,23 @@ export function App() {
               className="focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
             >
               {subscribed && (
-                <p className="flex items-center gap-2 text-body">
-                  <Check
+                <span className="inline-flex items-center gap-2">
+                  <CircleCheck
                     aria-hidden="true"
                     className="size-4 shrink-0 text-success"
                     strokeWidth={1.5}
                   />
                   Subscribed. We will write when something changes.
-                </p>
+                </span>
               )}
             </div>
           </div>
         </section>
 
+        {/* Past incidents */}
         <h2 className="mt-3 text-h2">Past incidents</h2>
         {incidents.map((incident) => (
-          <article key={incident.title} className={panel}>
+          <section key={incident.title} className={cn(panel, "p-5")}>
             <div className={headingRow}>
               <h3 className="font-sans text-body font-medium">
                 {incident.title}
@@ -471,20 +521,17 @@ export function App() {
               <State tone="neutral">Resolved</State>
             </div>
             <div className={cn(smallFigure, "mt-2 flex flex-wrap gap-x-5")}>
-              <time dateTime={incident.date}>{incident.dateText}</time>
+              <time dateTime={incident.dateTime}>{incident.date}</time>
               <span>{incident.duration}</span>
             </div>
             <ol className="mt-5">
               {incident.updates.map((update) => (
-                <li key={update.kind} className="border-t py-3 last:pb-0">
+                <li key={update.dateTime} className="border-t py-3 last:pb-0">
                   <div className="flex items-baseline gap-2">
-                    <span className={cn(label, "text-foreground")}>
+                    <span className="font-mono text-label text-foreground uppercase">
                       {update.kind}
                     </span>
-                    <time
-                      dateTime={`${incident.date}T${update.time}Z`}
-                      className={smallFigure}
-                    >
+                    <time dateTime={update.dateTime} className={smallFigure}>
                       {update.time}
                     </time>
                   </div>
@@ -492,18 +539,14 @@ export function App() {
                 </li>
               ))}
             </ol>
-          </article>
+          </section>
         ))}
       </main>
 
-      <footer className="mx-auto max-w-3xl px-3 md:px-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-5">
-          <span className={cn(label, "text-muted-foreground")}>
-            © 2026 Northgate
-          </span>
-          <span className={cn(label, "text-muted-foreground")}>
-            All times UTC
-          </span>
+      <footer className={container}>
+        <div className="flex flex-wrap justify-between gap-3 pb-5">
+          <span className={label}>Northgate Parcels Ltd, 2026</span>
+          <span className={label}>All times UTC</span>
         </div>
       </footer>
     </div>

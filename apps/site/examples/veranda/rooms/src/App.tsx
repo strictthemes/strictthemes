@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const navLink = cn(
+const headerLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
@@ -26,10 +26,10 @@ type Room = {
   href: string
   floor: string
   sentence: string
-  facts: string
   sleeps: number
-  from: number
-  windowSide: "left" | "right"
+  facts: string
+  fromPrice: number
+  window: "left" | "right"
   ground: "h-1/4" | "h-1/3" | "h-1/2"
   picture: string
 }
@@ -41,10 +41,10 @@ const rooms: Room[] = [
     floor: "Ground floor",
     sentence:
       "On the garden side, with a door of its own to the walled garden and no stairs to climb.",
-    facts: "Sleeps 2 · Double bed · Garden view",
     sleeps: 2,
-    from: 104,
-    windowSide: "right",
+    facts: "Sleeps 2 · Double bed · Garden view",
+    fromPrice: 104,
+    window: "right",
     ground: "h-1/2",
     picture: "Thrift on the ground floor, its door open to the walled garden",
   },
@@ -54,10 +54,10 @@ const rooms: Room[] = [
     floor: "First floor",
     sentence:
       "The smallest room, with a writing desk at the window and the garden below.",
-    facts: "Sleeps 1 · Single bed · Garden view",
     sleeps: 1,
-    from: 78,
-    windowSide: "left",
+    facts: "Sleeps 1 · Single bed · Garden view",
+    fromPrice: 78,
+    window: "left",
     ground: "h-1/3",
     picture: "Campion, a single bed and a desk at a tall window",
   },
@@ -66,10 +66,10 @@ const rooms: Room[] = [
     href: "#",
     floor: "First floor",
     sentence: "Two beds under a tall window that looks along the quay.",
-    facts: "Sleeps 2 · Twin beds · Harbour view",
     sleeps: 2,
-    from: 112,
-    windowSide: "right",
+    facts: "Sleeps 2 · Twin beds · Harbour view",
+    fromPrice: 112,
+    window: "right",
     ground: "h-1/4",
     picture: "Samphire, twin beds under a window that looks along the quay",
   },
@@ -79,10 +79,10 @@ const rooms: Room[] = [
     floor: "First floor",
     sentence:
       "The bay window at the front of the house, with the sea in all three panes.",
-    facts: "Sleeps 2 · King bed · Sea view",
     sleeps: 2,
-    from: 128,
-    windowSide: "left",
+    facts: "Sleeps 2 · King bed · Sea view",
+    fromPrice: 128,
+    window: "left",
     ground: "h-1/3",
     picture: "The bay window of Marram, with the bed facing the sea",
   },
@@ -92,10 +92,10 @@ const rooms: Room[] = [
     floor: "Second floor",
     sentence:
       "Up under the roof, with a daybed in the dormer for a third guest or an afternoon.",
-    facts: "Sleeps 3 · King bed and a daybed · Sea view",
     sleeps: 3,
-    from: 142,
-    windowSide: "right",
+    facts: "Sleeps 3 · King bed and a daybed · Sea view",
+    fromPrice: 142,
+    window: "right",
     ground: "h-1/3",
     picture: "Sea Holly under the roof, a daybed in the dormer window",
   },
@@ -105,10 +105,10 @@ const rooms: Room[] = [
     floor: "Second floor",
     sentence:
       "Two rooms joined by a short landing, for a family or for four friends.",
-    facts: "Sleeps 4 · King bed and two singles · Harbour view",
     sleeps: 4,
-    from: 164,
-    windowSide: "left",
+    facts: "Sleeps 4 · King bed and two singles · Harbour view",
+    fromPrice: 164,
+    window: "left",
     ground: "h-1/4",
     picture: "Tamarisk under the eaves, two rooms joined by a short landing",
   },
@@ -116,31 +116,38 @@ const rooms: Room[] = [
 
 type Filter = "all" | "one" | "two" | "more"
 
-const filters: {
-  value: Filter
-  label: string
-  phrase: string
-  fits: (sleeps: number) => boolean
-}[] = [
-  { value: "all", label: "All rooms", phrase: "", fits: () => true },
-  {
-    value: "one",
-    label: "One guest",
-    phrase: "for one guest",
-    fits: (sleeps) => sleeps === 1,
-  },
-  {
-    value: "two",
-    label: "Two guests",
-    phrase: "for two guests",
-    fits: (sleeps) => sleeps === 2,
-  },
-  {
-    value: "more",
-    label: "Three or more",
-    phrase: "for three or more guests",
-    fits: (sleeps) => sleeps >= 3,
-  },
+const filters: { value: Filter; label: string; phrase: string }[] = [
+  { value: "all", label: "All rooms", phrase: "" },
+  { value: "one", label: "One guest", phrase: "one guest" },
+  { value: "two", label: "Two guests", phrase: "two guests" },
+  { value: "more", label: "Three or more", phrase: "three or more guests" },
+]
+
+function matches(room: Room, filter: Filter) {
+  switch (filter) {
+    case "one":
+      return room.sleeps === 1
+    case "two":
+      return room.sleeps === 2
+    case "more":
+      return room.sleeps >= 3
+    default:
+      return true
+  }
+}
+
+function statusText(filter: Filter, count: number) {
+  const noun = count === 1 ? "room" : "rooms"
+  if (filter === "all") return `Showing all ${count} ${noun}`
+  const phrase = filters.find((f) => f.value === filter)?.phrase ?? ""
+  return `Showing ${count} ${noun} for ${phrase}`
+}
+
+const navLinks = [
+  { label: "Rooms", href: "/rooms", current: true },
+  { label: "Menu", href: "/menu", current: false },
+  { label: "Find us", href: "/#find-us", current: false },
+  { label: "Reserve", href: "/reserve", current: false },
 ]
 
 const included = [
@@ -150,13 +157,6 @@ const included = [
   "Wifi through the house",
   "Free parking at the quay",
   "A key of your own, to come and go as you like",
-]
-
-const navItems = [
-  { label: "Rooms", href: "/rooms", current: true },
-  { label: "Menu", href: "/menu", current: false },
-  { label: "Find us", href: "/#find-us", current: false },
-  { label: "Reserve", href: "/reserve", current: false },
 ]
 
 function Plate({ room, className }: { room: Room; className?: string }) {
@@ -175,43 +175,88 @@ function Plate({ room, className }: { room: Room; className?: string }) {
       <div
         className={cn(
           "absolute top-1/6 h-1/3 w-1/4 bg-secondary",
-          room.windowSide === "left" ? "left-1/6" : "right-1/6"
+          room.window === "left" ? "left-1/6" : "right-1/6"
         )}
       />
     </div>
   )
 }
 
+function RoomRow({ room, index }: { room: Room; index: number }) {
+  const plateFirst = index % 2 === 0
+  return (
+    <li className="grid gap-6 py-12 first:pt-0 last:pb-0 md:grid-cols-12 md:items-center">
+      <Plate
+        room={room}
+        className={
+          plateFirst
+            ? "md:col-span-7"
+            : "md:col-span-7 md:col-start-6 md:row-start-1"
+        }
+      />
+      <div
+        className={
+          plateFirst
+            ? "md:col-span-4 md:col-start-9"
+            : "md:col-span-4 md:col-start-1 md:row-start-1"
+        }
+      >
+        <p className="font-mono text-label text-muted-foreground uppercase">
+          {room.floor}
+        </p>
+        <h3 className="mt-2 text-h2 md:text-h1">{room.name}</h3>
+        <p className="mt-4 text-body">{room.sentence}</p>
+        <p className="mt-4 font-mono text-label text-foreground uppercase">
+          {room.facts}
+        </p>
+        <p className="mt-2 font-mono text-label text-muted-foreground uppercase tabular-nums">
+          From £{room.fromPrice} a night
+        </p>
+        <p className="mt-6">
+          <a
+            href={room.href}
+            className={cn(
+              textLink,
+              "inline-flex items-center gap-2 font-mono text-label uppercase"
+            )}
+          >
+            See {room.name}
+            <ArrowRight
+              className="size-4"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          </a>
+        </p>
+      </div>
+    </li>
+  )
+}
+
 export function App() {
   const [filter, setFilter] = useState<Filter>("all")
-  const chosen = filters.find((f) => f.value === filter) ?? filters[0]
-  const shown = rooms.filter((room) => chosen.fits(room.sleeps))
-  const count = `${shown.length} ${shown.length === 1 ? "room" : "rooms"}`
-  const status =
-    filter === "all"
-      ? `Showing all ${count}`
-      : `Showing ${count} ${chosen.phrase}`
+  const shown = rooms.filter((room) => matches(room, filter))
 
   return (
     <div className="mx-auto max-w-[1160px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-4 border-b border-border py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn("font-heading text-h2", navLink)}>
+        <a href="/" className={cn(headerLink, "font-heading text-h2")}>
           Kittiwake House
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
-            {navItems.map((item) => (
-              <li key={item.href}>
+            {navLinks.map((link) => (
+              <li key={link.href}>
                 <a
-                  href={item.href}
-                  aria-current={item.current ? "page" : undefined}
+                  href={link.href}
+                  aria-current={link.current ? "page" : undefined}
                   className={cn(
+                    headerLink,
                     "font-mono text-label uppercase",
-                    navLink,
-                    item.current && "underline"
+                    link.current && "underline"
                   )}
                 >
-                  {item.label}
+                  {link.label}
                 </a>
               </li>
             ))}
@@ -221,7 +266,7 @@ export function App() {
 
       <main>
         <section
-          aria-labelledby="page-title"
+          aria-labelledby="page-heading"
           className="grid gap-6 pt-12 md:grid-cols-12"
         >
           <div className="md:col-span-8">
@@ -233,23 +278,23 @@ export function App() {
                 Breakfast included
               </Badge>
             </div>
-            <h1 id="page-title" className="mt-2 text-h1 lg:text-display">
+            <h1 id="page-heading" className="mt-2 text-h1 lg:text-display">
               Six rooms, <span className="italic">no two alike</span>
             </h1>
             <p className="mt-4 max-w-xl text-body">
-              A price is for the room for one night, with breakfast for
-              everyone in it. You can arrive from{" "}
-              <time dateTime="15:00">15:00</time> and stay until{" "}
-              <time dateTime="10:30">10:30</time> on the day you leave.
+              A price is for the room for one night, with breakfast for everyone
+              in it. You can arrive from <time dateTime="15:00">15:00</time> and
+              stay until <time dateTime="10:30">10:30</time> on the day you
+              leave.
             </p>
           </div>
         </section>
 
         <section
-          aria-labelledby="rooms-title"
+          aria-labelledby="rooms-heading"
           className="mt-12 border-t border-border pt-6 md:mt-26"
         >
-          <h2 id="rooms-title" className="sr-only">
+          <h2 id="rooms-heading" className="sr-only">
             The rooms
           </h2>
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
@@ -259,13 +304,13 @@ export function App() {
               className="flex flex-wrap gap-2"
             >
               {filters.map((f) => {
-                const pressed = f.value === filter
+                const chosen = f.value === filter
                 return (
                   <Button
                     key={f.value}
                     type="button"
-                    variant={pressed ? "secondary" : "outline"}
-                    aria-pressed={pressed}
+                    variant={chosen ? "secondary" : "outline"}
+                    aria-pressed={chosen ? "true" : "false"}
                     onClick={() => setFilter(f.value)}
                     className={buttonClasses}
                   >
@@ -278,89 +323,37 @@ export function App() {
               role="status"
               className="font-mono text-label text-foreground uppercase"
             >
-              {status}
+              {statusText(filter, shown.length)}
             </p>
           </div>
-          <p className="mt-4 max-w-xl font-mono text-label text-muted-foreground">
+          <p className="mt-4 font-mono text-label text-muted-foreground">
             A guest travelling alone is welcome in any room for two, at the
             room&apos;s price.
           </p>
 
-          {shown.length === 0 ? (
+          {shown.length > 0 ? (
+            <ul className="mt-12 list-none divide-y divide-border p-0">
+              {shown.map((room, index) => (
+                <RoomRow key={room.name} room={room} index={index} />
+              ))}
+            </ul>
+          ) : (
             <p className="mt-12 max-w-xl text-body">
               No room sleeps that many. Write to us and we will see what we can
               do.
             </p>
-          ) : (
-            <ul className="mt-12 list-none divide-y divide-border p-0">
-              {shown.map((room, index) => {
-                const plateFirst = index % 2 === 0
-                return (
-                  <li
-                    key={room.name}
-                    className="grid gap-6 py-12 first:pt-0 last:pb-0 md:grid-cols-12 md:items-center"
-                  >
-                    <Plate
-                      room={room}
-                      className={
-                        plateFirst
-                          ? "md:col-span-7"
-                          : "md:col-span-7 md:col-start-6 md:row-start-1"
-                      }
-                    />
-                    <div
-                      className={
-                        plateFirst
-                          ? "md:col-span-4 md:col-start-9"
-                          : "md:col-span-4 md:col-start-1 md:row-start-1"
-                      }
-                    >
-                      <p className="font-mono text-label text-muted-foreground uppercase">
-                        {room.floor}
-                      </p>
-                      <h3 className="mt-2 text-h2 md:text-h1">{room.name}</h3>
-                      <p className="mt-4 max-w-xl text-body">
-                        {room.sentence}
-                      </p>
-                      <p className="mt-4 font-mono text-label text-foreground uppercase">
-                        {room.facts}
-                      </p>
-                      <p className="mt-2 font-mono text-label text-muted-foreground uppercase tabular-nums">
-                        From £{room.from} a night
-                      </p>
-                      <p className="mt-6">
-                        <a
-                          href={room.href}
-                          className={cn(
-                            "inline-flex items-center gap-2 font-mono text-label uppercase",
-                            textLink
-                          )}
-                        >
-                          See {room.name}
-                          <ArrowRight
-                            className="size-4"
-                            strokeWidth={1.5}
-                            aria-hidden="true"
-                          />
-                        </a>
-                      </p>
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
           )}
         </section>
 
         <section
-          aria-labelledby="included-title"
+          aria-labelledby="included-heading"
           className="mt-12 grid gap-6 md:mt-26 md:grid-cols-12 md:items-end"
         >
           <div className="rounded-xl bg-clay p-6 text-clay-foreground md:col-span-7">
             <p className="font-mono text-label uppercase">
               Included in every price
             </p>
-            <h2 id="included-title" className="mt-2 text-h2 md:text-h1">
+            <h2 id="included-heading" className="mt-2 text-h2 md:text-h1">
               In every room
             </h2>
             <ul className="mt-6 grid list-none gap-x-6 gap-y-2 p-0 md:grid-cols-2">
@@ -413,12 +406,15 @@ export function App() {
               <span className="block">Port Lowan LW6 3QT</span>
             </address>
             <p className="mt-4 text-body">
-              <a href="tel:+441632960352" className={navLink}>
+              <a href="tel:+441632960352" className={headerLink}>
                 01632 960 352
               </a>
             </p>
             <p className="mt-2 text-body">
-              <a href="mailto:stay@kittiwakehouse.example" className={navLink}>
+              <a
+                href="mailto:stay@kittiwakehouse.example"
+                className={headerLink}
+              >
                 stay@kittiwakehouse.example
               </a>
             </p>

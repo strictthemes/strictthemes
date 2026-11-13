@@ -1,14 +1,9 @@
 import { useState } from "react"
 import { CheckIcon } from "lucide-react"
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
+import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import {
   Table,
   TableBody,
@@ -17,12 +12,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 type Period = "monthly" | "yearly"
 
-const container = "mx-auto w-full max-w-[1200px] px-4 md:px-8"
-const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
 const focus =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const label = "font-mono text-label uppercase"
@@ -40,6 +38,8 @@ const footerLink = cn(
   "text-body text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
   focus
 )
+const container = "mx-auto w-full max-w-[1200px] px-4 md:px-8"
+const grid = "grid grid-cols-1 md:grid-cols-12 md:gap-x-8"
 
 const navItems = [
   { name: "Product", href: "#" },
@@ -51,10 +51,9 @@ type Plan = {
   name: string
   monthly: number
   yearly: number
-  free?: boolean
-  recommended?: boolean
-  audience: string
+  forWhom: string
   cta: string
+  recommended?: boolean
   features: string[]
 }
 
@@ -63,144 +62,156 @@ const plans: Plan[] = [
     name: "Starter",
     monthly: 0,
     yearly: 0,
-    free: true,
-    audience:
-      "For a small group of up to 3 people keeping one shared set of numbers.",
+    forWhom:
+      "For a small team of up to 3 people trying Plainsheet on real work.",
     cta: "Start free",
     features: [
       "Up to 3 people",
-      "10 sheets per workspace",
-      "Read-only share links",
+      "10 sheets",
       "7 days of version history",
-      "CSV and Excel import",
+      "Comments and mentions",
+      "Export to CSV and Excel",
     ],
   },
   {
     name: "Team",
     monthly: 12,
     yearly: 10,
-    recommended: true,
-    audience:
-      "For teams that plan, report and review in the same sheets every week.",
+    forWhom:
+      "For teams that plan, budget and report in shared sheets every week.",
     cta: "Start team",
+    recommended: true,
     features: [
       "Unlimited people and sheets",
-      "Comments and guest reviewers",
-      "30 days of version history",
-      "Restore deleted sheets",
+      "90 days of version history",
+      "Shared team templates",
+      "View-only links for guests",
       "Plain-language column notes",
-      "Email support within one working day",
+      "Email support within one day",
     ],
   },
   {
     name: "Business",
     monthly: 24,
     yearly: 20,
-    audience:
-      "For companies that need sign-in rules, an audit trail and invoices.",
+    forWhom:
+      "For companies that need sign-in rules, audit trails and admin control.",
     cta: "Start business",
     features: [
       "Everything in Team",
+      "Unlimited version history",
       "Single sign-on with SAML",
-      "Roles and sheet-level permissions",
-      "1 year of version history and an audit log",
-      "Invoice billing",
-      "A named support contact",
+      "Audit log of every change",
+      "Admin roles and permissions",
+      "Support within 4 hours",
     ],
   },
 ]
 
-const IN = "Included"
-const OUT = "Not included"
-
-const comparison = [
+const groups: {
+  name: string
+  rows: { feature: string; values: [string, string, string] }[]
+}[] = [
   {
-    group: "Sharing",
+    name: "Sharing",
     rows: [
       {
         feature: "People per workspace",
         values: ["Up to 3", "Unlimited", "Unlimited"],
       },
-      { feature: "Read-only share links", values: [IN, IN, IN] },
-      { feature: "Guest commenters", values: [OUT, IN, IN] },
+      { feature: "Sheets", values: ["10", "Unlimited", "Unlimited"] },
+      {
+        feature: "View-only links",
+        values: ["Not included", "Included", "Included"],
+      },
+      {
+        feature: "Shared templates",
+        values: ["Not included", "Included", "Included"],
+      },
     ],
   },
   {
-    group: "History",
+    name: "History",
     rows: [
-      { feature: "Version history", values: ["7 days", "30 days", "1 year"] },
-      { feature: "Restore deleted sheets", values: [OUT, IN, IN] },
-      { feature: "Audit log", values: [OUT, OUT, IN] },
+      {
+        feature: "Version history",
+        values: ["7 days", "90 days", "Unlimited"],
+      },
+      {
+        feature: "Restore a single cell",
+        values: ["Included", "Included", "Included"],
+      },
+      {
+        feature: "Named versions",
+        values: ["Not included", "Included", "Included"],
+      },
     ],
   },
   {
-    group: "Admin",
+    name: "Admin",
     rows: [
-      { feature: "Single sign-on (SAML)", values: [OUT, OUT, IN] },
-      { feature: "Roles and permissions", values: [OUT, OUT, IN] },
-      { feature: "Invoice billing", values: [OUT, OUT, IN] },
+      {
+        feature: "Single sign-on (SAML)",
+        values: ["Not included", "Not included", "Included"],
+      },
+      {
+        feature: "Audit log",
+        values: ["Not included", "Not included", "Included"],
+      },
+      {
+        feature: "Admin roles",
+        values: ["Not included", "Not included", "Included"],
+      },
+      {
+        feature: "Support response",
+        values: ["Community", "1 business day", "4 hours"],
+      },
     ],
   },
 ]
 
 const faqs = [
   {
-    q: "How does per-person billing work?",
-    a: "You pay for each person who can edit or comment in your workspace. Read-only viewers through a share link are free and never counted.",
+    q: "How does billing per person work?",
+    a: "You pay for each person who can edit sheets in your workspace. People you share a view-only link with are free. When someone joins or leaves, the next invoice changes to match.",
   },
   {
-    q: "Is there a free trial of the paid plans?",
-    a: "Yes. Team and Business are free for 14 days with no card needed. When the trial ends, your workspace moves to Starter unless you pick a plan.",
+    q: "Is there a free trial of Team or Business?",
+    a: "Yes. Every paid plan starts with 14 days free, and we do not ask for a card until the trial ends. If you do nothing, your workspace moves to Starter.",
   },
   {
-    q: "What does billed yearly mean?",
-    a: "On yearly billing you pay for 12 months up front at the lower price. Team is $120 per person a year and Business is $240 per person a year.",
+    q: "What does billed yearly mean for the price?",
+    a: "On yearly billing, Team is $10 and Business is $20 per person a month, paid once a year in advance. That is two months free compared with paying monthly.",
   },
   {
     q: "Can I cancel at any time?",
-    a: "Yes. Cancel from your billing settings and your plan runs to the end of the period you paid for. We do not charge a cancellation fee.",
+    a: "Yes. Cancel from the billing page and your plan stays active until the end of the period you paid for. We do not charge a cancellation fee.",
   },
   {
     q: "What happens to my data if I cancel?",
-    a: "Your sheets stay in your workspace on the Starter plan. You can export every sheet to CSV or Excel at any time, on any plan.",
+    a: "Your sheets stay in your workspace on the Starter plan. If you go over its limits, the extra sheets become read-only until you upgrade or remove some.",
   },
   {
-    q: "Where is my data stored?",
-    a: "Sheets are stored in data centres in the EU and encrypted at rest and in transit. Business workspaces can ask for a signed data processing agreement.",
+    q: "Can I export everything I put in Plainsheet?",
+    a: "Yes, on every plan. Export one sheet or the whole workspace as CSV or Excel files, with comments and version notes included.",
   },
 ]
 
 const footerGroups = [
-  {
-    title: "Product",
-    links: ["Features", "Templates", "Pricing", "Changelog"],
-  },
-  { title: "Company", links: ["About", "Careers", "Press", "Contact"] },
-  {
-    title: "Resources",
-    links: ["Help centre", "Guides", "Status", "Security"],
-  },
+  { name: "Product", links: ["Features", "Templates", "Pricing", "Changelog"] },
+  { name: "Company", links: ["About", "Careers", "Press", "Contact"] },
+  { name: "Help", links: ["Guides", "Status", "Privacy", "Terms"] },
 ]
 
-function SectionHeader({
-  id,
-  eyebrow,
-  title,
-}: {
-  id: string
-  eyebrow: string
-  title: string
-}) {
-  return (
-    <div className={cn(grid, "gap-y-2 border-t border-foreground pt-4")}>
-      <p className={cn(label, "text-muted-foreground md:col-span-3")}>
-        {eyebrow}
-      </p>
-      <h2 id={id} className="text-h1 md:col-span-9">
-        {title}
-      </h2>
-    </div>
-  )
+function price(plan: Plan, period: Period) {
+  return period === "yearly" ? plan.yearly : plan.monthly
+}
+
+function billingNote(plan: Plan, period: Period) {
+  if (plan.monthly === 0) return "Free forever"
+  if (period === "yearly")
+    return `Billed yearly, $${plan.yearly * 12} per person`
+  return "Billed monthly"
 }
 
 export function App() {
@@ -212,21 +223,26 @@ export function App() {
       <header className="border-b border-border">
         <div className={container}>
           <div className="flex flex-wrap items-center gap-4 py-4 md:gap-8">
-            <span className="font-heading text-h2">Plainsheet</span>
-            <nav aria-label="Main" className="hidden md:ml-auto md:block">
-              <ul className="flex items-center gap-8">
-                {navItems.map((item) => (
-                  <li key={item.name}>
-                    <a
-                      href={item.href}
-                      aria-current={item.current ? "page" : undefined}
-                      className={cn(navLink, item.current && "underline")}
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+            <a
+              href="#"
+              className={cn(
+                "font-heading text-h2 text-foreground underline-offset-4 transition-colors duration-150 hover:underline",
+                focus
+              )}
+            >
+              Plainsheet
+            </a>
+            <nav aria-label="Main" className="ml-auto hidden gap-8 md:flex">
+              {navItems.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  aria-current={item.current ? "page" : undefined}
+                  className={cn(navLink, item.current && "underline")}
+                >
+                  {item.name}
+                </a>
+              ))}
             </nav>
             <a href="#" className={cn(navLink, "hidden md:inline")}>
               Sign in
@@ -287,14 +303,14 @@ export function App() {
             <p className={cn(label, "text-muted-foreground md:col-span-12")}>
               Pricing
             </p>
-            <h1 className="mt-2 text-h1 md:col-span-8 md:col-start-1 md:text-display">
+            <h1 className="mt-2 text-h1 md:col-span-8 md:text-display">
               One price per person. No tiers hidden in a sales call.
             </h1>
-            <p className="mt-4 max-w-lg md:col-span-6 md:col-start-1">
-              Plainsheet is spreadsheets your whole team can read. Start free
-              with up to 3 people, and pay per person only when the rest of the
-              team joins. Every plan includes the same editor, the same imports
-              and the same export to CSV.
+            <p className="mt-4 max-w-lg md:col-span-6">
+              Plainsheet gives your whole team spreadsheets they can read: named
+              columns, notes in plain words and a full history of who changed
+              what. Start free with up to 3 people and pay per person when you
+              grow.
             </p>
           </div>
         </section>
@@ -323,58 +339,47 @@ export function App() {
                 ))}
               </div>
               <p className={cn(label, "text-muted-foreground")}>
-                2 months free
+                Yearly: 2 months free
               </p>
             </div>
 
-            <div className="mt-8 grid grid-cols-1 rounded-md border border-border md:grid-cols-3">
-              {plans.map((plan, index) => {
-                const price = period === "yearly" ? plan.yearly : plan.monthly
-                const note = plan.free
-                  ? "Free forever"
-                  : period === "yearly"
-                    ? `Billed yearly, $${plan.yearly * 12} / person`
-                    : "Billed monthly"
-                return (
-                  <div
-                    key={plan.name}
-                    className={cn(
-                      "row-span-6 grid grid-rows-subgrid gap-0 p-8",
-                      index > 0 &&
-                        "border-t border-border md:border-t-0 md:border-l"
-                    )}
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className={cn(label, "text-foreground")}>
-                        {plan.name}
-                      </h3>
-                      {plan.recommended && (
-                        <Badge
-                          variant="secondary"
-                          className="h-auto rounded-none bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
-                        >
-                          Recommended
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="mt-2 flex flex-wrap items-baseline gap-2">
-                      <p className="font-heading text-display">${price}</p>
-                      <p
-                        className={cn(
-                          label,
-                          "text-muted-foreground md:basis-full lg:basis-auto"
-                        )}
+            <div className="mt-8 grid grid-cols-1 divide-y divide-border rounded-md border border-border md:grid-cols-3 md:divide-x md:divide-y-0">
+              {plans.map((plan) => (
+                <div
+                  key={plan.name}
+                  className="row-span-6 grid grid-rows-subgrid gap-0 p-8"
+                >
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className={cn(label, "text-foreground")}>
+                      {plan.name}
+                    </h3>
+                    {plan.recommended && (
+                      <Badge
+                        variant="secondary"
+                        className="h-auto rounded-none bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground uppercase"
                       >
-                        / person / month
-                      </p>
-                    </div>
-                    <p
-                      className={cn(label, "mt-2 text-muted-foreground")}
-                      aria-live="polite"
+                        Recommended
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="mt-2 flex flex-wrap items-baseline gap-2">
+                    <span className="font-heading text-display">
+                      ${price(plan, period)}
+                    </span>
+                    <span
+                      className={cn(
+                        label,
+                        "text-muted-foreground md:basis-full lg:basis-auto"
+                      )}
                     >
-                      {note}
-                    </p>
-                    <p className="mt-4">{plan.audience}</p>
+                      / person / month
+                    </span>
+                  </p>
+                  <p className={cn(label, "mt-2 text-muted-foreground")}>
+                    {billingNote(plan, period)}
+                  </p>
+                  <p className="mt-4">{plan.forWhom}</p>
+                  <div className="mt-8">
                     <a
                       href="#"
                       className={cn(
@@ -382,66 +387,65 @@ export function App() {
                           variant: plan.recommended ? "default" : "outline",
                         }),
                         buttonClass,
-                        "mt-8 w-full"
+                        "w-full"
                       )}
                     >
                       {plan.cta}
                     </a>
-                    <ul className="mt-8 flex flex-col gap-2 border-t border-border pt-8">
-                      {plan.features.map((feature) => (
-                        <li key={feature} className="flex items-start gap-2">
-                          <CheckIcon
-                            aria-hidden="true"
-                            strokeWidth={1.5}
-                            className="mt-1 size-4 shrink-0 text-foreground"
-                          />
-                          <span>{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
-                )
-              })}
+                  <ul className="mt-8 flex flex-col gap-2 border-t border-border pt-8">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-2">
+                        <CheckIcon
+                          aria-hidden="true"
+                          strokeWidth={1.5}
+                          className="mt-1 size-4 shrink-0 text-foreground"
+                        />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         <section aria-labelledby="compare-heading" className="pb-16">
           <div className={container}>
-            <SectionHeader
-              id="compare-heading"
-              eyebrow="01 / Compare"
-              title="Compare plans"
-            />
+            <div
+              className={cn(grid, "gap-y-2 border-t border-foreground pt-4")}
+            >
+              <p className={cn(label, "text-muted-foreground md:col-span-3")}>
+                01 / Compare
+              </p>
+              <h2 id="compare-heading" className="text-h1 md:col-span-9">
+                Compare what each plan includes
+              </h2>
+            </div>
             <div className="mt-8">
-              <Table label="Compare plans" className="text-body">
+              <Table
+                label="Compare what each plan includes"
+                className="min-w-lg text-body"
+              >
                 <TableHeader>
                   <TableRow>
-                    <TableHead
-                      scope="col"
-                      className={cn(
-                        label,
-                        "text-muted-foreground first:pl-0 last:pr-0"
-                      )}
-                    >
-                      Feature
-                    </TableHead>
-                    {plans.map((plan) => (
+                    {["Feature", ...plans.map((p) => p.name)].map((name) => (
                       <TableHead
-                        key={plan.name}
+                        key={name}
                         scope="col"
                         className={cn(
                           label,
                           "text-muted-foreground first:pl-0 last:pr-0"
                         )}
                       >
-                        {plan.name}
+                        {name}
                       </TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
-                {comparison.map((group) => (
-                  <TableBody key={group.group}>
+                {groups.map((group) => (
+                  <TableBody key={group.name}>
                     <TableRow>
                       <TableHead
                         colSpan={4}
@@ -451,7 +455,7 @@ export function App() {
                           "pt-8 text-foreground first:pl-0 last:pr-0"
                         )}
                       >
-                        {group.group}
+                        {group.name}
                       </TableHead>
                     </TableRow>
                     {group.rows.map((row) => (
@@ -481,11 +485,16 @@ export function App() {
 
         <section aria-labelledby="faq-heading" className="pb-16">
           <div className={container}>
-            <SectionHeader
-              id="faq-heading"
-              eyebrow="02 / Questions"
-              title="Billing, trials and your data"
-            />
+            <div
+              className={cn(grid, "gap-y-2 border-t border-foreground pt-4")}
+            >
+              <p className={cn(label, "text-muted-foreground md:col-span-3")}>
+                02 / Questions
+              </p>
+              <h2 id="faq-heading" className="text-h1 md:col-span-9">
+                Billing, trials and your data
+              </h2>
+            </div>
             <div className={cn(grid, "mt-8")}>
               <Accordion className="md:col-span-9 md:col-start-4">
                 {faqs.map((faq) => (
@@ -509,13 +518,10 @@ export function App() {
               <h2 id="closing-heading" className="text-h1 md:col-span-8">
                 Still deciding? Start on the free plan.
               </h2>
-              <p className="mt-4 max-w-lg md:col-span-8 md:col-start-1">
-                Need more than 200 seats, a custom contract or a security
-                review?{" "}
+              <p className="mt-4 md:col-span-12">
                 <a href="#" className={textLink}>
-                  Contact sales
+                  Talk to sales about a plan for 50 people or more
                 </a>
-                .
               </p>
             </div>
           </div>
@@ -530,9 +536,12 @@ export function App() {
               <p>Spreadsheets your whole team can read.</p>
             </div>
             {footerGroups.map((group) => (
-              <div key={group.title} className="md:col-span-3">
-                <h2 className={cn(label, "text-foreground")}>{group.title}</h2>
-                <ul className="mt-4 flex flex-col gap-2">
+              <div
+                key={group.name}
+                className="flex flex-col gap-4 md:col-span-3"
+              >
+                <h2 className={cn(label, "text-foreground")}>{group.name}</h2>
+                <ul className="flex flex-col gap-2">
                   {group.links.map((link) => (
                     <li key={link}>
                       <a href="#" className={footerLink}>
@@ -544,11 +553,14 @@ export function App() {
               </div>
             ))}
           </div>
-          <div className="mt-8 border-t border-border pt-4">
-            <p className={cn(label, "text-muted-foreground")}>
-              © 2026 Plainsheet Ltd.
-            </p>
-          </div>
+          <p
+            className={cn(
+              label,
+              "mt-8 border-t border-border pt-4 text-muted-foreground"
+            )}
+          >
+            © 2026 Plainsheet Ltd.
+          </p>
         </div>
       </footer>
     </div>

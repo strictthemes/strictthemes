@@ -75,15 +75,6 @@
     --font-mono: 'Geist Mono Variable', monospace;
 }
 
-@layer base {
-  :root {
-    color-scheme: light;
-  }
-  .dark {
-    color-scheme: dark;
-  }
-}
-
 :root {
     --background: #FBF5E6;
     --foreground: #12262D;

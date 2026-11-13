@@ -14,9 +14,8 @@ import { cn } from "@/lib/utils"
 type Period = "monthly" | "yearly"
 
 const container = "mx-auto max-w-[1168px] px-4 md:px-6"
-const focusOutline =
-  "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
+const buttonClasses = "h-11 px-6 font-mono text-label"
 
 const navLinks = [
   { label: "Today", href: "/today" },
@@ -31,21 +30,22 @@ type Plan = {
   id: string
   name: string
   recommended?: boolean
-  monthly: number
-  yearlyPerMonth: number
-  yearlyTotal: number
+  price: Record<Period, string>
+  note: Record<Period, string>
   forWhom: string
   features: Feature[]
-  cta?: { label: string; variant: "default" | "secondary" }
+  action?: { label: string; variant: "default" | "secondary" }
 }
 
 const plans: Plan[] = [
   {
     id: "free",
     name: "Free",
-    monthly: 0,
-    yearlyPerMonth: 0,
-    yearlyTotal: 0,
+    price: { monthly: "$0", yearly: "$0" },
+    note: {
+      monthly: "Free for as long as you like",
+      yearly: "Free for as long as you like",
+    },
     forWhom: "For getting started with a few habits.",
     features: [
       { text: "Daily reminders" },
@@ -58,9 +58,8 @@ const plans: Plan[] = [
     id: "plus",
     name: "Plus",
     recommended: true,
-    monthly: 4,
-    yearlyPerMonth: 3,
-    yearlyTotal: 36,
+    price: { monthly: "$4", yearly: "$3" },
+    note: { monthly: "Billed monthly", yearly: "Billed $36 once a year" },
     forWhom:
       "For when five habits are not enough, or you want all your history.",
     features: [
@@ -70,21 +69,20 @@ const plans: Plan[] = [
       { text: "A note on each day" },
       { text: "Everything in Free" },
     ],
-    cta: { label: "Try Plus free", variant: "default" },
+    action: { label: "Try Plus free", variant: "default" },
   },
   {
     id: "together",
     name: "Together",
-    monthly: 8,
-    yearlyPerMonth: 6,
-    yearlyTotal: 72,
+    price: { monthly: "$8", yearly: "$6" },
+    note: { monthly: "Billed monthly", yearly: "Billed $72 once a year" },
     forWhom: "For a household that keeps habits together.",
     features: [
       { text: "Plus for up to 4 people" },
       { text: "Shared habits you tick off together" },
       { text: "Everything in Plus" },
     ],
-    cta: { label: "Choose Together", variant: "secondary" },
+    action: { label: "Choose Together", variant: "secondary" },
   },
 ]
 
@@ -95,101 +93,21 @@ const questions = [
   },
   {
     q: "What happens to my habits if I go back to Free?",
-    a: "You keep all of them. You choose which five stay active, and the rest wait until you need them again.",
+    a: "You keep all of them, with all their history. You choose which five stay active; the rest wait until you need them again.",
   },
   {
     q: "Can I pay once a year?",
-    a: "Yes. Plus is $36 for the year, which works out at $3 a month.",
+    a: "Yes. Plus is $36 a year, which works out at $3 a month.",
   },
   {
     q: "How does Together work?",
-    a: "One person pays. Up to 4 people join with a link you send them.",
+    a: "One person pays. They send a link, and up to 4 people join the plan with it.",
   },
   {
     q: "Can I cancel any time?",
     a: "Yes, in Profile. You keep Plus until the end of the period you paid for.",
   },
 ]
-
-function PlanCard({ plan, period }: { plan: Plan; period: Period }) {
-  const headingId = `plan-${plan.id}`
-  const price = period === "monthly" ? plan.monthly : plan.yearlyPerMonth
-  const note =
-    plan.monthly === 0
-      ? "Free for as long as you like"
-      : period === "monthly"
-        ? "Billed monthly"
-        : `Billed $${plan.yearlyTotal} once a year`
-
-  return (
-    <article
-      aria-labelledby={headingId}
-      className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:col-span-4"
-    >
-      <div className="flex flex-wrap items-center gap-3">
-        <h3 id={headingId} className="text-h2 text-foreground">
-          {plan.name}
-        </h3>
-        {plan.recommended && (
-          <Badge
-            variant="secondary"
-            className="h-auto gap-1 rounded-sm px-2 py-1 font-mono text-label"
-          >
-            Recommended
-          </Badge>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-2">
-        <p className="flex flex-wrap items-baseline gap-2">
-          <span className="font-heading text-display tabular-nums text-foreground">
-            ${price}
-          </span>
-          <span className={smallFigure}>a month</span>
-        </p>
-        <p className={smallFigure}>{note}</p>
-      </div>
-
-      <p className="text-body text-foreground">{plan.forWhom}</p>
-
-      <ul className="flex flex-col gap-2 border-t border-border pt-4">
-        {plan.features.map((feature) => {
-          const Icon = feature.limit ? Minus : Check
-          return (
-            <li
-              key={feature.text}
-              className="flex items-start gap-2 text-body text-foreground"
-            >
-              <Icon
-                aria-hidden="true"
-                strokeWidth={1.5}
-                className="mt-1 size-4 shrink-0 text-foreground"
-              />
-              {feature.text}
-            </li>
-          )
-        })}
-      </ul>
-
-      {plan.cta ? (
-        <a
-          href="#"
-          className={cn(
-            buttonVariants({ variant: plan.cta.variant }),
-            "mt-auto h-11 w-full px-6 font-mono text-label"
-          )}
-        >
-          {plan.cta.label}
-        </a>
-      ) : (
-        <p className="mt-auto flex h-11 items-center gap-2 font-mono text-label text-muted-foreground">
-          <CircleCheck aria-hidden="true" strokeWidth={1.5} className="size-4" />
-          You are on this plan
-        </p>
-      )}
-    </article>
-  )
-}
 
 export function App() {
   const [period, setPeriod] = useState<Period>("monthly")
@@ -205,10 +123,7 @@ export function App() {
         >
           <a
             href="/today"
-            className={cn(
-              "inline-flex h-11 items-center font-heading text-h2 text-foreground",
-              focusOutline
-            )}
+            className="inline-flex h-11 items-center font-heading text-h2 text-foreground focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
           >
             Mossy
           </a>
@@ -222,11 +137,10 @@ export function App() {
                       href={link.href}
                       aria-current={current ? "page" : undefined}
                       className={cn(
-                        "inline-flex h-11 items-center rounded-lg px-3 font-mono text-label",
+                        "inline-flex h-11 items-center rounded-lg px-3 font-mono text-label focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                         current
                           ? "bg-secondary text-secondary-foreground"
-                          : "text-foreground underline-offset-4 hover:underline",
-                        focusOutline
+                          : "text-foreground underline-offset-4 hover:underline"
                       )}
                     >
                       {link.label}
@@ -243,11 +157,9 @@ export function App() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
             <p className={smallFigure}>You are on Free</p>
-            <h1 className="text-h1 text-foreground md:text-display">
-              Pick what fits you
-            </h1>
+            <h1 className="text-h1 md:text-display">Pick what fits you</h1>
           </div>
-          <p className="max-w-lg text-body text-foreground">
+          <p className="max-w-lg text-body">
             Free covers most people. Plus is for when five habits are not
             enough.
           </p>
@@ -259,11 +171,15 @@ export function App() {
           </h2>
 
           <div className="flex flex-wrap items-center gap-3">
-            <div role="group" aria-label="Billing" className="flex flex-wrap gap-2">
+            <div
+              role="group"
+              aria-label="Billing"
+              className="flex flex-wrap gap-2"
+            >
               <Button
                 aria-pressed={period === "monthly"}
                 variant={period === "monthly" ? "secondary" : "outline"}
-                className="h-11 px-6 font-mono text-label"
+                className={buttonClasses}
                 onClick={() => setPeriod("monthly")}
               >
                 Monthly
@@ -271,7 +187,7 @@ export function App() {
               <Button
                 aria-pressed={period === "yearly"}
                 variant={period === "yearly" ? "secondary" : "outline"}
-                className="h-11 px-6 font-mono text-label"
+                className={buttonClasses}
                 onClick={() => setPeriod("yearly")}
               >
                 Yearly
@@ -290,7 +206,75 @@ export function App() {
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
             {plans.map((plan) => (
-              <PlanCard key={plan.id} plan={plan} period={period} />
+              <div
+                key={plan.id}
+                className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:col-span-4"
+              >
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="text-h2 text-foreground">{plan.name}</h3>
+                  {plan.recommended && (
+                    <Badge
+                      variant="secondary"
+                      className="h-auto gap-1 rounded-sm px-2 py-1 font-mono text-label"
+                    >
+                      Recommended
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <p className="flex flex-wrap items-baseline gap-2">
+                    <span className="font-heading text-display text-foreground tabular-nums">
+                      {plan.price[period]}
+                    </span>
+                    <span className={smallFigure}>a month</span>
+                  </p>
+                  <p className={smallFigure}>{plan.note[period]}</p>
+                </div>
+
+                <p className="text-body">{plan.forWhom}</p>
+
+                <ul className="flex flex-col gap-2 border-t border-border pt-4">
+                  {plan.features.map((feature) => {
+                    const Icon = feature.limit ? Minus : Check
+                    return (
+                      <li
+                        key={feature.text}
+                        className="flex items-start gap-2 text-body"
+                      >
+                        <Icon
+                          aria-hidden="true"
+                          strokeWidth={1.5}
+                          className="mt-1 size-4 shrink-0 text-foreground"
+                        />
+                        <span>{feature.text}</span>
+                      </li>
+                    )
+                  })}
+                </ul>
+
+                {plan.action ? (
+                  <a
+                    href="#"
+                    className={cn(
+                      buttonVariants({ variant: plan.action.variant }),
+                      buttonClasses,
+                      "mt-auto w-full"
+                    )}
+                  >
+                    {plan.action.label}
+                  </a>
+                ) : (
+                  <p className="mt-auto flex h-11 items-center gap-2 font-mono text-label text-muted-foreground">
+                    <CircleCheck
+                      aria-hidden="true"
+                      strokeWidth={1.5}
+                      className="size-4 shrink-0"
+                    />
+                    You are on this plan
+                  </p>
+                )}
+              </div>
             ))}
           </div>
         </section>
@@ -299,7 +283,7 @@ export function App() {
           aria-labelledby="questions-heading"
           className="flex flex-col gap-6 md:max-w-3xl"
         >
-          <h2 id="questions-heading" className="text-h2 text-foreground">
+          <h2 id="questions-heading" className="text-h2">
             Questions people ask
           </h2>
           <Accordion>
@@ -307,7 +291,7 @@ export function App() {
               <AccordionItem key={item.q} value={item.q}>
                 <AccordionTrigger>{item.q}</AccordionTrigger>
                 <AccordionContent>
-                  <p className="max-w-lg text-body text-foreground">{item.a}</p>
+                  <p className="max-w-lg">{item.a}</p>
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -318,10 +302,10 @@ export function App() {
           aria-labelledby="last-word-heading"
           className="flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:max-w-lg"
         >
-          <h2 id="last-word-heading" className="text-h2 text-foreground">
+          <h2 id="last-word-heading" className="text-h2">
             Not sure yet?
           </h2>
-          <p className="text-body text-foreground">
+          <p className="text-body">
             Stay on Free. Nothing you add there is lost if you move to Plus
             later.
           </p>
@@ -335,7 +319,7 @@ export function App() {
             "flex flex-wrap items-center justify-between gap-3 py-10"
           )}
         >
-          <p className="font-heading text-h2 text-foreground">Mossy</p>
+          <p className="font-heading text-h2">Mossy</p>
           <p className="font-mono text-label text-muted-foreground">
             Mossy · Made for small, daily steps · 2026
           </p>

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const headerLink = cn(
+const chromeLink = cn(
   "text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
@@ -17,8 +17,6 @@ const textLink = cn(
   "text-primary underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-foreground",
   focusRing
 )
-
-const buttonClasses = "h-auto rounded-md px-6 py-2 font-mono text-label"
 
 const navLinks = [
   { label: "Menu", href: "/menu" },
@@ -33,36 +31,31 @@ const seasonal = [
     name: "Pear and ginger tisane",
     text: "Dried pear, fresh ginger and a little lemon peel, steeped for five minutes. No caffeine, so it suits a late afternoon.",
     price: "£4.20 a pot",
-    picture: "A clay teapot beside a cup of pale amber tisane and a sliced pear",
+    picture: "A brown teapot beside a bowl of dried pear slices and ginger root",
   },
   {
     kind: "Plate",
     name: "Roast squash and lentil soup",
-    text: "Squash from Dale End Farm, roasted with cumin and simmered with red lentils. Served with a thick slice of rye bread.",
+    text: "Squash from a farm outside the village, roasted with cumin and simmered with red lentils. Served with a thick slice of rye bread.",
     price: "£7.50 with rye bread",
     picture: "A bowl of orange soup with a slice of dark rye bread on a wooden board",
   },
   {
     kind: "Cake",
     name: "Pear and cardamom loaf",
-    text: "A moist loaf with chunks of pear and ground cardamom, baked each morning and cut thick.",
+    text: "A loaf cake with chopped pear and ground cardamom, baked each morning and cut thick.",
     price: "£3.60 a slice",
-    picture: "A slice of pear loaf on a small cream plate with a fork",
+    picture: "A slice of pear loaf on a small plate with a fork beside it",
   },
 ]
 
-type Hours = { day: string; open?: [string, string] }
-
-const hours: Hours[] = [
-  { day: "Tuesday to Friday", open: ["9:00", "17:00"] },
-  { day: "Saturday", open: ["9:00", "18:00"] },
-  { day: "Sunday", open: ["10:00", "16:00"] },
-  { day: "Monday" },
+const hours = [
+  { day: "Tuesday to Friday", open: "09:00", openText: "9:00", close: "17:00" },
+  { day: "Saturday", open: "09:00", openText: "9:00", close: "18:00" },
+  { day: "Sunday", open: "10:00", openText: "10:00", close: "16:00" },
 ]
 
-function toDateTime(time: string) {
-  return time.padStart(5, "0")
-}
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function Newsletter() {
   const [email, setEmail] = useState("")
@@ -79,21 +72,21 @@ function Newsletter() {
     event.preventDefault()
     const value = email.trim()
     let message: string | null = null
-    if (value === "") {
-      message = "Write your email address."
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+    if (value === "") message = "Write your email address."
+    else if (!emailPattern.test(value))
       message = "Check the email address: it needs an @ and a domain."
-    }
-    setError(message)
+
     if (message) {
+      setError(message)
       inputRef.current?.focus()
       return
     }
+    setError(null)
     setDone(true)
   }
 
   return (
-    <div className="rounded-xl border bg-card p-6">
+    <div className="rounded-xl border bg-card p-6 md:col-span-7">
       <p className="font-mono text-label text-muted-foreground">
         Four letters a year
       </p>
@@ -101,6 +94,7 @@ function Newsletter() {
       <p className="mt-4 max-w-xl">
         A short letter when the season&apos;s teas come in, and nothing else.
       </p>
+
       {!done && (
         <form className="mt-6" noValidate onSubmit={handleSubmit}>
           <label
@@ -120,7 +114,7 @@ function Newsletter() {
                 value={email}
                 onChange={(event) => {
                   setEmail(event.target.value)
-                  setError(null)
+                  if (error) setError(null)
                 }}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? "newsletter-email-error" : undefined}
@@ -130,7 +124,7 @@ function Newsletter() {
             <Button
               type="submit"
               variant="secondary"
-              className={cn(buttonClasses, "mt-4 md:mt-0")}
+              className="mt-4 h-auto rounded-md px-6 py-2 font-mono text-label md:mt-0"
             >
               Sign up
             </Button>
@@ -145,11 +139,12 @@ function Newsletter() {
                 strokeWidth={1.5}
                 aria-hidden="true"
               />
-              {error}
+              <span>{error}</span>
             </p>
           )}
         </form>
       )}
+
       <div role="status">
         {done && (
           <div className="mt-6">
@@ -175,14 +170,14 @@ export function App() {
   return (
     <div className="mx-auto max-w-[1120px] px-4 text-body md:px-6">
       <header className="flex flex-col items-start gap-2 py-6 md:flex-row md:items-baseline md:justify-between">
-        <a href="/" className={cn(headerLink, "font-heading text-h2")}>
+        <a href="/" className={cn("font-heading text-h2", chromeLink)}>
           The Linden Room
         </a>
         <nav aria-label="Main">
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className={cn(headerLink, "text-body")}>
+                <a href={link.href} className={cn("text-body", chromeLink)}>
                   {link.label}
                 </a>
               </li>
@@ -201,14 +196,17 @@ export function App() {
               Tea, soup and cake, made slowly
             </h1>
             <p className="mt-4 max-w-xl text-body">
-              The Linden Room is a tea room and tea shop in a former seed
-              merchant&apos;s on Mill Lane, serving loose-leaf tea, lunch and
-              cakes baked each morning.
+              A tea room and shop in the old seed merchant&apos;s on Mill Lane,
+              pouring loose-leaf tea and herbal tisanes, serving soup at lunch
+              and selling the same teas by weight.
             </p>
             <p className="mt-6">
               <a
                 href="/booking"
-                className={cn(buttonVariants({ variant: "default" }), buttonClasses)}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "h-auto rounded-md px-6 py-2 font-mono text-label"
+                )}
               >
                 Book a table
               </a>
@@ -229,8 +227,8 @@ export function App() {
         <section className="mt-18">
           <h2 className="text-h2">In season</h2>
           <p className="mt-4 max-w-xl">
-            The tisane, the soup and the cake change on the first of each month,
-            with whatever the farms and orchards nearby have to give.
+            On the first Tuesday of each month we change one tea, one plate
+            and one cake to follow what the farms nearby are picking.
           </p>
           <div className="mt-6 grid gap-6 md:grid-cols-3">
             {seasonal.map((item) => (
@@ -271,7 +269,7 @@ export function App() {
             <p className="mt-2 font-heading text-h2">
               We pour at the seed merchant&apos;s old oak counter, from cups
               thrown at a pottery two streets away, and weigh out the teas you
-              take home on the same counter.
+              take home at the same counter.
             </p>
             <p className="mt-4">
               <a href="/visit" className={textLink}>
@@ -292,22 +290,17 @@ export function App() {
                 >
                   <span className="text-body">{row.day}</span>
                   <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
-                    {row.open ? (
-                      <>
-                        <time dateTime={toDateTime(row.open[0])}>
-                          {row.open[0]}
-                        </time>
-                        –
-                        <time dateTime={toDateTime(row.open[1])}>
-                          {row.open[1]}
-                        </time>
-                      </>
-                    ) : (
-                      "Closed"
-                    )}
+                    <time dateTime={row.open}>{row.openText}</time>–
+                    <time dateTime={row.close}>{row.close}</time>
                   </span>
                 </li>
               ))}
+              <li className="flex items-baseline justify-between gap-4 py-2">
+                <span className="text-body">Monday</span>
+                <span className="shrink-0 font-mono text-label text-foreground tabular-nums">
+                  Closed
+                </span>
+              </li>
             </ul>
             <p className="mt-4 max-w-xl">
               Lunch is served from <time dateTime="11:30">11:30</time> to{" "}
@@ -318,9 +311,7 @@ export function App() {
         </section>
 
         <section className="mt-18 grid gap-6 md:grid-cols-12">
-          <div className="md:col-span-7">
-            <Newsletter />
-          </div>
+          <Newsletter />
         </section>
       </main>
 
@@ -330,8 +321,8 @@ export function App() {
             <div className="md:col-span-6">
               <p className="font-heading text-h2">The Linden Room</p>
               <p className="mt-2 max-w-xl">
-                A tea room and tea shop in a former seed merchant&apos;s, selling
-                loose-leaf teas by weight.
+                A tea room and shop in a former seed merchant&apos;s, open six
+                days a week.
               </p>
             </div>
             <div className="md:col-span-5 md:col-start-8">

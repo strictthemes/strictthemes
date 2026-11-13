@@ -3,6 +3,13 @@ import { Check, CircleAlert, TriangleAlert } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import {
   Table,
@@ -16,21 +23,13 @@ import { cn } from "@/lib/utils"
 
 const FOCUS =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-const FOCUS_INSET =
+const FOCUS_INSIDE =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-const FOCUS_CODE =
-  "focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
-
 const BUTTON = "px-5 font-mono text-label uppercase"
 const LABEL = "font-mono text-label uppercase text-muted-foreground"
-const PANEL_HEADING =
-  "flex min-h-7 flex-wrap items-center justify-between gap-3"
-const H2 = "font-mono text-label uppercase text-muted-foreground"
-const SELECT = cn(
-  "h-8 w-full rounded-lg border border-input bg-card px-2 text-body",
-  FOCUS
-)
-const ICON = "size-4 shrink-0"
+const PANEL_HEADING = "font-mono text-label uppercase text-muted-foreground"
+const SMALL_FIGURE = "font-mono text-label tabular-nums text-muted-foreground"
+const INPUT = "px-2 text-body md:text-body"
 
 const NAV_LINKS = [
   { label: "Overview", href: "/" },
@@ -49,63 +48,60 @@ const SECTIONS = [
 ]
 
 const TIME_ZONES = [
-  { value: "Europe/London", label: "London (GMT/BST)" },
-  { value: "Europe/Dublin", label: "Dublin (GMT/IST)" },
-  { value: "Europe/Amsterdam", label: "Amsterdam (CET)" },
-  { value: "Europe/Oslo", label: "Oslo (CET)" },
-  { value: "Europe/Helsinki", label: "Helsinki (EET)" },
+  { value: "Europe/London", label: "Europe/London" },
+  { value: "Europe/Dublin", label: "Europe/Dublin" },
+  { value: "Europe/Amsterdam", label: "Europe/Amsterdam" },
+  { value: "Europe/Berlin", label: "Europe/Berlin" },
+  { value: "Europe/Stockholm", label: "Europe/Stockholm" },
 ]
 
-const ROLES = ["Owner", "Dispatcher", "Viewer"] as const
-type Role = (typeof ROLES)[number]
+const ROLES = [
+  { value: "owner", label: "Owner" },
+  { value: "dispatcher", label: "Dispatcher" },
+  { value: "viewer", label: "Viewer" },
+]
+
+const ME = "Mara Lindqvist"
 
 type Member = {
-  id: number
   name: string | null
   email: string
-  role: Role
-  lastActive: { dateTime: string; text: string } | null
+  role: string
+  lastActive: { text: string; dateTime: string } | null
   you?: boolean
 }
 
-const SIGNED_IN = "Maren Lindqvist"
-
 const INITIAL_MEMBERS: Member[] = [
   {
-    id: 1,
-    name: SIGNED_IN,
-    email: "maren.lindqvist@northgate.example",
-    role: "Owner",
-    lastActive: { dateTime: "2026-11-11T14:05", text: "11 Nov, 14:05" },
+    name: ME,
+    email: "mara.lindqvist@northgate.example",
+    role: "owner",
+    lastActive: { text: "13 Nov, 09:12", dateTime: "2026-11-13T09:12" },
     you: true,
   },
   {
-    id: 2,
     name: "Tobias Reyes",
     email: "tobias.reyes@northgate.example",
-    role: "Dispatcher",
-    lastActive: { dateTime: "2026-11-11T13:42", text: "11 Nov, 13:42" },
+    role: "dispatcher",
+    lastActive: { text: "13 Nov, 08:47", dateTime: "2026-11-13T08:47" },
   },
   {
-    id: 3,
-    name: "Priya Okafor",
-    email: "priya.okafor@northgate.example",
-    role: "Dispatcher",
-    lastActive: { dateTime: "2026-11-11T07:18", text: "11 Nov, 07:18" },
+    name: "Priya Ashworth",
+    email: "priya.ashworth@northgate.example",
+    role: "dispatcher",
+    lastActive: { text: "12 Nov, 17:30", dateTime: "2026-11-12T17:30" },
   },
   {
-    id: 4,
-    name: "Daniel Hartley",
-    email: "daniel.hartley@northgate.example",
-    role: "Viewer",
-    lastActive: { dateTime: "2026-11-09T16:30", text: "9 Nov, 16:30" },
+    name: "Callum Ferreira",
+    email: "callum.ferreira@northgate.example",
+    role: "viewer",
+    lastActive: { text: "10 Nov, 14:05", dateTime: "2026-11-10T14:05" },
   },
   {
-    id: 5,
-    name: "Lena Brandt",
-    email: "lena.brandt@northgate.example",
-    role: "Viewer",
-    lastActive: { dateTime: "2026-11-02T10:12", text: "2 Nov, 10:12" },
+    name: "Ines Okafor",
+    email: "ines.okafor@northgate.example",
+    role: "viewer",
+    lastActive: { text: "4 Nov, 11:20", dateTime: "2026-11-04T11:20" },
   },
 ]
 
@@ -121,9 +117,9 @@ const NOTIFICATIONS = [
     text: "Email me when a driver cannot hand over a parcel.",
   },
   {
-    key: "summary",
+    key: "daily",
     title: "Daily summary",
-    text: "Send a summary of the day's shipments at 18:00.",
+    text: "Send one email each morning with the previous day's figures.",
   },
   {
     key: "members",
@@ -131,64 +127,196 @@ const NOTIFICATIONS = [
     text: "Email me when someone accepts an invite to this workspace.",
   },
 ] as const
+
 type NotificationKey = (typeof NOTIFICATIONS)[number]["key"]
 type NotificationValues = Record<NotificationKey, boolean>
 
-type WorkspaceValues = { name: string; address: string; timeZone: string }
+const INITIAL_NOTIFICATIONS: NotificationValues = {
+  late: true,
+  failed: true,
+  daily: false,
+  members: true,
+}
+
+type Workspace = { name: string; address: string; timeZone: string }
+
+const INITIAL_WORKSPACE: Workspace = {
+  name: "Northgate North",
+  address: "northgate-north",
+  timeZone: "Europe/London",
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function plural(n: number, one: string, many: string) {
   return `${n} ${n === 1 ? one : many}`
 }
 
-function useSavedMessage() {
-  const [shown, setShown] = useState(false)
-  const timer = useRef<number | undefined>(undefined)
-  useEffect(() => () => window.clearTimeout(timer.current), [])
-  function show() {
-    window.clearTimeout(timer.current)
-    setShown(true)
-    timer.current = window.setTimeout(() => setShown(false), 4000)
-  }
-  return [shown, show] as const
+function PanelHeading({ id, children }: { id?: string; children: React.ReactNode }) {
+  return (
+    <h2 id={id} className={PANEL_HEADING}>
+      {children}
+    </h2>
+  )
 }
 
-function SavedStatus({ shown }: { shown: boolean }) {
+function HeadingRow({ children }: { children: React.ReactNode }) {
   return (
-    <div role="status">
-      {shown && (
-        <span className="inline-flex items-center gap-2 font-mono text-label text-success uppercase">
-          <Check className={ICON} strokeWidth={1.5} aria-hidden="true" />
-          Saved
-        </span>
-      )}
+    <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
+      {children}
     </div>
   )
 }
 
-function ErrorLine({ id, children }: { id: string; children: string }) {
+function ErrorLine({ id, children }: { id: string; children: React.ReactNode }) {
   return (
     <p
       id={id}
       className="mt-2 flex items-start gap-2 font-mono text-label text-destructive"
     >
-      <CircleAlert className={ICON} strokeWidth={1.5} aria-hidden="true" />
+      <CircleAlert className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
       {children}
     </p>
   )
 }
 
-function PanelHeading({ id, children }: { id: string; children: string }) {
+function SavedStatus({ show }: { show: boolean }) {
   return (
-    <div className={PANEL_HEADING}>
-      <h2 id={id} className={H2}>
-        {children}
-      </h2>
-    </div>
+    <p
+      role="status"
+      className="inline-flex items-center gap-2 font-mono text-label uppercase text-success"
+    >
+      {show && (
+        <>
+          <Check className="size-4" strokeWidth={1.5} aria-hidden="true" />
+          Saved
+        </>
+      )}
+    </p>
   )
 }
 
-function TopBar() {
-  const [open, setOpen] = useState(false)
+function useFlag(ms: number) {
+  const [on, setOn] = useState(false)
+  const timer = useRef<number | undefined>(undefined)
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+  return [
+    on,
+    () => {
+      window.clearTimeout(timer.current)
+      setOn(true)
+      timer.current = window.setTimeout(() => setOn(false), ms)
+    },
+  ] as const
+}
+
+export function App() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  // Workspace
+  const [savedWorkspace, setSavedWorkspace] = useState(INITIAL_WORKSPACE)
+  const [workspace, setWorkspace] = useState(INITIAL_WORKSPACE)
+  const [nameError, setNameError] = useState(false)
+  const [workspaceSaved, flashWorkspaceSaved] = useFlag(4000)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const workspaceDirty =
+    workspace.name !== savedWorkspace.name ||
+    workspace.address !== savedWorkspace.address ||
+    workspace.timeZone !== savedWorkspace.timeZone
+
+  function saveWorkspace(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!workspaceDirty) return
+    if (workspace.name.trim() === "") {
+      setNameError(true)
+      nameRef.current?.focus()
+      return
+    }
+    const next = { ...workspace, name: workspace.name.trim() }
+    setWorkspace(next)
+    setSavedWorkspace(next)
+    flashWorkspaceSaved()
+  }
+
+  function discardWorkspace() {
+    setWorkspace(savedWorkspace)
+    setNameError(false)
+    nameRef.current?.focus()
+  }
+
+  // Notifications
+  const [savedNotifications, setSavedNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const [notificationsSaved, flashNotificationsSaved] = useFlag(4000)
+  const firstSwitchRef = useRef<HTMLElement>(null)
+  const notificationsDirty = NOTIFICATIONS.some(
+    (n) => notifications[n.key] !== savedNotifications[n.key]
+  )
+
+  function saveNotifications(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!notificationsDirty) return
+    setSavedNotifications(notifications)
+    flashNotificationsSaved()
+  }
+
+  function discardNotifications() {
+    setNotifications(savedNotifications)
+    firstSwitchRef.current?.focus()
+  }
+
+  // Members
+  const [members, setMembers] = useState(INITIAL_MEMBERS)
+  const [inviteEmail, setInviteEmail] = useState("")
+  const [inviteRole, setInviteRole] = useState("viewer")
+  const [inviteError, setInviteError] = useState<string | null>(null)
+  const [inviteSent, setInviteSent] = useState<string | null>(null)
+  const inviteRef = useRef<HTMLInputElement>(null)
+  const activeCount = members.filter((m) => m.lastActive).length
+  const invitedCount = members.length - activeCount
+  const memberCount =
+    plural(activeCount, "member", "members") +
+    (invitedCount > 0 ? `, ${invitedCount} invited` : "")
+
+  function setRole(email: string, role: string) {
+    setMembers((list) => list.map((m) => (m.email === email ? { ...m, role } : m)))
+  }
+
+  function sendInvite(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const email = inviteEmail.trim()
+    let error: string | null = null
+    if (email === "") {
+      error = "Enter the email address of the person to invite."
+    } else if (!EMAIL_PATTERN.test(email)) {
+      error = "Enter an email address in the form name@example.com."
+    } else if (members.some((m) => m.email.toLowerCase() === email.toLowerCase())) {
+      error = "This address is already in the workspace. Enter another one."
+    }
+    if (error) {
+      setInviteError(error)
+      setInviteSent(null)
+      inviteRef.current?.focus()
+      return
+    }
+    setMembers((list) => [
+      ...list,
+      { name: null, email, role: inviteRole, lastActive: null },
+    ])
+    setInviteEmail("")
+    setInviteError(null)
+    setInviteSent(email)
+  }
+
+  // Danger zone
+  const [confirmName, setConfirmName] = useState("")
+  const [deleted, setDeleted] = useState(false)
+  const deletedRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    if (deleted) deletedRef.current?.focus()
+  }, [deleted])
+
   const linkClass = (href: string) =>
     cn(
       "font-mono text-label uppercase transition-colors duration-150",
@@ -197,582 +325,61 @@ function TopBar() {
         ? "text-foreground"
         : "text-muted-foreground hover:text-foreground"
     )
-  return (
-    <header className="border-b bg-card">
-      <div className="mx-auto flex max-w-[1280px] items-center gap-8 px-3 py-3 md:px-5">
-        <a
-          href="/"
-          className={cn(
-            "font-heading text-h2 text-foreground transition-colors duration-150",
-            FOCUS
-          )}
-        >
-          Northgate
-        </a>
-        <nav aria-label="Main" className="hidden items-center gap-5 md:flex">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              aria-current={link.href === CURRENT ? "page" : undefined}
-              className={linkClass(link.href)}
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-        <span className="ml-auto hidden font-mono text-label text-muted-foreground tabular-nums md:block">
-          {SIGNED_IN}
-        </span>
-        <Button
-          variant="outline"
-          className={cn(BUTTON, "ml-auto md:hidden")}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          onClick={() => setOpen((o) => !o)}
-        >
-          Menu
-        </Button>
-      </div>
-      <nav
-        id="mobile-nav"
-        aria-label="Main"
-        hidden={!open}
-        className="border-t md:hidden"
-      >
-        <div className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              aria-current={link.href === CURRENT ? "page" : undefined}
-              className={cn("block py-2", linkClass(link.href))}
-            >
-              {link.label}
-            </a>
-          ))}
-        </div>
-      </nav>
-    </header>
-  )
-}
-
-function WorkspacePanel({
-  saved,
-  onSave,
-}: {
-  saved: WorkspaceValues
-  onSave: (v: WorkspaceValues) => void
-}) {
-  const [values, setValues] = useState(saved)
-  const [nameError, setNameError] = useState(false)
-  const [savedShown, showSaved] = useSavedMessage()
-  const nameRef = useRef<HTMLInputElement>(null)
-
-  const dirty =
-    values.name !== saved.name ||
-    values.address !== saved.address ||
-    values.timeZone !== saved.timeZone
-
-  function submit(e: FormEvent) {
-    e.preventDefault()
-    if (!dirty) return
-    if (values.name.trim() === "") {
-      setNameError(true)
-      nameRef.current?.focus()
-      return
-    }
-    onSave(values)
-    showSaved()
-  }
-
-  function discard() {
-    setValues(saved)
-    setNameError(false)
-    nameRef.current?.focus()
-  }
-
-  return (
-    <section
-      id="workspace"
-      aria-labelledby="workspace-heading"
-      className="scroll-mt-5 rounded-xl border bg-card p-5"
-    >
-      <PanelHeading id="workspace-heading">Workspace</PanelHeading>
-      <form noValidate onSubmit={submit} className="mt-3">
-        <div className="flex flex-col gap-5">
-          <div className="max-w-md">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="ws-name" className={LABEL}>
-                Workspace name
-              </label>
-              <Input
-                ref={nameRef}
-                id="ws-name"
-                required
-                value={values.name}
-                aria-invalid={nameError || undefined}
-                aria-describedby={nameError ? "ws-name-error" : undefined}
-                onChange={(e) => {
-                  setValues({ ...values, name: e.target.value })
-                  setNameError(false)
-                }}
-                className="text-body md:text-body"
-              />
-            </div>
-            {nameError && (
-              <ErrorLine id="ws-name-error">
-                Enter a name for the workspace.
-              </ErrorLine>
-            )}
-          </div>
-
-          <div className="max-w-md">
-            <div className="flex flex-col gap-2">
-              <label htmlFor="ws-address" className={LABEL}>
-                Address
-              </label>
-              <div className="flex items-center gap-2">
-                <span
-                  id="ws-address-prefix"
-                  className="font-mono text-label text-muted-foreground tabular-nums"
-                >
-                  northgate.example/
-                </span>
-                <Input
-                  id="ws-address"
-                  value={values.address}
-                  aria-describedby="ws-address-prefix ws-address-help"
-                  onChange={(e) =>
-                    setValues({
-                      ...values,
-                      address: e.target.value
-                        .toLowerCase()
-                        .replace(/[^a-z0-9-]/g, ""),
-                    })
-                  }
-                  className="text-body md:text-body"
-                />
-              </div>
-            </div>
-            <p
-              id="ws-address-help"
-              className="mt-2 font-mono text-label text-muted-foreground"
-            >
-              Use lowercase letters, numbers and hyphens only.
-            </p>
-          </div>
-
-          <div className="flex max-w-md flex-col gap-2">
-            <label htmlFor="ws-timezone" className={LABEL}>
-              Time zone
-            </label>
-            <select
-              id="ws-timezone"
-              value={values.timeZone}
-              onChange={(e) =>
-                setValues({ ...values, timeZone: e.target.value })
-              }
-              className={SELECT}
-            >
-              {TIME_ZONES.map((tz) => (
-                <option key={tz.value} value={tz.value}>
-                  {tz.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-5">
-          <Button
-            type="submit"
-            disabled={!dirty}
-            focusableWhenDisabled
-            className={BUTTON}
-          >
-            Save changes
-          </Button>
-          <Button
-            variant="outline"
-            disabled={!dirty}
-            onClick={discard}
-            className={BUTTON}
-          >
-            Discard
-          </Button>
-          <SavedStatus shown={savedShown} />
-        </div>
-      </form>
-    </section>
-  )
-}
-
-function NotificationsPanel() {
-  const [saved, setSaved] = useState<NotificationValues>({
-    late: true,
-    failed: true,
-    summary: false,
-    members: true,
-  })
-  const [values, setValues] = useState(saved)
-  const [savedShown, showSaved] = useSavedMessage()
-  const listRef = useRef<HTMLDivElement>(null)
-
-  const dirty = NOTIFICATIONS.some((n) => values[n.key] !== saved[n.key])
-
-  function submit(e: FormEvent) {
-    e.preventDefault()
-    if (!dirty) return
-    setSaved(values)
-    showSaved()
-  }
-
-  function discard() {
-    setValues(saved)
-    listRef.current?.querySelector<HTMLElement>('[role="switch"]')?.focus()
-  }
-
-  return (
-    <section
-      id="notifications"
-      aria-labelledby="notifications-heading"
-      className="scroll-mt-5 rounded-xl border bg-card p-5"
-    >
-      <PanelHeading id="notifications-heading">Notifications</PanelHeading>
-      <form noValidate onSubmit={submit} className="mt-3">
-        <div ref={listRef}>
-          {NOTIFICATIONS.map((n) => (
-            <div
-              key={n.key}
-              className="flex items-center justify-between gap-5 border-t py-3 first:border-t-0 first:pt-0 last:pb-0"
-            >
-              <div>
-                <p
-                  id={`notif-${n.key}-title`}
-                  className="font-sans text-body font-medium"
-                >
-                  {n.title}
-                </p>
-                <p
-                  id={`notif-${n.key}-text`}
-                  className="mt-1 max-w-md text-body text-muted-foreground"
-                >
-                  {n.text}
-                </p>
-              </div>
-              <Switch
-                checked={values[n.key]}
-                onCheckedChange={(checked) =>
-                  setValues({ ...values, [n.key]: checked })
-                }
-                aria-labelledby={`notif-${n.key}-title`}
-                aria-describedby={`notif-${n.key}-text`}
-              />
-            </div>
-          ))}
-        </div>
-        <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-5">
-          <Button
-            type="submit"
-            disabled={!dirty}
-            focusableWhenDisabled
-            className={BUTTON}
-          >
-            Save changes
-          </Button>
-          <Button
-            variant="outline"
-            disabled={!dirty}
-            onClick={discard}
-            className={BUTTON}
-          >
-            Discard
-          </Button>
-          <SavedStatus shown={savedShown} />
-        </div>
-      </form>
-    </section>
-  )
-}
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function MembersPanel() {
-  const [members, setMembers] = useState(INITIAL_MEMBERS)
-  const [email, setEmail] = useState("")
-  const [role, setRole] = useState<Role>("Viewer")
-  const [error, setError] = useState<string | null>(null)
-  const [sentTo, setSentTo] = useState<string | null>(null)
-  const emailRef = useRef<HTMLInputElement>(null)
-
-  const joined = members.filter((m) => m.lastActive).length
-  const invited = members.length - joined
-  const count =
-    plural(joined, "member", "members") +
-    (invited > 0 ? `, ${invited} invited` : "")
-
-  function invite(e: FormEvent) {
-    e.preventDefault()
-    const address = email.trim()
-    let message: string | null = null
-    if (address === "") message = "Enter an email address to send the invite."
-    else if (!EMAIL_PATTERN.test(address))
-      message = "Enter a full email address, such as name@example.com."
-    else if (
-      members.some((m) => m.email.toLowerCase() === address.toLowerCase())
-    )
-      message = "This address is already in the workspace. Enter another one."
-    if (message) {
-      setError(message)
-      setSentTo(null)
-      emailRef.current?.focus()
-      return
-    }
-    setMembers([
-      ...members,
-      {
-        id: Date.now(),
-        name: null,
-        email: address,
-        role,
-        lastActive: null,
-      },
-    ])
-    setEmail("")
-    setSentTo(address)
-  }
-
-  function setMemberRole(id: number, next: Role) {
-    setMembers(members.map((m) => (m.id === id ? { ...m, role: next } : m)))
-  }
-
-  return (
-    <section
-      id="members"
-      aria-labelledby="members-heading"
-      className="scroll-mt-5 overflow-hidden rounded-xl border bg-card"
-    >
-      <div className="border-b px-5 pt-5 pb-3">
-        <div className={PANEL_HEADING}>
-          <h2 id="members-heading" className={H2}>
-            Members
-          </h2>
-          <span className="font-mono text-label text-muted-foreground tabular-nums">
-            {count}
-          </span>
-        </div>
-      </div>
-
-      <Table label="Members" className="text-body">
-        <TableHeader>
-          <TableRow>
-            <TableHead className={cn("px-5", LABEL)}>Name</TableHead>
-            <TableHead className={cn("px-5", LABEL)}>Email</TableHead>
-            <TableHead className={cn("px-5", LABEL)}>Role</TableHead>
-            <TableHead className={cn("px-5 text-right", LABEL)}>
-              Last active
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {members.map((m) => (
-            <TableRow key={m.id}>
-              <TableCell className="px-5 py-2">
-                {m.name ? (
-                  <>
-                    {m.name}
-                    {m.you && (
-                      <span className="ml-2 font-mono text-label text-muted-foreground uppercase">
-                        You
-                      </span>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <span aria-hidden="true">–</span>
-                    <span className="sr-only">No name yet</span>
-                  </>
-                )}
-              </TableCell>
-              <TableCell className="px-5 py-2">{m.email}</TableCell>
-              <TableCell className="px-5 py-2">
-                {m.you ? (
-                  m.role
-                ) : (
-                  <div className="w-32">
-                    <select
-                      aria-label={`Role of ${m.name ?? m.email}`}
-                      value={m.role}
-                      onChange={(e) =>
-                        setMemberRole(m.id, e.target.value as Role)
-                      }
-                      className={SELECT}
-                    >
-                      {ROLES.map((r) => (
-                        <option key={r}>{r}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </TableCell>
-              <TableCell className="px-5 py-2 text-right">
-                {m.lastActive ? (
-                  <time
-                    dateTime={m.lastActive.dateTime}
-                    className="font-mono tabular-nums"
-                  >
-                    {m.lastActive.text}
-                  </time>
-                ) : (
-                  <span className="inline-flex items-center gap-2">
-                    <span
-                      aria-hidden="true"
-                      className="size-2 shrink-0 rounded-full bg-muted-foreground"
-                    />
-                    <span className="text-body text-foreground">Invited</span>
-                  </span>
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-
-      <div className="border-t px-5 py-5">
-        <form noValidate onSubmit={invite}>
-          <div className="flex flex-wrap items-end gap-3">
-            <div className="flex w-full flex-col gap-2 md:w-64">
-              <label htmlFor="invite-email" className={LABEL}>
-                Invite by email
-              </label>
-              <Input
-                ref={emailRef}
-                id="invite-email"
-                type="email"
-                autoComplete="off"
-                value={email}
-                aria-invalid={error ? true : undefined}
-                aria-describedby={error ? "invite-error" : undefined}
-                onChange={(e) => {
-                  setEmail(e.target.value)
-                  setError(null)
-                  setSentTo(null)
-                }}
-                className="text-body md:text-body"
-              />
-            </div>
-            <div className="flex w-32 flex-col gap-2">
-              <label htmlFor="invite-role" className={LABEL}>
-                Role
-              </label>
-              <select
-                id="invite-role"
-                value={role}
-                onChange={(e) => setRole(e.target.value as Role)}
-                className={SELECT}
-              >
-                {ROLES.map((r) => (
-                  <option key={r}>{r}</option>
-                ))}
-              </select>
-            </div>
-            <Button type="submit" variant="secondary" className={BUTTON}>
-              Send invite
-            </Button>
-          </div>
-          {error && <ErrorLine id="invite-error">{error}</ErrorLine>}
-          <div role="status" className={cn(sentTo && "mt-2")}>
-            {sentTo && (
-              <p className="flex items-center gap-2 text-body">
-                <Check
-                  className={cn(ICON, "text-success")}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                />
-                <span>Invite sent to {sentTo}</span>
-              </p>
-            )}
-          </div>
-        </form>
-      </div>
-    </section>
-  )
-}
-
-function DangerZonePanel({ workspaceName }: { workspaceName: string }) {
-  const [confirmName, setConfirmName] = useState("")
-  const [deleted, setDeleted] = useState(false)
-  const statusRef = useRef<HTMLParagraphElement>(null)
-
-  useEffect(() => {
-    if (deleted) statusRef.current?.focus()
-  }, [deleted])
-
-  return (
-    <section
-      id="danger-zone"
-      aria-labelledby="danger-heading"
-      className="flex-1 scroll-mt-5 rounded-xl border bg-card p-5"
-    >
-      <PanelHeading id="danger-heading">Danger zone</PanelHeading>
-      <div className="mt-3">
-        {!deleted && (
-          <div>
-            <h3 className="font-sans text-body font-medium">
-              Delete this workspace
-            </h3>
-            <p className="mt-1 max-w-md">
-              Deleting {workspaceName} removes its shipment history, depots,
-              reports and every member's access. This cannot be undone. To go
-              on, type the workspace's name below.
-            </p>
-            <div className="mt-5 flex max-w-md flex-col gap-2">
-              <label htmlFor="confirm-name" className={LABEL}>
-                Confirm workspace name
-              </label>
-              <Input
-                id="confirm-name"
-                autoComplete="off"
-                value={confirmName}
-                onChange={(e) => setConfirmName(e.target.value)}
-                className="text-body md:text-body"
-              />
-            </div>
-            <Button
-              variant="destructive"
-              disabled={confirmName !== workspaceName}
-              onClick={() => setDeleted(true)}
-              className={cn(BUTTON, "mt-3 hover:text-foreground")}
-            >
-              <TriangleAlert strokeWidth={1.5} aria-hidden="true" />
-              Delete workspace
-            </Button>
-          </div>
-        )}
-        <p
-          ref={statusRef}
-          role="status"
-          tabIndex={deleted ? -1 : undefined}
-          className={FOCUS_CODE}
-        >
-          {deleted ? "This is where the workspace would be deleted." : ""}
-        </p>
-      </div>
-    </section>
-  )
-}
-
-export function App() {
-  const [workspace, setWorkspace] = useState<WorkspaceValues>({
-    name: "Northgate North",
-    address: "northgate-north",
-    timeZone: "Europe/London",
-  })
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
-      <TopBar />
+      <header className="border-b bg-card">
+        <div className="mx-auto flex max-w-[1280px] items-center gap-8 px-3 py-3 md:px-5">
+          <a
+            href="/"
+            className={cn("font-heading text-h2 text-foreground", FOCUS)}
+          >
+            Northgate
+          </a>
+          <nav aria-label="Main" className="hidden items-center gap-5 md:flex">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                aria-current={link.href === CURRENT ? "page" : undefined}
+                className={linkClass(link.href)}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+          <p className={cn("ml-auto hidden md:block", SMALL_FIGURE)}>{ME}</p>
+          <Button
+            variant="outline"
+            className={cn("ml-auto md:hidden", BUTTON)}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            Menu
+          </Button>
+        </div>
+        <nav
+          id="mobile-menu"
+          aria-label="Main"
+          hidden={!menuOpen}
+          className="border-t md:hidden"
+        >
+          <div className="mx-auto max-w-[1280px] px-3 py-2 md:px-5">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                aria-current={link.href === CURRENT ? "page" : undefined}
+                className={cn("block py-2", linkClass(link.href))}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      </header>
+
       <main className="mx-auto grid max-w-[1280px] grid-cols-1 gap-5 px-3 py-5 md:grid-cols-12 md:px-5">
         <div className="flex flex-wrap items-center justify-between gap-3 md:col-span-12">
           <h1 className="text-h1">Settings</h1>
@@ -782,25 +389,431 @@ export function App() {
           aria-label="Settings sections"
           className="overflow-hidden rounded-xl border bg-card md:col-span-12 lg:sticky lg:top-5 lg:col-span-3 lg:self-start"
         >
-          {SECTIONS.map((s) => (
+          {SECTIONS.map((section) => (
             <a
-              key={s.href}
-              href={s.href}
+              key={section.href}
+              href={section.href}
               className={cn(
                 "block border-t px-5 py-2 text-body text-foreground underline-offset-4 transition-colors duration-150 first:border-t-0 hover:underline",
-                FOCUS_INSET
+                FOCUS_INSIDE
               )}
             >
-              {s.label}
+              {section.label}
             </a>
           ))}
         </nav>
 
-        <div className="flex min-w-0 flex-col gap-5 md:col-span-12 lg:col-span-9">
-          <WorkspacePanel saved={workspace} onSave={setWorkspace} />
-          <NotificationsPanel />
-          <MembersPanel />
-          <DangerZonePanel workspaceName={workspace.name} />
+        <div className="flex flex-col gap-5 md:col-span-12 lg:col-span-9">
+          {/* Workspace */}
+          <section
+            id="workspace"
+            aria-labelledby="workspace-heading"
+            className="scroll-mt-5 rounded-xl border bg-card p-5"
+          >
+            <HeadingRow>
+              <PanelHeading id="workspace-heading">Workspace</PanelHeading>
+            </HeadingRow>
+            <form noValidate onSubmit={saveWorkspace} className="mt-3">
+              <div className="flex flex-col gap-5">
+                <div className="max-w-md">
+                  <label htmlFor="workspace-name" className={cn("block", LABEL)}>
+                    Workspace name
+                  </label>
+                  <div className="mt-2">
+                    <Input
+                      ref={nameRef}
+                      id="workspace-name"
+                      name="name"
+                      required
+                      autoComplete="off"
+                      value={workspace.name}
+                      aria-invalid={nameError || undefined}
+                      aria-describedby={nameError ? "workspace-name-error" : undefined}
+                      onChange={(e) => {
+                        setWorkspace({ ...workspace, name: e.target.value })
+                        setNameError(false)
+                      }}
+                      className={INPUT}
+                    />
+                  </div>
+                  {nameError && (
+                    <ErrorLine id="workspace-name-error">
+                      Enter a name for the workspace. It cannot be empty.
+                    </ErrorLine>
+                  )}
+                </div>
+
+                <div className="max-w-md">
+                  <label htmlFor="workspace-address" className={cn("block", LABEL)}>
+                    Address
+                  </label>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span id="workspace-address-prefix" className={SMALL_FIGURE}>
+                      northgate.example/
+                    </span>
+                    <Input
+                      id="workspace-address"
+                      name="address"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={workspace.address}
+                      aria-describedby="workspace-address-prefix workspace-address-help"
+                      onChange={(e) =>
+                        setWorkspace({
+                          ...workspace,
+                          address: e.target.value
+                            .toLowerCase()
+                            .replace(/[^a-z0-9-]/g, ""),
+                        })
+                      }
+                      className={INPUT}
+                    />
+                  </div>
+                  <p
+                    id="workspace-address-help"
+                    className="mt-2 font-mono text-label text-muted-foreground"
+                  >
+                    Use lowercase letters, numbers and hyphens only.
+                  </p>
+                </div>
+
+                <div className="max-w-md">
+                  <label htmlFor="workspace-time-zone" className={cn("block", LABEL)}>
+                    Time zone
+                  </label>
+                  <div className="mt-2">
+                    <Select
+                      items={TIME_ZONES}
+                      value={workspace.timeZone}
+                      onValueChange={(value) => {
+                        if (value !== null) setWorkspace({ ...workspace, timeZone: value })
+                      }}
+                    >
+                      <SelectTrigger id="workspace-time-zone">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_ZONES.map((tz) => (
+                          <SelectItem key={tz.value} value={tz.value}>
+                            {tz.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-5">
+                <Button
+                  type="submit"
+                  focusableWhenDisabled
+                  disabled={!workspaceDirty}
+                  className={BUTTON}
+                >
+                  Save changes
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={!workspaceDirty}
+                  onClick={discardWorkspace}
+                  className={BUTTON}
+                >
+                  Discard
+                </Button>
+                <SavedStatus show={workspaceSaved} />
+              </div>
+            </form>
+          </section>
+
+          {/* Notifications */}
+          <section
+            id="notifications"
+            aria-labelledby="notifications-heading"
+            className="scroll-mt-5 rounded-xl border bg-card p-5"
+          >
+            <HeadingRow>
+              <PanelHeading id="notifications-heading">Notifications</PanelHeading>
+            </HeadingRow>
+            <form noValidate onSubmit={saveNotifications} className="mt-3">
+              <ul>
+                {NOTIFICATIONS.map((item, index) => (
+                  <li
+                    key={item.key}
+                    className="flex items-start justify-between gap-5 border-t py-3 first:border-t-0 first:pt-0 last:pb-0"
+                  >
+                    <div>
+                      <p
+                        id={`notify-${item.key}-title`}
+                        className="font-sans text-body font-medium"
+                      >
+                        {item.title}
+                      </p>
+                      <p
+                        id={`notify-${item.key}-text`}
+                        className="mt-1 max-w-md text-body text-muted-foreground"
+                      >
+                        {item.text}
+                      </p>
+                    </div>
+                    <Switch
+                      ref={index === 0 ? firstSwitchRef : undefined}
+                      checked={notifications[item.key]}
+                      onCheckedChange={(checked) =>
+                        setNotifications({ ...notifications, [item.key]: checked })
+                      }
+                      aria-labelledby={`notify-${item.key}-title`}
+                      aria-describedby={`notify-${item.key}-text`}
+                      className="mt-1"
+                    />
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5 flex flex-wrap items-center gap-3 border-t pt-5">
+                <Button
+                  type="submit"
+                  focusableWhenDisabled
+                  disabled={!notificationsDirty}
+                  className={BUTTON}
+                >
+                  Save changes
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={!notificationsDirty}
+                  onClick={discardNotifications}
+                  className={BUTTON}
+                >
+                  Discard
+                </Button>
+                <SavedStatus show={notificationsSaved} />
+              </div>
+            </form>
+          </section>
+
+          {/* Members */}
+          <section
+            id="members"
+            aria-labelledby="members-heading"
+            className="scroll-mt-5 overflow-hidden rounded-xl border bg-card"
+          >
+            <div className="border-b px-5 pt-5 pb-3">
+              <HeadingRow>
+                <PanelHeading id="members-heading">Members</PanelHeading>
+                <p className={SMALL_FIGURE}>{memberCount}</p>
+              </HeadingRow>
+            </div>
+
+            <Table label="Members" className="text-body">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className={cn("px-5", LABEL)}>Name</TableHead>
+                  <TableHead className={cn("px-5", LABEL)}>Email</TableHead>
+                  <TableHead className={cn("px-5", LABEL)}>Role</TableHead>
+                  <TableHead className={cn("px-5 text-right", LABEL)}>
+                    Last active
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {members.map((member) => {
+                  const who = member.name ?? member.email
+                  return (
+                    <TableRow key={member.email}>
+                      <TableCell className="px-5 py-2">
+                        {member.name ?? (
+                          <>
+                            <span aria-hidden="true">—</span>
+                            <span className="sr-only">No name yet</span>
+                          </>
+                        )}
+                        {member.you && (
+                          <span className="ml-2 font-mono text-label uppercase text-muted-foreground">
+                            You
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="px-5 py-2">{member.email}</TableCell>
+                      <TableCell className="px-5 py-2">
+                        {member.you ? (
+                          ROLES.find((r) => r.value === member.role)?.label
+                        ) : (
+                          <div className="w-32">
+                            <Select
+                              items={ROLES}
+                              value={member.role}
+                              onValueChange={(value) => {
+                                if (value !== null) setRole(member.email, value)
+                              }}
+                            >
+                              <SelectTrigger aria-label={`Role of ${who}`}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {ROLES.map((role) => (
+                                  <SelectItem key={role.value} value={role.value}>
+                                    {role.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="px-5 py-2 text-right">
+                        {member.lastActive ? (
+                          <time
+                            dateTime={member.lastActive.dateTime}
+                            className="font-mono tabular-nums"
+                          >
+                            {member.lastActive.text}
+                          </time>
+                        ) : (
+                          <span className="inline-flex items-center gap-2">
+                            <span
+                              aria-hidden="true"
+                              className="size-2 shrink-0 rounded-full bg-muted-foreground"
+                            />
+                            <span className="text-body text-foreground">Invited</span>
+                          </span>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
+              </TableBody>
+            </Table>
+
+            <div className="border-t px-5 py-5">
+              <form noValidate onSubmit={sendInvite}>
+                <div className="flex flex-wrap items-end gap-3">
+                  <div className="flex w-full flex-col gap-2 md:w-64">
+                    <label htmlFor="invite-email" className={LABEL}>
+                      Invite by email
+                    </label>
+                    <Input
+                      ref={inviteRef}
+                      id="invite-email"
+                      type="email"
+                      name="email"
+                      autoComplete="off"
+                      spellCheck={false}
+                      value={inviteEmail}
+                      aria-invalid={inviteError ? true : undefined}
+                      aria-describedby={inviteError ? "invite-email-error" : undefined}
+                      onChange={(e) => {
+                        setInviteEmail(e.target.value)
+                        setInviteError(null)
+                        setInviteSent(null)
+                      }}
+                      className={INPUT}
+                    />
+                  </div>
+                  <div className="flex w-32 flex-col gap-2">
+                    <label htmlFor="invite-role" className={LABEL}>
+                      Role
+                    </label>
+                    <Select
+                      items={ROLES}
+                      value={inviteRole}
+                      onValueChange={(value) => {
+                        if (value !== null) setInviteRole(value)
+                      }}
+                    >
+                      <SelectTrigger id="invite-role">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {ROLES.map((role) => (
+                          <SelectItem key={role.value} value={role.value}>
+                            {role.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button type="submit" variant="secondary" className={BUTTON}>
+                    Send invite
+                  </Button>
+                </div>
+                {inviteError && (
+                  <ErrorLine id="invite-email-error">{inviteError}</ErrorLine>
+                )}
+                <div role="status">
+                  {inviteSent && (
+                    <p className="mt-2 flex items-start gap-2 text-body">
+                      <Check
+                        className="mt-1 size-4 shrink-0 text-success"
+                        strokeWidth={1.5}
+                        aria-hidden="true"
+                      />
+                      <span className="min-w-0 break-words">
+                        Invite sent to {inviteSent}
+                      </span>
+                    </p>
+                  )}
+                </div>
+              </form>
+            </div>
+          </section>
+
+          {/* Danger zone */}
+          <section
+            id="danger-zone"
+            aria-labelledby="danger-zone-heading"
+            className="flex-1 scroll-mt-5 rounded-xl border bg-card p-5"
+          >
+            <HeadingRow>
+              <PanelHeading id="danger-zone-heading">Danger zone</PanelHeading>
+            </HeadingRow>
+            <div className="mt-3">
+              {!deleted && (
+                <div>
+                  <h3 className="font-sans text-body font-medium">
+                    Delete this workspace
+                  </h3>
+                  <p className="mt-1 max-w-md text-body">
+                    Deleting {savedWorkspace.name} removes its shipments, depots,
+                    reports and members for good. This cannot be undone. To go on,
+                    type the workspace's name below.
+                  </p>
+                  <div className="mt-5 max-w-md">
+                    <label htmlFor="confirm-name" className={cn("block", LABEL)}>
+                      Confirm workspace name
+                    </label>
+                    <div className="mt-2">
+                      <Input
+                        id="confirm-name"
+                        autoComplete="off"
+                        spellCheck={false}
+                        value={confirmName}
+                        onChange={(e) => setConfirmName(e.target.value)}
+                        className={INPUT}
+                      />
+                    </div>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    disabled={confirmName !== savedWorkspace.name}
+                    onClick={() => setDeleted(true)}
+                    className={cn("mt-3 hover:text-foreground", BUTTON)}
+                  >
+                    <TriangleAlert strokeWidth={1.5} className="size-4" aria-hidden="true" />
+                    Delete workspace
+                  </Button>
+                </div>
+              )}
+              <p
+                ref={deletedRef}
+                role="status"
+                tabIndex={deleted ? -1 : undefined}
+                className="focus:outline-solid focus:outline-2 focus:outline-offset-2 focus:outline-ring"
+              >
+                {deleted ? "This is where the workspace would be deleted." : ""}
+              </p>
+            </div>
+          </section>
         </div>
       </main>
     </div>

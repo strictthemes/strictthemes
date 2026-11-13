@@ -73,11 +73,6 @@
     --font-mono: 'Red Hat Mono Variable', monospace;
 }
 
-@layer base {
-  :root { color-scheme: light; }
-  .dark { color-scheme: dark; }
-}
-
 :root {
     --background: #F3F6F8;
     --foreground: #16242E;

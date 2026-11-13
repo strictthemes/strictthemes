@@ -5,17 +5,22 @@ import { cn } from "@/lib/utils"
 const focusRing =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const textLink = cn(
-  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
-  focusRing
-)
-
-const navLink = cn(
+const navLinkClass = cn(
   "inline-flex h-11 items-center text-body text-foreground decoration-1 underline-offset-4 transition-colors duration-150 hover:underline",
   focusRing
 )
 
-const navItems = [
+const textLinkClass = cn(
+  "text-foreground underline decoration-1 underline-offset-4 transition-colors duration-150 hover:text-muted-foreground",
+  focusRing
+)
+
+const cardClass = "rounded-xl border border-border bg-card p-7"
+
+const badgeClass =
+  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground"
+
+const navLinks = [
   { label: "Approach", href: "/approach" },
   { label: "About", href: "/about" },
   { label: "Fees", href: "/fees" },
@@ -24,19 +29,22 @@ const navItems = [
 
 const currentHref = "/about"
 
-const badgeClass =
-  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label font-normal text-tertiary-foreground"
-
-const label = "font-mono text-label"
-
-type TrainingRow = {
-  year?: string
-  title: string
-  detail: string
+function NavLink({ label, href }: { label: string; href: string }) {
+  const current = href === currentHref
+  return (
+    <a
+      href={href}
+      aria-current={current ? "page" : undefined}
+      className={cn(navLinkClass, current && "underline")}
+    >
+      {label}
+    </a>
+  )
 }
 
-const training: TrainingRow[] = [
+const training = [
   {
+    year: null,
     title: "Thirty hours of further training",
     detail: "And supervision once a month",
   },
@@ -71,14 +79,7 @@ const areas = [
   "A change you did not choose",
 ]
 
-type SessionDay = {
-  day: string
-  start: string
-  end: string
-  where: string[]
-}
-
-const sessionDays: SessionDay[] = [
+const sessions = [
   { day: "Tuesday", start: "09:00", end: "17:00", where: ["In person"] },
   {
     day: "Wednesday",
@@ -89,27 +90,6 @@ const sessionDays: SessionDay[] = [
   { day: "Thursday", start: "09:00", end: "17:00", where: ["Online"] },
   { day: "Friday", start: "09:00", end: "13:00", where: ["Online"] },
 ]
-
-function NavList({ vertical = false }: { vertical?: boolean }) {
-  return (
-    <ul className={vertical ? undefined : "flex flex-wrap gap-x-4 md:gap-x-7"}>
-      {navItems.map((item) => {
-        const current = item.href === currentHref
-        return (
-          <li key={item.href}>
-            <a
-              href={item.href}
-              aria-current={current ? "page" : undefined}
-              className={cn(navLink, current && "underline")}
-            >
-              {item.label}
-            </a>
-          </li>
-        )
-      })}
-    </ul>
-  )
-}
 
 export function App() {
   return (
@@ -125,7 +105,13 @@ export function App() {
           Nora Ellingham
         </a>
         <nav aria-label="Main" className="w-full md:ml-auto md:w-auto">
-          <NavList />
+          <ul className="flex flex-wrap gap-x-4 md:gap-x-7">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <NavLink {...link} />
+              </li>
+            ))}
+          </ul>
         </nav>
       </header>
 
@@ -147,7 +133,7 @@ export function App() {
                 <h1 id="intro-heading" className="text-h1 md:text-display">
                   Nora Ellingham
                 </h1>
-                <p className={cn("mt-2 text-muted-foreground", label)}>
+                <p className="mt-2 font-mono text-label text-muted-foreground">
                   Registered psychotherapist · In practice since 2014
                 </p>
               </div>
@@ -180,10 +166,10 @@ export function App() {
             <dl className="mt-7 list-none border-b border-border p-0">
               {training.map((row) => (
                 <div
-                  key={`${row.year ?? "each"}-${row.title}`}
+                  key={row.title}
                   className="grid grid-cols-3 items-baseline gap-x-4 border-t border-border py-4"
                 >
-                  <dt className={cn("text-muted-foreground", label)}>
+                  <dt className="font-mono text-label text-muted-foreground">
                     {row.year ? (
                       <time dateTime={row.year} className="tabular-nums">
                         {row.year}
@@ -194,7 +180,7 @@ export function App() {
                   </dt>
                   <dd className="col-span-2 text-body">
                     <p className="text-body">{row.title}</p>
-                    <p className={cn("mt-2 text-muted-foreground", label)}>
+                    <p className="mt-2 font-mono text-label text-muted-foreground">
                       {row.detail}
                     </p>
                   </dd>
@@ -206,7 +192,12 @@ export function App() {
               the register, ask and I will send it.
             </p>
           </div>
-          <div className="mt-12 rounded-xl border border-border bg-card p-7 md:col-span-4 md:col-start-9 md:mt-0 md:self-start">
+          <div
+            className={cn(
+              cardClass,
+              "mt-12 md:col-span-4 md:col-start-9 md:mt-0 md:self-start"
+            )}
+          >
             <h3 className="text-h2">Languages</h3>
             <p className="mt-4 text-body">
               English and Dutch. A session can be in either, or move between
@@ -242,7 +233,7 @@ export function App() {
             <p className="mt-7 max-w-xl text-body">
               I do not work with couples, families or anyone under 18. The rest
               of what I do not offer is on{" "}
-              <a href="/approach#not-offered" className={textLink}>
+              <a href="/approach#not-offered" className={textLinkClass}>
                 the page about how I work
               </a>
               .
@@ -287,7 +278,7 @@ export function App() {
                 </tr>
               </thead>
               <tbody>
-                {sessionDays.map((row) => (
+                {sessions.map((row) => (
                   <tr key={row.day} className="border-t border-border">
                     <th
                       scope="row"
@@ -321,22 +312,27 @@ export function App() {
               No sessions on Mondays, at weekends or on public holidays.
             </p>
           </div>
-          <div className="mt-12 rounded-xl border border-border bg-card p-7 md:col-span-4 md:col-start-9 md:mt-0 md:self-start">
+          <div
+            className={cn(
+              cardClass,
+              "mt-12 md:col-span-4 md:col-start-9 md:mt-0 md:self-start"
+            )}
+          >
             <h3 className="text-h2">Finding the room</h3>
             <p className="mt-4 text-body">
               The Garden Room is behind 14 Orchard Row, through the side gate.
-              There is one low step. If steps are difficult, tell me, and we
-              can meet online.
+              There is one low step. If steps are difficult, tell me, and we can
+              meet online.
             </p>
           </div>
         </section>
 
         <section
-          aria-labelledby="action-heading"
+          aria-labelledby="meet-heading"
           className="mt-28 grid grid-cols-1 md:grid-cols-12 md:gap-x-7"
         >
-          <div className="rounded-xl border border-border bg-card p-7 md:col-span-7">
-            <h2 id="action-heading" className="text-h2">
+          <div className={cn(cardClass, "md:col-span-7")}>
+            <h2 id="meet-heading" className="text-h2">
               If you would like to meet
             </h2>
             <p className="mt-4 max-w-xl text-body">
@@ -362,14 +358,14 @@ export function App() {
         <div className="grid grid-cols-1 md:grid-cols-12 md:gap-x-7">
           <div className="md:col-span-7">
             <p className="font-heading text-h2">Nora Ellingham</p>
-            <p className={cn("mt-2 text-muted-foreground", label)}>
+            <p className="mt-2 font-mono text-label text-muted-foreground">
               Registered psychotherapist · Larkmere and online
             </p>
             <address className="mt-7 text-body not-italic">
               The Garden Room, 14 Orchard Row, Larkmere LK2 4DN
             </address>
             <p className="mt-2 text-body">
-              <a href="mailto:hello@ellingham.example" className={textLink}>
+              <a href="mailto:hello@ellingham.example" className={textLinkClass}>
                 hello@ellingham.example
               </a>
             </p>
@@ -378,7 +374,13 @@ export function App() {
             aria-label="Footer"
             className="mt-7 md:col-span-4 md:col-start-9 md:mt-0"
           >
-            <NavList vertical />
+            <ul>
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <NavLink {...link} />
+                </li>
+              ))}
+            </ul>
           </nav>
         </div>
         <p className="mt-7 max-w-xl text-body text-foreground">

@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import { Check, Minus } from "lucide-react"
 
 import {
@@ -23,35 +23,30 @@ import { cn } from "@/lib/utils"
 const focusOutline =
   "focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 
-const buttonClasses = "h-10 px-5 font-sans text-body font-semibold"
-
-const badgeClasses =
-  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
-
 const smallFigure = "font-mono text-label tabular-nums text-muted-foreground"
 
-const navLinks = [
-  { label: "Courses", href: "/catalogue", current: false },
-  { label: "My progress", href: "/progress", current: false },
-  { label: "Plans", href: "/plans", current: true },
-]
+const badgeClass =
+  "h-auto rounded-sm border-transparent bg-tertiary px-2 py-1 font-mono text-label text-tertiary-foreground"
+
+const buttonClass = "h-10 px-5 font-sans text-body font-semibold"
 
 type Billing = "monthly" | "yearly"
 
-type Price = { amount: string; unit: string; note: string }
-
 type Plan = {
+  id: string
   name: string
-  badge?: string
-  price: Record<Billing, Price>
+  marked: boolean
+  price: Record<Billing, { amount: string; unit: string; note: string }>
   audience: string
-  includes: { text: string; has: boolean }[]
+  includes: { has: boolean; text: string }[]
   cta: { label: string; variant: "default" | "secondary" }
 }
 
 const plans: Plan[] = [
   {
+    id: "free",
     name: "Free",
+    marked: false,
     price: {
       monthly: {
         amount: "$0",
@@ -66,17 +61,18 @@ const plans: Plan[] = [
     },
     audience: "For trying a course before you decide.",
     includes: [
-      { text: "The first module of every course", has: true },
-      { text: "A question at the end of each lesson", has: true },
-      { text: "Your progress and your days in a row", has: true },
-      { text: "No practice files", has: false },
-      { text: "No certificates", has: false },
+      { has: true, text: "The first module of every course" },
+      { has: true, text: "A question at the end of each lesson" },
+      { has: true, text: "Your progress and your days in a row" },
+      { has: false, text: "No practice files" },
+      { has: false, text: "No certificates" },
     ],
     cta: { label: "Start for free", variant: "secondary" },
   },
   {
+    id: "plus",
     name: "Plus",
-    badge: "Most chosen",
+    marked: true,
     price: {
       monthly: { amount: "$18", unit: "a month", note: "Billed every month" },
       yearly: {
@@ -87,15 +83,17 @@ const plans: Plan[] = [
     },
     audience: "For one learner who wants every course.",
     includes: [
-      { text: "All 9 courses, 102 lessons", has: true },
-      { text: "Practice files for every lesson", has: true },
-      { text: "A certificate for each course you finish", has: true },
-      { text: "Everything in Free", has: true },
+      { has: true, text: "All 9 courses, 102 lessons" },
+      { has: true, text: "Practice files for every lesson" },
+      { has: true, text: "A certificate for each course you finish" },
+      { has: true, text: "Everything in Free" },
     ],
     cta: { label: "Choose Plus", variant: "default" },
   },
   {
+    id: "team",
     name: "Team",
+    marked: false,
     price: {
       monthly: {
         amount: "$24",
@@ -110,23 +108,23 @@ const plans: Plan[] = [
     },
     audience: "For a team that learns together at work.",
     includes: [
-      { text: "Everything in Plus, for 3 to 50 learners", has: true },
-      { text: "The whole team's progress on one page", has: true },
-      { text: "One invoice, by card or bank transfer", has: true },
+      { has: true, text: "Everything in Plus, for 3 to 50 learners" },
+      { has: true, text: "The whole team's progress on one page" },
+      { has: true, text: "One invoice, by card or bank transfer" },
     ],
     cta: { label: "Choose Team", variant: "secondary" },
   },
 ]
 
 type Cell =
-  | { kind: "yes" }
-  | { kind: "no" }
   | { kind: "figure"; text: string }
   | { kind: "phrase"; text: string }
+  | { kind: "yes" }
+  | { kind: "no" }
 
 const yes: Cell = { kind: "yes" }
 const no: Cell = { kind: "no" }
-const figure = (text: string): Cell => ({ kind: "figure", text })
+const fig = (text: string): Cell => ({ kind: "figure", text })
 const phrase = (text: string): Cell => ({ kind: "phrase", text })
 
 function comparisonRows(billing: Billing): { name: string; cells: Cell[] }[] {
@@ -135,9 +133,9 @@ function comparisonRows(billing: Billing): { name: string; cells: Cell[] }[] {
     {
       name: "Price",
       cells: [
-        figure("$0"),
-        figure(yearly ? "$15 a month" : "$18 a month"),
-        figure(yearly ? "$20 a learner a month" : "$24 a learner a month"),
+        fig("$0"),
+        fig(yearly ? "$15 a month" : "$18 a month"),
+        fig(yearly ? "$20 a learner a month" : "$24 a learner a month"),
       ],
     },
     {
@@ -148,10 +146,7 @@ function comparisonRows(billing: Billing): { name: string; cells: Cell[] }[] {
     { name: "Progress and days in a row", cells: [yes, yes, yes] },
     { name: "Practice files", cells: [no, yes, yes] },
     { name: "Certificates", cells: [no, yes, yes] },
-    {
-      name: "Learners",
-      cells: [figure("1"), figure("1"), figure("3 to 50")],
-    },
+    { name: "Learners", cells: [fig("1"), fig("1"), fig("3 to 50")] },
     { name: "The team's progress on one page", cells: [no, no, yes] },
     {
       name: "Answers by email",
@@ -166,55 +161,39 @@ function comparisonRows(billing: Billing): { name: string; cells: Cell[] }[] {
 
 const questions = [
   {
-    value: "q1",
-    question: "Can I try a course before I pay?",
-    answer:
-      "Yes. The first module of every course is free, and you do not need a card to start.",
+    q: "Can I try a course before I pay?",
+    a: "Yes. The first module of every course is free, and you do not need a card to start.",
   },
   {
-    value: "q2",
-    question: "What happens if I stop paying for Plus?",
-    answer:
-      "You keep your progress and your certificates. Lessons after the first module of each course close until you come back.",
+    q: "What happens if I stop paying for Plus?",
+    a: "You keep your progress and your certificates. Lessons after the first module of each course close until you come back.",
   },
   {
-    value: "q3",
-    question: "Can I pay once a year?",
-    answer:
-      "Yes. Plus is $180 a year, which is two months free. Team is $240 a learner a year.",
+    q: "Can I pay once a year?",
+    a: "Yes. Plus is $180 a year, which is two months free. Team is $240 a learner a year.",
   },
   {
-    value: "q4",
-    question: "How does Team work?",
-    answer:
-      "One person pays for 3 to 50 learners and invites them by email. Everyone gets Plus, and the person who pays sees the team's progress on one page.",
+    q: "How does Team work?",
+    a: "One person pays for 3 to 50 learners and invites them by email. Everyone gets Plus, and the person who pays sees the team's progress on one page.",
   },
   {
-    value: "q5",
-    question: "Do certificates run out?",
-    answer:
-      "No. A certificate names the course, its lessons and the day you finished, and it stays in your account.",
+    q: "Do certificates run out?",
+    a: "No. A certificate names the course, its lessons and the day you finished, and it stays in your account.",
   },
 ]
 
-function Container({
-  className,
-  children,
-}: {
-  className?: string
-  children: ReactNode
-}) {
-  return (
-    <div className={cn("mx-auto w-full max-w-[1240px] px-5", className)}>
-      {children}
-    </div>
-  )
-}
+const navLinks = [
+  { label: "Courses", href: "/catalogue" },
+  { label: "My progress", href: "/progress" },
+  { label: "Plans", href: "/plans" },
+]
+
+const CURRENT_PAGE = "/plans"
 
 function Header() {
   return (
     <header className="border-b border-border">
-      <Container className="flex flex-wrap items-center gap-x-8 gap-y-1 py-3">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center gap-x-8 gap-y-1 px-5 py-3">
         <a
           href="/catalogue"
           className={cn(
@@ -226,24 +205,27 @@ function Header() {
         </a>
         <nav aria-label="Main" className="w-full md:w-auto">
           <ul className="flex gap-5">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  aria-current={link.current ? "page" : undefined}
-                  className={cn(
-                    "inline-flex h-10 items-center font-sans text-body font-semibold text-foreground underline-offset-8",
-                    link.current ? "underline decoration-2" : "hover:underline",
-                    focusOutline
-                  )}
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
+            {navLinks.map((link) => {
+              const current = link.href === CURRENT_PAGE
+              return (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    aria-current={current ? "page" : undefined}
+                    className={cn(
+                      "inline-flex h-10 items-center font-sans text-body font-semibold text-foreground underline-offset-8",
+                      current ? "underline decoration-2" : "hover:underline",
+                      focusOutline
+                    )}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              )
+            })}
           </ul>
         </nav>
-      </Container>
+      </div>
     </header>
   )
 }
@@ -251,23 +233,13 @@ function Header() {
 function Footer() {
   return (
     <footer className="border-t border-border">
-      <Container className="flex flex-wrap items-center justify-between gap-3 py-8">
+      <div className="mx-auto flex w-full max-w-[1240px] flex-wrap items-center justify-between gap-3 px-5 py-8">
         <p className="font-heading text-h2">Rowlark</p>
         <p className={smallFigure}>
           Rowlark · Practical data skills, one short lesson at a time · 2027
         </p>
-      </Container>
+      </div>
     </footer>
-  )
-}
-
-function YesNo({ has }: { has: boolean }) {
-  const Icon = has ? Check : Minus
-  return (
-    <span className="inline-flex items-center gap-2">
-      <Icon className="size-4" aria-hidden="true" />
-      {has ? "Yes" : "No"}
-    </span>
   )
 }
 
@@ -277,9 +249,7 @@ function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
     <li className="flex h-full flex-col gap-5 rounded-xl border border-border bg-card p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-h2">{plan.name}</h3>
-        {plan.badge ? (
-          <Badge className={badgeClasses}>{plan.badge}</Badge>
-        ) : null}
+        {plan.marked && <Badge className={badgeClass}>Most chosen</Badge>}
       </div>
       <div className="flex flex-col gap-2">
         <p className="flex flex-wrap items-baseline gap-2">
@@ -292,12 +262,12 @@ function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
       </div>
       <p className="text-body">{plan.audience}</p>
       <ul className="flex flex-col gap-2 border-t border-border pt-5">
-        {plan.includes.map((item) => {
-          const Icon = item.has ? Check : Minus
+        {plan.includes.map((line) => {
+          const Icon = line.has ? Check : Minus
           return (
-            <li key={item.text} className="flex items-start gap-2 text-body">
+            <li key={line.text} className="flex items-start gap-2 text-body">
               <Icon className="mt-1 size-4 shrink-0" aria-hidden="true" />
-              <span>{item.text}</span>
+              <span>{line.text}</span>
             </li>
           )
         })}
@@ -306,7 +276,7 @@ function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
         href="#"
         className={cn(
           buttonVariants({ variant: plan.cta.variant }),
-          buttonClasses,
+          buttonClass,
           "mt-auto w-full"
         )}
       >
@@ -316,17 +286,38 @@ function PlanCard({ plan, billing }: { plan: Plan; billing: Billing }) {
   )
 }
 
+function CellContent({ cell }: { cell: Cell }): ReactNode {
+  switch (cell.kind) {
+    case "yes":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Check className="size-4" aria-hidden="true" />
+          Yes
+        </span>
+      )
+    case "no":
+      return (
+        <span className="inline-flex items-center gap-2">
+          <Minus className="size-4" aria-hidden="true" />
+          No
+        </span>
+      )
+    default:
+      return cell.text
+  }
+}
+
 export function App() {
   const [yearly, setYearly] = useState(false)
   const billing: Billing = yearly ? "yearly" : "monthly"
-  const switchLabelId = useId()
   const rows = comparisonRows(billing)
 
   return (
     <div className="flex min-h-svh flex-col bg-background text-body text-foreground">
       <Header />
+
       <main className="flex-1">
-        <Container className="flex flex-col gap-20 pt-8 pb-20">
+        <div className="mx-auto flex w-full max-w-[1240px] flex-col gap-20 px-5 pt-8 pb-20">
           <div className="flex flex-col gap-3">
             <h1 className="text-h1 md:text-display">
               One plan opens every course
@@ -348,17 +339,17 @@ export function App() {
               <label className="inline-flex min-h-10 cursor-pointer items-center gap-3">
                 <Switch
                   checked={yearly}
-                  onCheckedChange={setYearly}
-                  aria-labelledby={switchLabelId}
+                  onCheckedChange={(checked) => setYearly(checked)}
+                  aria-labelledby="pay-yearly-label"
                 />
                 <span
-                  id={switchLabelId}
+                  id="pay-yearly-label"
                   className="font-sans text-body font-semibold"
                 >
                   Pay yearly
                 </span>
               </label>
-              <Badge className={badgeClasses}>2 months free</Badge>
+              <Badge className={badgeClass}>2 months free</Badge>
               <p role="status" className="sr-only">
                 {yearly
                   ? "Prices are shown for paying yearly."
@@ -367,7 +358,7 @@ export function App() {
             </div>
             <ul className="grid grid-cols-1 gap-5 lg:grid-cols-3">
               {plans.map((plan) => (
-                <PlanCard key={plan.name} plan={plan} billing={billing} />
+                <PlanCard key={plan.id} plan={plan} billing={billing} />
               ))}
             </ul>
           </section>
@@ -381,18 +372,18 @@ export function App() {
             </h2>
             <div className="overflow-hidden rounded-xl border border-border bg-card p-0">
               <Table
-                label="Comparison of the three plans"
                 className="text-body"
+                label="Comparison of the three plans"
               >
                 <TableHeader>
                   <TableRow>
-                    {["What you get", "Free", "Plus", "Team"].map((name) => (
+                    {["What you get", "Free", "Plus", "Team"].map((head) => (
                       <TableHead
-                        key={name}
+                        key={head}
                         scope="col"
                         className="px-5 font-mono text-label text-muted-foreground"
                       >
-                        {name}
+                        {head}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -402,7 +393,7 @@ export function App() {
                     <TableRow key={row.name}>
                       <th
                         scope="row"
-                        className="px-5 py-3 text-left text-body font-normal whitespace-nowrap text-foreground"
+                        className="px-5 py-3 text-left align-middle text-body font-normal whitespace-nowrap text-foreground"
                       >
                         {row.name}
                       </th>
@@ -414,13 +405,7 @@ export function App() {
                             cell.kind === "figure" && "font-mono tabular-nums"
                           )}
                         >
-                          {cell.kind === "yes" ? (
-                            <YesNo has />
-                          ) : cell.kind === "no" ? (
-                            <YesNo has={false} />
-                          ) : (
-                            cell.text
-                          )}
+                          <CellContent cell={cell} />
                         </TableCell>
                       ))}
                     </TableRow>
@@ -439,19 +424,20 @@ export function App() {
             </h2>
             <div className="rounded-xl border border-border bg-card px-5 py-0">
               <Accordion>
-                {questions.map((item) => (
-                  <AccordionItem key={item.value} value={item.value}>
-                    <AccordionTrigger>{item.question}</AccordionTrigger>
+                {questions.map((item, index) => (
+                  <AccordionItem key={item.q} value={`q${index + 1}`}>
+                    <AccordionTrigger>{item.q}</AccordionTrigger>
                     <AccordionContent>
-                      <p className="text-body">{item.answer}</p>
+                      <p className="text-body">{item.a}</p>
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
             </div>
           </section>
-        </Container>
+        </div>
       </main>
+
       <Footer />
     </div>
   )
