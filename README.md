@@ -157,7 +157,7 @@ and a GitLab CI example.
 | [`skills/strict-theme-*`](skills) | One skill for each theme: how to build any page in it. Generated from the theme; add one with `npx skills add strictthemes/strictthemes --skill strict-theme-kiln`. | First version |
 | [`action.yml`](action.yml) | Strict Check as a GitHub Action: `uses: strictthemes/strictthemes@v1`. | First version |
 
-Planned: a generator that writes a `DESIGN.md` from a site's address.
+Strict Check also writes a `DESIGN.md` from a site's address: `npx @strictthemes/check generate https://your-site.example`.
 
 ## Develop
 
