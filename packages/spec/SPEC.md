@@ -73,25 +73,25 @@ Other headings are kept as custom sections.
 ```yaml
 strict:
   version: 1
-  contrast: AA              # AA (4.5:1) or AAA (7:1)
+  contrast: AA            # AA (4.5:1) or AAA (7:1)
   colors:
-    allow: tokens           # tokens: only token colors may appear. any: no check
-    tolerance: 0.02         # how far a color may drift from a token (OKLab distance, 0–1)
+    allow: tokens         # tokens: only token colors. any: no check
+    tolerance: 0.02       # drift allowed from a token (OKLab, 0–1)
   spacing:
-    allow: scale            # scale: only spacing tokens. any: no check
-    extra: ["0", "1px"]     # values allowed in addition to the scale
+    allow: scale          # scale: only spacing tokens. any: no check
+    extra: ["0", "1px"]   # allowed in addition to the scale
   rounded:
-    allow: scale            # scale: only rounded tokens. any: no check
-    full: 12px              # optional: the largest box that may be fully round
+    allow: scale          # scale: only rounded tokens. any: no check
+    full: 12px            # optional: largest box that may be fully round
   typography:
-    allow: scale            # only the declared sizes, weights and line heights
-    fonts: declared         # only the declared font families
-  tells:                    # signs of generic AI-made UI: off, warn or error
+    allow: scale          # only the declared sizes, weights, line heights
+    fonts: declared       # only the declared font families
+  tells:                  # signs of generic AI-made UI: off, warn, error
     purple-gradient: error
     emoji-icons: error
     nested-cards: warn
     glow-shadows: warn
-  modes:                    # extra color modes; each overrides base color tokens
+  modes:                  # extra color modes, each overriding base colors
     dark:
       colors:
         background: "#0B0B0C"

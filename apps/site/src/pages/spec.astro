@@ -1,6 +1,7 @@
 ---
 import { marked } from "marked"
 import source from "../../../../packages/spec/SPEC.md?raw"
+import specPackage from "../../../../packages/spec/package.json"
 
 import Layout from "@/layouts/Base.astro"
 
@@ -9,18 +10,46 @@ const [heading = "", ...rest] = source.split("\n")
 const title = heading.replace(/^#\s*/, "")
 const parsed = marked.parse(rest.join("\n"), { async: false })
 
+// The names marked gives a code block's language, as the label over the block.
+const LANGUAGES: Record<string, string> = { yaml: "YAML", markdown: "Markdown", json: "JSON", css: "CSS", bash: "Shell" }
+
 // Each main heading gets a name to link to, made from its words, and the page
-// gets a list of them.
+// gets a list of them. A code block gets a label with its language, and it and
+// every table become a box that scrolls sideways on a phone, which a keyboard
+// can reach.
 const contents: { id: string; title: string }[] = []
-const html = parsed.replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
-  const title = inner.replace(/<[^>]+>/g, "")
-  const id = title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-  contents.push({ id, title })
-  return `<h2 id="${id}">${inner}</h2>`
-})
+let tables = 0
+const html = parsed
+  .replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
+    const title = inner.replace(/<[^>]+>/g, "")
+    const id = title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+    contents.push({ id, title })
+    return `<h2 id="${id}"><span class="spec-number" aria-hidden="true">${String(contents.length).padStart(2, "0")}</span>${inner}</h2>`
+  })
+  .replace(/<pre><code(?: class="language-([a-z]+)")?>/g, (_, language?: string) => {
+    const name = language ? (LANGUAGES[language] ?? language) : "Code"
+    return `<div class="spec-code"><p class="spec-code-label" aria-hidden="true">${name}</p><pre tabindex="0" role="region" aria-label="${name} example"><code>`
+  })
+  .replace(/<\/code><\/pre>/g, "</code></pre></div>")
+  // On a phone a table's rows stack, and each cell after the first carries its
+  // column's name, which the stacked layout shows above it.
+  .replace(/<table>([\s\S]*?)<\/table>/g, (_, inner: string) => {
+    tables += 1
+    const headers = [...inner.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((match) => match[1]!.replace(/<[^>]+>/g, ""))
+    const body = inner.replace(/<tr>([\s\S]*?)<\/tr>/g, (row: string, cells: string) => {
+      if (!cells.includes("<td")) return row
+      let index = -1
+      return `<tr>${cells.replace(/<td([^>]*)>/g, (_cell: string, attributes: string) => {
+        index += 1
+        return `<td${attributes} data-label="${headers[index] ?? ""}">`
+      })}</tr>`
+    })
+    const section = contents.at(-1)?.title ?? title
+    return `<div class="spec-table" tabindex="0" role="region" aria-label="${section}, table ${tables}"><table>${body}</table></div>`
+  })
 ---
 
 <Layout
@@ -31,6 +60,28 @@ const html = parsed.replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
     <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
       <p class="label text-muted-foreground md:col-span-12">Spec</p>
       <h1 class="text-h1 md:col-span-10 md:text-display">{title}</h1>
+      <p class="md:col-span-7">
+        One <code class="font-mono">DESIGN.md</code> file a coding agent reads, with a block of rules a linter checks: the tokens,
+        the order of the sections, the <code class="font-mono">strict</code> block, the lint rules and the exports for Tailwind, shadcn,
+        Nuxt UI and design tokens.
+      </p>
+      <dl class="grid grid-cols-1 border-t border-border sm:grid-cols-3 md:col-span-12">
+        <div class="flex flex-col gap-1 border-b border-border py-4 sm:border-b-0 sm:pr-8">
+          <dt class="label text-muted-foreground">Format</dt>
+          <dd><code class="font-mono">DESIGN.md</code>, version alpha</dd>
+        </div>
+        <div class="flex flex-col gap-1 border-b border-border py-4 sm:border-b-0 sm:border-l sm:px-8">
+          <dt class="label text-muted-foreground">Rules</dt>
+          <dd>The <code class="font-mono">strict</code> block, version 1</dd>
+        </div>
+        <div class="flex flex-col gap-1 py-4 sm:border-l sm:pl-8">
+          <dt class="label text-muted-foreground">Package</dt>
+          <dd>
+            <a href="https://www.npmjs.com/package/@strictthemes/spec" class="text-link underline underline-offset-4">{specPackage.name}</a>{" "}
+            {specPackage.version}
+          </dd>
+        </div>
+      </dl>
     </div>
   </section>
   <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
@@ -48,7 +99,10 @@ const html = parsed.replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
           ))
         }
       </ol>
+      <p class="pt-4">
+        <a href="https://github.com/strictthemes/strictthemes/blob/master/packages/spec/SPEC.md" class="label text-link underline underline-offset-4">This spec as Markdown</a>
+      </p>
     </nav>
-    <article class="prose min-w-0 md:col-span-8" set:html={html} />
+    <article class="prose prose-spec min-w-0 md:col-span-8" set:html={html} />
   </div>
 </Layout>
