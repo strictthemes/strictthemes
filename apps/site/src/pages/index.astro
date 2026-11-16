@@ -65,39 +65,6 @@ const steps = [
   },
 ]
 
-const roadmap = [
-  {
-    name: "Spec format and linter",
-    body: "DESIGN.md plus a strict block, with exports for four targets.",
-    status: "Built",
-  },
-  {
-    name: "Free themes",
-    body: "Twenty-three themes with light and dark modes, served as a shadcn registry.",
-    status: "Built",
-  },
-  {
-    name: "Page prompts",
-    body: "Full page briefs for a theme: a landing page, an essay, a dashboard, a shop and 111 more. Five for each of the twenty-three themes, each with a preview of the page built from it.",
-    status: "Built",
-  },
-  {
-    name: "Generator",
-    body: "Point it at a site's address and get a DESIGN.md that matches what its pages use, and a skill for coding agents if you want one. Part of Strict Check.",
-    status: "Built",
-  },
-  {
-    name: "Strict Check",
-    body: "Checks a project's code and rendered pages against a spec. It runs as a command, as an MCP server, as a skill for coding agents and as a job in a CI pipeline.",
-    status: "Built",
-  },
-  {
-    name: "Agent UI kit",
-    body: "Blocks for agent interfaces: tool calls, approvals, answers still being written and citations, served for each of the twenty-three themes.",
-    status: "Built",
-  },
-]
-
 // What Strict Check does, in three lines.
 const checks = [
   {
@@ -350,31 +317,5 @@ const BACKDROP_COLUMNS = 60
           class="overflow-x-auto rounded-md border border-border bg-card p-4 text-body md:p-8 md:whitespace-pre-wrap"><code>{REPORT_SAMPLE}</code></pre>
       </div>
     </div>
-  </section>
-
-  <section class="mx-auto flex max-w-page flex-col gap-16 px-4 py-16 md:px-8">
-    <SectionHeader
-      number={pages.length > 0 ? "05" : "04"}
-      label="Roadmap"
-      title="What exists, and what is next."
-    />
-    <ul class="flex flex-col">
-      {
-        roadmap.map((item) => (
-          <li class="grid gap-2 border-t border-border py-4 md:grid-cols-12 md:gap-8">
-            <h3 class="font-sans font-semibold md:col-span-3">{item.name}</h3>
-            <p class="text-muted-foreground md:col-span-7">{item.body}</p>
-            <p
-              class:list={[
-                "label md:col-span-2 md:text-right",
-                item.status === "Built" ? "text-foreground" : "text-muted-foreground",
-              ]}
-            >
-              {item.status}
-            </p>
-          </li>
-        ))
-      }
-    </ul>
   </section>
 </Layout>
