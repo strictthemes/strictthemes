@@ -10,6 +10,8 @@ export interface ElementData {
   stock: boolean
   /** True when the element has text of its own, or is a text field. */
   hasText: boolean
+  /** How many characters of text the element has of its own. */
+  chars?: number
   /** Text color, with the opacity of the element and its ancestors applied to the alpha. */
   color: Rgba
   /** The element's own background color. */
@@ -288,6 +290,7 @@ export function collect(options: CollectOptions = {}): PageData {
           tag: element.tagName.toLowerCase(),
           stock,
           hasText,
+          chars: text.trim().length,
           color: [color[0], color[1], color[2], Math.round(color[3] * opacity * 100) / 100],
           background,
           backdrop: backdrop ? [Math.round(backdrop[0]), Math.round(backdrop[1]), Math.round(backdrop[2])] : null,

@@ -76,18 +76,40 @@ them, and fails on any error or warning.
 
 ## What was tested
 
-- **In every theme** (2026-11-12): the demo, built for each of the
+- **In every theme** (2026-11-16): the demo, built for each of the
   twenty-three themes, passes Strict Check at 100% with no errors and no
   warnings, in light and dark mode at 1280px and 375px, with hover and
-  focus: 71,464 measured values in all. The first run found one fault, a
-  main button whose hover fill fell under 7:1 in Civic, and the hover was
-  changed for every theme.
-- **A real install** (2026-11-12, shadcn CLI, a new Vite project): for Relay
-  and for Atelier, one command installed the theme and the kit, the demo was
-  put in as the page, and the project type-checked, built and passed Strict
-  Check at 100%.
-- **Not tested:** Next.js, a screen reader, and a project without a Strict
-  theme, where the type classes the blocks use do not exist.
+  focus: 72,292 measured values in all. The first run, on 2026-11-12, found
+  one fault, a main button whose hover fill fell under 7:1 in Civic, and
+  the hover was changed for every theme.
+- **A real install in every theme** (2026-11-16, shadcn CLI, a new Vite
+  project for each): one command installed the theme and the kit from
+  strictthemes.com, the demo was put in as the page, and all twenty-three
+  projects type-checked, built and passed Strict Check at 100%.
+- **Next.js** (2026-11-16, a new App Router project, static export): the
+  same install for Relay, Kiln and Strict One type-checked, built and
+  passed at 100%. The blocks also render from a server component: the two
+  that hold a ref, `approval.tsx` and `stream.tsx`, start with
+  `"use client"`.
+- **Accessibility** (2026-11-16): axe-core finds no violation of WCAG 2.2
+  A or AA, or of its best practices, in the demo of any theme, in light at
+  1280px and in dark at 375px. A walk with the keyboard found one fault:
+  pressing Allow, Deny or Stop removed the button that had the focus, and
+  the keyboard was left on nothing. The focus now moves to the answer
+  (`Allowed`, `Denied`) or to the text written so far. The status line of
+  a stream is one element whose words change, apart from the stop button,
+  so that it is read out.
+- **Not tested:** a screen reader, by ear. The checks above read the
+  accessibility tree, not the speech.
+
+## What it needs
+
+A Strict theme in the project. The blocks use the theme's type classes
+(`text-body`, `text-label`) and its colors, so the install command names the
+theme first. In a project with a `DESIGN.md` of your own, export it first
+(`npx @strictthemes/spec export DESIGN.md --format shadcn`), then copy the
+files from this folder and replace the tokens by hand: each `-sp-<token>`
+with your spacing step and each `type-<token>` with your text class.
 
 ## Not here yet
 

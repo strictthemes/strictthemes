@@ -186,7 +186,7 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
           severity: 'error',
           value: `${element.fontSize}px`,
           selector: element.selector,
-          message: `Text is ${element.fontSize}px, which is not in the type scale (${scaleText(sizes)}).`,
+          message: `Text is ${px(element.fontSize)}, which is not in the type scale (${scaleText(sizes)}).`,
         }))
       }
       if (rules.weights) {
@@ -246,7 +246,7 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
           severity: 'error',
           value: `${kind} ${px}px`,
           selector: element.selector,
-          message: `A ${kind} of ${px}px is not on the spacing scale (${scaleText(scale)}).`,
+          message: `A ${kind} of ${Math.round(px * 100) / 100}px is not on the spacing scale (${scaleText(scale)}).`,
         }))
       }
     }
@@ -267,7 +267,7 @@ export function evaluatePage(data: PageData, rules: Rules, context: PageContext)
           value: round ? 'full round' : `${radius}px`,
           selector: element.selector,
           message: !round
-            ? `Corner radius is ${radius}px, which is not one of the theme's corners (${scaleText(scale)}).`
+            ? `Corner radius is ${Math.round(radius * 100) / 100}px, which is not one of the theme's corners (${scaleText(scale)}).`
             : rules.fullRound > 0
               ? `A fully rounded box ${Math.round(side)}px across. The theme allows a full round up to ${rules.fullRound}px across.`
               : `A fully rounded box, which is not one of the theme's corners. Use it only where DESIGN.md allows a full round.`,

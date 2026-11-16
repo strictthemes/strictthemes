@@ -1,5 +1,7 @@
+"use client"
+
 import { LoaderCircle } from "lucide-react"
-import type { ReactNode } from "react"
+import { useRef, type ReactNode } from "react"
 
 export interface StreamProps {
   /** The answer so far. */
@@ -20,11 +22,14 @@ const OUTLINE =
  * An answer that is still being written: the text so far with a caret at its
  * end, a line that says the agent is working, and a way to stop it. Screen
  * readers are told once that it is busy, not read every word as it lands.
+ * The stop button leaves the page once it is pressed, so the keyboard moves
+ * to the answer so far.
  */
 export function Stream({ children, streaming, label = "Writing", onStop, stopLabel = "Stop" }: StreamProps) {
+  const answer = useRef<HTMLDivElement>(null)
   return (
     <div className="flex flex-col gap-sp-md">
-      <div aria-busy={streaming} className="text-body text-foreground">
+      <div ref={answer} tabIndex={-1} aria-busy={streaming} className={`text-body text-foreground ${OUTLINE}`}>
         {children}
         {streaming && (
           <span
@@ -33,23 +38,27 @@ export function Stream({ children, streaming, label = "Writing", onStop, stopLab
           />
         )}
       </div>
-      <div role="status" className="flex min-h-10 flex-wrap items-center gap-sp-md">
-        {streaming && (
-          <>
-            <span className="flex items-center gap-sp-sm type-label text-muted-foreground">
+      <div className="flex min-h-10 flex-wrap items-center gap-sp-md">
+        {/* The line is there from the start and only its words change: that is what gets them read out. */}
+        <span role="status" className="flex items-center gap-sp-sm type-label text-muted-foreground">
+          {streaming && (
+            <>
               <LoaderCircle aria-hidden="true" className="size-4 shrink-0 animate-spin motion-reduce:animate-none" />
               {label}
-            </span>
-            {onStop !== undefined && (
-              <button
-                type="button"
-                onClick={onStop}
-                className={`inline-flex min-h-10 items-center justify-center rounded-lg border border-border bg-background px-sp-md py-sp-sm type-label text-foreground hover:bg-muted ${OUTLINE}`}
-              >
-                {stopLabel}
-              </button>
-            )}
-          </>
+            </>
+          )}
+        </span>
+        {streaming && onStop !== undefined && (
+          <button
+            type="button"
+            onClick={() => {
+              answer.current?.focus()
+              onStop()
+            }}
+            className={`inline-flex min-h-10 items-center justify-center rounded-lg border border-border bg-background px-sp-md py-sp-sm type-label text-foreground hover:bg-muted ${OUTLINE}`}
+          >
+            {stopLabel}
+          </button>
         )}
       </div>
     </div>

@@ -161,6 +161,7 @@ test('source: finds classes, colors, gradients and emoji that are off the theme'
       '      <p style={{ fontFamily: "Georgia" }}>Serif</p>',
       '      <p style={{ fontFamily: token.fontFamily }} className="font-[family-name:var(--font-mono)]">From the theme</p>',
       '      <p style="font-family: \'IBM Plex Mono\', monospace">Declared</p>',
+      '      <p>{["#4821", "#4819"].join(", ")}</p>',
       '    </main>',
       '  )',
       '}',

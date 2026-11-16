@@ -71,8 +71,10 @@ the check uses, and writes a `DESIGN.md` from what the pages use:
   the fill of most links and buttons as `primary` with the text on it,
   quieter text, a surface, the commonest border. What is left gets a name
   from its hue (`blue`, `grey-2`).
-- **Type:** the body size, one smaller size as `label`, and up to three
-  larger ones, each with its font, weight, line height and letter spacing.
+- **Type:** the body size (the one most of the prose is set in), up to two
+  smaller sizes (`label`, and `small` or `caption`), and up to four larger
+  ones, each with its font, weight, line height and letter spacing. A size
+  a heading is set in is kept though it is used once.
 - **Spacing:** the paddings, margins and gaps used most, up to eight steps.
 - **Corners:** up to three radii, and the largest fully round box.
 - **A dark mode,** when the page looks different with the browser's color
@@ -594,19 +596,27 @@ of a `DESIGN.md` and a list of notes. The `generate` command is those two.
 
 ## What the generator does not do
 
-- **It was tried on six pages,** not on many: two of this repo's example
-  pages, where it gave back the theme's type scale, spacing and corners
-  exactly, this repo's home page, and the home pages of three public sites,
-  where some roles needed a read. No one outside this repo is known to have
-  run it.
-- **The skill was run once.** A fresh agent was given a stock shadcn
-  project, a spec and skill generated from two example pages, and a request
-  for a pricing page. It passed the check on the first run at 100% of 3,389
-  values, in both modes and on hover and focus. It had to wire the tokens
-  into the project itself and choose the layout, and it listed where the
-  skill left it guessing; the skill now covers the larger of those (wiring
-  the tokens, font names, hover and focus). The changed skill has not been
-  run again.
+- **It was run on eighteen public sites** (2026-11-16), from one page of
+  text to a news front page: documentation, shops, product home pages, a
+  government site, an encyclopedia article. Seventeen gave a spec that
+  lints, and their own pages follow it at 80% to 100%; the tidy ones are
+  near 100%, and a site with fluid sizes or a wall of palettes is not. One
+  site answers a headless browser with 403, and the command says so. The
+  first round chose a pale badge as one site's main color, a status mark's
+  green as another's border, and dropped the large headings of a third;
+  those are fixed and have a test. A role can still be wrong: read them.
+- **The skill was run three times.** Each time a fresh agent was given a
+  stock shadcn project, a generated spec and skill, and a request for a
+  page. Two pricing pages (from two example pages, and from a public
+  site's home page) passed the check on the first run at 100%, of 3,389 and
+  4,384 values, in both modes and on hover and focus. A dashboard from a
+  third site's spec was at 99.4% on the first run and 100% of 3,363 on the
+  second. Each agent
+  listed where the skill left it guessing, and the skill now says those
+  things: how to wire the tokens and remove a project's defaults, the class
+  each token becomes, which font class goes with a text size, what to do
+  without a border color, and that a brand color often fails as text. The
+  layout is still the agent's to choose: the spec cannot hold it.
 - **It reads one width.** What changes on a phone is not measured.
 - **It cannot name intent.** A color used once on a badge and a brand color
   look the same to it apart from how often they appear.

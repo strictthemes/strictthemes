@@ -1,5 +1,7 @@
+"use client"
+
 import { Check, ShieldQuestion, X } from "lucide-react"
-import { useId } from "react"
+import { useEffect, useId, useRef } from "react"
 
 export type ApprovalState = "pending" | "allowed" | "denied"
 
@@ -32,6 +34,8 @@ const OTHER = `${BUTTON} border border-border bg-background text-foreground hove
 /**
  * A request from an agent to do something it may not do on its own. It says
  * what will happen before it happens, and the answer stays on screen after.
+ * The buttons leave the page once one is pressed, so the keyboard moves to
+ * the answer: it is read out, and the next Tab goes on from there.
  */
 export function Approval({
   title,
@@ -46,6 +50,16 @@ export function Approval({
   denyLabel = "Deny",
 }: ApprovalProps) {
   const heading = useId()
+  const answer = useRef<HTMLParagraphElement>(null)
+  const pressed = useRef(false)
+  useEffect(() => {
+    if (state !== "pending" && pressed.current) answer.current?.focus()
+    pressed.current = false
+  }, [state])
+  const press = (handler?: () => void) => () => {
+    pressed.current = true
+    handler?.()
+  }
   return (
     <section
       aria-labelledby={heading}
@@ -72,20 +86,25 @@ export function Approval({
       )}
       {state === "pending" ? (
         <div className="flex flex-wrap gap-sp-sm">
-          <button type="button" onClick={onAllow} className={MAIN}>
+          <button type="button" onClick={press(onAllow)} className={MAIN}>
             {allowLabel}
           </button>
           {onAllowAlways !== undefined && (
-            <button type="button" onClick={onAllowAlways} className={OTHER}>
+            <button type="button" onClick={press(onAllowAlways)} className={OTHER}>
               {allowAlwaysLabel}
             </button>
           )}
-          <button type="button" onClick={onDeny} className={OTHER}>
+          <button type="button" onClick={press(onDeny)} className={OTHER}>
             {denyLabel}
           </button>
         </div>
       ) : (
-        <p role="status" className="flex items-center gap-sp-sm type-label text-muted-foreground">
+        <p
+          ref={answer}
+          tabIndex={-1}
+          role="status"
+          className={`flex items-center gap-sp-sm self-start type-label text-muted-foreground ${OUTLINE}`}
+        >
           {state === "allowed" ? (
             <Check aria-hidden="true" className="size-4 shrink-0" />
           ) : (

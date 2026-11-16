@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 import { Approval, type ApprovalState } from "@/components/agent/approval"
 import { Citation, Sources, type Source } from "@/components/agent/citations"
@@ -36,6 +36,7 @@ const REST = ", so the full £46.50 can go back to the card it was paid with."
 export default function Demo() {
   const [approval, setApproval] = useState<ApprovalState>("pending")
   const [streaming, setStreaming] = useState(true)
+  const request = useRef<HTMLDivElement>(null)
 
   return (
     <div className="min-h-svh bg-background text-body text-foreground">
@@ -77,21 +78,27 @@ export default function Demo() {
           <h2 id="approval" className="text-h2">
             Approval
           </h2>
-          <Approval
-            title="Refund £46.50 to the customer's card"
-            description="The order arrived with a cracked lever. A refund cannot be taken back once it is sent."
-            detail={'refund --order PW-48213 --amount 46.50 --reason "damaged on arrival"'}
-            state={approval}
-            onAllow={() => setApproval("allowed")}
-            onAllowAlways={() => setApproval("allowed")}
-            allowAlwaysLabel="Always allow refunds under £50"
-            onDeny={() => setApproval("denied")}
-          />
+          <div ref={request}>
+            <Approval
+              title="Refund £46.50 to the customer's card"
+              description="The order arrived with a cracked lever. A refund cannot be taken back once it is sent."
+              detail={'refund --order PW-48213 --amount 46.50 --reason "damaged on arrival"'}
+              state={approval}
+              onAllow={() => setApproval("allowed")}
+              onAllowAlways={() => setApproval("allowed")}
+              allowAlwaysLabel="Always allow refunds under £50"
+              onDeny={() => setApproval("denied")}
+            />
+          </div>
           {approval !== "pending" && (
             <p>
               <button
                 type="button"
-                onClick={() => setApproval("pending")}
+                onClick={() => {
+                  setApproval("pending")
+                  // This button leaves the page, so the keyboard goes back to the request's first button.
+                  requestAnimationFrame(() => request.current?.querySelector("button")?.focus())
+                }}
                 className="text-body text-foreground underline underline-offset-4 hover:decoration-2 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 Ask again

@@ -187,6 +187,8 @@ export function checkSource(dir: string, rules: Rules, options: SourceOptions = 
               // `href="#fee"` is a link to an element, not a color.
               .filter((match) => !/(href|to|id|htmlFor|for)=\{?$/.test(content.slice(0, match.index)))
               .map((match) => match[2] ?? '')
+              // `"#4821"` is an order's number far more often than a color with an alpha digit.
+              .filter((literal) => !/^#\d{4}$/.test(literal))
         for (const literal of literals) {
           const problem = colorLiteralProblem(literal, rules)
           if (!problem) continue

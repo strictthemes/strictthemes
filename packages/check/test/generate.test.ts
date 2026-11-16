@@ -150,3 +150,76 @@ test('generate: the command writes the file, and does not replace one without --
     rmSync(dir, { recursive: true, force: true })
   }
 })
+
+// A page with the things that mislead a count: a pale badge beside the one real
+// button, colored marks with borders, one large heading among many small
+// texts, and a block of code longer than the prose.
+const BUSY = `<!doctype html>
+<html><head><meta charset="utf-8"><title>App</title><style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #FFFFFF; color: #16181D; font: 400 16px/1.5 Arial, sans-serif; padding: 32px; }
+  h1 { font: 700 64px/1 Arial, sans-serif; margin-bottom: 16px; }
+  h2 { font: 700 32px/1.2 Arial, sans-serif; margin-bottom: 8px; }
+  p { margin-bottom: 16px; }
+  code { display: block; font: 400 14px/1.5 "Courier New", monospace; }
+  .meta { font-size: 13px; line-height: 1.4; }
+  .fine { font-size: 12px; line-height: 1.4; }
+  .big { font-size: 20px; line-height: 1.4; }
+  a.badge { display: inline-block; background: #FFF6D3; color: #16181D; padding: 4px 8px; text-decoration: none; }
+  a.button { display: inline-block; background: #6A3DE8; color: #FFFFFF; padding: 8px 16px; text-decoration: none; }
+  .dot { display: inline-block; width: 16px; height: 16px; border: 2px solid #1FA64A; }
+  .row { border-bottom: 1px solid #D5D8DD; padding: 8px 0; }
+</style></head><body>
+  <a class="badge" href="#">New this week</a>
+  <h1>Ship it</h1>
+  <p>One long paragraph of prose, so that most of what a visitor reads on this page is set in the body size and in the body font, not in the font of the code under it.</p>
+  <a class="button" href="#">Start</a>
+  <h2>How it works</h2>
+  <span class="big">One</span> <span class="big">Two</span> <span class="big">Three</span> <span class="big">Four</span> <span class="big">Five</span>
+  <code>const a = 1</code><code>const b = 2</code><code>const c = 3</code><code>const d = 4</code>
+  <i class="dot"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i>
+  <div class="row"><span class="meta">Today</span> <span class="fine">9:00</span></div>
+  <div class="row"><span class="meta">Monday</span> <span class="fine">9:30</span></div>
+  <div class="row"><span class="meta">Tuesday</span> <span class="fine">10:00</span></div>
+  <div class="row"><span class="meta">Wednesday</span> <span class="fine">10:30</span></div>
+  <div class="row"><span class="meta">Thursday</span> <span class="fine">11:00</span></div>
+  <div class="row"><span class="meta">Friday</span> <span class="fine">11:30</span></div>
+</body></html>`
+
+test('generate: a count alone does not pick the roles', async (t) => {
+  const dir = mkdtempSync(join(tmpdir(), 'strict-generate-'))
+  writeFileSync(join(dir, 'index.html'), BUSY)
+  const server = await serveStatic(dir)
+  try {
+    let measured
+    try {
+      measured = await measurePages(server.url)
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith('No browser')) return t.skip('no browser on this machine')
+      throw error
+    }
+    const { source } = generateSpec(measured, { name: 'App', source: 'https://app.example', date: '2026-11-16' })
+    const { spec } = lintSpec(source)
+
+    // The strong fill is the main button, not the pale badge used as often.
+    assert.equal(spec.colors.primary, '#6A3DE8')
+    // The grey line between rows is the border, not the green of four marks.
+    assert.equal(spec.colors.border, '#D5D8DD')
+
+    const size = (token: string): string | undefined => { const value = spec.typography[token]?.fontSize; return value === undefined ? undefined : String(value) }
+    // Body text is what the prose is set in, though the code has more elements.
+    assert.equal(size('body'), '16px')
+    assert.equal(spec.typography.body?.fontFamily, 'Arial')
+    // The one large heading is in the scale, with the sizes used more often.
+    assert.equal(size('display'), '64px')
+    assert.equal(size('h1'), '32px')
+    assert.equal(size('h2'), '20px')
+    // Three sizes under the body are too many; the two used most are kept.
+    assert.equal(size('label'), '13px')
+    assert.equal(size('caption'), '12px')
+    assert.equal(size('small'), undefined)
+  } finally {
+    await server.close()
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

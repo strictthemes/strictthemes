@@ -41,7 +41,7 @@ Checked against the pages it was measured from: 100% of 2885 measured values fol
 The last line matters most. After writing the spec, the command checks the same pages against it and says how much of them it covers.
 
 - **Near 100%:** your site is consistent, and the spec describes it.
-- **Around 90%:** the site has one-off values. The command lists them under "To settle by hand": colors used once or twice, text sizes outside the main five, odd paddings. That list is a to-do list for the site as much as for the spec.
+- **Around 90%:** the site has one-off values. The command lists them under "To settle by hand": colors used once or twice, text sizes outside the main scale, odd paddings. That list is a to-do list for the site as much as for the spec.
 
 ## 2. Read what it wrote
 
@@ -82,7 +82,7 @@ Check the roles before you trust them. The command counts; it does not know what
 - **Is `primary` your brand color?** On a page with one main button and twenty grey ones, counting can pick the wrong one. Swap the names if it did.
 - **Do the leftover colors belong?** A `teal` that appears on one badge is either a real status color, which deserves a real name such as `success`, or a stray to remove from the site.
 
-Type, spacing and corners follow the same idea: the body size, one smaller size for labels and up to three larger ones; the paddings and gaps used most, up to eight steps; up to three corner sizes.
+Type, spacing and corners follow the same idea: the body size, up to two smaller sizes for labels and small text, and up to four larger ones; the paddings and gaps used most, up to eight steps; up to three corner sizes.
 
 ## 3. Rewrite the notes
 

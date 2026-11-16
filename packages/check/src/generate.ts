@@ -176,8 +176,10 @@ function paletteOf(pages: PageData[], notes: string[]): { palette: Palette; uses
   const actions = all.filter((entry) => entry.action > 0 && entry.hex !== background).sort((a, b) => b.action - a.action)
   const links = all.filter((entry) => entry.link > 0 && chroma(entry.hex) > CHROMATIC).sort((a, b) => b.link - a.link)
   const fills = all.filter((entry) => entry.fill > 0 && chroma(entry.hex) > CHROMATIC && entry.hex !== background).sort((a, b) => b.fill - a.fill)
-  const primary =
-    actions.find((entry) => chroma(entry.hex) > CHROMATIC) ?? links[0] ?? actions[0] ?? fills[0] ?? uses.get(foreground)
+  // Of the colored fills, a strong color wins over a pale one used as often: a tinted badge is not the main button.
+  const strength = (entry: Use): number => entry.action * Math.min(chroma(entry.hex), 0.15)
+  const colored = actions.filter((entry) => chroma(entry.hex) > CHROMATIC).sort((a, b) => strength(b) - strength(a))
+  const primary = colored[0] ?? links[0] ?? actions[0] ?? fills[0] ?? uses.get(foreground)
   if (primary) {
     const what = primary.action > 0
       ? `the fill of ${times(primary.action, 'link or button').replace('link or buttons', 'links and buttons')}`
@@ -206,9 +208,14 @@ function paletteOf(pages: PageData[], notes: string[]): { palette: Palette; uses
   seen.set('foreground', `the commonest text color, ${times(uses.get(foreground)?.text ?? 0, 'time')}`)
   taken.add(foreground)
 
-  const border = all.filter((entry) => entry.border > 0 && entry.hex !== foreground).sort((a, b) => b.border - a.border)[0]
-    ?? all.filter((entry) => entry.border > 0).sort((a, b) => b.border - a.border)[0]
+  // The border is a line between things: a grey before a color, which is more often a mark on one element.
+  // One line on one element is not a border color for the whole site.
+  const lines = all.filter((entry) => entry.border >= 2).sort((a, b) => b.border - a.border)
+  const border = lines.find((entry) => entry.hex !== foreground && chroma(entry.hex) < 0.08)
+    ?? lines.find((entry) => entry.hex !== foreground)
+    ?? lines[0]
   if (border && !taken.has(border.hex)) set('border', border.hex, `the commonest border, ${times(border.border, 'time')}`)
+  if (!border) notes.push('The pages draw too few lines to name a border color, so the spec has none. Add a `border` color if new pages need lines between things.')
 
   // What is left, commonest first: each gets a name from its hue, and a text color when it is a fill.
   const total = all.reduce((sum, entry) => sum + entry.text + entry.fill + entry.border, 0)
@@ -309,44 +316,89 @@ interface TypeToken {
 const FAMILY_SUFFIX = / (variable|var|vf)$/i
 const GENERIC = new Set(['serif', 'sans-serif', 'monospace', 'cursive', 'fantasy', 'system-ui', 'ui-serif', 'ui-sans-serif', 'ui-monospace', 'ui-rounded', 'math', 'emoji', 'fangsong', '-apple-system', 'blinkmacsystemfont'])
 
-/** The type scale: the body size, one label size under it, and up to three heading sizes over it. */
+/** A font that is for code. */
+const MONO = /mono|code|courier|consolas|menlo/i
+
+/** A size used this seldom is left out of the scale, unless a heading is set in it. */
+const RARE = 0.05
+
+/**
+ * The type scale: the body size, up to two smaller sizes under it, and up to
+ * four heading sizes over it.
+ */
 function typeScale(pages: PageData[], notes: string[]): TypeToken[] {
-  interface Size { size: number; count: number; family: Map<string, number>; weight: Map<number, number>; lineHeight: Map<number, number>; letterSpacing: Map<number, number> }
+  interface Face { chars: number; weight: Map<number, number>; lineHeight: Map<number, number>; letterSpacing: Map<number, number> }
+  interface Size { size: number; count: number; chars: number; written: number; headings: number; faces: Map<string, Face> }
   const sizes = new Map<number, Size>()
+  let texts = 0
   for (const page of pages) {
     for (const element of page.elements) {
       if (!visible(element) || !element.hasText || element.raised) continue
+      texts++
       const size = Math.round(element.fontSize * 2) / 2
+      const family = element.fontFamily.replace(FAMILY_SUFFIX, '')
+      // A long paragraph says more about a size than a one-word label does. Text in a code font
+      // counts for less: a page that shows code has much of it, and it is not what the page is read in.
+      const written = Math.max(1, element.chars ?? 1)
+      const chars = written * (MONO.test(family) ? 0.2 : 1)
       let entry = sizes.get(size)
-      if (!entry) sizes.set(size, (entry = { size, count: 0, family: new Map(), weight: new Map(), lineHeight: new Map(), letterSpacing: new Map() }))
+      if (!entry) sizes.set(size, (entry = { size, count: 0, chars: 0, written: 0, headings: 0, faces: new Map() }))
       entry.count++
-      bump(entry.family, element.fontFamily.replace(FAMILY_SUFFIX, ''))
-      bump(entry.weight, element.fontWeight)
-      if (element.lineHeight > 0 && !['input', 'textarea', 'select'].includes(element.tag)) bump(entry.lineHeight, Math.round((element.lineHeight / element.fontSize) * 100) / 100)
-      bump(entry.letterSpacing, Math.round((element.letterSpacing / element.fontSize) * 1000) / 1000)
+      entry.chars += chars
+      if (/^h[1-3]$/.test(element.tag)) entry.headings++
+      let face = entry.faces.get(family)
+      if (!face) entry.faces.set(family, (face = { chars: 0, weight: new Map(), lineHeight: new Map(), letterSpacing: new Map() }))
+      // Within a size the code font counts in full: where most of a size is code, that is its font.
+      face.chars += written
+      entry.written += written
+      bump(face.weight, element.fontWeight)
+      if (element.lineHeight > 0 && !['input', 'textarea', 'select'].includes(element.tag)) bump(face.lineHeight, Math.round((element.lineHeight / element.fontSize) * 100) / 100)
+      bump(face.letterSpacing, Math.round((element.letterSpacing / element.fontSize) * 1000) / 1000)
     }
   }
   const all = [...sizes.values()]
   if (all.length === 0) return []
-  const token = (name: string, entry: Size): TypeToken => ({
-    name,
-    size: entry.size,
-    family: top(entry.family) ?? 'sans-serif',
-    weight: top(entry.weight) ?? 400,
-    lineHeight: top(entry.lineHeight) ?? null,
-    letterSpacing: top(entry.letterSpacing) ?? 0,
-    count: entry.count,
-  })
+  // A size takes the font most of its text is set in, and that font's weight and line height.
+  const faceOf = (entry: Size, prefer?: string): [string, Face] => {
+    const faces = [...entry.faces].sort((a, b) => b[1].chars - a[1].chars)
+    // One odd element should not give a size a font of its own: the body's font wins where a fair share is set in it.
+    const own = faces.find(([family, face]) => family === prefer && face.chars >= entry.written * 0.3)
+    // A named font wins over the system's, which is often one stray element: a field or a badge.
+    const named = faces.find(([family, face]) => !GENERIC.has(family.toLowerCase()) && face.chars >= entry.written * 0.1)
+    return own ?? named ?? (faces[0] as [string, Face])
+  }
+  let bodyFamily: string | undefined
+  const token = (name: string, entry: Size): TypeToken => {
+    const [family, face] = faceOf(entry, bodyFamily)
+    return {
+      name,
+      size: entry.size,
+      family: family || 'sans-serif',
+      weight: top(face.weight) ?? 400,
+      lineHeight: top(face.lineHeight) ?? null,
+      letterSpacing: top(face.letterSpacing) ?? 0,
+      count: entry.count,
+    }
+  }
   const byCount = [...all].sort((a, b) => b.count - a.count)
-  // Body text is the commonest size a paragraph would be set in.
-  const body = byCount.find((entry) => entry.size >= 14 && entry.size <= 20) ?? (byCount[0] as Size)
+  // Body text is the size a paragraph would be set in that holds the most text.
+  const body = [...all].filter((entry) => entry.size >= 14 && entry.size <= 20).sort((a, b) => b.chars - a.chars || b.count - a.count)[0] ?? (byCount[0] as Size)
+  bodyFamily = faceOf(body)[0]
+  // A heading size is used a few times on a page at most, so one set in a heading counts for more.
+  const weight = (entry: Size): number => entry.count + entry.headings * 10
+  // A larger size seen once, and not in a heading, is one element's own.
+  const larger = all.filter((entry) => entry.size > body.size && weight(entry) >= 2).sort((a, b) => weight(b) - weight(a)).slice(0, 4).sort((a, b) => b.size - a.size)
+  const names = larger.length >= 4 ? ['display', 'h1', 'h2', 'h3'] : larger.length === 3 ? ['display', 'h1', 'h2'] : larger.length === 2 ? ['h1', 'h2'] : ['h1']
+  // The commonest smaller size is the label. A second one is kept when much of the text is set in it.
   const smaller = byCount.filter((entry) => entry.size < body.size)
-  const larger = byCount.filter((entry) => entry.size > body.size).slice(0, 3).sort((a, b) => b.size - a.size)
-  const names = larger.length >= 3 ? ['display', 'h1', 'h2'] : larger.length === 2 ? ['h1', 'h2'] : ['h1']
+  const label = smaller[0]
+  const second = smaller[1] && smaller[1].count >= Math.max(5, texts * RARE) ? smaller[1] : undefined
   const tokens = [
     ...larger.map((entry, index) => token(names[index] as string, entry)),
     token('body', body),
-    ...(smaller[0] ? [token('label', smaller[0])] : []),
+    ...(label && second && second.size > label.size ? [token('small', second)] : []),
+    ...(label ? [token('label', label)] : []),
+    ...(label && second && second.size < label.size ? [token('caption', second)] : []),
   ]
   const left = all.length - tokens.length
   if (left > 0) {
@@ -597,18 +649,28 @@ export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
     `Use it whenever you add or change a page, a section or a component in this project.`,
     'It names the tokens, says what is not allowed, and checks the result with Strict Check.',
   ].join(' ')
+  // The Tailwind export names each font after the first size that is set in it.
+  const fontClass = new Map<string, string>()
+  for (const [token, value] of Object.entries(spec.typography)) {
+    if (typeof value.fontFamily === 'string' && !fontClass.has(value.fontFamily)) fontClass.set(value.fontFamily, `font-${token}`)
+  }
   const type = Object.entries(spec.typography).map(([token, value]) => {
     const parts = [value.fontSize, value.fontFamily, value.fontWeight !== undefined ? `weight ${value.fontWeight}` : undefined, value.lineHeight !== undefined ? `line height ${value.lineHeight}` : undefined, value.letterSpacing !== undefined ? `letter spacing ${value.letterSpacing}` : undefined]
-    return `- **${token}:** ${parts.filter((part) => part !== undefined).join(', ')}`
+    const font = typeof value.fontFamily === 'string' ? fontClass.get(value.fontFamily) : undefined
+    return `- **${token}:** ${parts.filter((part) => part !== undefined).join(', ')}. As classes: \`text-${token}${font ? ` ${font}` : ''}\``
   })
+  const firstSpacing = Object.keys(spec.spacing)[0] ?? 'md'
+  const firstCorner = Object.keys(spec.rounded)[0] ?? 'md'
+  const bodyFont = typeof spec.typography.body?.fontFamily === 'string' ? fontClass.get(spec.typography.body.fontFamily) : undefined
   const scale = (group: Record<string, unknown>): string => Object.entries(group).map(([token, value]) => `${token} ${String(value)}`).join(', ')
   const rules: string[] = []
   if (strict?.colors.allow === 'tokens') rules.push('Use only the colors above, by token. No other hex value.')
+  if (spec.colors.border === undefined) rules.push('The spec names no border color. Divide things with space or a fill, or ask before you draw a line.')
   if (strict?.typography.allow === 'scale') rules.push('Set text in the sizes above only, each with its own weight, line height and letter spacing. A size has one weight: for emphasis use a larger size or a color, not bold. On a narrow screen step a heading down to the next size in the list.')
   if (strict?.typography.fonts === 'declared') rules.push('Use only the fonts above.')
   if (strict?.spacing.allow === 'scale') rules.push(`Padding, margin and gap come from the spacing steps${strict.spacing.extra.length > 0 ? `, or ${strict.spacing.extra.join(', ')}` : ''}.`)
   if (strict?.rounded.allow === 'scale') rules.push(`Corners come from the list above${strict.rounded.full ? `. A box up to ${strict.rounded.full} across may be fully round` : ', and nothing is fully round'}.`)
-  rules.push(`Text needs a contrast of ${strict?.contrast === 'AAA' ? '7:1 (4.5:1 for large text)' : '4.5:1 (3:1 for large text)'} or more against what is behind it${Object.keys(dark).length > 0 ? ', in light and in dark mode' : ''}. Put text on a fill only in that fill's \`on-\` color; a fill without one is not for text.`)
+  rules.push(`Text needs a contrast of ${strict?.contrast === 'AAA' ? '7:1 (4.5:1 for large text)' : '4.5:1 (3:1 for large text)'} or more against what is behind it${Object.keys(dark).length > 0 ? ', in light and in dark mode' : ''}. Put text on a colored fill only in that fill's \`on-\` color. The page and the pairs under \`components\` in the spec are measured and safe. Before you set text in any color other than the main text color, work out its contrast${Object.keys(dark).length > 0 ? ' in both modes' : ''}: a brand color often fails as text.`)
   rules.push('Hover and focus are checked too. A hover or focus color has to be one of the colors above, and every link, button and field needs a focus mark that can be seen.')
   const tells = Object.entries(strict?.tells ?? {}).filter(([, level]) => level !== 'off').map(([tell]) => tell.replace(/-/g, ' '))
   if (tells.length > 0) rules.push(`Avoid: ${tells.join(', ')}.`)
@@ -621,7 +683,7 @@ export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
     '',
     `1. Read \`${options.specPath}\` in full. Its front matter is the tokens; its sections say how they are used.`,
     '2. Look at how the project names the tokens in code (CSS variables, Tailwind classes) and use those names, not raw values.',
-    `3. If the tokens are not in the code yet, put them there first. For Tailwind 4, \`npx @strictthemes/spec export ${options.specPath} --format tailwind\` prints them as a \`@theme\` block, with the dark mode: color classes named after the tokens (\`bg-surface\`, \`text-on-primary\`), a text class for each size (\`text-h1\`), the corners and the spacing steps. Remove a default palette, text sizes and fonts the project came with, and restyle stock components that use them.`,
+    `3. If the tokens are not in the code yet, put them there first. For Tailwind 4, \`npx @strictthemes/spec export ${options.specPath} --format tailwind\` prints them as a \`@theme\` block, with the dark mode: color classes named after the tokens (\`bg-surface\`, \`text-on-primary\`), a text class for each size (\`text-h1\`), the corners and the spacing steps. To remove the palette, text sizes, fonts and corners the project came with, start the \`@theme\` block with \`--color-*: initial; --text-*: initial; --font-*: initial; --radius-*: initial;\`, delete other theme variables and imports that set them, and restyle stock components that used them.`,
     "4. Load each font under the exact family name the spec gives it. A package that registers the font as \"Name Variable\" needs its own `@font-face` with the spec's name.",
     '5. Run `npx @strictthemes/check --rules` to see what the check allows, as values and as classes.',
     '6. Look at a page that exists before you build a new one, and lay yours out the same way. If there is none, or a section of the spec is still a note asking to be written, choose a layout yourself and tell the user which choices were yours.',
@@ -639,6 +701,8 @@ export function generateSkill(spec: StrictSpec, options: SkillOptions): string {
     `**Spacing:** ${scale(spec.spacing)}`,
     '',
     `**Corners:** ${scale(spec.rounded)}`,
+    '',
+    `With the Tailwind export of step 3, a color is \`bg-<token>\`, \`text-<token>\` or \`border-<token>\`; a spacing step is \`space-<step>\` in any spacing class (\`p-space-${firstSpacing}\`, \`gap-space-${firstSpacing}\`); a corner is \`rounded-${firstCorner}\`. A text class sets the size, weight, line height and letter spacing but not the font: add the font class listed beside it${bodyFont ? `, and set \`${bodyFont}\` on the page for body text` : ''}.`,
     '',
     `If this list and \`${options.specPath}\` differ, the spec is right.`,
     '',
