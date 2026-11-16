@@ -12,37 +12,37 @@ This list starts with five deals on tools for building, hosting and watching a s
 
 ## Start here: five Black Friday 2026 deals of up to 40%
 
-These five come first. Designmodo's sale is already live. The other four give 35% off your first payment. On three of them, a high enough score in a small game on the deal page makes it 40%. Each name in the table opens its deal page. On a yearly plan the discount covers the whole first year. On a monthly plan it covers the first month.
+These five come first, and all five are live now. Designmodo gives up to 40% off yearly plans. The other four use the same code, `BLACKFRIDAY35`, for 35% off your first payment, and each has a small game on its deal page that makes it 40% if you win. On a yearly plan the discount covers the whole first year. On a monthly plan it covers the first month.
 
-| Deal | Discount | Runs | Code |
+To use a deal, open its page from the table, copy the code, pick a plan and paste the code at checkout.
+
+| Deal | Discount | Ends | Code |
 | --- | --- | --- | --- |
-| [Designmodo](https://designmodo.com/black-friday/) | Up to 40% off yearly plans | Now to 30 November | On the deal page |
-| [Unspam.email](https://unspam.email/black-friday) | 35%, or 40% with the game | 21 November to 1 December | `BLACKFRIDAY35` |
-| [Static](https://static.app/black-friday) | 35%, or 40% with the game | 20 November to 1 December | On the deal page from 20 November |
-| [Pulsetic](https://pulsetic.com/black-friday/) | 35%, or 40% with the game | 23 November to 3 December | On the deal page from 23 November |
-| [Siter.io](https://siter.io/black-friday) | 35% | 23 November to 1 December | On the deal page from 23 November |
+| [Designmodo](https://designmodo.com/black-friday/) | Up to 40% off yearly plans | 30 November | `BLACK` |
+| [Unspam.email](https://unspam.email/black-friday) | 35%, or 40% with the game | 1 December | `BLACKFRIDAY35` |
+| [Static](https://static.app/black-friday) | 35%, or 40% with the game | 1 December | `BLACKFRIDAY35` |
+| [Pulsetic](https://pulsetic.com/black-friday/) | 35%, or 40% with the game | 3 December | `BLACKFRIDAY35` |
+| [Siter.io](https://siter.io/black-friday) | 35%, or 40% with the game | 1 December | `BLACKFRIDAY35` |
 
-**Designmodo** makes Postcards and Slides, builders for emails and websites. Its sale is live. The sale ends on Monday 30 November at 11:59 pm Pacific Time.
+**Designmodo** makes Postcards, a builder for email newsletters, and Slides, a builder for static websites. The code `BLACK` works on every yearly plan of both, for the first year. The discount starts at 40% and goes down as coupons are used: there are three drops of 100 coupons each, at 40%, then 35%, then 30%, and when one runs out the next opens. So the earlier you buy, the more you save. The sale ends on Monday 30 November at 11:59 pm Pacific Time, or sooner if every coupon is used. It cannot be combined with other offers.
 
-Its Black Friday page also gives one code each for 40% off yearly plans at three more tools from the same team: `STATICBF26` for Static, `PULSETICBF26` for Pulsetic and `SITERBF26` for Siter.io. The page says every code stops working at the same time, on Monday 30 November at 11:59 pm Pacific Time. These are separate from the 35% offers on each tool's own page, which come next.
+![Designmodo's Black Friday 2026 page: up to 40% off yearly plans, with a line saying each drop has only 100 coupons and the discount goes down as they are used](/guides/black-friday-2026-deals/designmodo.jpg "Designmodo's Black Friday page on 16 November 2026, with the 40% drop live.")
 
-![Designmodo's Black Friday 2026 page: a dark page with the words Black Friday '26 Deals in large type, and a line saying the sale ends on Monday 30 November](/guides/black-friday-2026-deals/designmodo.jpg "Designmodo's Black Friday page on 16 November 2026.")
+**Unspam.email** tests a marketing email before you send it: spam filters, inbox placement, how it looks in each email client, and sender authentication. The code `BLACKFRIDAY35` takes 35% off the first payment of a new plan, which you build yourself. The page's example plan is $69.61 a month, so the first month comes to $45.25, or $461.49 for the whole first year. To get 40%, sort at least 22 of 25 emails correctly in the spam filter game on the page. The sale ends on Tuesday 1 December.
 
-**Unspam.email** tests a marketing email before you send it: spam filters, inbox placement, how it looks in each email client, and sender authentication. The code is `BLACKFRIDAY35`, for a new Custom plan. That plan is $69.61 a month, so the first month comes to $45.25. Until 20 November, the code `HIGHSEASON20` gives 20% off the first month. The sale ends on 1 December at 23:59 UTC.
+![Unspam's Black Friday page: 35% off Unspam for Black Friday until Tuesday 1 December, the code BLACKFRIDAY35, and an example plan at $45.25 for the first month](/guides/black-friday-2026-deals/unspam.jpg "Unspam's deal page, with the code and the price worked out.")
 
-![Unspam's Black Friday page: 35% off Unspam for Black Friday, starting Saturday 21 November, with an example of the Custom plan at $45.25 for the first month](/guides/black-friday-2026-deals/unspam.jpg "Unspam's deal page, with the price worked out.")
-
-**Static** hosts websites, with custom domains and free SSL. The first year is $39 on Starter (normally $60), $78 on Medium (normally $120) and $117 on Large (normally $180). The code appears on the page when the sale opens on 20 November. The sale ends on 1 December at 11:59 pm Eastern Time.
+**Static** hosts websites, with custom domains and free SSL. With `BLACKFRIDAY35`, the first year is $39 on Starter (normally $60), $78 on Medium (normally $120) and $117 on Large (normally $180). To get 40%, score 600 in 40 seconds in Bug Invaders, the game on the page. The sale ends on 1 December at 11:59 pm Eastern Time.
 
 ![Static's Black Friday page: an old television showing a game called Bug Invaders, with 35% off and a 40% bonus written under it](/guides/black-friday-2026-deals/static.jpg "Static's deal page opens with the game that raises the discount to 40%.")
 
-**Pulsetic** watches a site's uptime, APIs, DNS, SSL certificates and cron jobs, and gives you status pages and alerts. The first year is $58.50 on Solo (normally $90), $123.50 on Team (normally $190) and $318.50 on Organization (normally $490). Add-ons such as extra monitors and SMS alerts are not discounted. The code appears on the page on 23 November. The sale ends on 3 December at 11:59 pm Pacific Time.
+**Pulsetic** watches a site's uptime, APIs, DNS, SSL certificates and cron jobs, and gives you status pages and alerts. With `BLACKFRIDAY35`, the first year is $58.50 on Solo (normally $90), $123.50 on Team (normally $190) and $318.50 on Organization (normally $490). Add-ons such as extra monitors and SMS alerts are not discounted. To get 40%, finish the 20-second game on the page at 99% or higher. The sale ends on Thursday 3 December at 11:59 pm Pacific Time.
 
-![Pulsetic's Black Friday page: 35% off any paid plan, opening on Monday 23 November, with a countdown](/guides/black-friday-2026-deals/pulsetic.jpg "Pulsetic's deal page, counting down to 23 November.")
+![Pulsetic's Black Friday page: 35% off any paid plan, the code BLACKFRIDAY35, a countdown, and a note that 99% in a 20-second game gives 40% off](/guides/black-friday-2026-deals/pulsetic.jpg "Pulsetic's deal page, with the code.")
 
-**Siter.io** is a website builder that publishes to your own domain. The first year is $54.60 on Solo (normally $84), $93.60 on Plus (normally $144) and $187.20 on Pro (normally $288). The code appears on the page when the offer opens on 23 November. The offer ends on 1 December at 11:59 pm Eastern Time.
+**Siter.io** is a website builder that publishes to your own domain. With `BLACKFRIDAY35`, the first year is $54.60 on Solo (normally $84), $93.60 on Plus (normally $144) and $187.20 on Pro (normally $288). After that the plan renews at its normal price. To get 40%, win Pixel Run, the one-minute game on the page. The offer ends on 1 December at 11:59 pm Eastern Time.
 
-![Siter.io's Black Friday page: 35% off Solo, Plus and Pro from 23 November to 1 December, and a note that the code appears when the offer opens](/guides/black-friday-2026-deals/siter.jpg "Siter.io's deal page.")
+![Siter.io's Black Friday page: 35% off Solo, Plus and Pro until 1 December, the code BLACKFRIDAY35, and a bar offering 40% off for winning a game called Pixel Run](/guides/black-friday-2026-deals/siter.jpg "Siter.io's deal page, with the code.")
 
 ## Black Friday 2026 deals on UI kits and templates
 
