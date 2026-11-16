@@ -5,7 +5,7 @@ export interface Guide {
   slug: string
   title: string
   description: string
-  /** What sort of guide it is: "How to", "Explained" or "Worked example". */
+  /** What sort of guide it is: "How to", "Explained", "Worked example" or "Roundup". */
   kind: string
   /** The day it was first published, and the day its commands were last run, as YYYY-MM-DD. */
   date: string
