@@ -22,7 +22,7 @@ These five come first. Designmodo's sale is already live. The other four give 35
 | [Pulsetic](https://pulsetic.com/black-friday/) | 35%, or 40% with the game | 23 November to 3 December | On the deal page from 23 November |
 | [Siter.io](https://siter.io/black-friday) | 35% | 23 November to 1 December | On the deal page from 23 November |
 
-**Designmodo** makes Postcards and Slides, builders for emails and websites. Its sale is live. The coupons come in three limited drops: 40% off yearly plans first, then 35%, then 30%. When one drop runs out, the next one opens, so the earliest buyers get the most off. The sale ends on Monday 30 November at 11:59 pm Pacific Time.
+**Designmodo** makes Postcards and Slides, builders for emails and websites. Its sale is live. The sale ends on Monday 30 November at 11:59 pm Pacific Time.
 
 Its Black Friday page also gives one code each for 40% off yearly plans at three more tools from the same team: `STATICBF26` for Static, `PULSETICBF26` for Pulsetic and `SITERBF26` for Siter.io. The page says every code stops working at the same time, on Monday 30 November at 11:59 pm Pacific Time. These are separate from the 35% offers on each tool's own page, which come next.
 
