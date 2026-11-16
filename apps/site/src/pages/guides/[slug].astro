@@ -44,6 +44,6 @@ const urls = guideUrls(guide.slug)
         <a href={urls.markdown} class="label text-link underline underline-offset-4">This guide as Markdown</a>
       </p>
     </nav>
-    <article class="prose min-w-0 md:col-span-8" set:html={html} />
+    <article class="prose min-w-0 md:col-span-8" data-kind={guide.kind} set:html={html} />
   </div>
 </Layout>

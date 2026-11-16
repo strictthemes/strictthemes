@@ -63,6 +63,16 @@ export function renderGuide(guide: Guide): { html: string; contents: { id: strin
     .replace(/<p><img src="([^"]+)" alt="([^"]*)"(?: title="([^"]*)")?\s*\/?><\/p>/g, (_, src: string, alt: string, caption?: string) =>
       `<figure><a href="${src}"><img src="${src}" alt="${alt}" loading="lazy"></a>${caption ? `<figcaption>${caption}</figcaption>` : ""}</figure>`
     )
+    // Each cell of a table carries its column's name, for the layouts that stack a row's cells.
+    .replace(/<table>[\s\S]*?<\/table>/g, (table) => {
+      const names = [...table.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map((th) => (th[1] ?? "").replace(/<[^>]+>/g, "").trim())
+      return table.replace(/<tr>([\s\S]*?)<\/tr>/g, (row: string) => {
+        let column = 0
+        return row.replace(/<td/g, () => `<td data-label="${(names[column++] ?? "").replace(/"/g, "&quot;")}"`)
+      })
+    })
+    // A link to another site opens in a new tab, so the guide stays open.
+    .replace(/<a href="(https?:\/\/(?!strictthemes\.com)[^"]+)"/g, '<a href="$1" target="_blank"')
     .replace(/<h2>(.*?)<\/h2>/g, (_, inner: string) => {
     const title = inner.replace(/<[^>]+>/g, "")
     const id = title
