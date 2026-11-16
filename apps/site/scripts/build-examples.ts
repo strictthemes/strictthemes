@@ -12,6 +12,8 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { build, type Plugin } from "vite"
 
+import { analytics } from "./analytics.ts"
+
 const site = resolve(import.meta.dirname, "..")
 const examples = join(site, "examples")
 const dist = join(site, "dist")
@@ -47,7 +49,7 @@ for (const theme of folders(examples)) {
       // Relative addresses, so the page works from any folder.
       base: "./",
       logLevel: "warn",
-      plugins: [react(), tailwindcss(), noindex],
+      plugins: [react(), tailwindcss(), noindex, analytics],
       resolve: { alias: { "@": join(root, "src") } },
       build: {
         outDir: join(dist, "themes", theme, "prompts", page, "build"),

@@ -14,6 +14,8 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { build, type Plugin } from "vite"
 
+import { analytics } from "./analytics.ts"
+
 /** The demo holds a made-up shop, and the kit's own page is the one to find: keep it out of search results. */
 const noindex: Plugin = {
   name: "strict-kit-noindex",
@@ -61,7 +63,7 @@ for (const theme of themes) {
     // Relative addresses, so the page works from any folder.
     base: "./",
     logLevel: "warn",
-    plugins: [react(), tailwindcss(), noindex],
+    plugins: [react(), tailwindcss(), noindex, analytics],
     resolve: { alias: { "@": join(root, "src") } },
     build: { outDir: join(dist, "kit", theme.slug, "build"), emptyOutDir: true },
   })
