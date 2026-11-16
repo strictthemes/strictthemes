@@ -10,11 +10,9 @@ interface Props {
   description: string
   /** Dress the whole page in a theme other than the site's own. */
   theme?: string
-  /** List every guide in the footer. The home page does. */
-  footerGuides?: boolean
 }
 
-const { title, description, theme, footerGuides = false } = Astro.props
+const { title, description, theme } = Astro.props
 const canonical = new URL(Astro.url.pathname, SITE_URL).href
 const shareImage = new URL("/og.png", SITE_URL).href
 const nav = [
@@ -121,18 +119,15 @@ const current = Astro.url.pathname
 
     <footer class="border-t border-border">
       <div class="mx-auto grid max-w-page gap-8 px-4 py-8 md:grid-cols-12 md:px-8">
-        {
-          footerGuides && (
-            <nav aria-label="Guides" class="flex flex-col gap-2 border-b border-border pb-8 md:col-span-12">
-              <p class="label">Guides</p>
-              <ul class="label grid gap-x-8 text-muted-foreground sm:grid-cols-2 md:grid-cols-3">
-                {guides.map((guide) => (
-                  <li><a class="block py-1 hover:text-foreground" href={guideUrls(guide.slug).page}>{guide.title}</a></li>
-                ))}
-              </ul>
-            </nav>
-          )
-        }
+        {/* Every guide, the newest first. */}
+        <nav aria-label="Guides" class="flex flex-col gap-2 border-b border-border pb-8 md:col-span-12">
+          <p class="label">Guides</p>
+          <ul class="label grid gap-x-8 text-muted-foreground sm:grid-cols-2 md:grid-cols-3">
+            {guides.map((guide) => (
+              <li><a class="block py-1 hover:text-foreground" href={guideUrls(guide.slug).page}>{guide.title}</a></li>
+            ))}
+          </ul>
+        </nav>
         <div class="flex flex-col gap-4 md:col-span-6">
           <Logo class="size-8" />
           <p class="text-muted-foreground">
