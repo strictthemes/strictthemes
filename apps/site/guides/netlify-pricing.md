@@ -1,6 +1,6 @@
 ---
-title: "Netlify pricing in 2026: credits, and why sites get paused"
-description: Netlify's Free, Personal and Pro plans in 2026, what a credit buys, worked examples for a static site, and what happens when the credits run out.
+title: "Netlify pricing in 2026: the free tier, credits and paused sites"
+description: Netlify's Free, Personal and Pro plans in 2026, what the free tier includes, what a credit buys, worked examples for a static site, and what happens when credits run out.
 kind: Pricing
 date: 2026-11-18
 checked: 2026-11-18
@@ -30,6 +30,23 @@ This guide is for anyone who deploys a site to Netlify, whether by hand, from Gi
 | Enterprise | Custom, billed yearly | Custom | Custom | Custom |
 
 All plans include custom domains with SSL, unlimited deploy previews, serverless functions, form submissions and up to 500 projects. Netlify's docs say new accounts have been on credit-based plans since 4 September 2025. Accounts created before then stay on a legacy plan unless they switch, and the docs say a switch to credits cannot be undone.
+
+## What the Netlify free tier includes
+
+The free plan is $0 and Netlify calls it free forever. From its pricing page and its docs, it includes:
+
+- **300 credits a month, with a hard limit.** You cannot buy more on Free. When they run out, every site on the account is paused until the next month.
+- **Your own domain with SSL,** on the free plan.
+- **Unlimited deploy previews,** and deploys from Git, from the API or from an AI tool.
+- **Serverless functions, storage and a database,** which draw from the same 300 credits.
+- **Form submissions,** which cost no credits.
+- **Up to 500 projects,** one build at a time, and one owner.
+- **One day of history** for observability and web analytics.
+- **Standard email support.**
+
+What it leaves out: password protection and team members, which need Pro, and secret detection, which starts on Personal.
+
+For a small site that deploys a few times a month, 300 credits can be enough. The worked examples below show where they go.
 
 ## What a credit buys
 
@@ -136,6 +153,10 @@ Whichever host you pick, check the page it serves, not only the page you built. 
 ### How much does Netlify cost in 2026?
 
 Free is $0 with 300 credits a month. Personal is $9 a month with 1,000 credits. Pro starts at $20 a month with 3,000 credits and unlimited members. Enterprise is priced on request and billed yearly.
+
+### What does the Netlify free tier include?
+
+300 credits a month with a hard limit, a custom domain with SSL, unlimited deploy previews, functions, form submissions that use no credits, up to 500 projects and one build at a time. Password protection and team members need Pro.
 
 ### What is a Netlify credit?
 

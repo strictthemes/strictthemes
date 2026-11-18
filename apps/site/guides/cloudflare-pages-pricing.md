@@ -111,7 +111,7 @@ It costs money where Cloudflare is free, so weigh what you get. There is no free
 
 **Good for:** documentation and open source projects that already live on GitHub.
 
-For more hosts, see the Cloudflare Pages alternatives on [bootstrap.build](https://bootstrap.build/articles/cloudflare-pages-alternatives/). To compare with the other big developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/) and [Vercel pricing in 2026](/guides/vercel-pricing/).
+For more hosts, see the Cloudflare Pages alternatives on [bootstrap.build](https://bootstrap.build/articles/cloudflare-pages-alternatives/). To compare with the other big developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/), [Vercel pricing in 2026](/guides/vercel-pricing/) and [AWS Amplify pricing in 2026](/guides/aws-amplify-pricing/).
 
 ## Which Cloudflare option should you choose?
 

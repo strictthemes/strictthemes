@@ -131,7 +131,7 @@ Every sandbox plan includes an HTML check, a spam analysis, a blacklist report, 
 
 **Limitations:** the free plan is for testing an integration, not for running a product.
 
-**Good for:** apps where a password-reset email must arrive quickly.
+**Good for:** apps where a password-reset email must arrive quickly. [Postmark pricing in 2026](/guides/postmark-pricing/) has every tier.
 
 ### 7. Resend: best free tier for sending
 
@@ -143,7 +143,7 @@ Every sandbox plan includes an HTML check, a spam analysis, a blacklist report, 
 
 **Limitations:** the free plan's 100-a-day cap. A dedicated IP is a $30 a month add-on, and only on Scale above 3,000 emails a day.
 
-**Good for:** a new product that wants to start sending for free.
+**Good for:** a new product that wants to start sending for free. [Resend pricing in 2026](/guides/resend-pricing/) has its limits and overages.
 
 ## Which Mailtrap alternative should you choose?
 
