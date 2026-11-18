@@ -33,7 +33,7 @@ This guide is for anyone who deploys to Cloudflare by hand, from Git or from a c
 | Largest file | 25 MiB | 25 MiB |
 | Custom domains per project | 100 | 250 on Pro, 500 on Business |
 
-Workers Paid is a minimum of $5 a month per account. Cloudflare Pro is $20 a month billed yearly, or $25 billed monthly. Business is $200 a month billed yearly, or $250 billed monthly. Those two are Cloudflare's general plans, which also cover its CDN and security features, not only Pages.
+Workers Paid is a minimum of $5 a month per account. The Pages limits page lists the higher build, file and domain limits under Cloudflare's Pro and Business plans. Those are Cloudflare's general plans, which also cover its CDN and security features. Check with Cloudflare which plan raises the limit you need before you upgrade for it.
 
 ## What is free
 
@@ -78,6 +78,8 @@ Cloudflare's Pages overview, updated 25 August 2026, opens with a question: "Are
 The price is the same idea. Cloudflare's Workers docs say requests for static assets on Workers are free and unlimited, and that storing them costs nothing. Server code is billed as Workers, as it is on Pages. The limits are close too: 20,000 files per version on the free plan, 100,000 on paid, and 25 MiB per file. Workers builds give 3,000 build minutes a month on the free plan, and 6,000 on paid plans, then $0.005 a minute.
 
 One difference matters on the free plan. If a Worker is set to run before static files, with `run_worker_first`, then after the free daily requests are used up, those requests get an error with status 429 instead of the file.
+
+Static files also stop being free if you turn on Workers Caching. Cloudflare's Workers pricing page says requests served from that cache, static assets included, are billed like requests to a Worker.
 
 So for a new static site on Cloudflare, Workers is now the safer choice. An existing Pages site keeps working, and Cloudflare has a guide for moving it to Workers.
 
