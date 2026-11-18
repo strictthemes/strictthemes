@@ -95,6 +95,8 @@ Most hosts give you an address on their own domain first and let you connect you
 
 Any static host has to do three things: take the contents of your built folder, serve them over HTTPS at an address, and send `index.html` for `/`. If yours is a single-page app with routes, it must also offer the fallback from step 2.
 
+Hosts differ more in how they charge than in what they do. [Netlify pricing in 2026](/guides/netlify-pricing/) explains a host that bills in credits and pauses sites when they run out. [Vercel pricing in 2026](/guides/vercel-pricing/) explains a free plan that is for personal, non-commercial use only. If your project used to live on Glitch, [Glitch alternatives in 2026](/guides/glitch-alternatives/) lists where it can go.
+
 One that works by upload is [static.app](https://static.app/). Its home page describes one-click hosting for a static website: you drag an archive with your site onto the page, or point its desktop app at a folder on your computer. Its page on React hosting gives the steps: run the build, zip the files inside `dist` so that `index.html` is at the root of the zip, drag the zip onto the site, and pick a subdomain or enter a domain name. The same page says HTTPS is automatic, and that a setting called "JavaScript application" makes deep addresses such as `/about` work on reload. We describe this from its pages. We did not upload anything for this guide.
 
 Making the zip is the step people get wrong. Zip from inside the folder, then list what is in it:

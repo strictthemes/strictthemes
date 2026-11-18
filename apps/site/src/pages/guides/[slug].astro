@@ -3,16 +3,30 @@
 import type { GetStaticPaths } from "astro"
 
 import Layout from "@/layouts/Base.astro"
-import { guides, guideUrls, longDate, renderGuide, type Guide } from "@/lib/guides"
+import { guideFaq, guides, guideUrls, longDate, renderGuide, type Guide } from "@/lib/guides"
+import { SITE_URL } from "@/lib/themes"
 
 export const getStaticPaths: GetStaticPaths = () => guides.map((guide) => ({ params: { slug: guide.slug }, props: { guide } }))
 
 const { guide } = Astro.props as { guide: Guide }
 const { html, contents } = renderGuide(guide)
 const urls = guideUrls(guide.slug)
+// The kinds whose tables compare things row by row, and stack on a phone.
+const compares = ["Roundup", "Pricing"].includes(guide.kind)
+// A guide with a FAQ section says so to search engines too, in its own words.
+const faq = guideFaq(guide)
+const faqData = faq.length
+  ? JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      url: new URL(urls.page, SITE_URL).href,
+      mainEntity: faq.map(({ question, answer }) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })),
+    }).replace(/</g, "\\u003c")
+  : null
 ---
 
 <Layout title={`${guide.title} | Strict`} description={guide.description}>
+  {faqData && <script slot="head" type="application/ld+json" is:inline set:html={faqData} />}
   <section class="border-b border-border">
     <div class="mx-auto grid max-w-page gap-8 px-4 py-16 md:grid-cols-12 md:px-8">
       <p class="label text-muted-foreground md:col-span-12">
@@ -44,6 +58,6 @@ const urls = guideUrls(guide.slug)
         <a href={urls.markdown} class="label text-link underline underline-offset-4">This guide as Markdown</a>
       </p>
     </nav>
-    <article class="prose min-w-0 md:col-span-8" data-kind={guide.kind} set:html={html} />
+    <article class="prose min-w-0 md:col-span-8" data-kind={guide.kind} data-tables={compares ? "compare" : undefined} set:html={html} />
   </div>
 </Layout>

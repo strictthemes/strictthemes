@@ -34,6 +34,8 @@ To use a deal, open its page from the table, copy the code, pick a plan and past
 
 **Static** hosts websites, with custom domains and free SSL. With `BLACKFRIDAY35`, the first year is $39 on Starter (normally $60), $78 on Medium (normally $120) and $117 on Large (normally $180). To get 40%, score 600 in 40 seconds in Bug Invaders, the game on the page. The sale ends on 1 December at 11:59 pm Eastern Time.
 
+To see how Static's regular prices compare with Netlify's credits and Vercel's plans, read [Netlify pricing in 2026](/guides/netlify-pricing/) and [Vercel pricing in 2026](/guides/vercel-pricing/).
+
 ![Static's Black Friday page: an old television showing a game called Bug Invaders, with 35% off and a 40% bonus written under it](/guides/black-friday-2026-deals/static.jpg "Static's deal page opens with the game that raises the discount to 40%.")
 
 **Pulsetic** watches a site's uptime, APIs, DNS, SSL certificates and cron jobs, and gives you status pages and alerts. With `BLACKFRIDAY35`, the first year is $58.50 on Solo (normally $90), $123.50 on Team (normally $190) and $318.50 on Organization (normally $490). Add-ons such as extra monitors and SMS alerts are not discounted. To get 40%, finish the 20-second game on the page at 99% or higher. The sale ends on Thursday 3 December at 11:59 pm Pacific Time.

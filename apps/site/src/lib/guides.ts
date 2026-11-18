@@ -5,7 +5,7 @@ export interface Guide {
   slug: string
   title: string
   description: string
-  /** What sort of guide it is: "How to", "Explained", "Worked example" or "Roundup". */
+  /** What sort of guide it is: "How to", "Explained", "Worked example", "Roundup" or "Pricing". */
   kind: string
   /** The day it was first published, and the day its commands were last run, as YYYY-MM-DD. */
   date: string
@@ -53,6 +53,25 @@ export const guideUrls = (slug: string) => ({ page: `/guides/${slug}/`, markdown
 /** The guide as a Markdown file of its own: its title and description, then its text. */
 export const guideMarkdown = (guide: Guide): string =>
   `# ${guide.title}\n\n${guide.description}\n\nLast checked ${guide.checked}${guide.tool ? ` with ${guide.tool}` : ""}.\n\n${guide.body}\n`
+
+/**
+ * The questions under a guide's "FAQ" heading, each with its answer as plain text:
+ * every `###` heading in that section is a question, and the text under it, up to
+ * the next heading, is the answer.
+ */
+export function guideFaq(guide: Guide): { question: string; answer: string }[] {
+  const section = /^## FAQ.*\n([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(guide.body)?.[1] ?? ""
+  const plain = (text: string) =>
+    text
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/[*_`]/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+  return [...section.matchAll(/^### (.+)\n([\s\S]*?)(?=^### |(?![\s\S]))/gm)]
+    .map((match) => ({ question: plain(match[1] ?? ""), answer: plain(match[2] ?? "") }))
+    .filter((item) => item.question && item.answer)
+}
 
 /** The guide's text as HTML, and its main headings for a list of contents. */
 export function renderGuide(guide: Guide): { html: string; contents: { id: string; title: string }[] } {

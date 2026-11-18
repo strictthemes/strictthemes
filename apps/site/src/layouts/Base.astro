@@ -71,6 +71,7 @@ const current = Astro.url.pathname
     <meta property="og:image:alt" content="Strict: themes and guardrails for AI-built UI" />
     <meta name="twitter:card" content="summary_large_image" />
     <style is:inline set:html={themeScopeCss()} />
+    <slot name="head" />
     <!-- Privacy-friendly analytics by Plausible -->
     <script is:inline async src="https://plausible.io/js/pa-OGnKcX89pjyMgRIXCOrRb.js"></script>
     <script is:inline>
