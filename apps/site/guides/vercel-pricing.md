@@ -122,7 +122,7 @@ What it does not do matters as much. There is no free plan, only a 7-day trial o
 
 **Good for:** documentation, open source projects and personal sites that already live on GitHub.
 
-For more hosts, see the Vercel alternatives compared on [bootstrap.build](https://bootstrap.build/articles/vercel-alternatives/) and [WebDesignerHut](https://webdesignerhut.com/vercel-alternatives/), and [Netlify vs Vercel](https://bootstrap.build/articles/netlify-vs-vercel/). For Netlify's credit plans, see [Netlify pricing in 2026](/guides/netlify-pricing/).
+For more hosts, see the Vercel alternatives compared on [bootstrap.build](https://bootstrap.build/articles/vercel-alternatives/) and [WebDesignerHut](https://webdesignerhut.com/vercel-alternatives/), and [Netlify vs Vercel](https://bootstrap.build/articles/netlify-vs-vercel/). For Netlify's credit plans, see [Netlify pricing in 2026](/guides/netlify-pricing/), and for Cloudflare's, [Cloudflare Pages pricing in 2026](/guides/cloudflare-pages-pricing/).
 
 ## Which Vercel plan should you choose?
 

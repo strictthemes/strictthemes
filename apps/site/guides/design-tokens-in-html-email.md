@@ -318,6 +318,8 @@ One tool of this kind is [Unspam](https://unspam.email/). Its home page describe
 
 Send the test from the system that will send the real email. A test sent from your own mailbox tests your mailbox.
 
+A pre-send test is not the same as a sandbox, which catches the email your app sends while you build it so it never reaches anyone. [Mailtrap alternatives in 2026](/guides/mailtrap-alternatives/) compares tools for both jobs.
+
 ## 7. What to tell the agent
 
 Paste this with the token sheet under it:

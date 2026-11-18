@@ -120,7 +120,7 @@ The limits are real, so weigh them. There is no free plan, only a 7-day trial on
 
 **Good for:** documentation, open source projects and personal sites that already live on GitHub.
 
-For a longer list, see the Netlify alternatives compared on [bootstrap.build](https://bootstrap.build/articles/netlify-alternatives/) and [WebDesignerHut](https://webdesignerhut.com/netlify-alternatives/), and [Netlify vs Vercel](https://bootstrap.build/articles/netlify-vs-vercel/). For Vercel's plans, see [Vercel pricing in 2026](/guides/vercel-pricing/).
+For a longer list, see the Netlify alternatives compared on [bootstrap.build](https://bootstrap.build/articles/netlify-alternatives/) and [WebDesignerHut](https://webdesignerhut.com/netlify-alternatives/), and [Netlify vs Vercel](https://bootstrap.build/articles/netlify-vs-vercel/). For Vercel's plans, see [Vercel pricing in 2026](/guides/vercel-pricing/), and for Cloudflare's, [Cloudflare Pages pricing in 2026](/guides/cloudflare-pages-pricing/).
 
 ## Which Netlify plan should you choose?
 
