@@ -76,7 +76,7 @@ If a site matters, two settings are worth a minute: turn on auto recharge on a p
 
 Credits are not the only difference. These are the ones we noticed on the pricing page and in the docs:
 
-- **History.** Observability and web analytics keep one day of history on Free and Personal, and 30 days on Pro.
+- **History.** Observability keeps one day of history on Free and Personal, 7 days on Pro and 30 days on Enterprise. Web analytics keeps one day on Free and 30 days on Pro. For Personal, the pricing page says 7 days and the docs say 24 hours.
 - **Builds.** Free and Personal run one build at a time. Pro runs three. Extra concurrent builds cost $40 a month each.
 - **Password protection.** Only on Pro.
 - **Team members.** Free and Personal have one owner. Pro has unlimited members.

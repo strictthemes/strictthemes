@@ -16,7 +16,7 @@ This guide is for anyone who deploys to Vercel, including sites built with v0 or
 
 - **Hobby is free, but only for personal or non-commercial use.** That is in Vercel's terms of service. A client's site or your company's site does not fit that description.
 - **Pro is $20 a month for one deploying seat, with $20 of usage credit.** Each extra seat that can deploy is $20 a month. Viewer seats are free.
-- **Pro's CDN traffic is billed by tier, not per GB.** The tier included with Pro covers 1 TB of data transfer a month, and paid tiers start at $20 a month.
+- **Pro has two ways to pay for CDN traffic.** On demand, per request and per GB. Or Flat Rate CDN, which you turn on in billing: its lowest tier, included with Pro, covers 1 TB of data transfer a month.
 - **Hobby has hard caps.** You cannot buy more usage. In most cases, if you go over, you wait 30 days.
 - **For a commercial site that is only static files,** a $6 a month flat-price host costs less than Pro. See [the end of this guide](#if-your-site-is-only-static-files).
 
@@ -34,7 +34,7 @@ Prices are in US dollars and exclude VAT, GST and other taxes, which Vercel adds
 
 Section 4 of Vercel's terms of service is short. It says you may use the Hobby plan only "for your personal or non-commercial use". The same section says Vercel may change or end the plan, and may disable or remove a Hobby deployment with or without notice.
 
-The terms we read do not list examples of commercial use. So read the rule at face value. A site that sells something, advertises a business, or is made for a paying client is commercial. A personal portfolio, a side project that earns nothing, or a demo you share with friends fits Hobby. If you are unsure about your case, ask Vercel before you launch, not after.
+The terms we read do not list examples of commercial use. Our reading, not Vercel's: a site that sells something, advertises a business, or is made for a paying client is commercial. A personal portfolio, a side project that earns nothing, or a demo you share with friends fits Hobby. If you are unsure about your case, ask Vercel before you launch, not after.
 
 What Hobby includes each month, from Vercel's Hobby plan docs:
 
@@ -58,7 +58,10 @@ Pro is $20 a month. That buys one seat that can deploy, and $20 of usage credit 
 
 **Seats.** Each extra member who deploys or configures projects is $20 a month. Viewer seats, which can see deployments and analytics but not change production, are free. So a team of three developers pays $60 a month before any usage.
 
-**CDN traffic.** Pro bills CDN traffic through what Vercel calls Flat Rate CDN: you pay for a capacity tier, not per GB. Vercel's Flat Rate CDN docs, last updated 14 September 2026, list these tiers:
+**CDN traffic.** Vercel's CDN docs describe two ways for a Pro team to pay for requests and data transfer.
+
+- **On demand.** You pay for what visitors use, per request and per GB, at rates that vary by region. The Markdown version of Vercel's pricing page lists 10 million CDN requests and 1 TB of data transfer a month as included with Pro, then from $2 per million requests and from $0.15 per GB.
+- **Flat Rate CDN.** You turn it on from your team's billing page and pay for a capacity tier instead of per unit, so a spike on one day does not change the bill. Vercel's Flat Rate CDN docs, last updated 14 September 2026, list these tiers:
 
 | Tier | CDN requests a month | Data transfer a month |
 | --- | --- | --- |
@@ -67,9 +70,9 @@ Pro is $20 a month. That buys one seat that can deploy, and $20 of usage credit 
 | $100 a month | 50 million | 50 TB |
 | $300 a month | 150 million | 50 TB |
 
-If your usage for a month goes over your tier, Vercel moves you to a higher tier from the next billing cycle. A spike on a single day does not. The docs also exclude some uses from the flat rate, such as bulk file downloads and using the CDN as file storage.
+On Flat Rate CDN, if a month's usage goes over your tier, Vercel moves you to a higher tier from the next billing cycle. The docs exclude some uses from the flat rate, such as bulk file downloads and using the CDN as file storage.
 
-One number did not match. The Markdown version of Vercel's pricing page lists 10 million CDN requests a month as included with Pro, where the Flat Rate CDN docs say 1 million. If requests matter for your site, check the billing page in your dashboard.
+The docs we read did not say which of the two a new Pro team starts on. Check the CDN section of your billing page before you plan around either set of numbers.
 
 **Functions and other usage.** Compute is billed on demand once the credit is spent: active CPU from $0.128 an hour, function invocations at $0.60 per million, and image transformations at $0.05 per thousand.
 
@@ -146,7 +149,7 @@ You cannot buy more usage on Hobby. Vercel's docs say that in most cases you hav
 
 ### What does Vercel Pro include?
 
-One seat that can deploy, $20 of monthly usage credit, free viewer seats, team features, email support, and the lowest Flat Rate CDN tier. Vercel's docs put that tier at 1 million CDN requests and 1 TB of data transfer a month.
+One seat that can deploy, $20 of monthly usage credit, free viewer seats, team features and email support. CDN traffic is billed on demand, or through Flat Rate CDN if you turn it on, where the tier included with Pro covers 1 million CDN requests and 1 TB of data transfer a month.
 
 ### How do I stop a surprise Vercel bill?
 
