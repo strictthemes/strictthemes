@@ -8,7 +8,7 @@ checked: 2026-11-18
 
 Vercel has three plans: Hobby is free, Pro is $20 a month, and Enterprise is priced on request. The price is the easy part. The parts that catch people out are a line in the terms, which limits Hobby to personal or non-commercial use, and the way Pro adds seats, usage credit and CDN tiers on top of the $20.
 
-This guide is for anyone who deploys to Vercel, including sites built with v0 or a coding agent and pushed from a repository. We read every number below on Vercel's pricing page, its docs and its terms of service on 18 November 2026.
+This guide is for anyone who deploys to Vercel, including sites built with v0 or a coding agent and pushed from a repository. If you are weighing v0 itself, see [v0 alternatives in 2026](/guides/v0-alternatives/). We read every number below on Vercel's pricing page, its docs and its terms of service on 18 November 2026.
 
 ![Vercel's pricing page, with Hobby at $0, Pro at $20 a month and Enterprise at a custom price.](/guides/vercel-pricing/vercel.jpg "Vercel's pricing page, 18 November 2026")
 

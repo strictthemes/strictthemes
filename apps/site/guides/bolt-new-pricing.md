@@ -92,7 +92,7 @@ What it does not do: it runs no server code, so a Bolt app that needs its databa
 
 **Good for:** open source projects and personal sites already on GitHub.
 
-For more on where AI-generated sites can live, see [hosting an AI-generated website](https://bootstrap.build/articles/host-ai-generated-website/) on bootstrap.build. Before you publish, [check the live page against your design](/guides/publish-and-check-live-page/).
+For more on where AI-generated sites can live, see [hosting an AI-generated website](https://bootstrap.build/articles/host-ai-generated-website/) on bootstrap.build, and for other AI builders, [v0 alternatives in 2026](/guides/v0-alternatives/). Before you publish, [check the live page against your design](/guides/publish-and-check-live-page/).
 
 ## Which Bolt.new plan should you choose?
 

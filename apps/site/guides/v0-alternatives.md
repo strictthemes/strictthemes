@@ -6,7 +6,7 @@ date: 2026-11-19
 checked: 2026-11-19
 ---
 
-v0 is Vercel's AI builder. You describe a page or an app, it writes React and Next.js code, and it deploys to Vercel. It has a free plan with $5 of one-time credits and 7 messages a day, and Plus costs $30 per user a month. People look for alternatives for three reasons: the daily message limit, the tie to Vercel, and wanting either more control over the code or less.
+v0 is Vercel's AI builder. You describe a page or an app, it writes React and Next.js code, and it deploys to Vercel. It has a free plan with $5 of one-time credits and 7 messages a day, and Plus costs $30 per user a month. Reasons to look elsewhere include the daily message limit on Free, the tie to Vercel, and wanting either more control over the code or less.
 
 This guide covers five alternatives in three groups: app builders that run in the browser, coding agents that work in your editor, and an AI website editor for marketing sites. We read every price below on each tool's own pricing page or docs on 19 November 2026.
 
@@ -15,9 +15,9 @@ This guide covers five alternatives in three groups: app builders that run in th
 ## TL;DR
 
 - **Best for a full app in the browser with hosting included:** Bolt.new. Free with 1 million tokens a month; Pro from $25 a month with a custom domain.
-- **Best for an app with a built-in backend and a team:** Lovable. Free with daily build credits; Pro from $25 a month for 100 credits.
+- **Best for a team building an app together:** Lovable. Free with daily build credits; Pro from $25 a month for 100 credits.
 - **Best if you want to own and edit the code:** Cursor, a coding agent in an editor. Free, then from $8 a month.
-- **Best flat price for a team of agents:** Devin Desktop, formerly Windsurf. Pro is $20 a month; Teams is a flat $80.
+- **Best for frontier models in a $20 plan:** Devin Desktop, formerly Windsurf. Pro is $20 a month.
 - **Best for a marketing website you edit by hand afterwards:** Siter.io, a visual editor with AI. From $7 a month billed yearly.
 - **To host what you build:** a static site from any of these can go on a flat-price host such as Static.app, or a free one such as Cloudflare Pages.
 
@@ -27,7 +27,7 @@ This guide covers five alternatives in three groups: app builders that run in th
 | --- | --- | --- |
 | Free | $0 | $5 in one-time credits for new users, 7 messages a day, deploys to Vercel, GitHub sync |
 | Plus | $30 per user a month | All models, $30 of monthly credits per user, $2 of free daily credits on login |
-| Business | $100 per user a month | Plus's credits, with training opt-out by default |
+| Business | $100 per user a month | Everything in Plus, with training opt-out by default |
 | Enterprise | Custom | SAML SSO, role-based access, priority access, support SLAs |
 
 v0 bills its models by tokens, per million: v0 Mini is $0.10 in and $0.50 out, v0 Pro $2 and $10, v0 Max $4 and $20. Credits pay for that usage. v0 deploys to Vercel, and Vercel's free Hobby plan is for personal, non-commercial use only; see [Vercel pricing in 2026](/guides/vercel-pricing/).
@@ -46,7 +46,7 @@ v0 bills its models by tokens, per million: v0 Mini is $0.10 in and $0.50 out, v
 
 ### 1. Bolt.new: best for a full app in the browser with hosting included
 
-[Bolt.new](https://bolt.new/) builds an app from prompts in the browser, with a database and hosting. It is the closest to v0 in how it feels, without the tie to Vercel: Bolt hosts the result itself.
+[Bolt.new](https://bolt.new/) builds an app from prompts in the browser, with a database and hosting. Unlike v0, it hosts the result itself instead of deploying to Vercel.
 
 ![Bolt.new's pricing page, with Free at $0 and Pro at $25 a month billed monthly.](/guides/v0-alternatives/bolt.jpg "Bolt.new's pricing page, 19 November 2026")
 
@@ -56,17 +56,17 @@ What it does not do: tokens run faster on a large project, because Bolt reads yo
 
 **Good for:** a prototype or small app that you want online quickly, with a database, without setting up hosting.
 
-### 2. Lovable: best for an app with a built-in backend and a team
+### 2. Lovable: best for a team building an app together
 
-[Lovable](https://lovable.dev/) also builds apps from prompts, with a built-in backend for data and sign-in, and hosting. Even the free plan allows unlimited collaborators.
+[Lovable](https://lovable.dev/) also builds apps from prompts and hosts them. Every plan lists Lovable Cloud, and even the free plan allows unlimited collaborators.
 
 ![Lovable's pricing page, with Free, Pro at 25 and Business at 50 a month, shown in euros for our location.](/guides/v0-alternatives/lovable.jpg "Lovable's pricing page, shown in euros, 19 November 2026")
 
 Lovable's docs list prices in US dollars: Pro is $25 a month for 100 credits, or $250 a year, and Business is $50 a month for 100 credits, adding SSO and a team workspace. Larger credit tiers go up to 3,000 credits a month. The free plan gives 5 build credits a day, capped at 30 a month. Free apps run on lovable.app addresses with Lovable's badge; Pro adds custom domains, removes the badge and lets unused credits roll over. Its pricing page showed us euros, so check the currency for where you are.
 
-What it does not do: credits are the whole budget, and a complex change can use several. The free plan's 30 build credits a month is enough to try it, not to build much.
+What it does not do: credits are the whole budget, so check your balance as you go. The free plan's 30 build credits a month is enough to try it, not to build much.
 
-**Good for:** a team building an internal tool or a product with sign-in and data, in one place.
+**Good for:** a team building an internal tool or a product together, in one place.
 
 ## Coding agents in an editor
 
@@ -82,9 +82,9 @@ What it does not do: it does not host anything, and you need to know enough to r
 
 **Good for:** developers who want v0's speed on a codebase they control.
 
-### 4. Devin Desktop (Windsurf): best flat price for a team of agents
+### 4. Devin Desktop (Windsurf): best for frontier models in a $20 plan
 
-[Devin Desktop](https://devin.ai/pricing) is the new name for Windsurf, from Cognition. Free has a light quota, limited models and unlimited Tab completions. Pro is $20 a month with frontier models from the major labs and cloud agents. Max is $200 a month. Teams is a flat $80 a month for up to 100 members, with usage as shared on-demand credits.
+[Devin Desktop](https://devin.ai/pricing) is the new name for Windsurf, from Cognition. Free has a light quota, limited models and unlimited Tab completions. Pro is $20 a month with frontier models from the major labs and cloud agents. Max is $200 a month. Teams is a flat $80 a month for up to 100 members, plus usage, billed as shared on-demand credits. The page does not say how much usage the $80 includes.
 
 ![Devin's pricing page for individuals, with Free at $0, Pro at $20 and Max at $200 a month.](/guides/v0-alternatives/devin.jpg "Devin pricing for individuals, 19 November 2026")
 
@@ -116,14 +116,14 @@ Bolt.new, Lovable and Siter.io host for you. v0 deploys to Vercel. Cursor and De
 | Cloudflare Pages | Free plan | Yes | No bandwidth limit listed | No, direct upload works |
 | GitHub Pages | Free with public repositories | Yes | Soft limit of 100 GB a month | Yes |
 
-[Static.app](https://static.app/) takes a ZIP or a folder and serves it with SSL, a custom domain, forms and analytics, at a flat price from $6 a month. It has [a page on hosting sites made with v0](https://static.app/v0-hosting), and an API and MCP server so a coding agent can publish to it. It runs no server code, so a v0 app that uses Next.js server features will not work there, and it has no free plan, only a 7-day trial. [Cloudflare Pages](https://pages.cloudflare.com/) is free for static files. [GitHub Pages](https://pages.github.com/) is free for public repositories.
+[Static.app](https://static.app/) takes a ZIP or a folder and serves it with SSL, a custom domain, forms and analytics, at a flat price from $6 a month. It has [a page on hosting sites made with v0](https://static.app/v0-hosting), and an API and MCP server so a coding agent can publish to it. It runs no server code, so a v0 app that uses Next.js server features will not work there, and it has no free plan, only a 7-day trial. Until 1 December, its [Black Friday sale](/guides/black-friday-2026-deals/) takes 35% off the first payment. [Cloudflare Pages](https://pages.cloudflare.com/) is free for static files. [GitHub Pages](https://pages.github.com/) is free for public repositories.
 
 For more on hosting AI-generated sites, see [hosting an AI-generated website](https://bootstrap.build/articles/host-ai-generated-website/) and the [Lovable alternatives](https://bootstrap.build/articles/lovable-alternatives/) on bootstrap.build. Before you share the link, [check the live page against your design](/guides/publish-and-check-live-page/).
 
 ## Which v0 alternative should you choose?
 
 - **You liked v0 but want hosting that is not Vercel:** Bolt.new.
-- **You need sign-in, a database and a team in one tool:** Lovable.
+- **A team that wants to build and host an app in one tool:** Lovable.
 - **You can code, or want to learn, and want to own the project:** Cursor or Devin Desktop.
 - **You want frontier models in a $20 plan:** Devin Desktop Pro.
 - **You need a marketing site that someone will edit by hand:** Siter.io.
@@ -133,7 +133,7 @@ For more on hosting AI-generated sites, see [hosting an AI-generated website](ht
 
 ### What is the best free alternative to v0?
 
-Bolt.new has the largest free allowance of the browser builders: 1 million tokens a month, at most 300,000 a day, with hosting included. Lovable's free plan gives 5 build credits a day, up to 30 a month. Cursor and Devin Desktop have free plans for coding in an editor.
+The two browser builders count differently, so they are hard to rank. Bolt.new's free plan gives 1 million tokens a month, at most 300,000 a day, with hosting included. Lovable's free plan gives 5 build credits a day, up to 30 a month. Cursor and Devin Desktop have free plans for coding in an editor.
 
 ### How much does v0 cost?
 

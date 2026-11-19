@@ -87,7 +87,7 @@ What it does not do: it runs no server code, so an app with server rendering or 
 
 **Good for:** documentation and open source projects already on GitHub.
 
-However you publish, check the live page against your design. [Put an agent-built page online, then check the live address](/guides/publish-and-check-live-page/) shows how.
+However you publish, check the live page against your design. [Put an agent-built page online, then check the live address](/guides/publish-and-check-live-page/) shows how. For other ways to build with AI, see [v0 alternatives in 2026](/guides/v0-alternatives/).
 
 ## Which Windsurf plan should you choose?
 
