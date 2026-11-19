@@ -6,7 +6,7 @@ date: 2026-11-19
 checked: 2026-11-19
 ---
 
-Brevo prices its plans by the number of emails you send a month, not by the number of contacts. The free plan sends up to 300 emails a day. Starter is $9 a month for 5,000 emails, Standard is $18, and Professional starts at $499 for 150,000. If you send rarely, you can buy email credits that never expire instead of a plan.
+Brevo prices its plans by the number of emails you send a month, and each volume comes with a contact allowance. The free plan sends up to 300 emails a day. Starter is $9 a month for 5,000 emails, Standard is $18, and Professional starts at $499 for 150,000. If you send rarely, you can buy email credits that never expire instead of a plan.
 
 This guide is for anyone who sends marketing or transactional email through Brevo, including developers who send from an app. We read every number below on Brevo's pricing pages on 19 November 2026, with the currency set to US dollars. The page showed us euros by default, so check the currency switch when you compare.
 
@@ -25,7 +25,7 @@ This guide is for anyone who sends marketing or transactional email through Brev
 
 | Plan | Monthly billing | Yearly billing, per month | Emails a month | What it adds |
 | --- | --- | --- | --- | --- |
-| Free | $0 | $0 | Up to 300 a day | Email, forms, transactional email |
+| Free | $0 | $0 | Up to 300 a day | Email campaigns, transactional email |
 | Starter | From $9 | From $8.08 | From 5,000 | Advanced segmentation, AI content tools |
 | Standard | From $18 | From $16.17 | From 5,000 | Automation, A/B testing, no Brevo logo |
 | Professional | From $499 | From $449.08 | From 150,000 | WhatsApp and push, 10 seats, phone support |
@@ -47,7 +47,7 @@ Brevo's plan builder sets the price by the emails you send each month, counting 
 
 Standard costs more at every volume, and the gap grows: at 100,000 emails it is $57 a month more than Starter. What you get for it is marketing automation, A/B testing, send-time optimization, a landing page and no Brevo logo. If you only send newsletters and transactional email, Starter plus the logo add-on is usually cheaper.
 
-The plan builder also lists a contact allowance that changes with the volume you choose. Check it there before you pick a size.
+The plan builder also lists a contact allowance for each volume: on Starter, 500 contacts at 5,000 emails and 1,500 at 10,000. Check it there before you pick a size.
 
 ## The free plan
 
@@ -104,7 +104,7 @@ Starter starts at $9 a month for 5,000 emails and Standard at $18, with monthly 
 
 ### Does Brevo charge by contacts or by emails?
 
-By emails. Brevo prices Starter and Standard by the number of emails you send each month, counting campaigns and transactional email together.
+Mainly by emails. Brevo prices Starter and Standard by the number of emails you send each month, counting campaigns and transactional email together. Each volume includes a contact allowance: on Starter, the plan builder showed 500 contacts at 5,000 emails and 1,500 at 10,000.
 
 ### What is the difference between Brevo Starter and Standard?
 

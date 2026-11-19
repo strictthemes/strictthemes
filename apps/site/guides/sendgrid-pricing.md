@@ -6,7 +6,7 @@ date: 2026-11-19
 checked: 2026-11-19
 ---
 
-SendGrid, now sold as Twilio SendGrid, has no free plan that lasts. New accounts get a 60-day free trial with 100 emails a day. After that, the Email API starts at $19.95 a month for 50,000 emails on Essentials, and $89.95 a month for 100,000 on Pro. Marketing email is a separate product, Marketing Campaigns, from $15 a month.
+SendGrid, now sold as Twilio SendGrid, describes its free tier as a 60-day trial with 100 emails a day. After that, the Email API starts at $19.95 a month for 50,000 emails on Essentials, and $89.95 a month for 100,000 on Pro. Marketing email is a separate product, Marketing Campaigns, from $15 a month.
 
 This guide is for developers who send email from an app, including apps built with a coding agent. We read every number below on SendGrid's pricing pages, now on twilio.com, and in its support docs on 19 November 2026.
 
@@ -14,7 +14,7 @@ This guide is for developers who send email from an app, including apps built wi
 
 ## TL;DR
 
-- **The free trial lasts 60 days,** with 100 emails a day and no card. SendGrid's support docs say you cannot go over its limits.
+- **The free tier is described as a 60-day trial,** with 100 emails a day and no card. SendGrid's pages do not agree on what happens after day 60.
 - **Essentials is $19.95 a month for 50,000 emails,** or $34.95 for 100,000. One teammate, 3 days of searchable email activity.
 - **Pro starts at $89.95 a month for 100,000 emails** and goes to $1,099 for 2.5 million. It adds a dedicated IP, subusers, SSO and 1,000 teammates.
 - **Overages are billed the month after,** at a rate SendGrid's support page says varies. The pricing page does not list it.
@@ -57,7 +57,7 @@ The teammate limit is the one that pushes small teams up. Essentials allows one 
 
 SendGrid's trial is $0 for 60 days, sends 100 emails a day, and needs no card. Its pricing FAQ says the trial includes analytics, deliverability tools and the dynamic template editor.
 
-The 60 days are the change to know. SendGrid's FAQ and its overage article both describe the free tier as a trial of 60 days, not a plan that stays free. If you set up SendGrid for a side project and expect it to run for free, plan to pay $19.95 a month, or to move.
+The 60 days are the part to check. SendGrid's FAQ and its overage article both describe the free tier as a 60-day trial. But on the same pricing page, when you move the volume slider, the free card changes to "$0/mo" and "100 emails/day for free" with no 60-day limit. And SendGrid's billing docs describe downgrading a paid account to a free plan. The pages we read do not say what happens on day 61. If a free side project matters to you, ask SendGrid before you build on it.
 
 During the trial you cannot go over the limit. SendGrid's overage article says the trial covers 100 emails a day for 60 days and "you can't exceed these limitations".
 
@@ -92,7 +92,7 @@ At 50,000 emails a month, compared with the other developer email services we ha
 | Postmark Basic | $55 | 100 a month |
 | Amazon SES | $5 to $8 | Sandbox only, 200 a day to verified addresses |
 
-So SendGrid is cheap at 50,000 and 100,000 emails, and Amazon SES is cheaper still if you can live with AWS's console. Where SendGrid costs more is the step from Essentials to Pro, and the lack of a lasting free plan. See [Resend pricing in 2026](/guides/resend-pricing/), [Mailgun pricing in 2026](/guides/mailgun-pricing/), [Postmark pricing in 2026](/guides/postmark-pricing/) and [Amazon SES pricing in 2026](/guides/amazon-ses-pricing/).
+So SendGrid is cheap at 50,000 and 100,000 emails, and Amazon SES is cheaper still if you can live with AWS's console. Where SendGrid costs more is the step from Essentials to Pro, and its free tier is described as a 60-day trial. See [Resend pricing in 2026](/guides/resend-pricing/), [Mailgun pricing in 2026](/guides/mailgun-pricing/), [Postmark pricing in 2026](/guides/postmark-pricing/) and [Amazon SES pricing in 2026](/guides/amazon-ses-pricing/).
 
 ## Before you send: check where your email lands
 
@@ -110,17 +110,17 @@ What it does not do: it is not a sandbox for development email, and it does not 
 
 ## Which SendGrid plan should you choose?
 
-- **Trying SendGrid out:** the free trial. Know that it ends after 60 days.
+- **Trying SendGrid out:** the free trial, described as 60 days.
 - **One app, up to 100,000 emails a month, one person:** Essentials, at $19.95 or $34.95.
 - **A team, or more than 100,000 emails:** Pro. It is also the plan with a dedicated IP and SSO.
 - **A newsletter:** Marketing Campaigns, priced by contacts, on its own or with the Email API.
-- **A side project that should stay free:** a service with a lasting free plan, such as Resend's 3,000 emails a month.
+- **A side project that should stay free:** a service whose free plan is clearly permanent, such as Resend's 3,000 emails a month.
 
 ## FAQ
 
 ### Is SendGrid free?
 
-Not for long. SendGrid's free tier is a 60-day trial with 100 emails a day and no card. After 60 days you need a paid plan, which starts at $19.95 a month for 50,000 emails.
+SendGrid's FAQ describes its free tier as a 60-day trial with 100 emails a day and no card, though other parts of its pricing page show a $0 plan with no time limit. Paid plans start at $19.95 a month for 50,000 emails.
 
 ### How much does SendGrid cost?
 

@@ -33,7 +33,7 @@ This guide is for developers who deploy an app, an API or a database to Railway,
 | Services per project | 3 | 50 | 100 | Unlimited |
 | Memory per service | Up to 0.5 GB | Up to 48 GB | Up to 1 TB | Up to 2.4 TB |
 | Volume storage | 0.5 GB | Up to 5 GB | Up to 1 TB | Up to 5 TB |
-| Seats | 1 | 1 | Unlimited | Unlimited |
+| Seats | Not listed | 1 | Unlimited | Unlimited |
 | Log history | Not listed | 7 days | 30 days | 90 days |
 
 Railway's docs say Hobby's subscription fee is waived for a small set of active builders, judged on things like platform usage and GitHub account. If you qualify, the dashboard tells you.
