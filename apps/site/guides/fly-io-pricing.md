@@ -71,7 +71,7 @@ Accounts on Fly's older plans, which it stopped offering in October 2024, keep t
 
 ## Support, reservations and credits
 
-**Support** is a separate monthly plan: Standard at $29, Premium at $199, and Enterprise from $2,500. Without one, you have the community forum.
+**Support** is a separate monthly plan: Standard at $29, Premium at $199, and Enterprise from $2,500. Community support is free.
 
 **Reservations** give a 40% discount if you prepay a year. For example, $36 a year buys $5 a month of credit for shared machines in one region. The credit covers CPU and extra memory only, and does not roll over. They make sense once you know what you run every month.
 
@@ -81,7 +81,7 @@ Accounts on Fly's older plans, which it stopped offering in October 2024, keep t
 
 Fly's own docs point to auto-stop: a machine that stops when no requests arrive, and starts again on the next one. While stopped, you pay only for its root filesystem. A low-traffic app spends most of the month stopped.
 
-The other habits are plain ones. Pick the smallest machine that works and size up when you see it struggle. Delete volumes you no longer use, since they bill while detached. Skip the dedicated IPv4 address unless something needs it. And keep an eye on bandwidth if your users are in Africa, India or Asia, where it costs two to six times more.
+The other habits are plain ones. Pick the smallest machine that works and size up when you see it struggle. Delete volumes you no longer use, since they bill while detached. Skip the dedicated IPv4 address unless something needs it. And keep an eye on bandwidth from machines in Africa, India or Asia Pacific, where data leaving Fly costs two to six times more.
 
 Fly's docs work through examples. A background worker on one shared-cpu-1x machine, running all month, is $2.21. A small web app with a 10 GB volume and Fly's Managed Postgres is $43.67, and most of that is the database: the app machine and its volume are $5.19. So a small app with no managed database can stay under the $5 that Fly waives for a personal organization. Fly's docs are clear that there is no free tier, but in practice that waiver works like one.
 

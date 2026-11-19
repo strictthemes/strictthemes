@@ -33,6 +33,8 @@ This guide is for developers who host a site or a web app on Firebase. We read e
 
 These limits are per Firebase project, not per site. Two sites in one project share them.
 
+![Firebase's pricing table for Hosting: 10 GB of storage and 360 MB a day of data transfer at no cost, then $0.026 and $0.15 per GB on Blaze.](/guides/firebase-hosting-pricing/firebase-hosting.jpg "Firebase Hosting rows on the pricing page, 19 November 2026")
+
 The two Firebase pages describe the transfer limit in different units. The pricing page shows 360 MB a day, and says no-cost usage on Blaze is counted daily. The Hosting docs describe the Spark limit as 10 GB a month. They come to about the same over a month. On Blaze, plan on the daily figure: a busy day can be billed even if the month is light.
 
 ## What happens when you hit Spark's limits
@@ -65,8 +67,6 @@ App Hosting is Firebase's newer product for full-stack apps, such as Next.js or 
 | Compute and builds | Billed through Google Cloud Run, Cloud Build and Artifact Registry at their own rates |
 
 So an App Hosting bill has more lines than a Hosting bill. If your app does not need a server, classic Firebase Hosting is cheaper and simpler.
-
-![Firebase's pricing table for Hosting: 10 GB of storage and 360 MB a day of data transfer at no cost, then $0.026 and $0.15 per GB on Blaze.](/guides/firebase-hosting-pricing/firebase-hosting.jpg "Firebase Hosting rows on the pricing page, 19 November 2026")
 
 ## If your site is only static files
 

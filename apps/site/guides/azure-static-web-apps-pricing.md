@@ -43,7 +43,7 @@ One number disagrees between Microsoft's own pages. The pricing page and the pla
 
 Free is meant for hobby and personal projects, in Microsoft's words. It is generous on bandwidth for a small site: 100 GB a month is a lot of page views for a site of text and compressed images.
 
-The catch is the edge. Under the pricing table, Microsoft writes that if your site exceeds the usage quotas, "we will not be able to serve your site". There is no overage to buy on Free. A traffic spike or a large video file can take the site offline until the quota resets or you move to Standard.
+The catch is the edge. Under the pricing table, Microsoft writes that if your site exceeds the usage quotas, "we will not be able to serve your site". There is no overage to buy on Free. So a traffic spike or a large video file can stop the site being served. Microsoft's plans doc says to pick Standard when you expect traffic to exceed the bandwidth limits.
 
 Two other limits are easy to hit. Storage is 0.25 GB per deployment, so a site with many large images may not fit. And the 100 GB is per subscription, shared by every Static Web App in it.
 

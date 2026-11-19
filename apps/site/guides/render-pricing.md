@@ -81,13 +81,14 @@ Render lets you set a spend limit. If build minutes run out and the limit is rea
 
 ## If your site is only static files
 
-Render's static sites are free to deploy on every plan, with a CDN, custom domains and TLS. What you pay for is the bandwidth: they count against the plan's 5 GB on Hobby, then $0.15 per GB. If your site is only static files, these hosts are worth comparing:
+Render's static sites are free to deploy on every plan, with a CDN, custom domains and TLS. What you pay for is the bandwidth: they count against the plan's 5 GB on Hobby, then $0.15 per GB. If your site is only static files, compare them with these hosts:
 
 | Host | Price | Custom domain | Metered | Git needed |
 | --- | --- | --- | --- | --- |
 | Static.app | From $6 a month, or $60 a year | Yes | No, unlimited traffic | No |
 | Render static sites | Free to deploy | Yes, 2 on Hobby | 5 GB on Hobby, then $0.15 per GB | Yes, deploys from Git |
 | Cloudflare Pages | Free plan | Yes | No bandwidth limit listed | No, direct upload works |
+| GitHub Pages | Free with public repositories | Yes | Soft limit of 100 GB a month | Yes |
 
 ### Static.app
 
