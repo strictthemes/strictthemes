@@ -121,7 +121,7 @@ What it does not do: it runs no server code, so your API stays on Fly. There is 
 
 **Good for:** documentation and open source projects that already live on GitHub.
 
-For other app hosts, see the [Heroku alternatives](https://bootstrap.build/articles/heroku-alternatives/) and [Render alternatives](https://bootstrap.build/articles/render-alternatives/) on bootstrap.build. To compare Render's plans with Fly's, see [Render pricing in 2026](/guides/render-pricing/).
+For other app hosts, see the [Heroku alternatives](https://bootstrap.build/articles/heroku-alternatives/) and [Render alternatives](https://bootstrap.build/articles/render-alternatives/) on bootstrap.build. To compare Render's plans with Fly's, see [Render pricing in 2026](/guides/render-pricing/), and for the others, [Heroku pricing](/guides/heroku-pricing/) and [Railway pricing](/guides/railway-pricing/).
 
 ## Is Fly.io right for you?
 

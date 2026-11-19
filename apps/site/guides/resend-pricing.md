@@ -103,7 +103,7 @@ What it does not do: it is not a sandbox for development email, and it does not 
 
 ## Is Resend expensive?
 
-At low volume it is one of the cheaper options. Postmark, for comparison, charges $15 a month for 10,000 emails on its Basic plan; see [Postmark pricing in 2026](/guides/postmark-pricing/). At 50,000 emails, Resend's Pro is $20 and Postmark's Basic is $55.
+At low volume it is one of the cheaper options. Postmark, for comparison, charges $15 a month for 10,000 emails on its Basic plan; see [Postmark pricing in 2026](/guides/postmark-pricing/). At 50,000 emails, Resend's Pro is $20 and Postmark's Basic is $55. For the other big email APIs, see [SendGrid pricing](/guides/sendgrid-pricing/), [Mailgun pricing](/guides/mailgun-pricing/) and [Amazon SES pricing](/guides/amazon-ses-pricing/).
 
 Three things raise a Resend bill: going over the quota with overages on, needing Scale for the domains or a dedicated IP, and a marketing list that grows past 5,000 contacts.
 

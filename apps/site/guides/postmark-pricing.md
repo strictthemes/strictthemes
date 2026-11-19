@@ -67,7 +67,7 @@ Both sell transactional email to developers. At the volumes most apps start with
 | 50,000 | $55 | $20 (Pro) |
 | 100,000 | $115 (125,000 plan) | $35 (Pro) |
 
-Resend's free plan is also larger: 3,000 emails a month against Postmark's 100. Where Postmark's plans differ is in what is included at every tier, such as inbound email on Pro and unlimited domains on Platform, and in having no daily limit on any paid plan. See [Resend pricing in 2026](/guides/resend-pricing/) for its plans and limits.
+Resend's free plan is also larger: 3,000 emails a month against Postmark's 100. Where Postmark's plans differ is in what is included at every tier, such as inbound email on Pro and unlimited domains on Platform, and in having no daily limit on any paid plan. See [Resend pricing in 2026](/guides/resend-pricing/) for its plans and limits, and [SendGrid](/guides/sendgrid-pricing/), [Mailgun](/guides/mailgun-pricing/) and [Amazon SES](/guides/amazon-ses-pricing/) pricing for the others.
 
 ## Before you send: check where your email lands
 

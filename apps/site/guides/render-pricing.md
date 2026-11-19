@@ -116,7 +116,7 @@ What it does not do: it runs no server code, so an API stays on Render. There is
 
 **Good for:** documentation and open source projects that already live on GitHub.
 
-For other app hosts, see the [Render alternatives](https://bootstrap.build/articles/render-alternatives/) and [Heroku alternatives](https://bootstrap.build/articles/heroku-alternatives/) on bootstrap.build. To compare with paying per machine, see [Fly.io pricing in 2026](/guides/fly-io-pricing/).
+For other app hosts, see the [Render alternatives](https://bootstrap.build/articles/render-alternatives/) and [Heroku alternatives](https://bootstrap.build/articles/heroku-alternatives/) on bootstrap.build. To compare with paying per machine, see [Fly.io pricing in 2026](/guides/fly-io-pricing/), and for the other app platforms, [Heroku pricing](/guides/heroku-pricing/) and [Railway pricing](/guides/railway-pricing/).
 
 ## Which Render plan should you choose?
 
