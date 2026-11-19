@@ -67,7 +67,7 @@ Since the price follows your contact band, check how many contacts your audience
 
 ## Is Mailchimp expensive?
 
-For a newsletter of a few thousand people, it is in the middle. At 5,000 contacts, Mailchimp Essentials is $75 a month. Brevo prices by emails instead of contacts: its Starter plan is $56 a month for 50,000 emails, which is 10 sends to 5,000 people. See [Brevo pricing in 2026](/guides/brevo-pricing/).
+For a newsletter of a few thousand people, it is in the middle. At 5,000 contacts, Mailchimp Essentials is $75 a month. Brevo prices mainly by the emails you send, and each email volume comes with a contact allowance, so compare both numbers for your list. See [Brevo pricing in 2026](/guides/brevo-pricing/).
 
 Mailchimp's case is its tools: automation, templates, AI help and 300+ integrations. If you only send transactional email from an app, an email API costs far less; see [Resend pricing in 2026](/guides/resend-pricing/) and [Amazon SES pricing in 2026](/guides/amazon-ses-pricing/).
 
@@ -91,7 +91,6 @@ What it does not do: it does not send your campaigns, warm up a domain or fix a 
 - **A regular newsletter with a few thousand subscribers:** Essentials, if simple automation is enough.
 - **Welcome series, abandoned carts, coded templates or A/B testing at scale:** Standard.
 - **A team of more than 5 people, or phone support:** Premium.
-- **A large list that you mail rarely:** compare a service priced by emails, such as Brevo.
 
 ## FAQ
 

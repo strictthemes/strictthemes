@@ -6,7 +6,7 @@ date: 2026-11-19
 checked: 2026-11-19
 ---
 
-Cursor's pricing changed shape in 2026. It is now sold as part of The X Subscription, one subscription for Cursor, Grok and X. There are five individual plans: Free, Plus at $8 a month, Premium at $30, Super at $100 and Ultra at $200. Each paid plan includes a weekly pool of usage for Cursor's own models. Third-party models, from OpenAI, Anthropic, Google and others, are not in the pool: on Premium and up you pay their API list price from prepaid credit.
+Cursor's pricing has changed. It is now sold as part of The X Subscription, one subscription for Cursor, Grok and X. There are five individual plans: Free, Plus at $8 a month, Premium at $30, Super at $100 and Ultra at $200. Each paid plan includes a weekly pool of usage for Cursor's own models. Third-party models, from OpenAI, Anthropic, Google and others, are not in the pool: on Premium and up you pay their API list price from prepaid credit.
 
 This guide is for developers who use Cursor or are choosing a coding agent. We read every number below on Cursor's pricing page and in its docs on 19 November 2026. If you are on an older Cursor plan, such as Pro or Pro+, see [the section on legacy plans](#if-you-are-on-a-legacy-cursor-plan).
 

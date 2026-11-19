@@ -67,7 +67,7 @@ Brevo's FAQ says every plan includes transactional email: a REST API, SMTP relay
 
 Brevo's transactional page says dedicated IPs are available for high-volume senders. On the pricing page, a dedicated IP is listed under Enterprise.
 
-For developers who only need transactional email, an email API priced for that job can cost less. At 50,000 emails a month, Resend Pro is $20 and SendGrid Essentials is $19.95, against $56 for Brevo Starter. Brevo's case is that the same account runs your newsletters, forms and automation. See [Resend pricing in 2026](/guides/resend-pricing/) and [SendGrid pricing in 2026](/guides/sendgrid-pricing/).
+For developers who only need transactional email, an email API priced for that job can cost less. At 50,000 emails a month, Resend Pro is $20 and SendGrid Essentials is $19.95, against $56 for Brevo Starter. Brevo's case is that the same account runs your newsletters, forms and automation. See [Resend pricing in 2026](/guides/resend-pricing/) and [SendGrid pricing in 2026](/guides/sendgrid-pricing/). For a contact-priced newsletter tool, see [Mailchimp pricing in 2026](/guides/mailchimp-pricing/).
 
 ## Before you send: check where your email lands
 

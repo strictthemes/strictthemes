@@ -35,7 +35,7 @@ This guide is for developers who use Windsurf or are choosing a coding agent. We
 
 Pro, Max and Teams can also use your ChatGPT plan. Teams adds multiplayer sessions, SAML or OIDC single sign-on, centralized billing, cost controls with 3 usage tiers and a Slack support channel. Enterprise adds SCIM, role-based access, deployment in your own cloud and dedicated account support.
 
-**Teams is flat, not per seat.** Devin's page says "Teams is self-serve at a flat $80/month", for up to 100 members, with on-demand credits shared by the team. For a team of five, that is $16 a person; for twenty, $4. Usage beyond the included amount is where a team's bill grows.
+**Teams is a flat fee, not per seat.** Devin's page says "Teams is self-serve at a flat $80/month", and its Teams card describes "shared on-demand credits for up to 100 members". The page does not say how much usage, if any, the $80 includes. So treat the $80 as the platform fee, and expect the team's usage to be billed on top as on-demand credits.
 
 ## How usage works
 
@@ -49,7 +49,7 @@ The page does not publish the allowance in tokens or messages, so you cannot wor
 
 At the entry paid tier, Windsurf Pro is $20 a month and Cursor Premium is $30, though Cursor also has an $8 Plus plan with its own models only. The bigger difference is third-party models. Windsurf Pro includes frontier models from the major labs in its quota. Cursor's plans do not: on Premium and up, third-party models are billed at API list price from the first request. See [Cursor pricing in 2026](/guides/cursor-pricing/).
 
-For teams, Windsurf's flat $80 a month is far below Cursor's $30 per seat once a team has more than two or three people.
+For teams, the two are not like for like. Windsurf Teams is a flat $80 platform fee with usage as shared on-demand credits. Cursor Teams is $30 or more per seat, and each seat comes with its own weekly usage pool. Compare what your team would actually use, not the headline price.
 
 ## Publish what you build
 
@@ -94,7 +94,7 @@ However you publish, check the live page against your design. [Put an agent-buil
 - **Trying it, or mostly using Tab completions:** Free.
 - **Daily coding with frontier models:** Pro at $20.
 - **Heavy agent use, several sessions at once, or Devin Bots:** Max at $200.
-- **A team of three or more:** Teams at a flat $80 a month, with a cost-control tier set.
+- **A team:** Teams at a flat $80 a month plus on-demand usage. Set a cost-control tier before you invite everyone.
 - **A company that needs SCIM or its own cloud:** Enterprise.
 
 ## FAQ
@@ -117,7 +117,7 @@ On a paid plan you can buy extra usage, consumed at API pricing. The allowance a
 
 ### Is Windsurf Teams priced per user?
 
-No. Devin's pricing page describes Teams as a flat $80 a month for up to 100 members, with on-demand credits shared across the team.
+No. Devin's pricing page describes Teams as a flat $80 a month for up to 100 members, with shared on-demand credits for usage. The page does not say how much usage the $80 includes.
 
 ### Does Windsurf include frontier models?
 
