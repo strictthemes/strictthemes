@@ -1,21 +1,21 @@
 ---
-title: "Cloudflare Pages pricing in 2026: what is free, and what costs"
-description: Cloudflare Pages pricing and limits in 2026. Static files are free, functions bill as Workers, builds depend on your plan, and Cloudflare now points new projects to Workers.
+title: "Cloudflare Pages and Workers pricing in 2026: what is free, and what costs"
+description: Cloudflare Pages and Workers pricing in 2026. Static files are free, Workers Paid starts at $5 a month, functions bill as Workers, and the limits on builds, files and KV.
 kind: Pricing
 date: 2026-11-18
-checked: 2026-11-18
+checked: 2026-11-19
 ---
 
 Cloudflare Pages is free for static files, with no charge for bandwidth or for requests that only fetch a file. You start paying in two cases: when your site runs server code through Pages Functions, and when you need more builds or files than the free plan allows. There is also a change to know about first. Cloudflare's own Pages docs now tell you to start new projects with Workers instead.
 
-This guide is for anyone who deploys to Cloudflare by hand, from Git or from a coding agent. We read every number below in Cloudflare's docs and on its pricing pages on 18 November 2026.
+This guide is for anyone who deploys to Cloudflare by hand, from Git or from a coding agent. We read every number below in Cloudflare's docs and on its pricing pages on 18 November 2026, and checked the Workers prices again on 19 November.
 
 ![The Cloudflare Pages documentation, with a note that asks Are you sure you want to use Pages? and says to start new projects with Workers.](/guides/cloudflare-pages-pricing/pages-docs.jpg "Cloudflare's Pages docs, 18 November 2026")
 
 ## TL;DR
 
 - **Static files are free and unlimited.** Cloudflare's docs say requests for static assets are free on both free and paid plans, and the Pages page lists unlimited bandwidth on all plans.
-- **Server code is billed as Workers.** On the free plan, Pages Functions share 100,000 requests a day with your Workers. Workers Paid starts at $5 a month for 10 million requests.
+- **Server code is billed as Workers.** On the free plan, Pages Functions share 100,000 requests a day with your Workers. Workers Paid starts at $5 a month for the whole account, with 10 million requests and 30 million CPU milliseconds included.
 - **Builds depend on your Cloudflare plan.** Free has 500 builds a month, one at a time.
 - **The free plan has hard edges:** 20,000 files per site, 25 MiB per file, and 100 projects per account.
 - **Cloudflare now says to start new projects with Workers,** which serves static files on the same free terms.
@@ -56,6 +56,27 @@ Pages Functions run server code, such as an API route, a form handler or server-
 Cloudflare's Workers pricing page works through an example. A Worker that serves 15 million requests a month at 7 ms of CPU each costs $8 a month: $5 for the plan, $1.50 for the extra 5 million requests, and $1.50 for CPU time.
 
 ![Cloudflare's Workers pricing page, describing the free plan and the Workers Paid plan at a minimum of $5 a month.](/guides/cloudflare-pages-pricing/workers-pricing.jpg "Cloudflare's Workers pricing docs, 18 November 2026")
+
+## Cloudflare Workers pricing
+
+Workers is Cloudflare's platform for server code, and since Pages Functions bill as Workers, its prices are the ones that matter. There are two plans: Free, and Workers Paid at a minimum of $5 a month per account. These are from Cloudflare's Workers pricing docs, last updated 18 November 2026.
+
+| | Workers Free | Workers Paid |
+| --- | --- | --- |
+| Price | $0 | $5 a month minimum |
+| Requests | 100,000 a day | 10 million a month, then $0.30 per million |
+| CPU time | 10 ms per request | 30 million ms a month, then $0.02 per million ms |
+| Static asset requests | Free and unlimited | Free and unlimited |
+| KV reads | 100,000 a day | 10 million a month, then $0.50 per million |
+| KV writes | 1,000 a day | 1 million a month, then $5 per million |
+| KV storage | 1 GB | 1 GB, then $0.50 per GB a month |
+| D1 rows read | 5 million a day | 25 billion a month, then $0.001 per million |
+| D1 rows written | 100,000 a day | 50 million a month, then $1 per million |
+| D1 storage | 5 GB in all | 5 GB, then $0.75 per GB a month |
+
+On Workers Paid, a request can use up to 30 seconds of CPU time by default, and up to 5 minutes if you raise it. Cloudflare does not bill subrequests your Worker makes, only the requests that come in.
+
+The $5 covers the whole account, not each Worker. For most small apps it is the whole bill: the included 10 million requests are about 330,000 a day.
 
 If you worry about a runaway bill, Workers has a spending limit. The pricing page says it blocks new invocations at a threshold you set, and that it can stop every Worker on the account when it does.
 
@@ -111,7 +132,7 @@ It costs money where Cloudflare is free, so weigh what you get. There is no free
 
 **Good for:** documentation and open source projects that already live on GitHub.
 
-For more hosts, see the Cloudflare Pages alternatives on [bootstrap.build](https://bootstrap.build/articles/cloudflare-pages-alternatives/). To compare with the other big developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/), [Vercel pricing in 2026](/guides/vercel-pricing/) and [AWS Amplify pricing in 2026](/guides/aws-amplify-pricing/).
+For more hosts, see the Cloudflare Pages alternatives on [bootstrap.build](https://bootstrap.build/articles/cloudflare-pages-alternatives/). To compare with the other big developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/), [Vercel pricing in 2026](/guides/vercel-pricing/), [AWS Amplify pricing in 2026](/guides/aws-amplify-pricing/), [Firebase Hosting pricing in 2026](/guides/firebase-hosting-pricing/) and [Azure Static Web Apps pricing in 2026](/guides/azure-static-web-apps-pricing/).
 
 ## Which Cloudflare option should you choose?
 
@@ -140,6 +161,10 @@ Functions are billed as Workers. The free plan gives 100,000 requests a day, sha
 ### Is Cloudflare Pages being replaced by Workers?
 
 We found no end date for Pages in Cloudflare's docs. Its Pages docs, updated 25 August 2026, say Workers supports most Pages use cases, is its main platform for applications, and tell you to start new projects with Workers.
+
+### How much does Cloudflare Workers cost?
+
+Workers Free is $0 for 100,000 requests a day, with 10 ms of CPU time per request. Workers Paid is a $5 monthly minimum per account, with 10 million requests and 30 million CPU milliseconds a month included, then $0.30 per million requests and $0.02 per million CPU milliseconds. Requests for static assets are free on both.
 
 ### Does Cloudflare charge for bandwidth on Pages?
 

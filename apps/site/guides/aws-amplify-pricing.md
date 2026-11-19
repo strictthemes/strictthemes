@@ -95,7 +95,7 @@ It has real limits. There is no free plan, only a 7-day trial on a free subdomai
 
 **Good for:** documentation and open source projects that already live on GitHub.
 
-For more hosts, see the AWS Amplify alternatives on [bootstrap.build](https://bootstrap.build/articles/aws-amplify-alternatives/). To compare with other developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/) and [Vercel pricing in 2026](/guides/vercel-pricing/).
+For more hosts, see the AWS Amplify alternatives on [bootstrap.build](https://bootstrap.build/articles/aws-amplify-alternatives/). To compare with other developer hosts, see [Netlify pricing in 2026](/guides/netlify-pricing/), [Vercel pricing in 2026](/guides/vercel-pricing/), [Firebase Hosting pricing in 2026](/guides/firebase-hosting-pricing/) and [Azure Static Web Apps pricing in 2026](/guides/azure-static-web-apps-pricing/).
 
 ## Which way should you host on Amplify?
 
