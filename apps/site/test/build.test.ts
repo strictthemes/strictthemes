@@ -425,8 +425,15 @@ test("the home page shows a built page for each theme that has one", () => {
 })
 
 test("the site says nothing about the shop it used to be", () => {
+  // A guide may be about WordPress, so its title in a list of guides is not the site talking about itself.
+  const withoutGuideLinks = (text: string) =>
+    text
+      .replace(/<a\b[^>]*href="\/guides\/[^"]*"[^>]*>[\s\S]*?<\/a>/g, "")
+      .split("\n")
+      .filter((line) => !line.includes("https://strictthemes.com/guides/"))
+      .join("\n")
   for (const page of ["index.html", "themes/index.html", "spec/index.html", "404.html", "llms.txt"]) {
-    assert.doesNotMatch(read(page), /wordpress/i, page)
+    assert.doesNotMatch(withoutGuideLinks(read(page)), /wordpress/i, page)
   }
 })
 
