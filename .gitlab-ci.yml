@@ -1,0 +1,77 @@
+# Builds and tests the monorepo on every merge request and on master, then
+# copies the built site to the server from master.
+#
+# The build runs in Docker on the runner registered for this project. The
+# deploy runs on the shared server itself (a shell runner tagged "shared-vps")
+# and copies the build into /opt/sites/strictthemes, which the server's Caddy
+# serves. The rules in apps/site/public/.htaccess are mirrored in
+# /opt/edge/sites/strictthemes.caddy on that server: change both together.
+#
+# GitLab is where this repo lives; GitHub gets a mirror of master.
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  image: node:24
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - .npm/
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+    - npm run typecheck
+    # The site's tests build the site again, with the production address.
+    - npm test
+    # Strict Check needs a browser, and the image has none.
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends chromium > /dev/null
+    # Strict Check on the site itself, against its own theme: the code, and the
+    # built pages listed in apps/site/package.json.
+    - npm run strict-check -w apps/site -- --report "$CI_PROJECT_DIR/strict-check.txt"
+    # The agent kit, as the registry writes it for each theme: in every theme,
+    # both color modes and two widths, with hover and focus.
+    - npm run strict-check:kit -w apps/site
+    - echo "$CI_COMMIT_SHORT_SHA $CI_COMMIT_REF_NAME $(date -u '+%F %T UTC')" > apps/site/dist/deploy.txt
+  artifacts:
+    # Kept when the job fails too: a failed check is the one whose report gets read.
+    when: always
+    paths:
+      - apps/site/dist/
+      - strict-check.txt
+    expire_in: 1 week
+
+deploy:
+  stage: deploy
+  tags: [shared-vps]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "master"
+  needs: [build]
+  resource_group: production
+  variables:
+    # A fresh checkout clears what earlier jobs left in this runner's folder,
+    # so only this pipeline's build (the artifact) gets copied.
+    GIT_DEPTH: "1"
+    DEPLOY_PATH: /opt/sites/strictthemes/
+  script:
+    # The build must be whole: --delete removes what is not in it.
+    - test -f apps/site/dist/index.html
+    - test -f apps/site/dist/.htaccess
+    - test -f apps/site/dist/deploy.txt
+    # A build with far fewer files than the live site is a wrong or broken
+    # build, not a smaller site: stop rather than delete most of the site.
+    - new=$(find apps/site/dist -type f | wc -l); live=$(find "$DEPLOY_PATH" -type f | wc -l)
+    - echo "files in the build $new, on the server $live"
+    - if [ "$new" -lt $((live * 8 / 10)) ]; then echo "The build has under 80% of the live site's files. Not deploying."; exit 1; fi
+    - >
+      rsync -rl --checksum --delete --chmod=D755,F644
+      --filter='P .well-known/'
+      apps/site/dist/ "$DEPLOY_PATH"
+    - cat "$DEPLOY_PATH/deploy.txt"
