@@ -118,7 +118,7 @@ Bolt.new, Lovable and Siter.io host for you. v0 deploys to Vercel. Cursor and De
 
 [Static.app](https://static.app/) takes a ZIP or a folder and serves it with SSL, a custom domain, forms and analytics, at a flat price from $6 a month. It has [a page on hosting sites made with v0](https://static.app/v0-hosting), and an API and MCP server so a coding agent can publish to it. It runs no server code, so a v0 app that uses Next.js server features will not work there, and it has no free plan, only a 7-day trial. Until 1 December, its [Black Friday sale](/guides/black-friday-2026-deals/) takes 35% off the first payment. [Cloudflare Pages](https://pages.cloudflare.com/) is free for static files. [GitHub Pages](https://pages.github.com/) is free for public repositories.
 
-For more on hosting AI-generated sites, see [hosting an AI-generated website](https://bootstrap.build/articles/host-ai-generated-website/) and the [Lovable alternatives](https://bootstrap.build/articles/lovable-alternatives/) on bootstrap.build. Before you share the link, [check the live page against your design](/guides/publish-and-check-live-page/).
+If you are comparing Bolt.new instead, see [Bolt.new alternatives in 2026](/guides/bolt-alternatives/). For more on hosting AI-generated sites, see [hosting an AI-generated website](https://bootstrap.build/articles/host-ai-generated-website/) and the [Lovable alternatives](https://bootstrap.build/articles/lovable-alternatives/) on bootstrap.build. Before you share the link, [check the live page against your design](/guides/publish-and-check-live-page/).
 
 ## Which v0 alternative should you choose?
 

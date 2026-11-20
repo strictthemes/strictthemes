@@ -73,7 +73,7 @@ Resend's free plan is also larger: 3,000 emails a month against Postmark's 100. 
 
 Postmark's activity data shows whether each email was delivered, bounced or marked as spam. Delivered means the receiving server accepted the email. It does not tell you whether Gmail put it in the inbox, the promotions tab or spam. For that you need an inbox placement test.
 
-[Unspam](https://unspam.email/) runs that test. You send your real email from Postmark to a seed list of inboxes at Gmail, Outlook, Yahoo and others, and it reports where each copy landed. It also scores the message against spam signals, including your domain's SPF, DKIM and DMARC records, and renders it in 60+ email clients and devices.
+[Unspam](https://unspam.email/) runs that test. For how a test differs from a warm-up tool, see [email warm-up tools in 2026](/guides/email-warm-up-tools/). You send your real email from Postmark to a seed list of inboxes at Gmail, Outlook, Yahoo and others, and it reports where each copy landed. It also scores the message against spam signals, including your domain's SPF, DKIM and DMARC records, and renders it in 60+ email clients and devices.
 
 ![Unspam's pricing page, headed Plans that scale with your sending, with the No account and Free plans.](/guides/postmark-pricing/unspam.jpg "Unspam's pricing page, 18 November 2026")
 

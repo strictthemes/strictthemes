@@ -97,7 +97,7 @@ Every sandbox plan includes an HTML check, a spam analysis, a blacklist report, 
 
 ### 4. Unspam: best for checking inbox placement before a send
 
-[Unspam](https://unspam.email/) does what a sandbox cannot. It sends your real email to a seed list of inboxes at Gmail, Outlook, Yahoo and others, then reports where each copy landed: inbox, promotions, spam or missing. It also scores a message against spam signals, including SPF, DKIM and DMARC authentication, renders previews in 60+ email clients and devices, takes screenshots, and draws an attention heatmap. It has a REST API and an MCP server, so a test can run from your CI or from a coding agent.
+[Unspam](https://unspam.email/) does what a sandbox cannot. For warm-up tools, which are a different job, see [email warm-up tools in 2026](/guides/email-warm-up-tools/). It sends your real email to a seed list of inboxes at Gmail, Outlook, Yahoo and others, then reports where each copy landed: inbox, promotions, spam or missing. It also scores a message against spam signals, including SPF, DKIM and DMARC authentication, renders previews in 60+ email clients and devices, takes screenshots, and draws an attention heatmap. It has a REST API and an MCP server, so a test can run from your CI or from a coding agent.
 
 ![Unspam's pricing page, headed Plans that scale with your sending, with the No account and Free plans.](/guides/mailtrap-alternatives/unspam.jpg "Unspam's pricing page, 18 November 2026")
 
