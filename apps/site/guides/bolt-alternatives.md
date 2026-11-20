@@ -6,7 +6,7 @@ date: 2026-11-20
 checked: 2026-11-20
 ---
 
-Bolt.new builds an app from a prompt in the browser. It prices that work in tokens: the free plan gives 1 million a month, at most 300,000 a day, and Pro is $25 a month with a custom domain. People look for an alternative when the daily limit ends a session, when they want to pay by credits or a flat plan, or when they would rather own the code in an editor.
+Bolt.new builds an app from a prompt in the browser. It prices that work in tokens: the free plan gives 1 million a month, at most 300,000 a day, and Pro is $25 a month with a custom domain. Reasons to look elsewhere include the daily limit ending a session, wanting to pay by credits or a flat plan, and wanting to own the code in an editor.
 
 This guide covers six alternatives: three browser builders like Bolt (Lovable, Base44 and v0), two coding agents for your editor (Cursor and Devin Desktop), and one visual website editor (Siter.io). We read every price below on each tool's own pricing page on 19 and 20 November 2026.
 
@@ -14,7 +14,7 @@ This guide covers six alternatives: three browser builders like Bolt (Lovable, B
 
 ## TL;DR
 
-- **Closest to Bolt, with a free plan and a database:** Base44. Free has 25 message credits a month and up to 5 apps; paid plans start at $20 a month.
+- **A free plan with a database and sign-in:** Base44. Free has 25 message credits a month and up to 5 apps; paid plans start at $20 a month.
 - **Best for a team building an app together:** Lovable. Free allows unlimited collaborators; Pro is $25 a month for 100 credits.
 - **Best if you deploy to Vercel:** v0. Free has $5 of one-time credits; Plus is $30 per user a month.
 - **Best if you want to own and edit the code:** Cursor, from $8 a month, or Devin Desktop, formerly Windsurf, from $20.
@@ -64,7 +64,7 @@ What it does not do: credits are the whole budget, so check your balance as you 
 
 ![Base44's pricing page, with Elite at $160, Pro at $80 and Builder at $40 a month billed annually.](/guides/bolt-alternatives/base44.jpg "Base44's pricing page, 20 November 2026")
 
-Free is $0 with 25 message credits a month and up to 5 apps. Starter is $20 a month, or $16 billed annually, for 100 message credits and a custom domain, with a free domain for 1 year. Builder is $50 or $40 for 250 credits. Pro is $100 or $80 for 500 credits, and Elite is $200 or $160 for 1,200. Annual billing saves 20%. Each plan also has integration credits.
+Free is $0 with 25 message credits a month and up to 5 apps. Starter is $20 a month, or $16 billed annually, for 100 message credits and a custom domain. The annual cards also list a free domain for 1 year. Builder is $50 or $40 for 250 credits. Pro is $100 or $80 for 500 credits, and Elite is $200 or $160 for 1,200. Annual billing saves 20%. Each plan also has integration credits.
 
 What it does not do: the cards list GitHub integration only from Builder up, though the FAQ describes the sync in general, so check before you rely on it. Third-party services you connect bill you separately. It is a hosted platform, so your app runs there unless you export it.
 
@@ -76,7 +76,7 @@ What it does not do: the cards list GitHub integration only from Builder up, tho
 
 ![v0's pricing page, with Free at $0 and Plus at $30 per user a month.](/guides/bolt-alternatives/v0.jpg "v0's pricing page, 19 November 2026")
 
-Free is $0 with $5 of one-time credits for new users and 7 messages a day. Plus is $30 per user a month with $30 of monthly credits per user and $2 of free daily credits on login. Business is $100 per user a month. Models are billed by tokens, from $0.10 per million input tokens on v0 Mini to $4 on v0 Max.
+Free is $0 with $5 of one-time credits for new users and 7 messages a day. Plus is $30 per user a month with $30 of monthly credits per user and $2 of free daily credits on login. Business is $100 per user a month. Models are billed by tokens, from $0.10 per million input tokens on v0 Mini to $8 on v0 Max Fast.
 
 What it does not do: the free daily message limit is small, and the app deploys to Vercel, whose free Hobby plan is for personal, non-commercial use. See [Vercel pricing in 2026](/guides/vercel-pricing/) and [v0 alternatives in 2026](/guides/v0-alternatives/).
 

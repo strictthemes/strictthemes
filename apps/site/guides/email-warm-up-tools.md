@@ -12,9 +12,9 @@ This guide compares six warm-up tools and shows where a placement test fits. We 
 
 ## TL;DR
 
-- **Warm-up costs per mailbox.** MailReach is €25 per mailbox a month as shown. Folderly's core product is $96 per mailbox a month on a yearly plan. Prices climb with every inbox you add.
-- **Cheapest bundled warm-up:** Instantly, from $47 a month with unlimited accounts and unlimited warm-up. It is a cold email sending platform, so you also move your sending to it.
-- **Most expensive:** InboxAlly, from $149 a month, which trains inbox providers with engagement from its seed inboxes. It is built for senders with a placement problem.
+- **Warm-up pricing differs by vendor.** MailReach is €25 per mailbox a month as shown, and Folderly's core product is $96 per mailbox a month on a yearly plan. Warmy, Instantly, lemlist and InboxAlly price by plan.
+- **Instantly bundles warm-up with sending,** from $47 a month with unlimited accounts and unlimited warm-up. It is a cold email sending platform, so you also move your sending to it.
+- **InboxAlly starts at $149 a month.** It trains inbox providers with engagement from its seed inboxes, and is built for senders with a placement problem.
 - **A placement test is a different tool.** It does not warm anything up. It tells you whether mail lands in the inbox, in Promotions or in spam. Unspam charges $0.50 per inbox placement test on its Custom plan, with a free plan that includes 3.
 - **Which comes first depends on the sender.** Warm-up is sold for new cold-email mailboxes with no history. If your domain already sends to real subscribers, a test is a quicker first check.
 
@@ -24,7 +24,7 @@ This guide compares six warm-up tools and shows where a placement test fits. We 
 | --- | --- | --- |
 | What it does | Sends, opens, replies to and rescues mail between your mailbox and a network of other mailboxes | Sends your real message to seed inboxes and reports where each copy landed |
 | Aim | Build sending history and reputation | Measure placement now |
-| How it is priced | Usually per mailbox, a month | Usually per test, or a monthly allowance of tests |
+| How it is priced | Per mailbox at some vendors, per plan at others | Per test, or a monthly allowance of tests |
 | Needs your mailbox connected | Yes | No, you send from your usual tool |
 
 MailReach describes its warm-up in three steps. You connect your mailboxes, it starts conversations with high-reputation inboxes from its network, and your emails are opened, marked as important, taken out of spam and replied to. It then tracks a reputation score per address.
@@ -62,7 +62,7 @@ What it does not do: the price scales with every mailbox you warm, so ten mailbo
 
 ![Warmy's pricing page, with plans starting from $49 a month and a 7-day free trial.](/guides/email-warm-up-tools/warmy.jpg "Warmy's pricing page, 20 November 2026")
 
-Every plan lists placement test credits, a reputation tracker, Google Postmaster data, email verification and DMARC monitoring. Warmy says it has a network of more than 1 million mailboxes and more than 500,000 US seed mailboxes. Pricing is by the volume of warm-up emails you need. Its Black Friday banner offers 50% off annual plans.
+Every plan lists placement test credits, a reputation tracker, Google Postmaster data, email verification and DMARC monitoring. Warmy says it has a network of more than 1 million mailboxes and more than 500,000 US seed mailboxes. Pricing is by the volume of warm-up emails you need. Its Black Friday banner announces 50% off annual plans.
 
 What it does not do: the page does not say how many placement tests a plan includes. It tells you to confirm the monthly allowance with Warmy's team. The $49 starting price is for "plans starting from", so check your own volume on the trial.
 
@@ -82,7 +82,7 @@ What it does not do: it is a sending platform, so warm-up comes with moving your
 
 ### 4. lemlist (lemwarm): best if you already use lemlist
 
-[lemlist](https://www.lemlist.com/) bundles its warm-up and deliverability hub into its outreach plans. The Email plan is 55€ a month billed yearly, or 69€ billed monthly. Multichannel is 87€ yearly or 109€ monthly.
+[lemlist](https://www.lemlist.com/) bundles its warm-up and deliverability hub into its outreach plans. The Email plan starts at 55€ a month billed yearly, shown for 50,000 emails a month, or 69€ billed monthly. Multichannel is 87€ yearly or 109€ monthly.
 
 ![lemlist's pricing page, with the Email plan at 55 euros and Multichannel at 87 euros a month on yearly billing.](/guides/email-warm-up-tools/lemlist.jpg "lemlist's pricing page, shown in euros, 20 November 2026")
 
@@ -124,7 +124,7 @@ What it does not do: pricing is spread across several products, so it is harder 
 
 ![Unspam's pricing page, with the free plan at $0 a month and 21 tests included.](/guides/email-warm-up-tools/unspam.jpg "Unspam's pricing page, 20 November 2026")
 
-The Free plan is $0 and includes 21 tests a month, with 3 inbox placements. The Custom plan starts at $6.40 a month, billed by use: $0.50 for an inbox placement and $0.18 for a spam test. It never charges per inbox or per seat. DMARC monitoring is free for the first domain, then $6 for each extra domain. The pricing page runs a Black Friday offer of 35% off new subscriptions until 1 December; see [Black Friday 2026 deals](/guides/black-friday-2026-deals/).
+The Free plan is $0 and includes 21 tests a month, with 3 inbox placements. The Custom plan is a monthly plan you size by test type: the page priced a default mix of 25 tests at $6.40 a month, with $0.50 for an inbox placement and $0.18 for a spam test. It never charges per inbox or per seat. DMARC monitoring is free for the first domain, then $6 for each extra domain. The pricing page runs a Black Friday offer of 35% off new subscriptions until 1 December; see [Black Friday 2026 deals](/guides/black-friday-2026-deals/).
 
 What it does not do: it does not warm up mailboxes, send conversations or repair a reputation. It tells you where you land, so you can decide whether a warm-up tool is needed. For how it works with a sender, see [Resend pricing in 2026](/guides/resend-pricing/).
 
@@ -136,7 +136,7 @@ What it does not do: it does not warm up mailboxes, send conversations or repair
 - **You want warm-up, tests and monitoring from one vendor:** Warmy, checking the test allowance on its trial.
 - **Your mail already lands in spam or Promotions and you can pay to fix it:** InboxAlly or Folderly.
 - **You send newsletters or product email from a domain with real subscribers:** start with a placement test, since there is no new mailbox to warm. Then decide.
-- **You use a warm-up tool already:** add a test now and then to check it is working. A warm-up dashboard shows its own score, not where a real message lands.
+- **You use a warm-up tool that has no placement tests:** add a test now and then to check where a real message lands. Several of the tools above include tests.
 
 ## FAQ
 
@@ -146,7 +146,7 @@ Warm-up builds a sending history by exchanging engaged emails between your mailb
 
 ### How much does an email warm-up tool cost?
 
-From $47 a month for Instantly's Growth plan, which includes unlimited warm-up, to €25 per mailbox a month for MailReach, $96 per mailbox for Folderly's core product and $149 a month for InboxAlly. Prices are on each vendor's page and change.
+MailReach is €25 per mailbox a month, Folderly's core product is $96 per mailbox, Instantly starts at $47 a month, Warmy at $49 a month, lemlist at 55€ a month and InboxAlly at $149 a month. They bill by different units and currencies, so price your own setup. Prices are on each vendor's page and change.
 
 ### Do I need warm-up for a newsletter?
 
