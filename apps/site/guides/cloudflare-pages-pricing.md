@@ -172,4 +172,4 @@ Not for static files. The Pages page lists unlimited bandwidth on all plans, and
 
 ### Can I use Cloudflare Pages without Git?
 
-Yes. Pages supports direct upload of a built folder, and deploys from the command line. The build limits only apply to builds Cloudflare runs for you.
+Yes. Pages supports direct upload of a built folder, and deploys from the command line. The build limits only apply to builds Cloudflare runs for you. A static export of a WordPress site can be uploaded this way too; see [how to turn a WordPress site into a static site](/guides/wordpress-to-static-site/).

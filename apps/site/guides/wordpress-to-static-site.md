@@ -37,7 +37,7 @@ Simply Static lists what its free version does: one-click generation, ZIP export
 | --- | --- | --- | --- |
 | Simply Static (free) | $0 | ZIP file, local directory | Not included |
 | Simply Static Pro | $99 a year per site | GitHub, Netlify, Cloudflare Pages, AWS S3, BunnyCDN, SFTP | Forms and search integrations |
-| Simply Static Studio | $12 a month per site | Managed WordPress and static hosting | Included with Pro features |
+| Simply Static Studio | $12 a month for one site | Managed WordPress and static hosting | Included with Pro features |
 | Staatic Community | Free | Local directory, S3, GitHub, Netlify, SFTP, ZIP | Not included |
 | Staatic Premium | Not shown on its plugin page | Adds scheduled and change-based publishing | Forms and search integrations |
 
@@ -49,7 +49,7 @@ Simply Static lists what its free version does: one-click generation, ZIP export
 
 ![Simply Static's page in the WordPress plugin directory, headed Simply Static, The Static Site Generator.](/guides/wordpress-to-static-site/simply-static.jpg "Simply Static in the WordPress plugin directory, 20 November 2026")
 
-The free version exports a ZIP or a local directory, replaces URLs, and works with any theme. Pro is $99 a year per site and adds deploys to GitHub, Netlify, Cloudflare Pages, AWS S3, BunnyCDN and SFTP, incremental exports that update only changed pages, WP-CLI support and email support. Studio is $12 a month per site for managed WordPress and static hosting on a CDN, with 2 GB of storage and 250 GB of bandwidth, a 14-day free trial, and free migration.
+The free version exports a ZIP or a local directory, replaces URLs, and works with any theme. Pro is $99 a year per site and adds deploys to GitHub, Netlify, Cloudflare Pages, AWS S3, BunnyCDN and SFTP, incremental exports that update only changed pages, WP-CLI support and email support. Studio is $12 a month for one site, for managed WordPress and static hosting on a CDN, with 2 GB of storage and 250 GB of bandwidth, a 14-day free trial, and free migration.
 
 ![Simply Static's pricing page, with the Studio plan at 12 dollars a month for one site.](/guides/wordpress-to-static-site/simply-static-pricing.jpg "Simply Static's pricing page, Studio tab, 20 November 2026")
 
@@ -98,7 +98,7 @@ Some tutorials still name the Static HTML Output plugin. Its WordPress.org page 
 
 ![Static.app's pricing page, with a 7-day free trial, and the Starter plan at $5 a month when billed yearly.](/guides/wordpress-to-static-site/static-app.jpg "Static.app's pricing page, shown with yearly billing, 20 November 2026")
 
-What it does not do: it runs no PHP, so nothing dynamic from WordPress will work there. There is no free plan, only a 7-day trial with 1 website and 50 MB. It does not build from Git, so you upload the exported files each time you publish. Until 1 December, its [Black Friday sale](/guides/black-friday-2026-deals/) takes 35% off the first payment.
+What it does not do: it runs no PHP, so nothing dynamic from WordPress will work there. There is no free plan, only a 7-day trial with 1 website and 50 MB. Neither plugin deploys to it directly, so you upload the exported files each time you publish, or send them through its API. Until 1 December, its [Black Friday sale](/guides/black-friday-2026-deals/) takes 35% off the first payment.
 
 **Good for:** a brochure site or blog moved off WordPress hosting, where you want forms and a custom domain on one flat bill.
 
@@ -122,7 +122,7 @@ What it does not do: it runs no PHP, so nothing dynamic from WordPress will work
 
 - **A site you update a few times a year:** Simply Static free, export a ZIP, and upload it to Static.app or Cloudflare Pages.
 - **You want publishing to deploy on its own:** Staatic Community to GitHub, Netlify or S3, or Simply Static Pro at $99 a year.
-- **You want one vendor for hosting and the plugin:** Simply Static Studio at $12 a month per site.
+- **You want one vendor for hosting and the plugin:** Simply Static Studio at $12 a month for one site.
 - **You need forms, search or comments:** a paid plugin integration, or a static host's form service.
 - **You run a shop, a membership site or logins:** do not go static. Keep WordPress, or use a different tool.
 
@@ -142,7 +142,7 @@ Yes, as your editor. Both plugins keep WordPress as the place where you edit, th
 
 ### How much does Simply Static cost?
 
-The free version costs nothing. Pro is $99 a year per site, and Studio, which includes hosting, is $12 a month per site.
+The free version costs nothing. Pro is $99 a year per site, and Studio, which includes hosting, is $12 a month for one site. Its page has a site-count selector, so check the price for more sites.
 
 ### Can I host a static WordPress site on Static.app?
 

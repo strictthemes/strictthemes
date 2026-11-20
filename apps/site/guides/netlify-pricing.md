@@ -176,4 +176,4 @@ Monthly plan credits do not, except on Pro tiers with 5,000 or more credits, whe
 
 ### Is Netlify still good for static sites?
 
-Yes, if your traffic is modest or you want Netlify's other features in one place. If you only need static files online and want a bill that does not change with traffic, a flat-price or free static host is simpler.
+Yes, if your traffic is modest or you want Netlify's other features in one place. If you are exporting a WordPress site to static files, see [how to turn a WordPress site into a static site](/guides/wordpress-to-static-site/). If you only need static files online and want a bill that does not change with traffic, a flat-price or free static host is simpler.

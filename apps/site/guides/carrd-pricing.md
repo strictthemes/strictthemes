@@ -103,7 +103,7 @@ What it does not do: it has no page builder like Carrd's, so you bring a finishe
 - **No branding, but a Carrd address is fine:** Pro Lite at $9 a year.
 - **A landing page on your own domain with a signup form:** Pro Standard at $19 a year.
 - **Many sites, password-protected pages or redirects:** Pro Plus, sized to your number of sites.
-- **A multi-page site:** a static host, since Carrd builds single pages.
+- **A multi-page site:** a static host, since Carrd builds single pages. Moving a WordPress site? See [how to turn a WordPress site into a static site](/guides/wordpress-to-static-site/).
 
 ## FAQ
 
