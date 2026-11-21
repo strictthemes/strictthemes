@@ -1,5 +1,6 @@
 # Builds and tests the monorepo on every merge request and on master, then
-# copies the built site to the server from master.
+# copies the built site to the server from master. Merge requests also run the
+# Strict Checks.
 #
 # The build runs in Docker on the runner registered for this project. The
 # deploy runs on the shared server itself (a shell runner tagged "shared-vps")
@@ -31,14 +32,20 @@ build:
     - npm run typecheck
     # The site's tests build the site again, with the production address.
     - npm test
-    # Strict Check needs a browser, and the image has none.
-    - apt-get update -qq && apt-get install -y -qq --no-install-recommends chromium > /dev/null
-    # Strict Check on the site itself, against its own theme: the code, and the
-    # built pages listed in apps/site/package.json.
-    - npm run strict-check -w apps/site -- --report "$CI_PROJECT_DIR/strict-check.txt"
-    # The agent kit, as the registry writes it for each theme: in every theme,
-    # both color modes and two widths, with hover and focus.
-    - npm run strict-check:kit -w apps/site
+    # The Strict Checks run on merge requests only: master accepts nothing but
+    # merge requests, so what lands there has passed them already, and they
+    # take most of the build's time (over 10 minutes on this runner).
+    - |
+      if [ "$CI_PIPELINE_SOURCE" = merge_request_event ]; then
+        # Strict Check needs a browser, and the image has none.
+        apt-get update -qq && apt-get install -y -qq --no-install-recommends chromium > /dev/null
+        # Strict Check on the site itself, against its own theme: the code, and
+        # the built pages listed in apps/site/package.json.
+        npm run strict-check -w apps/site -- --report "$CI_PROJECT_DIR/strict-check.txt"
+        # The agent kit, as the registry writes it for each theme: in every
+        # theme, both color modes and two widths, with hover and focus.
+        npm run strict-check:kit -w apps/site
+      fi
     - echo "$CI_COMMIT_SHORT_SHA $CI_COMMIT_REF_NAME $(date -u '+%F %T UTC')" > apps/site/dist/deploy.txt
   artifacts:
     # Kept when the job fails too: a failed check is the one whose report gets read.
