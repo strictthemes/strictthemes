@@ -1,6 +1,6 @@
 # Builds and tests the monorepo on every merge request and on master, then
 # copies the built site to the server from master. Merge requests also run the
-# Strict Checks.
+# Strict Checks; the agent kit check is skipped when only guides changed.
 #
 # The build runs in Docker on the runner registered for this project. The
 # deploy runs on the shared server itself (a shell runner tagged "shared-vps")
@@ -43,8 +43,21 @@ build:
         # the built pages listed in apps/site/package.json.
         npm run strict-check -w apps/site -- --report "$CI_PROJECT_DIR/strict-check.txt"
         # The agent kit, as the registry writes it for each theme: in every
-        # theme, both color modes and two widths, with hover and focus.
-        npm run strict-check:kit -w apps/site
+        # theme, both color modes and two widths, with hover and focus. It is
+        # the slowest step, so it is skipped when the merge request changes
+        # nothing but guides (their text and pictures), which the kit never
+        # uses. When the changed files can't be listed, it runs.
+        changed=""
+        if [ -n "$CI_MERGE_REQUEST_DIFF_BASE_SHA" ]; then
+          git cat-file -e "$CI_MERGE_REQUEST_DIFF_BASE_SHA" 2>/dev/null || git fetch -q --depth=200 origin "$CI_MERGE_REQUEST_DIFF_BASE_SHA" 2>/dev/null || true
+          changed=$(git diff --name-only "$CI_MERGE_REQUEST_DIFF_BASE_SHA" HEAD 2>/dev/null || true)
+        fi
+        if [ -n "$changed" ] && ! printf '%s\n' "$changed" | grep -qvE '^apps/site/(guides|public/guides)/'; then
+          echo "Only guides changed; skipping the agent kit check:"
+          printf '%s\n' "$changed"
+        else
+          npm run strict-check:kit -w apps/site
+        fi
       fi
     - echo "$CI_COMMIT_SHORT_SHA $CI_COMMIT_REF_NAME $(date -u '+%F %T UTC')" > apps/site/dist/deploy.txt
   artifacts:
