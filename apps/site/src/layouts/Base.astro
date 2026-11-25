@@ -55,6 +55,9 @@ const guideGroups = [
   { title: "Explained", guides: guides.filter((guide) => !howTo.includes(guide.kind) && !picks.includes(guide.kind)) },
   { title: "Prices and picks", guides: guides.filter((guide) => picks.includes(guide.kind)) },
 ]
+// Each column shows its newest guides only, so a long group doesn't stretch
+// the footer; the rest are one link away on the guides page.
+const footerGuideLimit = 8
 // The part of a title before its colon is enough to find a guide by.
 const shortTitle = (title: string) => title.split(": ")[0]
 ---
@@ -131,7 +134,7 @@ const shortTitle = (title: string) => title.split(": ")[0]
 
     <footer class="border-t border-border">
       <div class="mx-auto grid max-w-page gap-8 px-4 py-8 md:grid-cols-12 md:px-8">
-        {/* Every guide, the newest first, in three columns by what sort of guide it is. */}
+        {/* The newest guides, in three columns by what sort of guide it is. */}
         <nav aria-label="Guides" class="flex flex-col gap-8 border-b border-border pb-8 md:col-span-12">
           <div class="flex items-baseline justify-between gap-4">
             <p class="label">Guides</p>
@@ -145,7 +148,7 @@ const shortTitle = (title: string) => title.split(": ")[0]
                   <span>{String(group.guides.length).padStart(2, "0")}</span>
                 </p>
                 <ul class="flex flex-col border-t border-foreground">
-                  {group.guides.map((guide) => (
+                  {group.guides.slice(0, footerGuideLimit).map((guide) => (
                     <li class="border-b border-border">
                       <a class="block py-2 text-muted-foreground hover:text-foreground" href={guideUrls(guide.slug).page}>
                         {shortTitle(guide.title)}
@@ -153,6 +156,11 @@ const shortTitle = (title: string) => title.split(": ")[0]
                     </li>
                   ))}
                 </ul>
+                {group.guides.length > footerGuideLimit && (
+                  <a href="/guides/" class="label py-2 text-muted-foreground hover:text-foreground">
+                    {group.guides.length - footerGuideLimit} more in {group.title.toLowerCase()}
+                  </a>
+                )}
               </div>
             ))}
           </div>
