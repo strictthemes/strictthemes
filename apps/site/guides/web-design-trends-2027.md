@@ -72,6 +72,16 @@ document.startViewTransition(() => showNextSlide());
 
 ![MDN's page for the view-transition at-rule, marked limited availability.](/guides/web-design-trends-2027/cross-document.jpg "MDN, @view-transition, 26 November 2026")
 
+**Examples:** two developer sites already animate page changes this way. We read their stylesheets on 26 November 2026.
+
+![Adam Argyle's Nerdy Notebook, a CSS notebook with a pink and purple gradient title and a sidebar of demos.](/guides/web-design-trends-2027/example-nerdy-dev.jpg "nerdy.dev, Nerdy Notebook, 26 November 2026")
+
+Adam Argyle's Nerdy Notebook at nerdy.dev sets `@view-transition { navigation: auto; }` and gives the first heading on each page a `view-transition-name`, so the browser can animate the title from one page to the next.
+
+![Una Kravets' home page, with a large photo, a serif HELLO WORLD heading and social icons.](/guides/web-design-trends-2027/example-una-im.jpg "una.im, home page, 26 November 2026")
+
+**Example:** Una Kravets' site at una.im also uses `@view-transition { navigation: auto; }`, wrapped in a `prefers-reduced-motion` check so it turns off for people who ask for less motion.
+
 **Worth it?** Yes. A browser without support just loads the next page as it always did. That makes page transitions one of the safest web design trends to adopt. They also work on a plain static site, with no JavaScript framework. Respect `prefers-reduced-motion` for people who turn motion off.
 
 ## 2. Scroll-driven animations
@@ -88,6 +98,10 @@ MDN marks `animation-timeline` as Baseline 2026, newly available. Firefox was th
   animation-timeline: scroll();
 }
 ```
+
+![Stripe's home page, with a colourful ribbon gradient behind the headline Financial infrastructure to grow your revenue.](/guides/web-design-trends-2027/example-stripe.jpg "stripe.com, home page, 26 November 2026")
+
+**Example:** Stripe's stylesheets use `animation-timeline: scroll(inline self)` with an animation named `detect-scroll`, which ties a style to a row's sideways scroll. Its dialog overlay uses a named scroll timeline inside `@supports (animation-timeline: scroll())`, the same safe pattern as above.
 
 **Worth it?** Yes, for small touches. It replaces scroll listeners in JavaScript. Firefox support is only a month old, so wrap it in `@supports (animation-timeline: scroll())` and make sure the page reads fine without the animation.
 
@@ -108,6 +122,10 @@ MDN marks `anchor-name` and `position-anchor` as Baseline 2026, newly available,
 }
 ```
 
+![Chrome for Developers home page, with the headline A Powerful Web. Made Easier.](/guides/web-design-trends-2027/example-developer-chrome.jpg "developer.chrome.com, home page, 26 November 2026")
+
+**Example:** On developer.chrome.com, the user button in the header sets `anchor-name: --devsite-user-button`, and a fixed panel uses `position-anchor: --devsite-user-button` to sit next to it. Stripe's stylesheets also use `position-anchor`, inside an `@supports (anchor-name: ...)` check, for the indicator in its side navigation.
+
 **Worth it?** Yes, together with popovers (trend 8). Test the fallback placement in each browser, since that is the part that varies.
 
 ## 4. Entry animations with @starting-style
@@ -126,6 +144,10 @@ dialog[open] {
 }
 ```
 
+![Tailwind CSS home page, with the headline Rapidly build modern websites without ever leaving your HTML.](/guides/web-design-trends-2027/example-tailwindcss.jpg "tailwindcss.com, home page, 26 November 2026")
+
+**Example:** Tailwind CSS ships a `starting:` variant that writes `@starting-style` for you, and its own site uses it. Its stylesheet has `@starting-style` rules that start open elements and popovers at `opacity: 0`, so they fade in.
+
 **Worth it?** Yes. It is small, and an older browser simply shows the element without the fade.
 
 ## 5. Container queries
@@ -143,6 +165,14 @@ MDN marks `@container` as widely available. Style queries on custom properties, 
 }
 ```
 
+![Linear's dark home page, with the headline The product development system for teams and agents.](/guides/web-design-trends-2027/example-linear.jpg "linear.app, home page, 26 November 2026")
+
+**Example:** Linear's home page sets `container-type: inline-size` on parts of the page and uses a named container query, `@container ... (width >= 975px)`, for its row of startup logos.
+
+![Astro's home page on a purple gradient, with the headline The web framework for content-driven websites.](/guides/web-design-trends-2027/example-astro.jpg "astro.build, home page, 26 November 2026")
+
+**Example:** Astro's site has an `@container` utility class that sets `container-type: inline-size`, so any block can become a container.
+
 **Worth it?** Yes. This is the main layout change for component-based sites. Use size queries freely. Style queries are new in Firefox, so keep them for extras.
 
 ## 6. :has(), the parent selector
@@ -156,6 +186,10 @@ MDN marks `:has()` as widely available.
 ```css
 .field:has(input:invalid) { border-color: var(--danger); }
 ```
+
+![Figma's home page, with a carousel of website designs and a prompt box.](/guides/web-design-trends-2027/example-figma.jpg "figma.com, home page, 26 November 2026")
+
+**Example:** Figma's site uses the same pattern as the snippet above: `:has(input:invalid)` draws a red outline around an input's wrapper when the value is not valid. Its CSS also uses `container-type: scroll-state`, a newer kind of container query.
 
 **Worth it?** Yes. It is safe to use everywhere.
 
@@ -181,6 +215,10 @@ MDN marks all three as widely available.
 }
 ```
 
+![Open Props home page, with the headline Supercharged CSS variables and a code sample.](/guides/web-design-trends-2027/example-open-props.jpg "open-props.style, home page, 26 November 2026")
+
+**Example:** Open Props, a set of ready-made CSS variables, builds its palette in `oklch()`, with the hue and chroma set by variables. Its palette playground then picks colours with `light-dark()`, inside an `@supports` check.
+
 **Worth it?** Yes. Check contrast after you mix colours, since a mix can drop below the minimum. [Colour contrast for non-designers](/guides/contrast-for-non-designers/) explains the numbers.
 
 ## 8. Popovers and button commands
@@ -195,6 +233,10 @@ MDN marks the Popover API and the Invoker Commands API as Baseline 2025, newly a
 <button commandfor="menu" command="toggle-popover">Menu</button>
 <div id="menu" popover>...</div>
 ```
+
+![Vercel's home page, with a black triangle logo and the headline Agentic Infrastructure.](/guides/web-design-trends-2027/example-vercel.jpg "vercel.com, home page, 26 November 2026")
+
+**Example:** On vercel.com, the menu behind the logo is a `<div popover="manual" role="menu">`, and the stylesheets style it with `:popover-open`. On nerdy.dev's home page, the search button uses `commandfor="site-search" command="show-modal"` to open a `<dialog>` with no script, and the close button uses `command="close"`.
 
 **Worth it?** Yes. Less JavaScript, and keyboard behaviour you get for free. Pair it with anchor positioning to place the menu next to its button.
 
@@ -230,6 +272,10 @@ h1, h2, h3 { text-wrap: balance; }
 p { text-wrap: pretty; }
 ```
 
+![Svelte's home page, with the headline web development for the rest of us and a 3D illustration.](/guides/web-design-trends-2027/example-svelte.jpg "svelte.dev, home page, 26 November 2026")
+
+**Example:** Svelte's home page sets `text-wrap: balance` on its intro text and on another short block of text. Its code blocks also mix colours with `color-mix(in oklch, ...)`.
+
 **Worth it?** Yes. It is two lines, and a browser without support wraps text the old way. MDN notes that `pretty` is slower, and suggests it for longer text where layout matters more than speed.
 
 ## Accessibility is now a legal requirement in the EU
@@ -249,6 +295,24 @@ More sites are now built with a coding agent. An agent picks a colour, a size an
 The fix is old: design tokens, named values such as `primary` or `spacing-md`. What is new is where they live. A `DESIGN.md` file in the project's root holds the tokens and a short description of how to use them. The agent reads it before it builds, and a checker can test the result afterwards.
 
 This is not a browser feature, so there is no support table. It is a working habit. [What is a DESIGN.md](/guides/what-is-design-md/) explains the format, and [design tokens for coding agents](/guides/design-tokens-for-coding-agents/) covers naming them.
+
+## Sites using these trends today
+
+We loaded each home page on 26 November 2026 and searched its stylesheets and markup. The table lists only what we found. A feature in a stylesheet can still be limited to one part of the page.
+
+| Site | What its CSS or HTML uses |
+| --- | --- |
+| [nerdy.dev](https://nerdy.dev/) | Cross-page view transitions, `view-transition-name`, `commandfor` buttons, `:has()`, `color-mix()` |
+| [una.im](https://una.im/) | Cross-page view transitions |
+| [stripe.com](https://stripe.com/) | Scroll-driven animation, anchor positioning, `commandfor` |
+| [developer.chrome.com](https://developer.chrome.com/) | Anchor positioning, `text-wrap: balance` |
+| [tailwindcss.com](https://tailwindcss.com/) | `@starting-style`, `:popover-open`, `color-mix(in oklab)` |
+| [linear.app](https://linear.app/) | Container queries |
+| [astro.build](https://astro.build/) | Container queries, `text-wrap: balance` and `pretty` |
+| [figma.com](https://www.figma.com/) | `:has()`, scroll-state container queries |
+| [open-props.style](https://open-props.style/) | `oklch()`, `light-dark()` |
+| [vercel.com](https://vercel.com/) | The `popover` attribute, `:popover-open`, `@starting-style` |
+| [svelte.dev](https://svelte.dev/) | `text-wrap: balance`, `color-mix(in oklch)` |
 
 ## Which trends to adopt in 2027
 
